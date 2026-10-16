@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs'
 // Real DOM, MutationObserver and installed Alpine; no host routes or tests/** edits.
 const root = path.resolve(import.meta.dirname, '../..')
 const output = await build({ stdin: { resolveDir: root, contents: `
-import { Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm.js'
+import { Alpine } from './vendor/livewire/livewire/dist/livewire.esm.js'
 import { createConsumerGraph } from './resources/js/runtime/assets/consumer-graph.js'
 import { createDomTransactions } from './resources/js/runtime/lifecycle/dom-transactions.js'
 import { waitForAssetActivation } from './resources/js/runtime/lifecycle/asset-activation.js'

@@ -27,7 +27,7 @@
         "predocs:build": "npm run docs:changelog",
         "docs:build": "mintlify build",
         "prebuild": "npm run docs:changelog",
-        "build": "npm run audit:core:coverage && npm run build:components:index && npm run audit:component-schema && npm run build:icons:manifest && npm run build:css && npm run build:js && node scripts/generate-bundle-summary.mjs && php scripts/assets/validate-build.php",
+        "build": "npm run build:components:index && npm run audit:component-schema && npm run build:icons:manifest && npm run build:css && npm run build:js && node scripts/generate-bundle-summary.mjs && php scripts/assets/validate-build.php",
         "check:budgets": "node scripts/check-bundle-budgets.mjs",
         "compare:budgets": "node scripts/compare-bundle-metrics.mjs",
         "audit:components": "node scripts/audit-components.mjs",

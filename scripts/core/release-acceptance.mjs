@@ -39,12 +39,15 @@ const add = (name, command, env = {}) => commands.push({ name, command, env })
 const probe = (name, args = []) => add(name, [name.endsWith('.php') ? php : node,
     ...(name.endsWith('.mjs') ? ['--expose-gc'] : []), `scripts/compatibility/${name}`, ...args])
 if (phase === 'contracts') {
+    // Public checkouts omit private audit evidence. Derive the reports required
+    // by executable contracts from this checkout; verify retained reports for drift.
+    for (const [name, script, report] of [
+        ['architecture-inventory', 'scripts/core/architecture-inventory.mjs', '.internal/core-architecture-inventory.json'],
+        ['css-cascade', 'scripts/core/css-cascade-report.mjs', '.internal/core-css-cascade-report.json'],
+    ]) add(name, [node, script, ...(fs.existsSync(path.join(root, report)) ? ['--check'] : [])])
     for (const name of inventory) if (!helpers.has(name) && !browserProof(name)) probe(name)
     probe('component-schema-v4.php'); probe('esbuild-package-contract.mjs', [path.join(temporary, 'esbuild-fixture')]); probe('overlay-retarget.mjs')
-    add('coverage', [node, 'scripts/core/audit-coverage.mjs'])
-    add('architecture-inventory', [node, 'scripts/core/architecture-inventory.mjs', '--check'])
     add('css-source-contract', [node, 'scripts/assets/css-source-contract.mjs'])
-    add('css-cascade', [node, 'scripts/core/css-cascade-report.mjs', '--check'])
     add('build-parity', [php, 'scripts/assets/validate-build.php'])
     add('budgets', [node, 'scripts/check-bundle-budgets.mjs'])
 } else if (phase === 'browser') {

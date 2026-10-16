@@ -7,7 +7,7 @@ import { launchCoreBrowser } from './browser-profile.mjs'
 // Isolated browser/HTTP harness; no application routes, DB or test files changed.
 const root = path.resolve(import.meta.dirname, '../..')
 const source = `
-import { Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm.js'
+import { Alpine } from './vendor/livewire/livewire/dist/livewire.esm.js'
 import { createAssetDemand } from './resources/js/runtime/assets/asset-demand.js'
 import { createAssetLinkStore } from './resources/js/runtime/assets/asset-link-store.js'
 import { withFactoryReadiness } from './resources/js/runtime/alpine/factory-readiness.js'

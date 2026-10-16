@@ -5,7 +5,7 @@ import { build } from 'esbuild'
 import { launchCoreBrowser } from './browser-profile.mjs'
 const root = path.resolve(import.meta.dirname, '../..')
 const output = await build({ stdin: { resolveDir: root, contents: `
-import { Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm.js'
+import { Alpine } from './vendor/livewire/livewire/dist/livewire.esm.js'
 import { createAssetLinkStore } from './resources/js/runtime/assets/asset-link-store.js'
 import { createBundleRegistry } from './resources/js/runtime/assets/bundle-registry.js'
 import { createAssetDemand } from './resources/js/runtime/assets/asset-demand.js'

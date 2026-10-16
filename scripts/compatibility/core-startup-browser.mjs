@@ -9,7 +9,7 @@ import { createFlexSdkPlugin } from '../assets/flex-sdk-plugin.mjs'
 // The synchronous proxy was not covered by the existing full-directive tests.
 // Exercise the actual distribution and installed Alpine with controlled HTTP.
 const root = path.resolve(import.meta.dirname, '../..')
-const alpine = await build({ stdin: { contents: `import { Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm.js'; globalThis.Alpine = Alpine; Alpine.start(); window.alpineStarted = true`, resolveDir: root }, bundle: true, format: 'iife', minify: true, write: false, logLevel: 'silent' })
+const alpine = await build({ stdin: { contents: `import { Alpine } from './vendor/livewire/livewire/dist/livewire.esm.js'; globalThis.Alpine = Alpine; Alpine.start(); window.alpineStarted = true`, resolveDir: root }, bundle: true, format: 'iife', minify: true, write: false, logLevel: 'silent' })
 const gateModule = await build({ entryPoints: [path.join(root, 'resources/js/core/startup/startup-gate.js')], bundle: true, format: 'esm', minify: true, write: false, logLevel: 'silent' })
 const author = await build({ stdin: { contents: `
 import { createResourceScope, isAssetElementActive, waitForAssetActivation } from '@bjanczak/flex-fields/sdk/v1';

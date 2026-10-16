@@ -42,7 +42,9 @@ final class MetadataParser
             $html = $converted;
         }
         $document = new DOMDocument;
-        @$document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING);
+        // libxml 2.9 can prefer a legacy HTML charset over an XML instruction.
+        // Bytes are normalized above; pin the first HTML declaration as UTF-8.
+        @$document->loadHTML('<meta charset="UTF-8">'.$html, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING);
         $meta = [];
         $images = [];
         $currentImage = null;

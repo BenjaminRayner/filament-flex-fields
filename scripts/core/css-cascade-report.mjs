@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
-import { readdir, readFile, writeFile } from 'node:fs/promises'
-import { resolve, relative } from 'node:path'
+import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises'
+import { resolve, relative, dirname } from 'node:path'
 import { analyzeStylesheetCascade } from '../assets/css-cascade-report.mjs'
 
 const sample = analyzeStylesheetCascade([
@@ -29,6 +29,9 @@ const destination = resolve(root, '.internal/core-css-cascade-report.json')
 const output = JSON.stringify(report, null, 2) + '\n'
 if (process.argv.includes('--check')) {
     if (await readFile(destination, 'utf8') !== output) throw Error('CSS cascade report is stale; rebuild and regenerate it.')
-} else await writeFile(destination, output)
+} else {
+    await mkdir(dirname(destination), { recursive: true })
+    await writeFile(destination, output)
+}
 process.stdout.write(JSON.stringify({ files: report.files.length, duplicateRuleGroups: report.duplicateRuleGroups,
     conflictingAnimationNames: report.conflictingAnimationNames, report: relative(root, destination) }) + '\n')

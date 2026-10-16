@@ -12,7 +12,7 @@ import { createAssetLinkStore } from './resources/js/runtime/assets/asset-link-s
 window.admission = { load: importAdmittedModule, snapshot: () => assetAdmissionSnapshot(document), store: () => createAssetLinkStore({ document, window }) }
 ` }, bundle: true, format: 'esm', minify: true, write: false, logLevel: 'silent' })
 const requests = []
-let retries = 0
+const retries = new Map()
 const server = createServer((request, response) => {
     requests.push(request.url)
     const respond = (type, body, status = 200) => {
@@ -25,7 +25,11 @@ const server = createServer((request, response) => {
         return respond('text/javascript', `window.nativeStarted.push(${id}); await new Promise(resolve => window.nativeRelease.set(${id}, resolve)); export const ready = ${id}`)
     }
     if (request.url === '/style') return respond('text/css', 'body { color: rgb(0, 128, 0) }')
-    if (request.url === '/retry?signed=unchanged') return respond('text/javascript', retries++ === 0 ? '' : 'export const ready = true', retries === 1 ? 503 : 200)
+    if (['/retry?signed=unchanged', '/retry?signed=native-reference'].includes(request.url)) {
+        const attempts = (retries.get(request.url) ?? 0) + 1
+        retries.set(request.url, attempts)
+        return respond('text/javascript', attempts === 1 ? '' : 'export const ready = true', attempts === 1 ? 503 : 200)
+    }
     if (request.url === '/evaluation-failure') return respond('text/javascript', 'window.failedEvaluations = (window.failedEvaluations ?? 0) + 1; throw Error("native evaluation failure"); export const ready = false')
     response.writeHead(404); response.end()
 })
@@ -81,9 +85,21 @@ try {
         }
         return outcomes
     })
-    assert.deepEqual(nativeRetry, browserEngine === 'chromium' ? [false, false] : [false, true])
+    // Failed network imports differ between browser releases. Compare the
+    // coordinator with native import in this engine instead of pinning old behavior.
+    const referenceRetry = await page.evaluate(async () => {
+        const outcomes = []
+        for (let i = 0; i < 2; i++) {
+            try { outcomes.push((await import('/retry?signed=native-reference')).ready === true) }
+            catch { outcomes.push(false) }
+        }
+        return outcomes
+    })
+    assert.equal(referenceRetry[0], false)
+    assert.deepEqual(nativeRetry, referenceRetry)
     const nativeRetryRequests = requests.filter(url => url === '/retry?signed=unchanged').length
-    assert.equal(nativeRetryRequests, browserEngine === 'chromium' ? 1 : 2)
+    assert.equal(nativeRetryRequests, requests.filter(url => url === '/retry?signed=native-reference').length)
+    assert.equal(nativeRetryRequests, referenceRetry[1] ? 2 : 1)
     proofs.push(`native ${browserEngine} failed-load behavior is preserved (${nativeRetry.join(',')}); each attempt releases admission without URL rewriting or a universal refetch guarantee`)
     await page.evaluate(async () => {
         for (let i = 0; i < 2; i++) {

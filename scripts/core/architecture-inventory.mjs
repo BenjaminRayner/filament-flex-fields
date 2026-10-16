@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { readdir, readFile, writeFile } from 'node:fs/promises'
+import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises'
 import { dirname, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -169,6 +169,7 @@ const destination = resolve(root, '.internal/core-architecture-inventory.json')
 if (process.argv.includes('--check')) {
     if (await readFile(destination, 'utf8') !== output) throw new Error('Core inventory is stale. Regenerate it after source changes.')
 } else {
+    await mkdir(dirname(destination), { recursive: true })
     await writeFile(destination, output)
 }
 console.log(JSON.stringify({ files: records.length, modules: modules.length, serviceBindings: serviceBindings.length, verification: 'inventory-only' }))
