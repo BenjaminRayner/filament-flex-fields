@@ -7,6 +7,7 @@ use Bjanczak\FilamentFlexFields\Support\Media\MediaCaptureOs;
 use Bjanczak\FilamentFlexFields\Support\Media\SpatieMediaCaptureAdapter;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 beforeEach(function () {
     MediaCaptureOs::resetRuntimeState();
@@ -65,48 +66,15 @@ it('skips disabled retention categories', function () {
 });
 
 it('only considers spatie media stamped with flex_capture for prune', function () {
-    $withStamp = new class
-    {
-        public string $uuid = 'capture-uuid';
-
-        /** @var array<string, mixed> */
-        public array $custom_properties = [
-            'flex_capture' => ['field' => 'attachment', 'collection' => 'documents'],
-        ];
-
-        public function getAttributeValue(string $key): mixed
-        {
-            return match ($key) {
-                'uuid' => $this->uuid,
-                'custom_properties' => $this->custom_properties,
-                default => null,
-            };
-        }
-
-        public function delete(): void {}
-    };
-
-    $withoutStamp = new class
-    {
-        public string $uuid = 'other-uuid';
-
-        /** @var array<string, mixed> */
-        public array $custom_properties = [];
-
-        public function getAttributeValue(string $key): mixed
-        {
-            return match ($key) {
-                'uuid' => $this->uuid,
-                'custom_properties' => $this->custom_properties,
-                default => null,
-            };
-        }
-
-        public function delete(): void {}
-    };
-
+    $withStamp = new Media;
+    $withStamp->setCustomProperty('flex_capture', ['field' => 'attachment', 'collection' => 'documents']);
+    $withoutStamp = new Media;
+    $emptyStamp = new Media;
+    $emptyStamp->setCustomProperty('flex_capture', ['collection' => 'documents']);
     expect(SpatieMediaCaptureAdapter::hasFlexCaptureStamp($withStamp))->toBeTrue()
-        ->and(SpatieMediaCaptureAdapter::hasFlexCaptureStamp($withoutStamp))->toBeFalse();
+        ->and(SpatieMediaCaptureAdapter::hasFlexCaptureStamp($withoutStamp))->toBeFalse()
+        ->and(SpatieMediaCaptureAdapter::hasFlexCaptureStamp($emptyStamp))->toBeFalse()
+        ->and(SpatieMediaCaptureAdapter::hasFlexCaptureStamp((object) ['custom_properties' => $withStamp->custom_properties]))->toBeFalse();
 });
 
 it('registers prune capture media command', function () {

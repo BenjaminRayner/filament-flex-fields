@@ -1,7 +1,118 @@
 ---
 title: "SegmentTabs"
 description: Schema layout component featuring iOS-style segmented tabs with per-tab form schemas and query-string persistence.
+icon: "panels-left-bottom"
+"canonical": "https://flex-fields.bjanczak.com/docs/segmenttabs"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/segment-tabs.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "SegmentTabs in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/segment-tabs-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/segment-tabs-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/segment-tabs.webp"
+"twitter:image:alt": "SegmentTabs in the FLEX Fields playground"
 ---
+
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/segmenttabs#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/segmenttabs",
+      "name": "SegmentTabs",
+      "description": "Schema layout component featuring iOS-style segmented tabs with per-tab form schemas and query-string persistence.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/segmenttabs#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/segmenttabs#article",
+      "url": "https://flex-fields.bjanczak.com/docs/segmenttabs",
+      "headline": "SegmentTabs",
+      "description": "Schema layout component featuring iOS-style segmented tabs with per-tab form schemas and query-string persistence.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/segmenttabs#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/segment-tabs-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/segment-tabs-motion.mp4#video",
+      "name": "SegmentTabs — FLEX Fields demonstration",
+      "description": "A recorded demonstration of SegmentTabs in the FLEX Fields playground for Filament. Schema layout component featuring iOS-style segmented tabs with per-tab form schemas and query-string persistence.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/segment-tabs.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT3.867S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/segment-tabs-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/segmenttabs#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/segment-tabs-motion.mp4"
+  poster="/art/previews/segment-tabs.webp"
+  width="1920"
+  height="1080"
+  aria-label="SegmentTabs — FLEX Fields demonstration"
+>
+  <a href="/art/previews/segment-tabs-motion.mp4">Watch the SegmentTabs demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -115,7 +226,7 @@ SegmentTabs::make('User Editor')
 
 ### Playground
 
-`/admin/flex-fields-playground/segment-tabs`
+`/admin/flex-fields/segment-tabs`
 
 See [Playground](/docs/index#playground) for setup.
 
@@ -141,3 +252,12 @@ See [Playground](/docs/index#playground) for setup.
 | `fff-segment-tab-panel` | Individual tab content wrapper |
 
 Uses `fff-segment-control` classes for the tab switcher header.
+
+## Runtime and composition
+
+Tabs reuse SegmentControl presentation rather than copying its HTML. Initially
+active child assets are render-blocking; inactive panels load on activation and
+retire assets after their last consumer disappears. Local selection survives
+Livewire action morphs. Query persistence stores relative tab keys and preserves
+Livewire history state. Automatic horizontal overflow provides chevrons and fading
+edges; keyboard selection scrolls the active tab into view.

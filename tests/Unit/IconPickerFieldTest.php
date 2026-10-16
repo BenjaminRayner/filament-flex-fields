@@ -110,3 +110,10 @@ it('registers an empty icon picker playground variant with null default state', 
         ->toContain("IconPickerField::make('icon_picker__empty')")
         ->toContain('Empty (no selection)');
 });
+
+it('invalidates the browser catalog when a same-length allowlist changes', function (): void {
+    $field = IconPickerField::make('icon')->sets(['heroicons'])->icons(['heroicon-o-star']);
+    $before = $field->getIconPickerConfigurationFingerprint();
+    $field->icons(['heroicon-o-heart']);
+    expect($field->getIconPickerConfigurationFingerprint())->not->toBe($before);
+});

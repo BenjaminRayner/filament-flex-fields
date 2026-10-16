@@ -6,7 +6,8 @@ use Bjanczak\FilamentFlexFields\Data\FlexFieldDefinition;
 use Bjanczak\FilamentFlexFields\Enums\FieldType;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexColorPickerField;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldFormBuilder;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
+use Bjanczak\FilamentFlexFields\Support\Playground\FlexColorPickerPlayground;
+use Illuminate\Support\Facades\Validator;
 
 it('exposes flex color picker configuration api', function () {
     $field = FlexColorPickerField::make('accent')
@@ -51,8 +52,8 @@ it('supports shorthand output format methods', function () {
         ->and(FlexColorPickerField::make('a')->rgba()->alpha()->getFormat())->toBe(FlexColorPickerField::FORMAT_RGBA);
 });
 
-it('validates supported color strings', function () {
-    $field = FlexColorPickerField::make('accent');
+it('validates supported color strings with alpha enabled', function () {
+    $field = FlexColorPickerField::make('accent')->alpha();
 
     expect($field->isValidColorString('#6366F1'))->toBeTrue()
         ->and($field->isValidColorString('#fff'))->toBeTrue()
@@ -70,18 +71,12 @@ it('rejects unsupported layout and format values', function () {
 })->throws(InvalidArgumentException::class);
 
 it('requires a color when the field is required', function () {
-    $field = FlexColorPickerField::make('accent')
-        ->required()
-        ->label('Accent color');
-
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
-
-    $message = null;
-    $rule('accent', null, function (string $failMessage) use (&$message): void {
-        $message = $failMessage;
-    });
-
-    expect($message)->not->toBeNull();
+    $field = FlexColorPickerField::make('accent')->required();
+    $validator = Validator::make(
+        ['accent' => null], ['accent' => $field->getValidationRules()],
+    );
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->failed()['accent'])->toHaveKey('Required');
 });
 
 it('builds flex color picker from flex field definition', function () {
@@ -115,7 +110,7 @@ it('builds flex color picker from flex field definition', function () {
 });
 
 it('registers flex color picker playground defaults', function () {
-    $state = app(FlexFieldsPlaygroundBuilder::class)->defaultState();
+    $state = app(FlexColorPickerPlayground::class)->defaultState();
 
     expect($state)->toHaveKeys([
         'flex_color_picker__advanced',

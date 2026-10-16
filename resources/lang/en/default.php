@@ -1,7 +1,8 @@
 <?php
 
-return [
+declare(strict_types=1);
 
+return [
     'categories' => [
         'text' => 'Text',
         'number' => 'Numbers',
@@ -10,28 +11,23 @@ return [
         'media' => 'Media',
         'advanced' => 'Advanced',
     ],
-
     'number_stepper_decrease' => 'Decrease value',
     'number_stepper_increase' => 'Increase value',
     'traffic_split_resize' => 'Resize split between segment :from and :to',
     'segment_control_scroll_previous' => 'Scroll tabs left',
     'segment_control_scroll_next' => 'Scroll tabs right',
-
     'rating' => [
         'stars' => '{1} :count star|[2,*] :count stars',
     ],
-
     'color_swatch' => [
         'select' => 'Select :color',
     ],
-
     'flex_color_picker' => [
         'eyedropper' => 'Pick color from screen',
         'format' => 'Color format',
         'value' => 'Color value',
         'opacity' => 'Opacity',
     ],
-
     'icon_picker' => [
         'placeholder' => 'Select an icon',
         'search' => 'Search icons',
@@ -41,12 +37,15 @@ return [
         'load_more' => 'Load more',
         'all_sets' => 'All sets',
     ],
-
     'todo_list' => [
+        'empty' => 'No tasks found.',
+        'retry' => 'Try again',
+        'load_failed' => 'Unable to load tasks.',
         'create_option' => 'Create option',
         'create_placeholder' => 'New task…',
         'create_description_placeholder' => 'Description (optional)…',
         'search_prompt' => 'Search…',
+        'delete_confirmation' => 'Delete “:label” and its subtasks?',
         'delete_item' => 'Delete task',
         'edit_item' => 'Edit task',
         'edit_modal_heading' => 'Edit task',
@@ -63,8 +62,9 @@ return [
         'scroll_for_more' => 'Scroll for more…',
         'loading_more' => 'Loading…',
     ],
-
     'slug' => [
+        'operation_error' => 'Unable to complete this action. Please try again.',
+        'copy_error' => 'Unable to copy the permalink.',
         'placeholder' => 'your-permalink-slug',
         'permalink' => 'Permalink',
         'badge_auto' => 'Auto',
@@ -79,8 +79,8 @@ return [
         'visit' => 'Visit',
         'changed' => 'Changed',
     ],
-
     'field_types' => [
+        'font_select' => 'Font Select',
         'single_line_text' => 'Single line text',
         'multi_line_text' => 'Multi line text',
         'flex_textarea' => 'Flex textarea',
@@ -157,8 +157,15 @@ return [
         'hidden' => 'Hidden',
         'read_only' => 'Read only',
     ],
-
     'dual_listbox' => [
+        'selection_count' => ':count marked',
+        'moved_count' => ':count items transferred',
+        'limit_reached' => 'Selection limit reached',
+        'keyboard_hint' => 'Space to mark · Enter to transfer · Shift + arrows to select a range',
+        'touch_hint' => 'Tap to mark several · Hold to drag · Tap with another finger to add to the stack',
+        'select_all' => 'Mark all',
+        'clear' => 'Clear',
+        'transfer' => 'Transfer items',
         'available' => 'Available',
         'selected' => 'Selected',
         'search_available' => 'Search available…',
@@ -166,26 +173,25 @@ return [
         'empty_available' => 'No items available',
         'empty_selected' => 'Nothing selected yet',
         'move_all_right' => 'Move all to selected',
-        'move_selected_right' => 'Move selected to right',
-        'move_selected_left' => 'Move selected to left',
+        'move_selected_right' => 'Add marked items',
+        'move_selected_left' => 'Remove marked items',
         'move_all_left' => 'Move all to available',
         'swap_lists' => 'Swap available and selected',
         'move_up' => 'Move up',
         'move_down' => 'Move down',
         'reorder' => 'Drag to reorder',
     ],
-
     'price_range' => [
         'min' => 'Min price',
         'max' => 'Max price',
     ],
-
     'verification_code' => [
+        'submit_failed' => 'Verification request failed. Try again.',
+        'retry' => 'Try again',
         'digit' => 'Digit :current of :total',
         'resend' => 'Resend',
-        'footer_prompt' => "Didn't receive a code?",
+        'footer_prompt' => 'Didn\'t receive a code?',
     ],
-
     'credit_card' => [
         'mark' => 'Untitled.',
         'number' => 'Card number',
@@ -196,13 +202,17 @@ return [
         'valid_thru' => 'Valid thru',
         'authorized_signature' => 'Authorized signature — not valid unless signed',
         'flip' => 'Flip card',
+        'preview_name' => 'YOUR NAME',
+        'name_placeholder' => 'Jane Smith',
+        'expiry_placeholder' => 'MM/YY',
+        'brand_placeholder' => 'CARD',
     ],
-
     'cover_card' => [
         'action' => 'Action',
     ],
-
     'video' => [
+        'show_duration' => 'Show duration',
+        'show_remaining' => 'Show remaining time',
         'play' => 'Play',
         'pause' => 'Pause',
         'mute' => 'Mute',
@@ -225,8 +235,11 @@ return [
         'airplay' => 'Start AirPlay',
         'stop_airplay' => 'Stop AirPlay',
     ],
-
     'audio' => [
+        'capture_unavailable' => 'Recording is unavailable in this browser.',
+        'capture_failed' => 'Unable to open the microphone. Check its permissions.',
+        'too_large' => 'The recording exceeds the allowed file size.',
+        'seek' => 'Recording position',
         'play' => 'Play',
         'pause' => 'Pause',
         'progress' => 'Audio progress',
@@ -263,8 +276,13 @@ return [
         'transcription_error_runtime_unconfigured' => 'Whisper runtime assets are not configured on this page.',
         'transcription_runtime_missing' => 'Speech-to-text is unavailable until the Whisper runtime is installed on this app:',
     ],
-
     'signature' => [
+        'actions' => 'Signature actions',
+        'replay_unavailable' => 'Replay is unavailable for this imported image.',
+        'redo' => 'Redo',
+        'replay' => 'Replay signature',
+        'color' => 'Ink color',
+        'width' => 'Stroke width',
         'placeholder' => 'Sign here',
         'trackpad_placeholder' => 'Press the shortcut key, then glide your finger on the trackpad',
         'trackpad_pill_paused' => 'Click here or press :key to draw on trackpad',
@@ -278,21 +296,21 @@ return [
         'legal_acknowledgment' => 'By signing, you agree that this electronic signature is legally binding.',
         'pdf_preview' => 'Preview document',
         'pdf_preview_title' => 'Signature preview',
-        'pdf_preview_body' => 'Review the agreement below. Your signature will appear in the designated area when you sign on the pad.',
+        'pdf_preview_body' => 'Review the signature currently on the pad. Close this window to continue signing.',
+        'preview_empty' => 'No signature yet',
+        'preview_empty_description' => 'Draw your signature on the pad to see its preview here.',
         'ui' => [
             'required' => 'Please sign here.',
             'too_few_strokes' => 'Add at least :min stroke(s).',
             'too_large' => 'Signature is too large (max :max KB).',
         ],
     ],
-
     'flex_fields_playground' => [
         'save' => 'Save to storage',
         'saved' => 'Playground state saved',
         'saved_sealed_at' => 'Legal seal: :at',
         'validation_passed' => 'Validation passed',
     ],
-
     'tags' => [
         'suggestions' => [
             'min_chars' => 'Type at least :min characters to search.',
@@ -300,13 +318,11 @@ return [
             'no_results' => 'No matching tags.',
         ],
     ],
-
     'geocoding' => [
         'failed' => 'Geocoding request failed. Please try again.',
         'rate_limited' => 'Too many geocoding requests. Please wait a moment and try again.',
         'circuit_open' => 'Geocoding is temporarily unavailable. Please try again shortly.',
     ],
-
     'link_preview' => [
         'placeholder' => 'https://example.com/article',
         'loading' => 'Fetching link preview…',
@@ -317,8 +333,9 @@ return [
         'rate_limited' => 'Too many preview requests. Please wait a moment and try again.',
         'visit' => 'Visit link',
     ],
-
     'barcode_scanner' => [
+        'save' => 'Save code',
+        'scan_again' => 'Scan again',
         'placeholder' => 'Scan or type barcode…',
         'scan' => 'Scan barcode',
         'modal_heading' => 'Scan barcode',
@@ -354,7 +371,6 @@ return [
             'checksum' => 'The barcode checksum is invalid.',
         ],
     ],
-
     'social_links' => [
         'add' => 'Add',
         'add_platform' => 'Add social link',
@@ -397,7 +413,7 @@ return [
             'telegram' => 'https://t.me/username',
             'whatsapp' => 'https://wa.me/123456789',
             'pinterest' => 'https://pinterest.com/username',
-            'threads' => 'https://threads.net/@username',
+            'threads' => 'https://threads.com/@username',
             'discord' => 'https://discord.gg/invite',
             'messenger' => 'https://m.me/page',
             'reddit' => 'https://reddit.com/u/username',
@@ -415,7 +431,6 @@ return [
             'row' => ':platform: :message',
         ],
     ],
-
     'schedule' => [
         'timezone' => 'Timezone',
         'timezone_placeholder' => 'Select timezone',
@@ -468,7 +483,6 @@ return [
             'day_slots_changed' => ':day schedule was updated.',
         ],
     ],
-
     'address_autocomplete' => [
         'search_placeholder' => 'Search for an address…',
         'missing_token' => 'Mapbox access token is missing. Set MAPBOX_ACCESS_TOKEN in your .env file.',
@@ -489,7 +503,6 @@ return [
             'place_name' => 'place name',
         ],
     ],
-
     'map_picker' => [
         'search_placeholder' => 'Search for a place…',
         'summary_empty' => 'Select a location on the map or search above.',
@@ -514,7 +527,6 @@ return [
             'place_name' => 'place name',
         ],
     ],
-
     'validation' => [
         'choice_checkbox_cards' => [
             'invalid_option' => 'One or more selected options are invalid.',
@@ -627,21 +639,20 @@ return [
             'inline_edit_pending' => 'Confirm the slug with OK before saving the form.',
         ],
     ],
-
     'phone' => [
         'country' => 'Country',
         'timezone' => 'Timezone',
         'placeholder' => 'Phone number',
         'search_countries' => 'Search countries…',
     ],
-
     'currency' => [
         'currency' => 'Currency',
         'placeholder' => '0',
         'search_currencies' => 'Search currencies…',
     ],
-
     'calculator' => [
+        'invalid' => 'Enter a valid expression within the field limits.',
+        'backspace' => 'Delete last character',
         'title' => 'Calculator',
         'placeholder' => '0',
         'open' => 'Open calculator',
@@ -649,17 +660,14 @@ return [
         'cancel' => 'Cancel',
         'close' => 'Close calculator',
     ],
-
     'country' => [
         'placeholder' => 'Select country',
         'search_countries' => 'Search countries…',
     ],
-
     'timezone' => [
         'placeholder' => 'Select timezone',
         'search_timezones' => 'Search timezones…',
     ],
-
     'date_time' => [
         'placeholder_date' => 'mm/dd/yyyy',
         'placeholder_time' => 'hh:mm',
@@ -691,7 +699,6 @@ return [
             'same_day_not_allowed' => 'Start and end cannot be the same day.',
         ],
     ],
-
     'rich_editor' => [
         'clear_content' => 'Clear content',
         'toolbar_groups' => [
@@ -749,8 +756,118 @@ return [
             ],
         ],
     ],
-
     'file_upload' => [
+        'editor' => [
+            'warmth' => 'Warmth',
+            'exposure' => 'Exposure',
+            'highlights' => 'Highlights',
+            'shadows' => 'Shadows',
+            'fade' => 'Fade',
+            'vibrance' => 'Vibrance',
+            'clarity' => 'Clarity',
+            'sharpness' => 'Sharpness',
+            'vignette' => 'Vignette',
+            'free' => 'Free',
+            'transform' => 'Transform image',
+            'straighten' => 'Straighten',
+            'brightness' => 'Brightness',
+            'contrast' => 'Contrast',
+            'saturation' => 'Saturation',
+            'retry' => 'Try again',
+            'title' => 'Image editor',
+            'draft' => 'Preview',
+            'close' => 'Close editor',
+            'tools' => 'Image tools',
+            'preview' => 'Image being edited',
+            'loading' => 'Preparing image…',
+            'circle' => 'Circle crop',
+            'crop' => 'Crop',
+            'zoom' => 'Zoom',
+            'adjustments' => 'Adjustments',
+            'instruction' => 'Drag the frame to crop. Move or zoom the image for the perfect fit.',
+            'dimensions' => 'Size and rotation',
+            'position' => 'Move image',
+            'save_hint' => 'Changes apply when you save.',
+            'saving' => 'Applying…',
+            'apply' => 'Save',
+            'failure' => 'The image could not be edited. Your selection is still available; try again.',
+        ],
+        'viewer' => [
+            'close' => 'Close viewer',
+            'open' => 'View image',
+            'saving' => 'Saving…',
+            'save' => 'Save information',
+            'previous' => 'Previous image',
+            'next' => 'Next image',
+            'zoomIn' => 'Zoom in',
+            'zoomOut' => 'Zoom out',
+            'resetZoom' => 'Reset zoom',
+            'failed' => 'The image could not be loaded.',
+            'saveFailed' => 'Check the information before switching images.',
+        ],
+        'metadata' => [
+            'edit' => 'Edit file information',
+            'title' => 'Title',
+            'alt' => 'Alternative text',
+            'caption' => 'Caption',
+            'copyright' => 'Copyright',
+            'tags' => 'Tags',
+        ],
+        'requirements' => [
+            'min_file' => 'min :count file',
+            'max_file' => 'max :count file',
+            'images' => 'Images',
+            'image_examples' => 'JPG, PNG, WEBP, GIF and more',
+            'videos' => 'Videos (all video formats)',
+            'audio' => 'Audio (all audio formats)',
+            'all_files' => 'All file types',
+            'formats' => 'Configured file types',
+            'min_size' => 'min :size',
+            'max_size' => 'max :size',
+            'total_size' => 'max :size total',
+            'min_files' => 'min :count files',
+            'max_files' => 'max :count files',
+            'min_width' => 'min width :pixels px',
+            'min_height' => 'min height :pixels px',
+            'max_width' => 'max width :pixels px',
+            'max_height' => 'max height :pixels px',
+            'required' => 'required',
+        ],
+        'visual' => [
+            'more' => 'File actions',
+            'processing' => 'Processing previews',
+            'processing_failed' => 'Preview processing failed',
+            'avatar_add' => 'Add photo',
+            'replace' => 'Replace photo',
+            'url_heading' => 'Import from a link',
+            'url_hint' => 'Paste a direct link to your file. We will check it before adding it.',
+            'camera_hint' => 'Take a photo and review it before uploading.',
+            'camera_privacy' => 'Your camera opens only when you choose to use it.',
+            'heading' => 'Drag and drop files to upload',
+            'hint' => 'Choose files from your device or drop them here.',
+            'select' => 'Select files',
+            'ready' => 'Ready',
+            'uploading' => 'Uploading',
+            'loading' => 'Preparing',
+            'failed' => 'Upload failed',
+            'cancelled' => 'Not uploaded',
+            'remove' => 'Remove file',
+            'upload' => 'Upload file',
+            'cancel' => 'Cancel upload',
+            'retry' => 'Retry upload',
+            'retry_short' => 'Retry',
+            'edit' => 'Edit image',
+            'pause' => 'Pause upload',
+            'resume' => 'Resume upload',
+            'paused' => 'Paused',
+            'reorder' => 'Drag to reorder; use arrow keys with keyboard',
+            'pause_all' => 'Pause all uploads',
+            'resume_all' => 'Resume all uploads',
+            'open' => 'Open file',
+            'download' => 'Download file',
+            'before' => 'Move earlier',
+            'after' => 'Move later',
+        ],
         'summary' => ':count file(s), :size KB total',
         'remaining_slots' => ':remaining of :max slots remaining',
         'replace_confirmation' => 'Replace the current file?',
@@ -776,13 +893,50 @@ return [
             'url_disabled' => 'URL import is not enabled for this field.',
             'disabled' => 'Uploads are disabled for this field.',
             'max_files_reached' => 'The maximum number of files has already been uploaded.',
+            'webcam_controls' => [
+                'settings' => 'Camera settings',
+                'close' => 'Close camera',
+                'camera' => 'Camera',
+                'zoom' => 'Zoom',
+                'exposureMode' => 'Exposure mode',
+                'exposureCompensation' => 'Exposure compensation',
+                'exposureTime' => 'Exposure time',
+                'iso' => 'ISO',
+                'whiteBalanceMode' => 'White balance',
+                'colorTemperature' => 'Color temperature',
+                'focusMode' => 'Focus mode',
+                'focusDistance' => 'Focus distance',
+                'brightness' => 'Brightness',
+                'contrast' => 'Contrast',
+                'saturation' => 'Saturation',
+                'sharpness' => 'Sharpness',
+                'pan' => 'Pan',
+                'tilt' => 'Tilt',
+                'frameRate' => 'Frame rate',
+                'backgroundBlur' => 'Background blur',
+                'fillLightMode' => 'Photo flash',
+                'redEyeReduction' => 'Red-eye reduction',
+                'imageWidth' => 'Photo width',
+                'imageHeight' => 'Photo height',
+                'none' => 'Off',
+                'manual' => 'Manual',
+                'single-shot' => 'Single shot',
+                'continuous' => 'Automatic',
+                'off' => 'Off',
+                'auto' => 'Auto',
+                'flash' => 'Flash',
+                'error' => 'This camera could not apply the setting. Its current settings are shown.',
+            ],
+            'webcam_mirror' => 'Mirror photo',
+            'webcam_grid' => 'Composition grid',
             'webcam_capture' => 'Capture photo',
             'webcam_starting' => 'Starting camera…',
             'webcam_unavailable' => 'No usable camera was found on this device.',
+            'webcam_capture_failed' => 'Unable to capture this photo. Try again.',
             'webcam_permission_denied' => 'Camera permission was denied.',
             'webcam_flip_camera' => 'Switch camera',
-            'webcam_flash_on' => 'Turn flash on',
-            'webcam_flash_off' => 'Turn flash off',
+            'webcam_flash_on' => 'Turn torch on',
+            'webcam_flash_off' => 'Turn torch off',
             'webcam_open' => 'Click to take a photo or',
             'webcam_open_action' => 'Open camera',
             'webcam_modal_heading' => 'Take a photo',
@@ -794,6 +948,7 @@ return [
             'webcam_disabled' => 'Webcam capture is not enabled for this field.',
         ],
         'validation' => [
+            'storage_unavailable' => 'Unable to verify stored upload sizes. Please try again.',
             'documents_only' => 'Only document files are allowed.',
             'images_only' => 'Only image files are allowed.',
             'spreadsheets_only' => 'Only spreadsheet files are allowed.',
@@ -803,8 +958,10 @@ return [
             'image_dimensions' => 'The image dimensions are invalid.',
         ],
     ],
-
     'select_field' => [
+        'load_error' => 'Unable to load options. Please try again.',
+        'rate_limited' => 'Too many requests. Try again in :seconds seconds.',
+        'retry' => 'Try again',
         'loading' => 'Loading…',
         'searching' => 'Searching…',
         'loading_more' => 'Loading more…',
@@ -827,7 +984,6 @@ return [
             'section' => 'Mentions',
         ],
     ],
-
     'user_select_field' => [
         'empty_hint' => [
             'try_different_search' => 'Try a different name or email address.',
@@ -835,7 +991,6 @@ return [
             'no_users_available' => 'No users are available right now.',
         ],
     ],
-
     'schema' => [
         'custom_fields_section' => 'Custom fields',
         'publish_group' => 'Publish workflow',
@@ -961,7 +1116,7 @@ return [
             'nps_options_help' => 'Value/label pairs for each score on the NPS scale (defaults 0–10).',
             'phone' => 'Phone / country settings',
             'location' => 'Location settings',
-            'color' => 'Color settings',
+            'color_settings' => 'Color settings',
             'barcode' => 'Barcode settings',
             'social_links' => 'Social links settings',
             'traffic_split' => 'Traffic split settings',
@@ -1064,5 +1219,20 @@ return [
             'color' => 'Color theme',
         ],
     ],
-
+    'boolean' => [
+        'yes' => 'Yes',
+        'no' => 'No',
+    ],
+    'translatable' => [
+        'empty' => 'Empty',
+    ],
+    'nps' => [
+        'min' => 'Not at all likely',
+        'max' => 'Extremely likely',
+        'awful' => 'Awful',
+        'poor' => 'Poor',
+        'neutral' => 'Neutral',
+        'good' => 'Good',
+        'excellent' => 'Excellent',
+    ],
 ];

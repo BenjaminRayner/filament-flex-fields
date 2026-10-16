@@ -16,9 +16,22 @@ use Bjanczak\FilamentFlexFields\Support\Playground\TagsFieldPlayground;
 use Bjanczak\FilamentFlexFields\Support\Playground\TimezoneFieldPlayground;
 use Bjanczak\FilamentFlexFields\Support\Playground\UserSelectPlayground;
 use Bjanczak\FilamentFlexFields\Tests\Support\TestableTranslatableForm;
+use Bjanczak\FilamentFlexFields\Tests\Support\WithPickerPlaygroundPanel;
+use Filament\Facades\Filament;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Livewire;
+
+uses(WithPickerPlaygroundPanel::class);
+
+beforeEach(function (): void {
+    Filament::setCurrentPanel('admin');
+});
+
+afterEach(function (): void {
+    Filament::setCurrentPanel(null);
+    TestableTranslatableForm::$formSchema = [];
+});
 
 /**
  * @return array<string, array{0: class-string, 1: string}>

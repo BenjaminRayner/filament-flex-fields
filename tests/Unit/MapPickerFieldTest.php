@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Enums\MapboxSearchType;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\MapPickerField;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
+use Bjanczak\FilamentFlexFields\Support\Playground\MapPickerPlayground;
 
 it('dehydrates structured state using configured fields only', function () {
     $field = MapPickerField::make('location')
@@ -117,7 +117,7 @@ it('enables focus outline on the map search input by default', function () {
 });
 
 it('registers map picker playground defaults', function () {
-    $state = app(FlexFieldsPlaygroundBuilder::class)->defaultState();
+    $state = app(MapPickerPlayground::class)->defaultState();
 
     expect($state)->toHaveKeys([
         'map_picker__full',

@@ -169,6 +169,7 @@ test('property: same instanceId with new batch URLs re-acquires (navigate morph)
     graph.resyncFromDom({ querySelectorAll: () => [first] })
     assert.equal(graph.getRefCount('/css/flex-fields-flex-text-input.css'), 1)
 
+    first.isConnected = false
     graph.resyncFromDom({ querySelectorAll: () => [second] })
     assert.equal(graph.getRefCount('/css/flex-fields-flex-text-input.css'), 0)
     assert.equal(graph.getRefCount('/css/flex-fields-item-card.css'), 1)

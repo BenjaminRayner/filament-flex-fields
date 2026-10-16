@@ -1,9 +1,118 @@
 ---
 title: "SegmentControl"
 description: IOS-style single-select segmented control with sliding indicators, icons, and animated label expansion.
+icon: "square-split-horizontal"
+"canonical": "https://flex-fields.bjanczak.com/docs/segmentcontrol"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/segment-control.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "SegmentControl in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/segment-control-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/segment-control-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/segment-control.webp"
+"twitter:image:alt": "SegmentControl in the FLEX Fields playground"
 ---
 
-![SegmentControl](/art/sc-17.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/segmentcontrol#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/segmentcontrol",
+      "name": "SegmentControl",
+      "description": "IOS-style single-select segmented control with sliding indicators, icons, and animated label expansion.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/segmentcontrol#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/segmentcontrol#article",
+      "url": "https://flex-fields.bjanczak.com/docs/segmentcontrol",
+      "headline": "SegmentControl",
+      "description": "IOS-style single-select segmented control with sliding indicators, icons, and animated label expansion.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/segmentcontrol#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/segment-control-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/segment-control-motion.mp4#video",
+      "name": "SegmentControl — FLEX Fields demonstration",
+      "description": "A recorded demonstration of SegmentControl in the FLEX Fields playground for Filament. IOS-style single-select segmented control with sliding indicators, icons, and animated label expansion.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/segment-control.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT3.917S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/segment-control-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/segmentcontrol#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/segment-control-motion.mp4"
+  poster="/art/previews/segment-control.webp"
+  width="1920"
+  height="1080"
+  aria-label="SegmentControl — FLEX Fields demonstration"
+>
+  <a href="/art/previews/segment-control-motion.mp4">Watch the SegmentControl demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -142,7 +251,7 @@ SegmentControl::make('date_range')
 
 ### Playground
 
-`/admin/flex-fields-playground/segment-control`
+`/admin/flex-fields/segment-control`
 
 See [Playground](/docs/index#playground) for setup.
 
@@ -171,3 +280,12 @@ See [Playground](/docs/index#playground) for setup.
 | `fff-segment-item` | Individual segment wrapper |
 | `fff-segment-item--selected` | Active segment state |
 | `fff-segment-item--disabled` | Disabled segment state |
+
+## Shared rendering and overflow
+
+Control, Tabs and locale tabs use one renderer and one lifecycle. The SSR strip is
+styled before Alpine starts. A constrained field host enables automatic horizontal
+scrolling, fading edges and chevrons when options exceed available width. Selection
+is scrolled into view, including RTL layouts. `fullWidth()` distributes choices
+instead. Arrow keys, Home and End skip disabled choices. No duplicated template or
+observer is required when using the field inside `CompositeField`.

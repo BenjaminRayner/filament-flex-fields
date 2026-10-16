@@ -1,0 +1,37 @@
+---
+title: "Versioned saved values"
+description: "Encode family values with configuration, restrictions and independent value versions."
+---
+
+Keep a stored value with the exact configuration and value versions that produced
+it. The snapshot format is separate from the asset manifest, package release,
+PHP/JS ABI and ordinary `FieldValueCodec` format.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyValueSnapshot;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyValueSnapshotCodec;
+
+$snapshot = new FamilyValueSnapshot(
+    definition: $definition,
+    value: $acceptedValue,
+);
+
+$json = FamilyValueSnapshotCodec::encode($snapshot);
+
+// Persist $json in your application's storage after authorization.
+$restored = FamilyValueSnapshotCodec::decode($json);
+```
+
+The envelope has format version `1` and requires every saved definition key,
+including explicit configuration/value versions and all restriction flags.
+It preserves `null`, `false`, integers, floats, empty arrays and Unicode.
+It accepts finite JSON-compatible data only, with an 8 MiB envelope, 32,768-node
+and depth-60 budget. PHP reference aliases are detached when the snapshot is
+constructed. The codec does not construct an adapter or require its package to be
+installed, so you can retain and inspect a snapshot after uninstalling a package.
+Decoding a snapshot does not authorize it or validate the family's business rules.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

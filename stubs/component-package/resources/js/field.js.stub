@@ -1,0 +1,12 @@
+import { createResourceScope } from '@bjanczak/flex-fields/sdk/v1'
+
+export default function {{FACTORY}}() {
+    let scope
+    return {
+        init() {
+            scope = createResourceScope()
+            scope.listen(this.$el, 'input', () => this.$dispatch('fff-{{PREFIX}}-changed', { source: 'input' }))
+        },
+        destroy() { scope?.dispose(); scope = undefined },
+    }
+}

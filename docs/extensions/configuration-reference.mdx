@@ -1,0 +1,125 @@
+---
+title: "Configuration option reference"
+description: "All ConfigurationOption flags, six supported types, inheritance semantics and validation examples."
+---
+
+Use `ConfigurationSchema` and `ConfigurationOption` from
+`Bjanczak\FilamentFlexFields\Support\Components\Configuration`.
+Configuration is bounded JSON data; closures and PHP objects are not option values.
+
+## Constructor options
+
+| Parameter | Default | Behavior |
+| --- | --- | --- |
+| `type` | Required | `ConfigurationType::Boolean`, `Integer`, `Number`, `String`, `List` or `Map`. |
+| `default` | `null` | Validated default. A non-nullable option with no non-null default remains absent until supplied. |
+| `nullable` | `false` | Accept explicit `null`. A nullable option defaults to `null`; null skips choices and min/max checks. |
+| `required` | `false` | Require the key to exist after defaults and layers. Combine with nullability deliberately. |
+| `locked` | `false` | Every supplied layer must preserve the declared default. Requires an admissible default. |
+| `choices` | `[]` | Restrict to a list of up to 256 scalar values with strict type comparison. An empty list does not constrain choices. |
+| `min` | `null` | Minimum numeric value, character count or collection item count. Not valid for Boolean. |
+| `max` | `null` | Maximum numeric value, character count or collection item count. Must be at least `min`. |
+| `items` | `null` | Optional `ConfigurationType` for every List/Map value. It is not a complete nested property schema. |
+
+## Type examples
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationOption;
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationSchema;
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationType;
+
+$schema = new ConfigurationSchema([
+    'enabled' => new ConfigurationOption(
+        type: ConfigurationType::Boolean,
+        default: true,
+    ),
+    'maxTags' => new ConfigurationOption(
+        type: ConfigurationType::Integer,
+        default: 20,
+        min: 1,
+        max: 100,
+    ),
+    'opacity' => new ConfigurationOption(
+        type: ConfigurationType::Number,
+        default: 1.0,
+        min: 0,
+        max: 1,
+    ),
+    'caption' => new ConfigurationOption(
+        type: ConfigurationType::String,
+        nullable: true,
+        max: 200,
+    ),
+    'languages' => new ConfigurationOption(
+        type: ConfigurationType::List,
+        default: ['en'],
+        min: 1,
+        max: 5,
+        items: ConfigurationType::String,
+    ),
+    'labels' => new ConfigurationOption(
+        type: ConfigurationType::Map,
+        default: [],
+        max: 10,
+        items: ConfigurationType::String,
+    ),
+]);
+```
+
+Boolean accepts `true`/`false`, not `1`/`0` or textual booleans. Integer does not
+coerce numeric strings. Number accepts integers and finite floats. List needs a
+sequential PHP array; Map needs a keyed array or `[]`. Objects, resources, invalid
+UTF-8, non-finite numbers and excessive data reject.
+
+## Defaults and overrides
+
+```php
+$result = $schema->resolve([
+    ['maxTags' => 30],  // Earlier application defaults.
+    ['maxTags' => 10],  // Later instance options.
+    ['enabled' => false],
+]);
+
+// $result['maxTags'] === 10
+// $result['enabled'] === false
+```
+
+`resolve()` applies the ordered layers you give it, after option defaults.
+`FamilySchemaRenderer` supplies package, application, panel and instance layers.
+`ChildRenderer` supplies child package defaults, explicit child options and mapped
+parent options. These are related but distinct resolution paths. Maps and lists
+replace as a whole; they are not recursively merged. Missing keys inherit; explicit
+`false`, `null` and empty arrays remain values when valid for that option.
+
+```php
+$protected = new ConfigurationSchema([
+    'enforcePolicy' => new ConfigurationOption(
+        type: ConfigurationType::Boolean,
+        default: true,
+        locked: true,
+    ),
+]);
+
+$protected->resolve([['enforcePolicy' => true]]); // Accepted.
+// $protected->resolve([['enforcePolicy' => false]]); // Rejected.
+```
+
+A required nullable option satisfies key presence when its value is null. Use
+`nullable: false` and appropriate value constraints if null must not be accepted.
+A locked option is a configuration guard; it does not authorize record access.
+
+## ConfigurationSchema methods and limits
+
+| API | Purpose |
+| --- | --- |
+| `new ConfigurationSchema($options)` | Declare up to 128 named typed options. Names start lowercase, then contain letters, digits or underscores, up to 96 characters. |
+| `validateLayer($values)` | Validate one map, including unknown keys and locked defaults. |
+| `resolve($layers = [])` | Apply up to eight ordered layers, enforce required options, return detached values. |
+| `export()` | Export sorted contract metadata for comparison and diagnostics. |
+| `assertData($value)` | Validate bounded JSON-compatible data. |
+| `copyData()` / `copyArray()` | Obtain a detached validated data snapshot. |
+| `canonicalData()` | Produce deterministic map ordering without changing value types or list order. |
+
+Each map/contract is limited to 64 KiB, 4096 nodes and 16 nested levels.
+Bounds protect configuration admission; domain-specific rules such as a valid
+timezone or image ratio still belong to your adapter/component.

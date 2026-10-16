@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor;
 
 use Filament\Forms\Components\RichEditor\RichEditorTool;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Js;
 use ReflectionProperty;
 
@@ -30,6 +29,8 @@ class FlexRichEditorTool extends RichEditorTool
             ->merge([
                 'tabindex' => -1,
                 'type' => 'button',
+                'data-fff-open-trigger' => '',
+                'data-fff-intent' => 'select',
                 'aria-label' => e($label),
                 'x-bind:class' => '{ \'fi-active\': '.($this->hasActiveStyling() ? $activeJsExpression : 'false').' }',
                 'x-bind:disabled' => $this->isDisabledWhenNotActive() ? '!('.$activeJsExpression.')' : null,
@@ -91,11 +92,8 @@ class FlexRichEditorTool extends RichEditorTool
             ->disabledWhenNotActive($tool->isDisabledWhenNotActive())
             ->activeStyling($tool->hasActiveStyling());
 
-        $label = $tool->getLabel();
-
-        if ($label instanceof Htmlable || filled($label)) {
-            $flex->label($label);
-        }
+        // Preserve callbacks, null and explicitly empty labels when adapting a tool.
+        $flex->label(self::copyUnevaluatedProperty($tool, 'label'));
 
         foreach ($tool->getExtraAttributes() as $attribute => $value) {
             $flex->extraAttributes([$attribute => $value], merge: true);

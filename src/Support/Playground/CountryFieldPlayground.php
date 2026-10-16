@@ -28,6 +28,9 @@ class CountryFieldPlayground
             'country__soft' => 'PL',
             'country__lg' => 'GB',
             'country__disabled' => 'PL',
+            'country__kosovo' => 'XK',
+            'country__territories' => 'BV',
+            'country__locale_fr' => 'PL',
         ];
     }
 
@@ -38,7 +41,7 @@ class CountryFieldPlayground
     {
         return [
             Section::make('Country field')
-                ->description('Searchable country picker with circle flags — reuses the same country list as PhoneField.')
+                ->description('249 ISO countries and territories with local circle flags, shared with PhoneField.')
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     CountryField::make('country__basic')
@@ -72,6 +75,22 @@ class CountryFieldPlayground
                                 ->countries(['PL', 'US', 'DE'])
                                 ->locale('pl')
                                 ->helperText('Country names via locale(pl): Polska.'),
+                            CountryField::make('country__kosovo')
+                                ->label('ISO + Kosovo')
+                                ->additionalRegions(['XK'])
+                                ->defaultCountry('XK')
+                                ->helperText('250 entries: 249 ISO codes plus the user-assigned XK code.'),
+                            CountryField::make('country__territories')
+                                ->label('Local territory flags')
+                                ->additionalRegions(['DG', 'EA', 'IC'])
+                                ->countries(['BV', 'HM', 'DG', 'EA', 'IC'])
+                                ->showCountryCode()
+                                ->helperText('Materialized SVGs — no remote CDN or broken aliases.'),
+                            CountryField::make('country__locale_fr')
+                                ->label('French labels')
+                                ->countries(['PL', 'US', 'DE'])
+                                ->locale('fr')
+                                ->helperText('ICU country names without downloading a translation library.'),
                             CountryField::make('country__locale_en')
                                 ->label('English labels')
                                 ->countries(['PL', 'US', 'DE'])

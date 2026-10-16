@@ -33,7 +33,9 @@ it('deduplicates alpine chunk preloads across multiple fields on one request', f
         expect(FlexFieldAlpineQueue::has($chunk))->toBeTrue();
     }
 
-    expect($second)->toBe([]);
+    expect($second)->toBe(array_values(array_diff(
+        FlexFieldAssets::alpineChunksFor('voice-note-recorder-field'), $first,
+    )))->not->toBeEmpty();
 });
 
 it('lazy-loads emoji picker chunks only when fields request shared chunks', function () {
@@ -41,7 +43,9 @@ it('lazy-loads emoji picker chunks only when fields request shared chunks', func
     $textareaChunks = FlexFieldAlpineQueue::enqueueChunksFor('flex-textarea');
 
     expect($inputChunks)->toBe(FlexFieldAssets::alpineChunksFor('flex-text-input'))
-        ->and($textareaChunks)->toBe([]);
+        ->and($textareaChunks)->toBe(array_values(array_diff(
+            FlexFieldAssets::alpineChunksFor('flex-textarea'), $inputChunks,
+        )))->not->toBeEmpty();
 });
 
 it('registers only alpine manifest entry names as primary alpine components', function () {
@@ -80,7 +84,9 @@ it('deduplicates mapbox chunk preloads across map picker and address autocomplet
     $addressChunks = FlexFieldAlpineQueue::enqueueChunksFor('address-autocomplete');
 
     expect($mapChunks)->not->toBeEmpty()
-        ->and($addressChunks)->toBe([]);
+        ->and($addressChunks)->toBe(array_values(array_diff(
+            FlexFieldAssets::alpineChunksFor('address-autocomplete'), $mapChunks,
+        )))->not->toBeEmpty();
 });
 
 it('deduplicates searchable select menu chunk preloads across country timezone and currency fields', function () {
@@ -136,16 +142,20 @@ it('keeps flex text input shell code separate from the shared emoji chunk', func
 });
 
 it('rewrites nested chunk imports to semantic names after build', function () {
-    $audioChunk = collect(glob(__DIR__.'/../../resources/dist/components/flex-fields-audio-*.js'))
-        ->first();
+    $manifest = FlexFieldAssets::alpineManifest();
+    $chunks = $manifest['__shared_chunks__'];
+    expect($chunks)->not->toBeEmpty();
 
-    expect($audioChunk)->toBeString();
-
-    $source = file_get_contents($audioChunk);
-
-    expect($source)
-        ->toContain('flex-fields-dynamic-bars-')
-        ->not->toContain('chunk-');
+    foreach ($chunks as $chunk) {
+        expect($chunk)->toStartWith('flex-fields-')->toEndWith('.js');
+        $source = file_get_contents(__DIR__.'/../../resources/dist/components/'.$chunk);
+        preg_match_all('~\\b(?:from\\s*|import\\s*(?:\\(\\s*)?)[\'"]\\./([^\'"]+\\.js)[\'"]~', $source, $imports);
+        foreach ($imports[1] as $import) {
+            expect($import)->toStartWith('flex-fields-')
+                ->and($chunks)->toContain($import)
+                ->and(is_file(__DIR__.'/../../resources/dist/components/'.$import))->toBeTrue();
+        }
+    }
 });
 
 it('uses a registry-only overlay coordinator without legacy window event bus', function () {
@@ -188,33 +198,4 @@ it('preloads transitive barcode scanner zxing chunks from the alpine manifest gr
             expect($barcodeChunks)->toContain($import);
         }
     }
-});
-
-it('uses Filament native x-load in field blades instead of custom x-fff-load', function () {
-    $viewsRoot = __DIR__.'/../../resources/views';
-    $bladeFiles = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($viewsRoot, FilesystemIterator::SKIP_DOTS),
-    );
-
-    $offenders = [];
-
-    foreach ($bladeFiles as $file) {
-        if (! $file->isFile() || $file->getExtension() !== 'php') {
-            continue;
-        }
-
-        $relative = str_replace($viewsRoot.'/', '', $file->getPathname());
-
-        if (str_contains($relative, 'flex-fff-load-bootstrap')) {
-            continue;
-        }
-
-        $contents = file_get_contents($file->getPathname());
-
-        if (preg_match('/x-fff-load/', $contents) === 1) {
-            $offenders[] = $relative;
-        }
-    }
-
-    expect($offenders)->toBe([]);
 });

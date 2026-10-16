@@ -1,9 +1,22 @@
+import { reportRuntimeError, diagnosticContext } from '../runtime/diagnostics/document-diagnostics.js'
 /**
  * FFART x-fff-load — CRG-aware Alpine lazy loader (Faza 8).
  * Mirrors Filament x-load: defer Alpine init until the entry module is imported.
  */
 
+import { isAssetElementActive, waitForAssetActivation } from '../runtime/lifecycle/asset-activation.js'
+
 import { getAlpineLoadGate } from './flex-alpine-load-gate.js'
+import { withFactoryReadiness } from '../runtime/alpine/factory-readiness.js'
+import { createGenerationLeases } from '../runtime/owners/generation-leases.js'
+import { initializationPlanIdentity } from '../runtime/owners/plan-identity.js'
+import { getRuntimeState } from '../runtime/runtime-state.js'
+import { resolveModuleFactoryIdentity } from '../runtime/alpine/factory-identity.js'
+import { declaredComponentIdentity } from '../runtime/assets/component-scope.js'
+import { resolveLegacyComponentIdentity } from '../runtime/filament/legacy-component-identity.js'
+
+export { withFactoryReadiness }
+const activationLeases = getRuntimeState().activationLeases ??= createGenerationLeases({ snapshot: initializationPlanIdentity })
 
 function isFffLoadDirectiveRegistered() {
     return globalThis.__fffFffLoadDirectiveRegistered === true
@@ -17,54 +30,16 @@ export function resetFffLoadDirectiveForTests() {
     delete globalThis.__fffFffLoadDirectiveRegistered
 }
 
+// Retained only for callers migrating historical markup. The directive below
+// always uses explicit declaration identity and never enters this adapter.
 export function resolveFffLoadComponentId(el) {
-    if (el?.dataset?.fffAssetConsumer) {
-        return el.dataset.fffAssetConsumer
-    }
-
-    const fromAncestor = el?.closest?.('[data-fff-asset-consumer]')?.dataset?.fffAssetConsumer
-
-    if (fromAncestor) {
-        return fromAncestor
-    }
-
-    const fieldSelectors = [
-        '.fi-fo-select-wrp',
-        '.fff-select-field-wrapper',
-        '.fi-fo-field-wrp',
-        '[data-fff-lazy-alpine-mount]',
-    ]
-
-    for (const selector of fieldSelectors) {
-        const fieldScope = el?.closest?.(selector)
-
-        if (!fieldScope) {
-            continue
-        }
-
-        const fromFieldBatch = fieldScope.querySelector?.('[data-fff-asset-consumer]')?.dataset?.fffAssetConsumer
-
-        if (fromFieldBatch) {
-            return fromFieldBatch
-        }
-
-        const fromParentBatch = fieldScope.parentElement?.querySelector?.('[data-fff-asset-consumer]')?.dataset?.fffAssetConsumer
-
-        if (fromParentBatch) {
-            return fromParentBatch
-        }
-    }
-
-    const entryUrl = el?.getAttribute?.('x-fff-load-src')
-        ?? el?.getAttribute?.('x-load-src')
-        ?? ''
-    const match = String(entryUrl).match(/\/components\/(?:flex-fields-)?([^./?]+)\.js/i)
-
-    return match?.[1] ?? null
+    return declaredComponentIdentity(el) ?? resolveLegacyComponentIdentity(el)
 }
 
 function resolveComponentId(el) {
-    return resolveFffLoadComponentId(el)
+    const identity = declaredComponentIdentity(el)
+    if (!identity) throw new Error('Flex Fields component requires a declared instance asset boundary.')
+    return identity
 }
 
 function resolveEntryUrl(el) {
@@ -80,7 +55,7 @@ function ignoreAttributeName(Alpine) {
 }
 
 function deferAlpineInit(el, Alpine) {
-    if (!Alpine?.skipDuringClone || el._x_async === 'loaded') {
+    if (!Alpine?.skipDuringClone || ['init', 'waiting', 'await', 'loaded'].includes(el._x_async)) {
         return
     }
 
@@ -90,14 +65,14 @@ function deferAlpineInit(el, Alpine) {
         el._x_async = 'init'
         el._x_ignore = true
         el.setAttribute(ignoreAttr, '')
-    })
+    })()
 }
 
 function shouldInitTree(el, ignoreAttr) {
     return el.isConnected && !el.closest?.(`[${ignoreAttr}]`)
 }
 
-async function activateAlpineInit(el, Alpine, { cancelled = () => false } = {}) {
+async function activateAlpineInit(el, Alpine, { cancelled = () => false, signal = undefined } = {}) {
     if (!Alpine?.skipDuringClone) {
         return
     }
@@ -117,39 +92,92 @@ async function activateAlpineInit(el, Alpine, { cancelled = () => false } = {}) 
             return
         }
 
+        // Keep x-ignore while the enclosing tab/modal is dormant.
+        el._x_async = 'waiting'
+        if (!await waitForAssetActivation(el, { signal }) || cancelled()) return
         el._x_async = 'await'
 
-        const entryUrl = resolveEntryUrl(el)
-        const componentId = resolveComponentId(el)
-
-        if (!entryUrl) {
-            return
-        }
-
         const gate = getAlpineLoadGate()
-
-        if (componentId) {
-            await gate.awaitBundleReady(componentId)
+        // Transport is shared. Only the current plan may register/init a factory.
+        // A morph during import restarts preparation from the current markers.
+        while (!cancelled() && el.isConnected) {
+            const lease = activationLeases.acquire(el, { replace: true })
+            const abort = () => lease.release()
+            signal?.addEventListener('abort', abort, { once: true })
+            try {
+                const entryUrl = resolveEntryUrl(el)
+                let componentId = null
+                let module
+                let phase = 'preparation'
+                try {
+                    componentId = resolveComponentId(el)
+                    if (!entryUrl) throw new Error('Flex Fields component has no module URL.')
+                    // Preparation never holds an evaluation slot while waiting
+                    // for queued styles. Native evaluation has its own admission
+                    // phase; factory registration/init remains owner guarded.
+                    if (componentId) await gate.awaitBundleReady(componentId, el)
+                    if (cancelled() || !el.isConnected) return
+                    if (!lease.current()) continue
+                    phase = 'evaluation'
+                    module = await gate.importModule(entryUrl, {
+                        document: el.ownerDocument ?? globalThis.document,
+                        signal: lease.signal,
+                    })
+                } catch (error) {
+                    if (cancelled() || !el.isConnected) return
+                    if (!lease.current()) continue
+                    reportRuntimeError(el.ownerDocument ?? globalThis.document, error, diagnosticContext(el, {
+                        componentId, code: phase === 'evaluation' ? 'module_import_failed' : 'owner_plan_failed', phase,
+                    }))
+                    throw error
+                }
+                if (cancelled() || !el.isConnected) return
+                if (!lease.current()) continue
+                const active = globalThis.window?.FffAssetInjector?.isElementActive?.(el)
+                    ?? isAssetElementActive(el, { document: el.ownerDocument ?? globalThis.document })
+                if (!active) {
+                    el._x_async = 'waiting'
+                    if (!await waitForAssetActivation(el, { signal }) || cancelled()) return
+                    el._x_async = 'await'
+                    if (componentId) await gate.awaitBundleReady(componentId, el)
+                }
+                if (cancelled() || !el.isConnected) return
+                if (!lease.current()) continue
+                const expression = el.getAttribute('x-data') ?? ''
+                const factoryName = expression.trim().match(/^([A-Za-z_$][\w$]*)\s*\(/)?.[1]
+                if (factoryName) {
+                    try {
+                        const identity = resolveModuleFactoryIdentity(el, componentId, entryUrl, module)
+                        const source = module[identity.export]
+                        if (typeof source !== 'function') throw new Error('Flex Fields module has no declared component factory.')
+                        gate.prepareAlpineData(factoryName, source, identity)
+                    } catch (error) {
+                        reportRuntimeError(el.ownerDocument ?? globalThis.document, error, diagnosticContext(el, {
+                            componentId, code: 'factory_init_failed', phase: 'init',
+                        }))
+                        throw error
+                    }
+                }
+                break
+            } finally {
+                signal?.removeEventListener('abort', abort)
+                lease.release()
+            }
         }
-
-        if (cancelled()) {
-            return
-        }
-
-        await gate.importModule(entryUrl)
-
-        if (cancelled() || !el.isConnected) {
-            return
-        }
+        if (cancelled() || !el.isConnected) return
 
         el._x_async = 'loaded'
 
-        Alpine.destroyTree(el)
+        // Replacing the SSR placeholder is activation, not owner disposal.
+        // Retained user intent must survive this internal Alpine handover.
+        el._fffReinitializing = true
+        try { Alpine.destroyTree(el) } finally { delete el._fffReinitializing }
         el._x_ignore = false
         el.removeAttribute(ignoreAttr)
 
         if (shouldInitTree(el, ignoreAttr)) {
             Alpine.initTree(el)
+
         }
     })()
 }
@@ -160,7 +188,7 @@ function recoverLateFffLoadElements(Alpine) {
     }
 
     document.querySelectorAll('[x-fff-load]').forEach((el) => {
-        if (el._x_async === 'loaded' || el._x_async === 'await') {
+        if (['loaded', 'waiting', 'await'].includes(el._x_async)) {
             return
         }
 
@@ -169,40 +197,56 @@ function recoverLateFffLoadElements(Alpine) {
         }
 
         deferAlpineInit(el, Alpine)
-        void activateAlpineInit(el, Alpine)
+        void activateAlpineInit(el, Alpine).catch(() => {
+            if (!el.isConnected) return
+            el._x_async = 'failed'
+            el.dispatchEvent(new CustomEvent('fff-load-error', { bubbles: true }))
+        })
     })
 }
 
-export function registerFffLoadDirective(Alpine) {
-    if (!Alpine?.directive || isFffLoadDirectiveRegistered()) {
-        return
-    }
-
-    markFffLoadDirectiveRegistered()
-
+export function createFffLoadHandler(Alpine) {
     const inlineHandler = (el) => {
         deferAlpineInit(el, Alpine)
     }
 
     const asyncHandler = (el, _payload, { cleanup }) => {
         let cancelled = false
+        const controller = new AbortController()
 
-        cleanup(() => {
-            cancelled = true
-        })
-
-        return activateAlpineInit(el, Alpine, {
+        const activate = () => activateAlpineInit(el, Alpine, {
             cancelled: () => cancelled,
+            signal: controller.signal,
         }).catch(() => {
             if (!cancelled) {
+                el._x_async = 'failed'
                 el.dispatchEvent(new CustomEvent('fff-load-error', { bubbles: true }))
             }
         })
+        const retry = () => {
+            if (el._x_async !== 'failed' || cancelled) return
+            deferAlpineInit(el, Alpine)
+            void activate()
+        }
+        el.addEventListener('fff-load-retry', retry)
+        cleanup(() => {
+            if (!el._fffReinitializing) el.dispatchEvent(new CustomEvent('fff-load-dispose', { bubbles: true }))
+            cancelled = true
+            controller.abort()
+            el.removeEventListener('fff-load-retry', retry)
+        })
+
+        return activate()
     }
 
     asyncHandler.inline = inlineHandler
+    return asyncHandler
+}
 
-    Alpine.directive('fff-load', asyncHandler).before('ignore')
+export function registerFffLoadDirective(Alpine) {
+    if (!Alpine?.directive || isFffLoadDirectiveRegistered()) return
+    markFffLoadDirectiveRegistered()
+    Alpine.directive('fff-load', createFffLoadHandler(Alpine)).before('ignore')
 }
 
 export function ensureFffLoadDirectiveRegistered(Alpine = globalThis.Alpine) {
@@ -211,7 +255,7 @@ export function ensureFffLoadDirectiveRegistered(Alpine = globalThis.Alpine) {
     }
 
     registerFffLoadDirective(Alpine)
-    recoverLateFffLoadElements(Alpine)
+    if (!globalThis.__fffStartupDirective) recoverLateFffLoadElements(Alpine)
 
     return true
 }

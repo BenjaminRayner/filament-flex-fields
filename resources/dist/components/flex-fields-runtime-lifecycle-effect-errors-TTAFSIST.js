@@ -1,0 +1,1 @@
+function f(e,...o){try{let t=e(...o);typeof t?.then=="function"&&Promise.resolve(t).catch(()=>{})}catch{}}function r(e,o,t=()=>!0){typeof e?.then=="function"&&Promise.resolve(e).catch(c=>{t()&&f(o,c)})}export{f as a,r as b};

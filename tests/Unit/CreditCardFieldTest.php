@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CreditCardField;
+use Bjanczak\FilamentFlexFields\Support\CreditCard\Validation\CardRule;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\CreditCardFieldConfigurator;
 
 it('exposes credit card styling and configuration api', function () {
@@ -95,10 +96,10 @@ it('rejects invalid luhn card numbers during validation', function () {
 
     $field = CreditCardField::make('payment');
 
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
+    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof CardRule);
 
     $message = null;
-    $rule('payment', [
+    $rule->validate('payment', [
         'number' => '4242424242424241',
         'name' => 'Jan',
         'expiry' => '12/28',
@@ -115,10 +116,10 @@ it('allows valid luhn card numbers during validation when pan storage is enabled
 
     $field = CreditCardField::make('payment');
 
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
+    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof CardRule);
 
     $message = null;
-    $rule('payment', [
+    $rule->validate('payment', [
         'number' => '4242424242424242',
         'name' => 'Jan',
         'expiry' => '12/28',
@@ -135,10 +136,10 @@ it('requires tokenization under default enterprise pci posture', function () {
 
     $field = CreditCardField::make('payment');
 
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
+    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof CardRule);
 
     $message = null;
-    $rule('payment', [
+    $rule->validate('payment', [
         'number' => '4242424242424242',
         'name' => 'Jan',
         'expiry' => '12/28',
@@ -211,7 +212,7 @@ it('does not use laravel required rule on the composite state', function () {
 it('requires each card subfield when the field is required', function () {
     $field = CreditCardField::make('payment')->required();
 
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
+    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof CardRule);
 
     $emptyState = [
         'number' => '',
@@ -221,7 +222,7 @@ it('requires each card subfield when the field is required', function () {
     ];
 
     $message = null;
-    $rule('payment', $emptyState, function (string $failMessage) use (&$message): void {
+    $rule->validate('payment', $emptyState, function (string $failMessage) use (&$message): void {
         $message = $failMessage;
     });
 
@@ -231,10 +232,10 @@ it('requires each card subfield when the field is required', function () {
 it('allows empty card details when the field is optional', function () {
     $field = CreditCardField::make('payment');
 
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
+    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof CardRule);
 
     $message = null;
-    $rule('payment', [
+    $rule->validate('payment', [
         'number' => '',
         'name' => '',
         'expiry' => '',
@@ -249,10 +250,10 @@ it('allows empty card details when the field is optional', function () {
 it('validates card number length when partially filled', function () {
     $field = CreditCardField::make('payment');
 
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
+    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof CardRule);
 
     $message = null;
-    $rule('payment', [
+    $rule->validate('payment', [
         'number' => '4242',
         'name' => '',
         'expiry' => '',

@@ -12,7 +12,7 @@ it('declares schedule field type in datetime category', function () {
     expect(FieldType::Schedule)->toBeInstanceOf(FieldType::class)
         ->and(FieldType::Schedule->value)->toBe('schedule')
         ->and(FieldType::Schedule->category())->toBe(FieldCategory::DateTime)
-        ->and(FieldType::Schedule->icon())->toBe('heroicon-o-calendar-days')
+        ->and(FieldType::Schedule->icon())->toBe('hugeicons-calendar-03')
         ->and(FieldType::Schedule->isCustomComponent())->toBeTrue()
         ->and(FieldType::Schedule->assetComponents())->toBe(['schedule-field']);
 });

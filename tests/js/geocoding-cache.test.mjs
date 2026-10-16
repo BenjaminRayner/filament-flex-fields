@@ -1,35 +1,26 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import {
-    clearGeocodingCache,
-    geocodingCacheKey,
-    readGeocodingCache,
-    writeGeocodingCache,
-} from '../../resources/js/core/geocoding-cache.js'
-
-test('geocodingCacheKey serializes payload', () => {
-    assert.equal(geocodingCacheKey('search', { q: 'warsaw' }), 'search:{"q":"warsaw"}')
-})
+import { createGeocodingResultCache } from '../../resources/js/select/geocoding/result-cache.js'
 
 test('writeGeocodingCache stores and reads values', () => {
-    clearGeocodingCache()
+    const cache = createGeocodingResultCache()
 
-    const key = geocodingCacheKey('reverse', { lat: 52.1, lng: 21.0 })
+    const key = 'reverse:52.1,21.0'
 
-    writeGeocodingCache(key, [{ id: 'place-1' }])
+    cache.set(key, [{ id: 'place-1' }])
 
-    assert.deepEqual(readGeocodingCache(key), [{ id: 'place-1' }])
+    assert.deepEqual(cache.get(key), [{ id: 'place-1' }])
 })
 
 test('writeGeocodingCache evicts oldest entry when max entries exceeded', () => {
-    clearGeocodingCache()
+    const cache = createGeocodingResultCache()
 
-    writeGeocodingCache('first', 'a', 2)
-    writeGeocodingCache('second', 'b', 2)
-    writeGeocodingCache('third', 'c', 2)
+    cache.set('first', 'a', 2)
+    cache.set('second', 'b', 2)
+    cache.set('third', 'c', 2)
 
-    assert.equal(readGeocodingCache('first'), null)
-    assert.equal(readGeocodingCache('second'), 'b')
-    assert.equal(readGeocodingCache('third'), 'c')
+    assert.equal(cache.get('first'), null)
+    assert.equal(cache.get('second'), 'b')
+    assert.equal(cache.get('third'), 'c')
 })

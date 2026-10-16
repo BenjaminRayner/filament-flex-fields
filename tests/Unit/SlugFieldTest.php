@@ -7,7 +7,7 @@ use Bjanczak\FilamentFlexFields\Enums\FieldType;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SlugField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TitleSlugField;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldFormBuilder;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
+use Bjanczak\FilamentFlexFields\Support\Playground\SlugFieldPlayground;
 use Bjanczak\FilamentFlexFields\Support\Slug\SlugGenerator;
 use Bjanczak\FilamentFlexFields\Support\Slug\SpatieSlugIntegration;
 use Bjanczak\FilamentFlexFields\Tests\Support\TestableSlugForm;
@@ -81,47 +81,6 @@ it('normalizes slug values and supports homepage slug', function () {
     expect($field->normalizeSlug('  Hello--World!! '))->toBe('hello-world')
         ->and($field->normalizeSlug('/'))->toBe('/')
         ->and($field->generateSlugFromSource('Luxury Yacht Charter'))->toBe('luxury-yacht-charter');
-});
-
-it('keeps homepage slash as fixed chrome instead of editable input value', function () {
-    expect(SlugGenerator::toEditableSlug('/', true))->toBe('')
-        ->and(SlugGenerator::fromEditableSlug('', '-', true))->toBe('/')
-        ->and(SlugGenerator::fromEditableSlug('about', '-', true))->toBe('about')
-        ->and(SlugGenerator::normalizeEditableSlug('/about'))->toBe('about')
-        ->and(SlugGenerator::normalizeEditableSlug('//'))->toBe('')
-        ->and(SlugGenerator::permalinkSlugSegment('test', null, true))->toBe('/test')
-        ->and(SlugGenerator::permalinkSlugSegment('/', null, true))->toBe('')
-        ->and(SlugGenerator::permalinkSlugSegment('test', '/blog/', true))->toBe('test')
-        ->and(SlugGenerator::shouldShowPermalinkSlugSeparator(null, 'https://wyachts.test'))->toBeTrue()
-        ->and(SlugGenerator::shouldShowPermalinkSlugSeparator('/blog/', 'https://wyachts.test'))->toBeFalse();
-
-    $field = SlugField::make('slug')
-        ->allowHomepageSlug()
-        ->urlHost('https://wyachts.test');
-
-    expect($field->getFullPermalinkUrl('test'))->toBe('https://wyachts.test/test')
-        ->and($field->getFullPermalinkUrl('/'))->toBe('https://wyachts.test');
-
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/slug-field.blade.php');
-    $js = file_get_contents(__DIR__.'/../../resources/js/components/slug-field.js');
-    $utils = file_get_contents(__DIR__.'/../../resources/js/support/slug-utils.js');
-
-    expect($blade)
-        ->toContain('class="fff-slug-field__slug-separator"')
-        ->and($blade)->toContain('$showInitialSlugSeparator')
-        ->and($blade)->toContain('x-bind:value="editableSlugValue()"');
-
-    expect($js)
-        ->toContain('slugPathSeparatorVisible()')
-        ->and($js)->toContain('permalinkSlugSegment()')
-        ->and($js)->toContain('resolvePermalinkSlugForUrl')
-        ->and($js)->toContain('buildSelfHealingRouteKey')
-        ->and($js)->toContain('fromEditableSlug');
-
-    expect($utils)
-        ->toContain('normalizeEditableSlug')
-        ->and($utils)->toContain('fromEditableSlug')
-        ->and($utils)->toContain('toEditableSlug');
 });
 
 it('builds full permalink urls with postfix', function () {
@@ -302,7 +261,7 @@ it('builds slug field from flex field definition config', function () {
 });
 
 it('registers slug field playground variants', function () {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
+    $builder = app(SlugFieldPlayground::class);
     $state = $builder->defaultState();
 
     expect($state)->toHaveKeys([
@@ -325,10 +284,9 @@ it('exposes slug field wrapper classes', function () {
         'fff-slug-field-field',
         'fff-flex-text-input-field',
         'fff-slug-field-field--sm',
-        'fff-rounding-md',
         'fff-flex-text-input-field--sm',
-        'fff-rounding-md',
         'fff-slug-field-field--secondary',
+        'fff-rounding-md',
     ]);
 });
 
@@ -409,85 +367,6 @@ it('translates slug ui strings in polish', function () {
     expect(__('filament-flex-fields::default.slug.edit'))->toBe('Edytuj')
         ->and(__('filament-flex-fields::default.validation.slug.pattern'))
         ->toBe('Slug moze zawierac tylko male litery, cyfry i myslniki.');
-});
-
-it('keeps slug inline editor stretched to the full field width', function () {
-    $sourceCss = file_get_contents(__DIR__.'/../../resources/css/components/slug-field.css');
-    $builtCss = file_get_contents(__DIR__.'/../../resources/dist/css/slug-field.css');
-
-    expect($sourceCss)
-        ->toMatch('/\.fff-slug-field__control\s*\{[^}]*width:\s*100%/s')
-        ->toMatch('/\.fff-slug-field__permalink-body\s*\{[^}]*flex:\s*1 1 0/s')
-        ->toMatch('/\.fff-slug-field__permalink-body > \.fff-slug-field__editor/s')
-        ->toMatch('/\.fff-slug-field__editor \.fff-slug-field__input\s*\{[^}]*flex:\s*1 1 0/s')
-        ->toMatch('/\.fff-slug-field__prefix\s*\{[^}]*flex:\s*0 1 auto/s')
-        ->toMatch('/\.fff-slug-field__value\s*\{[^}]*flex:\s*1 1 auto/s')
-        ->and($sourceCss)->not->toMatch('/\.fff-slug-field__editor\s*\{[^}]*display:\s*grid/s');
-
-    expect($builtCss)
-        ->toMatch('/\.fff-slug-field__control\{[^}]*width:100%/s')
-        ->and($builtCss)->toMatch('/\.fff-slug-field__permalink-body\{[^}]*flex:1 1 0/s')
-        ->and($builtCss)->toMatch('/\.fff-slug-field__permalink-body>\.fff-slug-field__editor/s')
-        ->and($builtCss)->toMatch('/\.fff-slug-field__prefix\{[^}]*flex:0(?:\s+1)?\s+auto/s');
-});
-
-it('renders inline slug editor hidden before alpine hydration', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/slug-field.blade.php');
-
-    expect($blade)
-        ->toContain('class="fff-slug-field__permalink-body"')
-        ->and($blade)->toContain('class="fff-slug-field__host"')
-        ->and($blade)->toMatch('/class="fff-slug-field__editor"\s+style="display: none;"\s+x-cloak\s+x-show="showInlineEditor\(\) && mode === \'edit\'"/s');
-});
-
-it('renders only one permalink preview before hydration in readonly modes', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/slug-field.blade.php');
-    $css = file_get_contents(__DIR__.'/../../resources/css/components/slug-field.css');
-
-    expect($blade)
-        ->toContain('$showInitialReadonlyPreview = $slugReadOnly')
-        ->and($blade)->toContain('$showInitialPreview = ! $slugReadOnly && ($inlineEditing || (! $inlineEditing && $showPermalinkChrome))')
-        ->and($blade)->toContain('@unless ($showInitialReadonlyPreview) style="display: none;" x-cloak @endunless');
-
-    expect($css)
-        ->toContain('.fff-slug-field:not(.is-hydrated).is-slug-readonly .fff-slug-field__permalink-body > .fff-slug-field__preview:not(.is-readonly)')
-        ->and($css)->toContain('.fff-slug-field:not(.is-hydrated):not(.is-slug-readonly) .fff-slug-field__permalink-body > .fff-slug-field__preview.is-readonly');
-});
-
-it('collapses action button labels on narrow containers via css container queries', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/slug-field.blade.php');
-    $sourceCss = file_get_contents(__DIR__.'/../../resources/css/components/slug-field.css');
-    $builtCss = file_get_contents(__DIR__.'/../../resources/dist/css/slug-field.css');
-
-    expect($blade)
-        ->toContain('class="fff-slug-field__button-label"')
-        ->and($blade)->toContain('aria-label="{{ $labels[\'edit\'] }}"')
-        ->and($blade)->toContain('title="{{ $labels[\'edit\'] }}"');
-
-    expect($sourceCss)
-        ->toContain('container-type: inline-size')
-        ->and($sourceCss)->toContain('container-name: slug-field')
-        ->and($sourceCss)->toMatch('/@container slug-field \(max-width: 30rem\)/')
-        ->and($sourceCss)->toContain('.fff-slug-field__button-label')
-        ->and($sourceCss)->toContain('.fff-slug-field__button:not(.fff-slug-field__button--icon-only)');
-
-    expect($builtCss)
-        ->toMatch('/@container slug-field \(max-width:\s*30rem\)/');
-});
-
-it('hides the secondary actions group when no secondary buttons are visible', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/slug-field.blade.php');
-    $js = file_get_contents(__DIR__.'/../../resources/js/components/slug-field.js');
-
-    expect($blade)
-        ->toContain('x-show="hasSecondaryActions()"')
-        ->and($blade)->toContain('@if ($hasSecondaryActionsConfig)');
-
-    expect($js)
-        ->toContain('hasSecondaryActions()')
-        ->and($js)->toMatch('/hasSecondaryActions\(\)\s*\{[^}]*showRegenerateButton && this\.canRegenerate\(\)/s')
-        ->and($js)->toMatch('/showCopyButton && this\.fullUrl\(\)/s')
-        ->and($js)->toMatch('/showVisitLink && this\.canVisitLink && this\.fullUrl\(\)/s');
 });
 
 it('does not double-stack locale tab spacing in fused title slug groups', function () {

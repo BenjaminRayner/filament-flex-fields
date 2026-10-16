@@ -23,6 +23,7 @@ class ColorSwatchPlayground
             'green' => '#22c55e',
             'yellow' => '#eab308',
             'white' => '#ffffff',
+            'black' => '#000000',
         ];
     }
 
@@ -38,6 +39,7 @@ class ColorSwatchPlayground
             'green' => 'Emerald',
             'yellow' => 'Golden Yellow',
             'white' => 'White',
+            'black' => 'Black',
         ];
     }
 
@@ -52,6 +54,9 @@ class ColorSwatchPlayground
             'color_swatch__lg' => 'magenta',
             'color_swatch__compact' => 'charcoal',
             'color_swatch__tooltips' => 'green',
+            'color_swatch__white' => 'white',
+            'color_swatch__black' => 'black',
+            'color_swatch__disabled' => 'white',
         ];
     }
 
@@ -92,6 +97,11 @@ class ColorSwatchPlayground
                                 ->colors($colors)
                                 ->default('magenta'),
                         ]),
+                    Grid::make(3)->schema([
+                        ColorSwatchField::make('color_swatch__white')->label('Selected white')->colors($colors)->default('white')->tooltips($labels),
+                        ColorSwatchField::make('color_swatch__black')->label('Selected black')->colors($colors)->default('black')->tooltips($labels),
+                        ColorSwatchField::make('color_swatch__disabled')->label('Disabled')->colors($colors)->default('white')->disabled(),
+                    ]),
                     Grid::make(2)
                         ->schema([
                             ColorSwatchField::make('color_swatch__compact')

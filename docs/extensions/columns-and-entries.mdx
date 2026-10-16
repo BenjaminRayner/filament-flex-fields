@@ -1,0 +1,49 @@
+---
+title: "Table columns and infolist entries"
+description: "Create independent display surfaces that share formatting and styles."
+---
+
+Use the shared display trait to emit an independent consumer for every table cell or infolist entry:
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Concerns\EmitsFlexDisplayAssets;
+use Filament\Tables\Columns\Column;
+
+class RatingColumn extends Column
+{
+    use EmitsFlexDisplayAssets;
+
+    protected string $view = 'acme-rating::column';
+
+    protected function flexDisplayComponentId(): string
+    {
+        return 'acme-rating-column';
+    }
+}
+```
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Concerns\EmitsFlexDisplayAssets;
+use Filament\Infolists\Components\Entry;
+
+class RatingEntry extends Entry
+{
+    use EmitsFlexDisplayAssets;
+
+    protected string $view = 'acme-rating::entry';
+
+    protected function flexDisplayComponentId(): string
+    {
+        return 'acme-rating-entry';
+    }
+}
+```
+
+Use `$getState()` in your views and escape displayed text. Wrap an entry with `$getEntryWrapperView()` to keep its label and infolist layout. A shared PHP formatter can produce the same presentation data for both views.
+
+When showing the same attribute several times in one infolist, assign each entry a different `key()`. The trait distinguishes records and surfaces automatically. `criticalStyles()` is an optional choice for displays that must have their styles at first paint; leave it off for surfaces that should load only on activation.
+
+## Continue reading
+
+[Family reference](/docs/extensions/family-reference) · [Shared asset ownership](/docs/extensions/asset-ownership)
+

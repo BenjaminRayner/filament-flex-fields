@@ -1,159 +1,1531 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Filament Flex Fields",
+  "theme": "aspen",
+  "name": "FLEX Fields",
+  "description": "Advanced Filament 5 components with virtualized selects, signatures, barcode scanning, shared asset loading and Media OS workflows.",
   "colors": {
-    "primary": "#6366f1",
-    "light": "#818cf8",
-    "dark": "#4f46e5"
+    "primary": "#5B49D6",
+    "light": "#A89AFF",
+    "dark": "#4935B5"
+  },
+  "logo": {
+    "light": "/art/docs-logo-light.svg",
+    "dark": "/art/docs-logo-dark.svg"
+  },
+  "favicon": "/art/docs-favicon.svg",
+  "banner": {
+    "content": "**FLEX Fields v4 is here.** [Explore what's new →](/docs/changelog)",
+    "color": {
+      "light": "#5B49D6",
+      "dark": "#5B49D6"
+    },
+    "dismissible": true
+  },
+  "integrations": {
+    "ga4": {
+      "measurementId": "G-609GENVBF0"
+    }
+  },
+  "appearance": {
+    "default": "system",
+    "strict": false
+  },
+  "fonts": {
+    "family": "Inter",
+    "heading": {
+      "family": "Inter",
+      "weight": 600
+    }
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "background": {
+    "color": {
+      "light": "#FFFFFF",
+      "dark": "#101018"
+    }
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs",
+    "codeblocks": {
+      "theme": {
+        "light": "github-light",
+        "dark": "github-dark"
+      }
+    },
+    "latex": false
   },
   "navigation": {
-    "groups": [
-    {
-      "group": "Getting Started",
-      "pages": [
-        "docs/index",
-        "docs/shared-concepts",
-        "docs/flex-field-groups",
-        "docs/focus-outline"
-      ],
-      "icon": "rocket"
-    },
-    {
-      "group": "Guides & Resources",
-      "pages": [
-        "docs/form-layout-patterns",
-        "docs/layout-components-quick-comparison",
-        "docs/schema-conditions",
-        "docs/field-intelligence",
-        "docs/admin-columns",
-        "docs/deprecated-class-aliases"
-      ],
-      "icon": "book-open"
-    },
-    {
-      "group": "Text & Input",
-      "pages": [
-        "docs/flextextinput",
-        "docs/flextextareafield",
-        "docs/phonefield",
-        "docs/countryfield",
-        "docs/timezonefield",
-        "docs/slugfield-and-titleslugfield",
-        "docs/addressautocompletefield",
-        "docs/flexverificationcode",
-        "docs/tags-field",
-        "docs/link-preview-field",
-        "docs/social-links-field"
-      ],
-      "icon": "type"
-    },
-    {
-      "group": "Number & Range",
-      "pages": [
-        "docs/numberstepper",
-        "docs/calculator-field",
-        "docs/currencyfield",
-        "docs/flexslider",
-        "docs/trackslider",
-        "docs/pricerangefield",
-        "docs/trafficsplit"
-      ],
-      "icon": "hash"
-    },
-    {
-      "group": "Choice & Selection",
-      "pages": [
-        "docs/switchfield",
-        "docs/segmentcontrol",
-        "docs/choicecards",
-        "docs/choicecheckboxcards",
-        "docs/imagechoicecards",
-        "docs/flexchecklist",
-        "docs/flexradiolist",
-        "docs/matrixchoicefield",
-        "docs/flex-matrix-table",
-        "docs/selectfield",
-        "docs/icon-picker-field",
-        "docs/userselect",
-        "docs/duallistboxfield",
-        "docs/bubblechoicefield"
-      ],
-      "icon": "check-square"
-    },
-    {
-      "group": "Date & Time",
-      "pages": [
-        "docs/date-and-time-fields",
-        "docs/schedule-field"
-      ],
-      "icon": "calendar"
-    },
-    {
-      "group": "Media, Color & Location",
-      "pages": [
-        "docs/colorswatchfield",
-        "docs/flexcolorpickerfield",
-        "docs/flexfileupload-and-fleximageupload",
-        "docs/videofield",
-        "docs/audiofield",
-        "docs/voicenoterecorderfield",
-        "docs/mappickerfield",
-        "docs/signaturefield",
-        "docs/creditcardfield",
-        "docs/barcode-scanner-field"
-      ],
-      "icon": "image"
-    },
-    {
-      "group": "Rating & Tables",
-      "pages": [
-        "docs/ratingfield",
-        "docs/nps-field",
-        "docs/ratingcolumn",
-        "docs/iconcolumn",
-        "docs/usercolumn"
-      ],
-      "icon": "star"
-    },
-    {
-      "group": "Actions & Enterprise",
-      "pages": [
-        "docs/hold-confirm-action",
-        "docs/compliance-pack",
-        "docs/media-capture-os",
-        "docs/upgrade-v2-to-v3",
-        "docs/sre-runbook",
-        "docs/COMPATIBILITY"
-      ],
-      "icon": "shield"
-    },
-    {
-      "group": "Layout & Display (Schemas)",
-      "pages": [
-        "docs/itemcard",
-        "docs/itemcardgroup",
-        "docs/itemcardstack",
-        "docs/covercard",
-        "docs/progressbar",
-        "docs/progresscircle",
-        "docs/segmenttabs",
-        "docs/translatablefields"
-      ],
-      "icon": "layout-template"
-    }
+    "tabs": [
+      {
+        "tab": "Home",
+        "pages": [
+          "docs/index"
+        ]
+      },
+      {
+        "tab": "Start here",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "docs/quickstart",
+              "docs/installation",
+              "docs/first-component"
+            ]
+          },
+          {
+            "group": "Configure your forms",
+            "pages": [
+              "docs/configuration",
+              "docs/data-and-validation",
+              "docs/rtl"
+            ]
+          },
+          {
+            "group": "Run & maintain",
+            "pages": [
+              "docs/requirements",
+              "docs/updating",
+              "docs/troubleshooting",
+              "docs/sre-runbook"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Components",
+        "groups": [
+          {
+            "group": "Component reference",
+            "pages": [
+              "docs/component-library",
+              {
+                "group": "Text & Input",
+                "pages": [
+                  "docs/flextextinput",
+                  "docs/flextextareafield",
+                  "docs/flex-rich-editor",
+                  "docs/phonefield",
+                  "docs/countryfield",
+                  "docs/timezonefield",
+                  "docs/font-select",
+                  "docs/slugfield-and-titleslugfield",
+                  "docs/flexverificationcode",
+                  "docs/tags-field",
+                  "docs/link-preview-field",
+                  "docs/social-links-field"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "Number & Range",
+                "pages": [
+                  "docs/numberstepper",
+                  "docs/calculator-field",
+                  "docs/currencyfield",
+                  "docs/flexslider",
+                  "docs/trackslider",
+                  "docs/pricerangefield",
+                  "docs/trafficsplit"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "Choice & Selection",
+                "pages": [
+                  "docs/switchfield",
+                  "docs/segmentcontrol",
+                  "docs/choicecards",
+                  "docs/choicecheckboxcards",
+                  "docs/imagechoicecards",
+                  "docs/flexchecklist",
+                  "docs/flexradiolist",
+                  "docs/matrixchoicefield",
+                  "docs/flex-matrix-table",
+                  "docs/selectfield",
+                  "docs/icon-picker-field",
+                  "docs/userselect",
+                  "docs/duallistboxfield",
+                  "docs/bubblechoicefield",
+                  "docs/todolistfield"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "File Upload",
+                "pages": [
+                  "docs/flexfileupload-and-fleximageupload",
+                  "docs/file-upload-storage-and-validation",
+                  "docs/file-upload-models-and-migration",
+                  "docs/file-upload-images-and-sources",
+                  "docs/file-upload-metadata",
+                  "docs/file-upload-events-and-recovery",
+                  "docs/file-upload-api"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "Date & Time",
+                "pages": [
+                  "docs/date-and-time-fields",
+                  "docs/date-picker",
+                  "docs/date-range-picker",
+                  "docs/time-picker",
+                  "docs/date-periods-and-duration",
+                  "docs/date-time-configuration",
+                  "docs/date-time-events-and-validation",
+                  "docs/schedule-field"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "Media & Color",
+                "pages": [
+                  "docs/colorswatchfield",
+                  "docs/flexcolorpickerfield",
+                  "docs/videofield",
+                  "docs/audiofield",
+                  "docs/voicenoterecorderfield",
+                  "docs/signaturefield",
+                  "docs/creditcardfield",
+                  "docs/barcode-scanner-field"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "Maps & Location",
+                "pages": [
+                  "docs/mappickerfield",
+                  "docs/map-coordinates",
+                  "docs/map-display",
+                  "docs/map-markers",
+                  "docs/map-zones",
+                  "docs/map-editor",
+                  "docs/country-map-field",
+                  "docs/addressautocompletefield",
+                  "docs/location-v4",
+                  "docs/map-feature-forms"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "Rating & Tables",
+                "pages": [
+                  "docs/ratingfield",
+                  "docs/nps-field",
+                  "docs/ratingcolumn",
+                  "docs/iconcolumn",
+                  "docs/usercolumn",
+                  "docs/status-chip-column"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "Layout & Display (Schemas)",
+                "pages": [
+                  "docs/itemcard",
+                  "docs/itemcardgroup",
+                  "docs/itemcardstack",
+                  "docs/covercard",
+                  "docs/progressbar",
+                  "docs/progresscircle",
+                  "docs/segmenttabs",
+                  "docs/translatablefields"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "Dynamic custom fields",
+                "expanded": false,
+                "pages": [
+                  "docs/flex-field-groups",
+                  "docs/field-intelligence"
+                ]
+              },
+              {
+                "group": "Actions",
+                "expanded": false,
+                "pages": [
+                  "docs/hold-confirm-action"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Asset Manager",
+        "groups": [
+          {
+            "group": "Loading & lifecycle",
+            "pages": [
+              "docs/asset-loading",
+              "docs/assets/sharing",
+              "docs/assets/lifecycle",
+              "docs/assets/performance"
+            ]
+          },
+          {
+            "group": "Delivery & diagnostics",
+            "pages": [
+              "docs/assets/deployment",
+              "docs/extensions/asset-delivery"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Media OS",
+        "groups": [
+          {
+            "group": "Storage and images",
+            "pages": [
+              "docs/media-capture-os",
+              "docs/media-os-configuration",
+              "docs/media-os-api",
+              "docs/media-os-images",
+              "docs/media-os-spatie"
+            ]
+          },
+          {
+            "group": "Lifecycle and integrations",
+            "pages": [
+              "docs/media-os-lifecycle",
+              "docs/media-os-extensions",
+              "docs/media-os-capture",
+              "docs/media-os-browser",
+              "docs/media-ingress-migration"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Extensions",
+        "groups": [
+          {
+            "group": "Getting started",
+            "pages": [
+              "docs/extensions/index",
+              "docs/extensions/quickstart",
+              "docs/extensions/generate-package",
+              "docs/extensions/package-structure",
+              "docs/extensions/standalone",
+              "docs/extensions/recipes"
+            ]
+          },
+          {
+            "group": "Components and families",
+            "pages": [
+              "docs/extensions/fields",
+              "docs/extensions/columns-and-entries",
+              "docs/extensions/registration",
+              "docs/extensions/routes",
+              "docs/extensions/packages-and-families",
+              "docs/extensions/package-dependencies",
+              "docs/extensions/definition-reference",
+              "docs/extensions/family-reference"
+            ]
+          },
+          {
+            "group": "Composition",
+            "pages": [
+              "docs/extensions/asset-ownership",
+              "docs/extensions/child-select",
+              "docs/extensions/child-php-api",
+              "docs/extensions/child-contracts",
+              "docs/extensions/custom-child-factories",
+              "docs/extensions/child-reference"
+            ]
+          },
+          {
+            "group": "Configuration and values",
+            "pages": [
+              "docs/extensions/configuration",
+              "docs/extensions/configuration-reference",
+              "docs/extensions/schema-adapter",
+              "docs/extensions/schema-builders",
+              "docs/extensions/schema-exchange",
+              "docs/extensions/submission",
+              "docs/extensions/saved-values",
+              "docs/extensions/validation",
+              "docs/extensions/migrations",
+              "docs/extensions/batch-migrations",
+              "docs/extensions/schema-reference"
+            ]
+          },
+          {
+            "group": "JavaScript and interactions",
+            "pages": [
+              "docs/extensions/factories",
+              "docs/extensions/sdk",
+              "docs/extensions/surfaces",
+              "docs/extensions/events",
+              "docs/extensions/hooks",
+              "docs/extensions/sdk-reference"
+            ]
+          },
+          {
+            "group": "Assets and delivery",
+            "pages": [
+              "docs/extensions/build",
+              "docs/extensions/manifest-reference",
+              "docs/extensions/compatibility-assets"
+            ]
+          },
+          {
+            "group": "Appearance and discovery",
+            "pages": [
+              "docs/extensions/appearance",
+              "docs/extensions/translation",
+              "docs/extensions/locales",
+              "docs/extensions/catalog"
+            ]
+          },
+          {
+            "group": "Publishing and support",
+            "pages": [
+              "docs/extensions/deployment",
+              "docs/extensions/upgrading",
+              "docs/extensions/package-selection",
+              "docs/extensions/removal",
+              "docs/extensions/unavailable-extensions",
+              "docs/extensions/diagnostics",
+              "docs/extensions/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Changelog",
+        "groups": [
+          {
+            "group": "Releases",
+            "pages": [
+              "docs/changelog",
+              "docs/changelog-archive"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Roadmap",
+        "groups": [
+          {
+            "group": "Product direction",
+            "pages": [
+              "docs/roadmap"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Licensing",
+        "groups": [
+          {
+            "group": "License and plans",
+            "pages": [
+              "docs/licensing",
+              "docs/plans",
+              "docs/request-license",
+              "docs/licensing-faq",
+              "docs/license-terms"
+            ]
+          }
+        ]
+      }
     ]
   },
   "navbar": {
     "links": [
       {
+        "type": "github",
         "label": "GitHub",
         "href": "https://github.com/janczakb/filament-flex-fields"
       }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Live demo",
+      "href": "https://demo.bjanczak.com/"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/janczakb/filament-flex-fields"
+    },
+    "links": [
+      {
+        "header": "Components",
+        "items": [
+          {
+            "label": "Component library",
+            "href": "/docs/component-library"
+          },
+          {
+            "label": "Select & search",
+            "href": "/docs/selectfield"
+          },
+          {
+            "label": "Files & media",
+            "href": "/docs/flexfileupload-and-fleximageupload"
+          },
+          {
+            "label": "Maps & location",
+            "href": "/docs/mappickerfield"
+          },
+          {
+            "label": "Translated fields",
+            "href": "/docs/translatablefields"
+          },
+          {
+            "label": "RTL support",
+            "href": "/docs/rtl"
+          }
+        ]
+      },
+      {
+        "header": "Build",
+        "items": [
+          {
+            "label": "Get started",
+            "href": "/docs/quickstart"
+          },
+          {
+            "label": "Configuration & styling",
+            "href": "/docs/configuration"
+          },
+          {
+            "label": "Saving & validation",
+            "href": "/docs/data-and-validation"
+          },
+          {
+            "label": "Asset Manager",
+            "href": "/docs/asset-loading"
+          },
+          {
+            "label": "Create an extension",
+            "href": "/docs/extensions"
+          },
+          {
+            "label": "Updating & deployment",
+            "href": "/docs/updating"
+          }
+        ]
+      },
+      {
+        "header": "Product",
+        "items": [
+          {
+            "label": "Live playground",
+            "href": "https://demo.bjanczak.com/"
+          },
+          {
+            "label": "Changelog",
+            "href": "/docs/changelog"
+          },
+          {
+            "label": "Release archive",
+            "href": "/docs/changelog-archive"
+          },
+          {
+            "label": "Roadmap",
+            "href": "/docs/roadmap"
+          },
+          {
+            "label": "Requirements",
+            "href": "/docs/requirements"
+          },
+          {
+            "label": "FLEX Forms",
+            "href": "https://flexforms.bjanczak.com"
+          }
+        ]
+      },
+      {
+        "header": "Resources",
+        "items": [
+          {
+            "label": "Source on GitHub",
+            "href": "https://github.com/janczakb/filament-flex-fields"
+          },
+          {
+            "label": "Report an issue",
+            "href": "https://github.com/janczakb/filament-flex-fields/issues/new?template=bug_report.md"
+          },
+          {
+            "label": "Suggest a feature",
+            "href": "https://github.com/janczakb/filament-flex-fields/issues/new?template=feature_request.md"
+          },
+          {
+            "label": "Troubleshooting",
+            "href": "/docs/troubleshooting"
+          },
+          {
+            "label": "Monitoring & operations",
+            "href": "/docs/sre-runbook"
+          },
+          {
+            "label": "Media migration",
+            "href": "/docs/media-ingress-migration"
+          }
+        ]
+      }
     ]
   },
-  "description": "Comprehensive SaaS-inspired UI components, form fields, and layouts for Filament.",
-  "icons": {
-    "library": "lucide"
+  "search": {
+    "prompt": "Search documentation…"
+  },
+  "metadata": {
+    "timestamp": true
+  },
+  "interaction": {
+    "drilldown": false
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "download-pdf"
+    ],
+    "display": "header"
+  },
+  "seo": {
+    "indexing": "navigable",
+    "trailingSlash": false,
+    "metatags": {
+      "og:site_name": "FLEX Fields Documentation",
+      "og:locale": "en_US",
+      "twitter:card": "summary_large_image",
+      "canonical": "https://flex-fields.bjanczak.com",
+      "og:image": "https://flex-fields.bjanczak.com/art/og/flex-fields-v4.webp",
+      "og:image:width": "1200",
+      "og:image:height": "630",
+      "twitter:image": "https://flex-fields.bjanczak.com/art/og/flex-fields-v4.webp"
+    },
+    "organization": {
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ],
+      "id": "https://flex-fields.bjanczak.com/#organization",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg"
+    },
+    "paths": [
+      {
+        "path": "docs/addressautocompletefield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/address-autocomplete-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/address-autocomplete-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "AddressAutocompleteField in the FLEX Fields playground",
+          "twitter:image:alt": "AddressAutocompleteField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/audiofield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/audio-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/audio-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "AudioField in the FLEX Fields playground",
+          "twitter:image:alt": "AudioField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/barcode-scanner-field",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/barcode-scanner-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/barcode-scanner-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Barcode scanner in the FLEX Fields playground",
+          "twitter:image:alt": "Barcode scanner in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/bubblechoicefield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/bubble-choice-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/bubble-choice-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "BubbleChoiceField in the FLEX Fields playground",
+          "twitter:image:alt": "BubbleChoiceField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/calculator-field",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/calculator-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/calculator-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "CalculatorField in the FLEX Fields playground",
+          "twitter:image:alt": "CalculatorField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/choicecards",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/choice-cards-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/choice-cards-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "ChoiceCards in the FLEX Fields playground",
+          "twitter:image:alt": "ChoiceCards in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/choicecheckboxcards",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/choice-checkbox-cards-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/choice-checkbox-cards-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "ChoiceCheckboxCards in the FLEX Fields playground",
+          "twitter:image:alt": "ChoiceCheckboxCards in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/colorswatchfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/color-swatch-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/color-swatch-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "ColorSwatchField in the FLEX Fields playground",
+          "twitter:image:alt": "ColorSwatchField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/country-map-field",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/country-map-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/country-map-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "CountryMapField in the FLEX Fields playground",
+          "twitter:image:alt": "CountryMapField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/countryfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/country-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/country-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "CountryField in the FLEX Fields playground",
+          "twitter:image:alt": "CountryField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/covercard",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/cover-card-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/cover-card-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "CoverCard in the FLEX Fields playground",
+          "twitter:image:alt": "CoverCard in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/creditcardfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/credit-card-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/credit-card-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "CreditCardField in the FLEX Fields playground",
+          "twitter:image:alt": "CreditCardField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/currencyfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/currency-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/currency-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "CurrencyField in the FLEX Fields playground",
+          "twitter:image:alt": "CurrencyField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/date-periods-and-duration",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/date-periods-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/date-periods-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Months, years & duration in the FLEX Fields playground",
+          "twitter:image:alt": "Months, years & duration in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/date-picker",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/date-picker-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/date-picker-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Date picker in the FLEX Fields playground",
+          "twitter:image:alt": "Date picker in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/date-range-picker",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/date-range-picker-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/date-range-picker-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Date range picker in the FLEX Fields playground",
+          "twitter:image:alt": "Date range picker in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/duallistboxfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/dual-listbox-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/dual-listbox-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "DualListboxField in the FLEX Fields playground",
+          "twitter:image:alt": "DualListboxField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/file-upload-images-and-sources",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/photo-editor-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/photo-editor-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Upload images, avatars and sources in the FLEX Fields playground",
+          "twitter:image:alt": "Upload images, avatars and sources in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/flex-matrix-table",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/flex-matrix-table-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/flex-matrix-table-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "FlexMatrixTable in the FLEX Fields playground",
+          "twitter:image:alt": "FlexMatrixTable in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/flex-rich-editor",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/flex-rich-editor-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/flex-rich-editor-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "FlexRichEditor in the FLEX Fields playground",
+          "twitter:image:alt": "FlexRichEditor in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/flexchecklist",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/flex-checklist-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/flex-checklist-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "FlexChecklist in the FLEX Fields playground",
+          "twitter:image:alt": "FlexChecklist in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/flexcolorpickerfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/flex-color-picker-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/flex-color-picker-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "FlexColorPickerField in the FLEX Fields playground",
+          "twitter:image:alt": "FlexColorPickerField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/flexfileupload-and-fleximageupload",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/file-upload-list-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/file-upload-list-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "FLEX File Upload in the FLEX Fields playground",
+          "twitter:image:alt": "FLEX File Upload in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/flexradiolist",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/flex-radiolist-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/flex-radiolist-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "FlexRadiolist in the FLEX Fields playground",
+          "twitter:image:alt": "FlexRadiolist in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/flexslider",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/flex-slider-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/flex-slider-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "FlexSlider in the FLEX Fields playground",
+          "twitter:image:alt": "FlexSlider in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/flextextareafield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/flex-textarea-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/flex-textarea-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "FlexTextareaField in the FLEX Fields playground",
+          "twitter:image:alt": "FlexTextareaField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/flextextinput",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/flex-text-input-emoji-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/flex-text-input-emoji-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "FlexTextInput in the FLEX Fields playground",
+          "twitter:image:alt": "FlexTextInput in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/flexverificationcode",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/verification-code-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/verification-code-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "FlexVerificationCode in the FLEX Fields playground",
+          "twitter:image:alt": "FlexVerificationCode in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/font-select",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/font-select-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/font-select-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Font Select in the FLEX Fields playground",
+          "twitter:image:alt": "Font Select in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/hold-confirm-action",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/hold-confirm-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/hold-confirm-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Hold confirm & confirm morph in the FLEX Fields playground",
+          "twitter:image:alt": "Hold confirm & confirm morph in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/icon-picker-field",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/icon-picker-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/icon-picker-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "IconPickerField in the FLEX Fields playground",
+          "twitter:image:alt": "IconPickerField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/imagechoicecards",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/image-choice-cards-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/image-choice-cards-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "ImageChoiceCards in the FLEX Fields playground",
+          "twitter:image:alt": "ImageChoiceCards in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/itemcardgroup",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/item-card-group-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/item-card-group-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "ItemCardGroup in the FLEX Fields playground",
+          "twitter:image:alt": "ItemCardGroup in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/link-preview-field",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/link-preview-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/link-preview-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Link Preview Field in the FLEX Fields playground",
+          "twitter:image:alt": "Link Preview Field in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/map-coordinates",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/map-coordinates-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/map-coordinates-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "MapCoordinatesField in the FLEX Fields playground",
+          "twitter:image:alt": "MapCoordinatesField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/map-display",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/map-display-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/map-display-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "MapDisplayField in the FLEX Fields playground",
+          "twitter:image:alt": "MapDisplayField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/map-editor",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/map-editor-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/map-editor-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "MapEditorField in the FLEX Fields playground",
+          "twitter:image:alt": "MapEditorField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/map-markers",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/map-markers-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/map-markers-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "MapMarkersField in the FLEX Fields playground",
+          "twitter:image:alt": "MapMarkersField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/map-zones",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/map-zones-polygon-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/map-zones-polygon-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "MapZonesField in the FLEX Fields playground",
+          "twitter:image:alt": "MapZonesField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/mappickerfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/map-picker-structured-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/map-picker-structured-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "MapPickerField in the FLEX Fields playground",
+          "twitter:image:alt": "MapPickerField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/matrixchoicefield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/matrix-choice-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/matrix-choice-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "MatrixChoiceField in the FLEX Fields playground",
+          "twitter:image:alt": "MatrixChoiceField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/nps-field",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/nps-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/nps-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "NpsField in the FLEX Fields playground",
+          "twitter:image:alt": "NpsField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/numberstepper",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/number-stepper-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/number-stepper-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "NumberStepper in the FLEX Fields playground",
+          "twitter:image:alt": "NumberStepper in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/phonefield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/phone-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/phone-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "PhoneField in the FLEX Fields playground",
+          "twitter:image:alt": "PhoneField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/pricerangefield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/price-range-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/price-range-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "PriceRangeField in the FLEX Fields playground",
+          "twitter:image:alt": "PriceRangeField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/progresscircle",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/progress-circle-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/progress-circle-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "ProgressCircle in the FLEX Fields playground",
+          "twitter:image:alt": "ProgressCircle in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/ratingfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/rating-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/rating-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "RatingField in the FLEX Fields playground",
+          "twitter:image:alt": "RatingField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/schedule-field",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/schedule-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/schedule-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "ScheduleField in the FLEX Fields playground",
+          "twitter:image:alt": "ScheduleField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/segmentcontrol",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/segment-control-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/segment-control-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "SegmentControl in the FLEX Fields playground",
+          "twitter:image:alt": "SegmentControl in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/segmenttabs",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/segment-tabs-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/segment-tabs-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "SegmentTabs in the FLEX Fields playground",
+          "twitter:image:alt": "SegmentTabs in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/selectfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/select-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/select-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "SelectField in the FLEX Fields playground",
+          "twitter:image:alt": "SelectField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/signaturefield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/signature-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/signature-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "SignatureField in the FLEX Fields playground",
+          "twitter:image:alt": "SignatureField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/slugfield-and-titleslugfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/slug-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/slug-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "SlugField & TitleSlugField in the FLEX Fields playground",
+          "twitter:image:alt": "SlugField & TitleSlugField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/social-links-field",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/social-links-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/social-links-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Social links in the FLEX Fields playground",
+          "twitter:image:alt": "Social links in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/switchfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/switch-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/switch-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "SwitchField in the FLEX Fields playground",
+          "twitter:image:alt": "SwitchField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/tags-field",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/tags-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/tags-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "TagsField in the FLEX Fields playground",
+          "twitter:image:alt": "TagsField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/time-picker",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/time-picker-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/time-picker-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Time picker in the FLEX Fields playground",
+          "twitter:image:alt": "Time picker in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/timezonefield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/timezone-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/timezone-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "TimezoneField in the FLEX Fields playground",
+          "twitter:image:alt": "TimezoneField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/todolistfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/todo-list-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/todo-list-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Todo List in the FLEX Fields playground",
+          "twitter:image:alt": "Todo List in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/trackslider",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/track-slider-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/track-slider-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "TrackSlider in the FLEX Fields playground",
+          "twitter:image:alt": "TrackSlider in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/trafficsplit",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/traffic-split-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/traffic-split-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "TrafficSplit in the FLEX Fields playground",
+          "twitter:image:alt": "TrafficSplit in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/translatablefields",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/translatable-fields-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/translatable-fields-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "TranslatableFields in the FLEX Fields playground",
+          "twitter:image:alt": "TranslatableFields in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/userselect",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/user-select-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/user-select-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "UserSelect in the FLEX Fields playground",
+          "twitter:image:alt": "UserSelect in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/videofield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/video-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/video-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "VideoField in the FLEX Fields playground",
+          "twitter:image:alt": "VideoField in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/voicenoterecorderfield",
+        "metatags": {
+          "og:video": "https://flex-fields.bjanczak.com/art/previews/voice-note-recorder-field-motion.mp4",
+          "og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/voice-note-recorder-field-motion.mp4",
+          "og:video:type": "video/mp4",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:type": "image/webp",
+          "og:image:alt": "Voice Note Recorder in the FLEX Fields playground",
+          "twitter:image:alt": "Voice Note Recorder in the FLEX Fields playground"
+        }
+      }
+    ]
+  },
+  "thumbnails": {
+    "fonts": {
+      "family": "Inter"
+    }
+  },
+  "errors": {
+    "404": {
+      "redirect": false,
+      "title": "This documentation page could not be found",
+      "description": "Search for the component name, or return to the [documentation home](/docs)."
+    }
+  },
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/docs/index",
+      "permanent": true
+    },
+    {
+      "source": "/docs/address-autocomplete",
+      "destination": "/docs/addressautocompletefield",
+      "permanent": true
+    },
+    {
+      "source": "/docs/why-flex",
+      "destination": "/docs",
+      "permanent": true
+    },
+    {
+      "source": "/docs/integration-recipes",
+      "destination": "/docs/component-library",
+      "permanent": true
+    },
+    {
+      "source": "/docs/layout-components-quick-comparison",
+      "destination": "/docs/component-library",
+      "permanent": true
+    },
+    {
+      "source": "/docs/accessibility-and-safety",
+      "destination": "/docs/data-and-validation",
+      "permanent": true
+    },
+    {
+      "source": "/docs/choose-your-components",
+      "destination": "/docs/component-library",
+      "permanent": true
+    },
+    {
+      "source": "/docs/performance-and-dependencies",
+      "destination": "/docs/asset-loading",
+      "permanent": true
+    },
+    {
+      "source": "/docs/COMPATIBILITY",
+      "destination": "/docs/requirements",
+      "permanent": true
+    }
+  ],
+  "markdown": {
+    "instructions": [
+      "Examples target Filament 5. Verify optional dependencies before configuring integrations.",
+      "Upload transfer completion, permanent storage and record acceptance are separate milestones. Native and Spatie image conversions retain the original."
+    ]
   }
 }

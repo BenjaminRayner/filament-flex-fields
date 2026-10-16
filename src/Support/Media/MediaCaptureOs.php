@@ -4,114 +4,100 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Media;
 
-use Bjanczak\FilamentFlexFields\Support\Enterprise\ObservabilityHooks;
-use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaIngress;
-use Illuminate\Support\Facades\Storage;
+use Bjanczak\FilamentFlexFields\Support\Events\ActivityDispatcher;
+use Bjanczak\FilamentFlexFields\Support\Events\BarcodeCaptured;
+use Bjanczak\FilamentFlexFields\Support\Media\Capture\CaptureIdentity;
+use Bjanczak\FilamentFlexFields\Support\Media\Capture\RetentionSettings;
+use Bjanczak\FilamentFlexFields\Support\Media\Capture\TranscriptionResolver;
+use Bjanczak\FilamentFlexFields\Support\Media\Compatibility\MediaTranslation;
+use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaContext;
+use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaKind;
+use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaPayload;
+use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaStorageDriver;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
+use Closure;
+use InvalidArgumentException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Throwable;
 
 /**
- * @deprecated Prefer {@see FlexMedia} / {@see MediaIngress}
- * for persist/control-plane flows. Host hook registrars remain supported as deprecated aliases into the same runtime.
+ * @deprecated Compatibility registration facade. MediaOs owns all new media transactions.
+ *
+ * @phpstan-import-type Policies from RetentionSettings
  */
 final class MediaCaptureOs implements MediaStorageContract
 {
-    /** @var (callable(string): bool|null)|null */
-    private static $virusScanCallback = null;
-
-    /** @var (callable(): string|null)|null */
-    private static $legalSignerIdResolver = null;
-
-    /** @var (callable(): string|null)|null */
-    private static $documentHashResolver = null;
-
-    /** @var (callable(string, string, array<string, mixed>): string|null)|null */
-    private static $signedUploadUrlResolver = null;
-
-    /** @var (callable(string): string|null)|null */
-    private static $tokenizeCreditCardCallback = null;
-
-    private static ?VoiceNoteTranscriptionInterface $transcriptionInterface = null;
-
-    /**
-     * @var array{
-     *     uploads: array{enabled: bool, days: int|null},
-     *     voice_notes: array{enabled: bool, days: int|null},
-     *     signatures: array{enabled: bool, days: int|null},
-     *     temp_captures: array{enabled: bool, days: int|null},
-     * }|null
-     */
-    private static ?array $retentionPolicies = null;
-
-    /**
-     * @param  (callable(string $path): bool|null)|null  $callback
-     */
+    /** @param (callable(string): bool|null)|null $callback */
     public static function registerVirusScanCallback(?callable $callback): void
     {
-        self::$virusScanCallback = $callback;
+        RequestState::configure(MediaCaptureState::class, static function (MediaCaptureState $state) use ($callback): void {
+            $state->virusScanCallback = $callback === null ? null : Closure::fromCallable($callback);
+        });
     }
 
-    /**
-     * @return (callable(string $path): bool|null)|null
-     */
-    public static function virusScanCallback(): ?callable
+    /** @return (Closure(string): (bool|null))|null */
+    public static function virusScanCallback(): ?Closure
     {
-        return self::$virusScanCallback;
+        return self::state()->virusScanCallback;
     }
 
-    /**
-     * @param  (callable(string $disk, string $path, array<string, mixed> $context): string|null)|null  $resolver
-     */
+    /** @param (callable(string, string, array<string, mixed>): string|null)|null $resolver */
     public static function registerSignedUploadUrlResolver(?callable $resolver): void
     {
-        self::$signedUploadUrlResolver = $resolver;
+        RequestState::configure(MediaCaptureState::class, static function (MediaCaptureState $state) use ($resolver): void {
+            $state->signedUploadUrlResolver = $resolver === null ? null : Closure::fromCallable($resolver);
+            $state->signedUrlConfigured = true;
+        });
     }
 
-    /**
-     * @return (callable(string $disk, string $path, array<string, mixed> $context): string|null)|null
-     */
-    public static function signedUploadUrlResolver(): ?callable
+    /** @return (Closure(string, string, array<string, mixed>): (string|null))|null */
+    public static function signedUploadUrlResolver(): ?Closure
     {
-        return self::$signedUploadUrlResolver;
+        self::configureSignedUrls(self::configuration());
+
+        return self::state()->signedUploadUrlResolver;
     }
 
-    /**
-     * Tokenize primary account numbers via host-app callback — Flex Fields never persists raw PAN.
-     *
-     * @param  (callable(string $pan): string|null)|null  $callback
-     */
+    /** @param (callable(string): string|null)|null $callback */
     public static function registerTokenizeCreditCardCallback(?callable $callback): void
     {
-        self::$tokenizeCreditCardCallback = $callback;
+        RequestState::configure(MediaCaptureState::class, static function (MediaCaptureState $state) use ($callback): void {
+            $state->tokenizeCreditCardCallback = $callback === null ? null : Closure::fromCallable($callback);
+        });
     }
 
-    /**
-     * @return (callable(string $pan): string|null)|null
-     */
-    public static function tokenizeCreditCardCallback(): ?callable
+    /** @return (Closure(string): (string|null))|null */
+    public static function tokenizeCreditCardCallback(): ?Closure
     {
-        return self::$tokenizeCreditCardCallback;
+        return self::state()->tokenizeCreditCardCallback;
     }
 
     public static function registerTranscriptionInterface(?VoiceNoteTranscriptionInterface $interface): void
     {
-        self::$transcriptionInterface = $interface;
+        RequestState::configure(MediaCaptureState::class, static function (MediaCaptureState $state) use ($interface): void {
+            $state->transcriptionInterface = $interface;
+            $state->transcriptionFactory = null;
+            $state->transcriptionConfigured = true;
+        });
+    }
+
+    /** @param (Closure(): VoiceNoteTranscriptionInterface)|null $factory */
+    public static function registerTranscriptionFactory(?Closure $factory): void
+    {
+        RequestState::configure(MediaCaptureState::class, static function (MediaCaptureState $state) use ($factory): void {
+            $state->transcriptionInterface = null;
+            $state->transcriptionFactory = $factory;
+            $state->transcriptionConfigured = false;
+        });
     }
 
     public static function transcriptionInterface(): ?VoiceNoteTranscriptionInterface
     {
-        return self::$transcriptionInterface;
+        return app(TranscriptionResolver::class)->resolve();
     }
 
-    /**
-     * Boot permissive dev defaults when virus scan is not required.
-     * When {@see shouldRequireVirusScan()} is true, no callback is registered — uploads fail closed.
-     */
-    public static function bootSafeDefaults(): void
-    {
-        if (self::$virusScanCallback === null && ! self::shouldRequireVirusScan()) {
-            self::registerVirusScanCallback(static fn (string $path): bool => true);
-        }
-    }
+    /** @deprecated Permissive policy does not install a fake certifying scanner. */
+    public static function bootSafeDefaults(): void {}
 
     public static function shouldRequireVirusScan(): bool
     {
@@ -128,218 +114,90 @@ final class MediaCaptureOs implements MediaStorageContract
         return self::virusScanCallback() !== null;
     }
 
-    /**
-     * @param  (callable(): string|null)|null  $resolver
-     */
+    /** @param (callable(): string|null)|null $resolver */
     public static function registerLegalSignerIdResolver(?callable $resolver): void
     {
-        self::$legalSignerIdResolver = $resolver;
+        RequestState::configure(MediaCaptureState::class, static function (MediaCaptureState $state) use ($resolver): void {
+            $state->legalSignerIdResolver = $resolver === null ? null : Closure::fromCallable($resolver);
+        });
     }
 
-    /**
-     * @param  (callable(): string|null)|null  $resolver
-     */
+    /** @param (callable(): string|null)|null $resolver */
     public static function registerDocumentHashResolver(?callable $resolver): void
     {
-        self::$documentHashResolver = $resolver;
+        RequestState::configure(MediaCaptureState::class, static function (MediaCaptureState $state) use ($resolver): void {
+            $state->documentHashResolver = $resolver === null ? null : Closure::fromCallable($resolver);
+        });
     }
 
     public static function resolveLegalSignerId(): ?string
     {
-        if (self::$legalSignerIdResolver !== null) {
-            $resolved = (self::$legalSignerIdResolver)();
-
-            if (is_string($resolved) && filled($resolved)) {
-                return $resolved;
-            }
-        }
-
-        $user = auth()->user();
-
-        if ($user !== null) {
-            $id = $user->getAuthIdentifier();
-
-            return is_scalar($id) ? (string) $id : null;
-        }
-
-        return null;
+        return app(CaptureIdentity::class)->signer();
     }
 
     public static function resolveDocumentHash(): ?string
     {
-        if (self::$documentHashResolver === null) {
-            return null;
-        }
-
-        $resolved = (self::$documentHashResolver)();
-
-        return is_string($resolved) && filled($resolved) ? $resolved : null;
+        return app(CaptureIdentity::class)->documentHash();
     }
 
     public static function passesVirusScanForTemporaryFile(TemporaryUploadedFile $file): bool
     {
-        if (! self::shouldScanBeforePersist()) {
-            return true;
-        }
-
+        $context = new MediaContext(kind: MediaKind::Upload, driver: MediaStorageDriver::Disk);
         try {
-            if (! $file->exists()) {
-                return ! self::shouldRequireVirusScan();
-            }
-        } catch (\Throwable) {
-            return ! self::shouldRequireVirusScan();
+            $prepared = app(MediaOs::class)->inspect(MediaTranslation::source(MediaPayload::fromTemporaryUploadedFile($file)), MediaTranslation::intent($context));
+            $prepared->close();
+
+            return true;
+        } catch (Throwable) {
+            return false;
         }
-
-        $path = rescue(fn (): string => $file->getRealPath() ?: $file->path(), '', report: false);
-
-        if ($path === '') {
-            return ! self::shouldRequireVirusScan();
-        }
-
-        return self::passesVirusScan($path);
     }
 
-    /**
-     * Move or delete a rejected stored file. Returns quarantine path when configured.
-     */
     public static function rejectStoredFile(string $diskName, string $storedPath): ?string
     {
-        if (MediaCaptureQuarantine::isEnabled()) {
-            return MediaCaptureQuarantine::quarantineFromDisk($diskName, $storedPath);
-        }
-
-        rescue(fn () => Storage::disk($diskName)->delete($storedPath), report: false);
-
-        return null;
+        return MediaCaptureQuarantine::quarantineFromDisk($diskName, $storedPath);
     }
 
-    /**
-     * Boot Media & Capture OS from package config (retention, transcription binding).
-     *
-     * @param  array<string, mixed>|null  $config
-     */
+    /** @param array<string, mixed>|null $config */
     public static function bootFromConfig(?array $config = null): void
     {
-        self::bootSafeDefaults();
-
-        $config ??= config('filament-flex-fields.media_capture', []);
-
-        if (! is_array($config)) {
-            return;
-        }
-
-        if (isset($config['retention']) && is_array($config['retention'])) {
-            self::$retentionPolicies = array_replace_recursive(
-                self::retentionPolicyDefaults(),
-                $config['retention'],
-            );
-        }
-
-        self::bootSignedUrlResolverFromConfig($config);
-        self::bootTranscriptionFromConfig($config);
+        $config ??= self::configuration();
+        app(RetentionSettings::class)->resolve($config);
+        self::configureSignedUrls($config);
+        app(TranscriptionResolver::class)->resolve($config);
     }
 
-    /**
-     * @param  array<string, mixed>  $config
-     */
-    private static function bootSignedUrlResolverFromConfig(array $config): void
-    {
-        if (self::$signedUploadUrlResolver !== null) {
-            return;
-        }
-
-        if (($config['auto_signed_urls'] ?? true) !== true) {
-            return;
-        }
-
-        self::registerSignedUploadUrlResolver(new LaravelStorageSignedUrlResolver);
-    }
-
-    /**
-     * @param  array<string, mixed>  $config
-     */
-    private static function bootTranscriptionFromConfig(array $config): void
-    {
-        if (self::$transcriptionInterface !== null) {
-            return;
-        }
-
-        $transcriptionClass = $config['transcription'] ?? null;
-
-        if (is_string($transcriptionClass) && filled($transcriptionClass) && class_exists($transcriptionClass)) {
-            $instance = app($transcriptionClass);
-
-            if ($instance instanceof VoiceNoteTranscriptionInterface) {
-                self::registerTranscriptionInterface(self::wrapTranscriptionWithCircuitBreaker($instance, $config));
-
-                return;
-            }
-        }
-
-        self::registerTranscriptionInterface(
-            self::wrapTranscriptionWithCircuitBreaker(new NullVoiceNoteTranscription, $config),
-        );
-    }
-
-    /**
-     * @param  array<string, mixed>  $config
-     */
-    private static function wrapTranscriptionWithCircuitBreaker(
-        VoiceNoteTranscriptionInterface $provider,
-        array $config,
-    ): VoiceNoteTranscriptionInterface {
-        $cb = $config['transcription_circuit_breaker'] ?? [];
-
-        if (! is_array($cb) || ($cb['enabled'] ?? true) !== true) {
-            return $provider;
-        }
-
-        return new CircuitBreakerTranscriptionProvider(
-            $provider,
-            (int) ($cb['failure_threshold'] ?? 3),
-            (int) ($cb['open_seconds'] ?? 30),
-        );
-    }
-
-    /**
-     * Record a barcode capture event for observability / SIEM bridges.
-     *
-     * @param  array<string, mixed>  $context
-     */
+    /** @param array<string, mixed> $context */
     public static function recordBarcodeCapture(BarcodeValue $barcode, string $field, array $context = []): void
     {
-        ObservabilityHooks::record(
-            ObservabilityHooks::EVENT_BARCODE_CAPTURE,
-            array_merge([
-                'field' => $field,
-                'value' => $barcode->value,
-                'format' => $barcode->format,
-            ], $context),
-        );
+        app(ActivityDispatcher::class)->dispatch(new BarcodeCaptured(
+            $field, $barcode->value, $barcode->format, $context,
+        ));
     }
 
-    /**
-     * @return array{
-     *     uploads: array{enabled: bool, days: int|null},
-     *     voice_notes: array{enabled: bool, days: int|null},
-     *     signatures: array{enabled: bool, days: int|null},
-     *     temp_captures: array{enabled: bool, days: int|null},
-     * }
-     */
+    /** @return Policies */
     public static function retentionPolicies(): array
     {
-        return self::$retentionPolicies ?? self::retentionPolicyDefaults();
+        return app(RetentionSettings::class)->resolve();
+    }
+
+    /** @return Policies */
+    public static function retentionPolicyDefaults(): array
+    {
+        return RetentionSettings::defaults();
     }
 
     public static function passesVirusScan(string $path): bool
     {
-        $virusScan = self::virusScanCallback();
-
-        if ($virusScan === null) {
+        $scanner = self::virusScanCallback();
+        if ($scanner === null) {
             return ! self::shouldRequireVirusScan();
         }
-
-        return $virusScan($path) !== false;
+        try {
+            return $scanner($path) === true;
+        } catch (Throwable) {
+            return false;
+        }
     }
 
     public static function shouldRequireCreditCardTokenization(): bool
@@ -352,65 +210,54 @@ final class MediaCaptureOs implements MediaStorageContract
         return (bool) config('filament-flex-fields.media_capture.pci.never_store_pan', true);
     }
 
-    /**
-     * Attempt PCI tokenization for validation/dehydrate paths.
-     */
     public static function tokenizePrimaryAccountNumber(string $pan): ?string
     {
-        $tokenize = self::tokenizeCreditCardCallback();
-
-        if ($tokenize === null || $pan === '') {
-            return null;
-        }
-
-        $token = $tokenize($pan);
+        $callback = self::tokenizeCreditCardCallback();
+        $token = $pan === '' || $callback === null ? null : $callback($pan);
 
         return is_string($token) && $token !== '' ? $token : null;
     }
 
-    /**
-     * Default media retention posture for capture fields (host apps may override centrally).
-     *
-     * @return array{
-     *     uploads: array{enabled: bool, days: int|null},
-     *     voice_notes: array{enabled: bool, days: int|null},
-     *     signatures: array{enabled: bool, days: int|null},
-     *     temp_captures: array{enabled: bool, days: int|null},
-     * }
-     */
-    public static function retentionPolicyDefaults(): array
-    {
-        return [
-            'uploads' => [
-                'enabled' => false,
-                'days' => null,
-            ],
-            'voice_notes' => [
-                'enabled' => false,
-                'days' => 365,
-            ],
-            'signatures' => [
-                'enabled' => false,
-                'days' => null,
-            ],
-            'temp_captures' => [
-                'enabled' => true,
-                'days' => 7,
-            ],
-        ];
-    }
-
-    /**
-     * Reset runtime overrides (tests).
-     */
     public static function resetRuntimeState(): void
     {
-        self::$virusScanCallback = null;
-        self::$signedUploadUrlResolver = null;
-        self::$tokenizeCreditCardCallback = null;
-        self::$transcriptionInterface = null;
-        self::$retentionPolicies = null;
-        self::$legalSignerIdResolver = null;
-        self::$documentHashResolver = null;
+        $state = self::state();
+        $state->virusScanCallback = null;
+        $state->signedUploadUrlResolver = null;
+        $state->tokenizeCreditCardCallback = null;
+        $state->transcriptionInterface = null;
+        $state->transcriptionFactory = null;
+        $state->retentionPolicies = null;
+        $state->legalSignerIdResolver = null;
+        $state->documentHashResolver = null;
+        $state->signedUrlConfigured = false;
+        $state->transcriptionConfigured = false;
+    }
+
+    private static function state(): MediaCaptureState
+    {
+        return RequestState::resolve(MediaCaptureState::class);
+    }
+
+    /** @return array<string, mixed> */
+    private static function configuration(): array
+    {
+        $configuration = config('filament-flex-fields.media_capture', []);
+        if (! is_array($configuration)) {
+            throw new InvalidArgumentException('Media capture configuration must be an array.');
+        }
+
+        return $configuration;
+    }
+
+    /** @param array<string, mixed> $configuration */
+    private static function configureSignedUrls(array $configuration): void
+    {
+        $state = self::state();
+        if ($state->signedUrlConfigured) {
+            return;
+        }
+        $state->signedUploadUrlResolver = ($configuration['auto_signed_urls'] ?? true) === true
+            ? Closure::fromCallable(new LaravelStorageSignedUrlResolver) : null;
+        $state->signedUrlConfigured = true;
     }
 }

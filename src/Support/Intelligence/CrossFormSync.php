@@ -56,7 +56,18 @@ final class CrossFormSync
      */
     public static function resolveConflictMerge(array $source, array $target): array
     {
-        return array_replace_recursive($target, $source);
+        // Lists are complete values, not patches of numeric indexes.
+        if (array_is_list($source) || array_is_list($target)) {
+            return $source;
+        }
+
+        foreach ($source as $key => $value) {
+            $target[$key] = is_array($value) && is_array($target[$key] ?? null)
+                ? self::resolveConflictMerge($value, $target[$key])
+                : $value;
+        }
+
+        return $target;
     }
 
     public static function resolveConflictLastWrite(mixed $source, mixed $target, int $sourceUpdatedAt, int $targetUpdatedAt): mixed

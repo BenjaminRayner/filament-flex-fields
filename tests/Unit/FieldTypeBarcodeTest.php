@@ -13,7 +13,7 @@ it('declares barcode field type in media category', function () {
     expect(FieldType::Barcode)->toBeInstanceOf(FieldType::class)
         ->and(FieldType::Barcode->value)->toBe('barcode')
         ->and(FieldType::Barcode->category())->toBe(FieldCategory::Media)
-        ->and(FieldType::Barcode->icon())->toBe('heroicon-o-qr-code')
+        ->and(FieldType::Barcode->icon())->toBe('hugeicons-qr-code')
         ->and(FieldType::Barcode->isCustomComponent())->toBeTrue()
         ->and(FieldType::Barcode->assetComponents())->toBe(['barcode-scanner-field']);
 });
@@ -29,6 +29,7 @@ it('maps barcode field type to barcode scanner field via form builder', function
             'config' => [
                 'formats' => [BarcodeFormat::Ean13->value, BarcodeFormat::Qr->value],
                 'continuous' => true,
+                'confirm_scan' => true,
                 'beep_on_scan' => false,
                 'auto_submit' => true,
                 'camera_facing' => 'user',
@@ -43,6 +44,7 @@ it('maps barcode field type to barcode scanner field via form builder', function
     expect($field)->toBeInstanceOf(BarcodeScannerField::class)
         ->and($field->getSupportedFormats())->toBe([BarcodeFormat::Ean13, BarcodeFormat::Qr])
         ->and($field->isContinuous())->toBeTrue()
+        ->and($field->shouldConfirmScan())->toBeTrue()
         ->and($field->shouldBeepOnScan())->toBeFalse()
         ->and($field->shouldAutoSubmit())->toBeTrue()
         ->and($field->getCameraFacing())->toBe('user')

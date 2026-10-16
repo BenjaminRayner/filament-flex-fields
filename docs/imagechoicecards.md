@@ -1,7 +1,118 @@
 ---
 title: "ImageChoiceCards"
 description: Image card selection with full-bleed media, footer label, animated indicators, radio or checkbox modes, and default or overlay layouts.
+icon: "images"
+"canonical": "https://flex-fields.bjanczak.com/docs/imagechoicecards"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/image-choice-cards.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "ImageChoiceCards in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/image-choice-cards-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/image-choice-cards-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/image-choice-cards.webp"
+"twitter:image:alt": "ImageChoiceCards in the FLEX Fields playground"
 ---
+
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/imagechoicecards#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/imagechoicecards",
+      "name": "ImageChoiceCards",
+      "description": "Image card selection with full-bleed media, footer label, animated indicators, radio or checkbox modes, and default or overlay layouts.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/imagechoicecards#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/imagechoicecards#article",
+      "url": "https://flex-fields.bjanczak.com/docs/imagechoicecards",
+      "headline": "ImageChoiceCards",
+      "description": "Image card selection with full-bleed media, footer label, animated indicators, radio or checkbox modes, and default or overlay layouts.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/imagechoicecards#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/image-choice-cards-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/image-choice-cards-motion.mp4#video",
+      "name": "ImageChoiceCards — FLEX Fields demonstration",
+      "description": "A recorded demonstration of ImageChoiceCards in the FLEX Fields playground for Filament. Image card selection with full-bleed media, footer label, animated indicators, radio or checkbox modes, and default or overlay layouts.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/image-choice-cards.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT5.783S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/image-choice-cards-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/imagechoicecards#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/image-choice-cards-motion.mp4"
+  poster="/art/previews/image-choice-cards.webp"
+  width="1920"
+  height="1080"
+  aria-label="ImageChoiceCards — FLEX Fields demonstration"
+>
+  <a href="/art/previews/image-choice-cards-motion.mp4">Watch the ImageChoiceCards demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -98,7 +209,7 @@ When `maxSelections` is reached, further options cannot be selected until one is
 | Mode | State |
 |------|--------|
 | Single (`multiple(false)`) | Option key `string\|int\|null` |
-| Multi (`multiple(true)`) | `array` of option keys (via `OptionsArrayStateCast`) |
+| Multi (`multiple(true)`) | `array` of option keys (with unique string identities) |
 
 #### Validation rules (built-in)
 
@@ -191,7 +302,7 @@ Defaults: see `FieldTypeDefaultConfigRegistry` for `image_choice_cards`.
 
 ### Playground
 
-`/admin/flex-fields-playground/image-choice-cards`
+`/admin/flex-fields/image-choice-cards`
 
 Demos: square 1:1, **overlay layout**, radio exclusive, checkbox min/max, size/rounding/aspect matrix, Select → reactive `disabledOptions`, required validation, dark mode via panel.
 
@@ -234,3 +345,27 @@ Demos: square 1:1, **overlay layout**, radio exclusive, checkbox min/max, size/r
 | [ChoiceCards](/docs/choicecards) | Text/icon cards without images |
 | [ChoiceCheckboxCards](/docs/choicecheckboxcards) | Multi-select text cards |
 | [SelectField](/docs/selectfield) | Compact dropdown selection |
+
+### Keyboard, direction and safe values
+
+Use **Tab** to reach the control, **Space** or **Enter** to select, and arrow keys
+or **Home / End** to navigate enabled options. In a single-selection group,
+arrow navigation also changes the value. Multiple-selection groups move focus
+without changing selections. Horizontal navigation follows the text direction.
+
+Direction is inherited from the page, or can be set on this field:
+
+```php
+->extraAttributes(['dir' => 'rtl'])
+```
+
+Validation checks the submitted values on the server. Unknown or disabled option
+keys, nested values, duplicate selections and associative selection arrays are
+rejected. Numeric identifiers travel as strings to preserve leading zeros and
+large IDs; an Eloquent integer cast can still store an integer column.
+
+`exactSelections()` takes precedence over minimum and maximum settings. The
+selection cap also blocks additional choices immediately; selected choices can
+always be removed. Negative limits and a minimum above the maximum are invalid
+configuration. If a stored selection is now disabled, resolve it before saving;
+Image Choice Cards can clear disabled choices with `pruneDisabledSelection()`.

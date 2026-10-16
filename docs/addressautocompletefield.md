@@ -1,9 +1,124 @@
 ---
 title: "AddressAutocompleteField"
 description: Mapbox-powered address search without a map — combobox autocomplete with structured or string storage.
+icon: "map-pin-house"
+"canonical": "https://flex-fields.bjanczak.com/docs/addressautocompletefield"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/address-autocomplete.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "AddressAutocompleteField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/address-autocomplete-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/address-autocomplete-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/address-autocomplete.webp"
+"twitter:image:alt": "AddressAutocompleteField in the FLEX Fields playground"
 ---
 
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/addressautocompletefield#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/addressautocompletefield",
+      "name": "AddressAutocompleteField",
+      "description": "Mapbox-powered address search without a map — combobox autocomplete with structured or string storage.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/addressautocompletefield#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/addressautocompletefield#article",
+      "url": "https://flex-fields.bjanczak.com/docs/addressautocompletefield",
+      "headline": "AddressAutocompleteField",
+      "description": "Mapbox-powered address search without a map — combobox autocomplete with structured or string storage.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/addressautocompletefield#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/address-autocomplete-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/address-autocomplete-motion.mp4#video",
+      "name": "AddressAutocompleteField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of AddressAutocompleteField in the FLEX Fields playground for Filament. Mapbox-powered address search without a map — combobox autocomplete with structured or string storage.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/address-autocomplete.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT13.7S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/address-autocomplete-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/addressautocompletefield#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/address-autocomplete-motion.mp4"
+  poster="/art/previews/address-autocomplete.webp"
+  width="1920"
+  height="1080"
+  aria-label="AddressAutocompleteField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/address-autocomplete-motion.mp4">Watch the AddressAutocompleteField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
+
 [← Back to Table of Contents](/docs/index)
+
+### Shared location settings
+
+Address search shares its provider and authenticated endpoints with [MapPickerField](/docs/mappickerfield). See [shared map configuration](/docs/location-v4#shared-address-search-endpoints) for routing, authentication and proxy settings.
 
 ### Summary
 
@@ -18,6 +133,11 @@ Mapbox-powered **address search** without a map — combobox autocomplete with s
 | **Playground** | `address-autocomplete` slug in Flex Fields playground |
 
 Requires Mapbox token in `config('filament-flex-fields.mapbox.access_token')` or per-field `mapboxToken()`.
+
+The default server proxy shares its authenticated endpoints with Map Picker,
+without loading a map SDK. See
+[shared endpoint configuration](/docs/location-v4#shared-address-search-endpoints)
+to configure the prefix and authentication guard.
 
 ---
 
@@ -157,9 +277,31 @@ AddressAutocompleteField::make('shipping_address')
 
 ---
 
+### Shared search and editable addresses
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\AddressAutocompleteField;
+
+AddressAutocompleteField::make('address')
+    ->countries(['PL'])
+    ->searchLimit(8)
+    ->searchBounds([14, 49, 24.2, 55])
+    ->searchProximity([21.0122, 52.2297])
+    ->fields(['lat', 'lng', 'street', 'city', 'region', 'postcode', 'country', 'place_name'])
+    ->editableAddress()
+    ->editableAddressFields(['street', 'city', 'postcode', 'country'])
+    ->requiredFields(['street', 'city', 'country']);
+```
+
+Both fields support `searchLimit()` (1–10), `searchBounds()` (nonwrapping bbox), `searchProximity()` ([lng,lat]), `geocodingEndpoints('/search', '/reverse')`, debounce/minimum search length, countries/types/language and existing storage policies. Search is bounded to 256 characters. Direct/proxy cache keys include search scope and limit. `countries(null)` is unrestricted; `countries([])` denies search rather than silently becoming unrestricted. The configured endpoint must be a same-origin path because requests carry session/CSRF information.
+
+AddressAutocomplete keeps its existing default storage keys; `fields(['lat','lng', ...])` opts into coordinate storage. `addressDetails()` shows structured detail inputs; `editableAddress()` enables manual corrections; `editableAddressFields()` admits only street/city/region/postcode/country. Read-only detail inputs do not modify state. A manual address edit clears the old coordinates and result identity, avoiding a new text address paired with stale coordinates. Required keys must be present in the configured stored field set. Restricted nonempty addresses with country storage must include admitted country metadata; omitting it no longer bypasses validation.
+
+---
+
 ### Playground
 
-`/admin/flex-fields-playground/address-autocomplete`
+`/admin/flex-fields/address-autocomplete`
 
 See [Playground](/docs/index#playground) for setup.
 

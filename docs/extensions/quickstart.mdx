@@ -1,0 +1,127 @@
+---
+title: "Your first extension"
+description: "Build and install a reusable Summary field, column and infolist entry step by step."
+---
+
+This walkthrough creates `acme/summary` inside an application that already has FLEX
+and a Filament panel. Run the first command from the application directory containing
+`artisan` and `composer.json`. Replace `acme` with your vendor name before distributing it.
+
+<Steps>
+  <Step title="Generate the family">
+    The parent directory must exist. The destination must be new.
+
+    ```shell
+    mkdir -p packages
+    php artisan make:flex-component-package acme/summary ./packages/summary \
+      --prefix=acme-summary \
+      --namespace='Acme\Summary' \
+      --class=Summary
+    ```
+
+    You now have a field, column, entry, provider, views, shared CSS and build script.
+    The command does not install dependencies or change your application's Composer configuration.
+    To inspect the plan first, append `--dry-run --json`.
+  </Step>
+  <Step title="Build the package">
+    Use the FLEX installation already present in the application. This avoids requiring
+    a second Composer installation merely to run the starter's build.
+
+    ```shell
+    cd packages/summary
+    npm install
+    FLEX_FIELDS_ROOT="../../vendor/janczakb/filament-flex-fields" npm run build
+    cd ../..
+    ```
+
+    If your Composer vendor directory is different, set `FLEX_FIELDS_ROOT` to the installed
+    FLEX package directory. Build before Composer discovery boots your new provider.
+    The resulting manifest references the complete `resources/dist/<release>` directory.
+  </Step>
+  <Step title="Install the local Composer package">
+    Add a path repository in the application's Composer configuration, then require the package.
+
+    ```shell
+    composer config repositories.acme-summary \
+      '{"type":"path","url":"packages/summary","options":{"symlink":true}}'
+    composer require 'acme/summary:@dev'
+    php artisan filament:assets
+    php artisan fff:assets:doctor
+    php artisan fff:assets:explain acme-summary-field
+    ```
+
+    Composer discovers `SummaryServiceProvider`. Keep your application's existing FLEX
+    package repository and license access configuration. The local development constraint
+    is not a release version for a distributed package.
+  </Step>
+  <Step title="Add the field">
+    Add this component to the form schema of your resource or Livewire form:
+
+    ```php
+    use Acme\Summary\Forms\SummaryField;
+    use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+
+    SummaryField::make('summary')
+        ->schema([
+            FlexTextInput::make('text')
+                ->label('Summary')
+                ->required()
+                ->maxLength(80),
+        ]);
+    ```
+
+    This is the real FLEX input inside your field. Its state, validation and assets remain
+    owned by the child. You can change its supported fluent options without copying its view.
+  </Step>
+  <Step title="Store the value and show it elsewhere">
+    The generated field stores `['text' => 'Example']`. Add a JSON attribute and an Eloquent
+    array cast to the model used by your form:
+
+    ```php
+    // In your application migration:
+    Schema::table('posts', function (Blueprint $table): void {
+        $table->json('summary')->nullable();
+    });
+    ```
+
+    Import `Illuminate\Support\Facades\Schema` and `Illuminate\Database\Schema\Blueprint`
+    in that migration, and run your normal migration workflow.
+
+    ```php
+    // In your model:
+    protected function casts(): array
+    {
+        return ['summary' => 'array'];
+    }
+    ```
+
+    Use the matching surface in a table or infolist:
+
+    ```php
+    use Acme\Summary\Tables\SummaryColumn;
+    use Acme\Summary\Infolists\SummaryEntry;
+
+    // Table columns:
+    SummaryColumn::make('summary');
+
+    // Infolist schema:
+    SummaryEntry::make('summary');
+    ```
+  </Step>
+</Steps>
+
+## Confirm the result
+
+Enter a summary, submit the form and reopen the record. The same value should appear
+in the field, table and infolist. The column and entry use shared display CSS without
+loading the field's interactive JavaScript. Two fields on the same page must keep
+independent values and consumer identities.
+
+<Columns cols={2}>
+  <Card title="Understand the package" icon="folder-tree" href="/docs/extensions/package-structure">
+    Learn which generated files to change and which build outputs to distribute.
+  </Card>
+  <Card title="Configure an existing child" icon="settings-2" href="/docs/extensions/child-php-api">
+    Add relationships, queries and callback configuration through trusted PHP.
+  </Card>
+</Columns>

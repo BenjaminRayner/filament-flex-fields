@@ -1,0 +1,38 @@
+.fff-recording-launch { display:inline-flex; align-items:center; gap:.375rem; min-block-size:2.25rem; padding:.375rem .75rem; border:1px solid #e4e4e7; border-radius:999px; color:#52525b; background:#fff; font-size:.8125rem; cursor:pointer; }
+.fff-recording-launch svg { inline-size:1rem; block-size:1rem; }
+.dark .fff-recording-launch { background:#27272a; border-color:#3f3f46; color:#e4e4e7; }
+.fff-recording-selection { display:flex; align-items:center; flex-wrap:wrap; gap:.75rem; padding:.75rem 1rem; margin-block-end:1rem; border-radius:14px; background:#f7f7f7; color:#18181b; font-size:.8125rem; }
+.fff-recording-candidate { position:relative; cursor:pointer!important; outline:2px dashed #a1a1aa; outline-offset:6px; }
+.fff-recording-candidate:hover, .fff-recording-chosen { outline-color:var(--primary-500,#f59e0b); }
+.fff-recording-candidate * { pointer-events:none!important; }
+.fff-recording-backdrop { position:fixed; inset:0; z-index:10; background:#fff; color:#18181b; visibility:visible; }
+.fff-recording-canvas { position:fixed; left:var(--fff-recording-canvas-left,90px); top:var(--fff-recording-canvas-top,90px); width:var(--fff-recording-canvas-width,calc(100vw - 180px)); height:var(--fff-recording-canvas-height,calc((100vw - 180px) * 9 / 16)); border-radius:34px; background:#f7f7f7; }
+.fff-recording-close { position:fixed; inset-block-start:28px; inset-inline-end:32px; display:grid; place-items:center; inline-size:40px; block-size:40px; border-radius:50%; background:#f7f7f7; border:0; color:#52525b; cursor:pointer; }
+.fff-recording-close svg { inline-size:22px; block-size:22px; }
+.fff-recording-bottom { position:fixed; inset-inline:24px; inset-block-end:24px; display:flex; flex-direction:column; align-items:center; gap:.5rem; }
+.fff-recording-zoom-row { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; justify-content:center; font-size:.8125rem; color:#52525b; }
+.fff-recording-zoom { inline-size:min(240px,40vw); accent-color:#18181b; }
+.fff-recording-zoom-value { min-inline-size:3rem; text-align:end; font-variant-numeric:tabular-nums; }
+.fff-recording-widths { display:flex; gap:.25rem; }
+.fff-recording-width-button { border:0; padding:.25rem .5rem; border-radius:8px; background:#f7f7f7; color:#71717a; font-size:.75rem; cursor:pointer; }
+.fff-recording-width-button[aria-pressed="true"] { background:#e4e4e7; color:#18181b; }
+.fff-recording-hint { color:#a1a1aa; font-size:.6875rem; }
+.fff-recording-controls-hidden .fff-recording-close, .fff-recording-controls-hidden .fff-recording-bottom { visibility:hidden; }
+/* Intentional visual isolation only while the playground's recording view is open.
+   CSS visibility does not alter explicit asset activation scopes or move owners. */
+body.fff-recording-active { overflow:hidden; }
+body.fff-recording-active > * { visibility:hidden; }
+body.fff-recording-active .fff-recording-backdrop,
+body.fff-recording-active .fff-recording-target,
+body.fff-recording-active .fff-teleported-menu,
+body.fff-recording-active .fi-modal { visibility:visible; }
+body.fff-recording-active .fff-recording-ancestor { transform:none!important; filter:none!important; perspective:none!important; contain:none!important; isolation:auto!important; z-index:auto!important; overflow:visible!important; }
+body.fff-recording-active .fff-recording-target { position:fixed!important; z-index:20!important; left:var(--fff-recording-left)!important; top:var(--fff-recording-top)!important; width:var(--fff-recording-width)!important; inline-size:var(--fff-recording-width)!important; max-inline-size:none!important; margin:0!important; transform:scale(var(--fff-recording-scale,1))!important; transform-origin:top left!important; clip-path:inset(var(--fff-recording-clip,0px))!important; }
+body.fff-recording-active .fff-recording-backdrop.fff-recording-controls-hidden .fff-recording-close,
+body.fff-recording-active .fff-recording-backdrop.fff-recording-controls-hidden .fff-recording-bottom { visibility:hidden; }
+.fff-recording-launch:focus-visible, .fff-recording-close:focus-visible, .fff-recording-width-button:focus-visible { outline:2px solid #71717a; outline-offset:3px; }
+
+.fff-recording-helper-toggle { display:inline-flex; align-items:center; gap:.375rem; cursor:pointer; }
+.fff-recording-helper-toggle input { accent-color:#18181b; }
+body.fff-recording-active .fff-recording-hide-helpers .fi-fo-field-content-col > .fi-sc.fi-inline:has(.fi-sc-text),
+body.fff-recording-active .fff-recording-hide-helpers .fi-fo-field-wrp-helper-text { display:none!important; }

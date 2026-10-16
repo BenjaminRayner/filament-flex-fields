@@ -15,8 +15,22 @@ use Throwable;
  */
 trait EmitsFlexFieldTableColumnAssets
 {
+    protected bool $hasCriticalFlexStyles = false;
+
+    /** Opt in for an initially visible table; hidden tabs/modals remain lazy. */
+    public function criticalStyles(bool $condition = true): static
+    {
+        $this->hasCriticalFlexStyles = $condition;
+
+        return $this;
+    }
+
     protected function withFlexFieldColumnAssets(string $component, string $html): string
     {
+        if ($this->hasCriticalFlexStyles) {
+            FlexFieldStylesheetQueue::requireCritical($component);
+        }
+
         return $this->flexFieldColumnAssetMarkup($component).$html;
     }
 
@@ -25,6 +39,7 @@ trait EmitsFlexFieldTableColumnAssets
         return FlexFieldStylesheetQueue::emitDomRootConsumerMarkup(
             $component,
             $this->flexFieldColumnAssetConsumerId($component),
+            $this->hasCriticalFlexStyles,
         );
     }
 

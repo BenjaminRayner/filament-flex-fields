@@ -323,6 +323,25 @@ describe('overlay-runtime', () => {
         runtime.destroy()
     })
 
+    it('keeps end alignment stationary while the panel opening scale changes', () => {
+        const context = createTestContext()
+        globalThis.document = context.document
+        globalThis.window = context.window
+        globalThis.matchMedia = context.window.matchMedia
+        const runtime = createOverlayRuntime(context)
+        const anchor = createElement()
+        const panel = createElement()
+        anchor.getBoundingClientRect = () => ({ top: 100, bottom: 140, left: 600, right: 632, width: 32, height: 32 })
+        let scale = .96
+        panel.getBoundingClientRect = () => ({ top: 146, bottom: 346, left: 328, right: 632, width: 304 * scale, height: 200 * scale })
+        runtime.open({ id: 'emoji', anchor, panel, align: 'end', minWidth: 304, matchTriggerWidth: false, manageVisibility: false })
+        assert.equal(panel.style.left, '328px')
+        scale = 1
+        runtime.updatePosition('emoji')
+        assert.equal(panel.style.left, '328px')
+        runtime.destroy()
+    })
+
     it('emits telemetry on open', () => {
         const context = createTestContext()
         globalThis.document = context.document

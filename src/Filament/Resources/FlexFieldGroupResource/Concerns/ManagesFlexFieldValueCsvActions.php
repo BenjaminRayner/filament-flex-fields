@@ -19,8 +19,8 @@ trait ManagesFlexFieldValueCsvActions
     {
         return [
             Action::make('exportValuesCsvTemplate')
-                ->label(__('filament-flex-fields::default.schema.export_csv_values'))
-                ->icon('heroicon-o-table-cells')
+                ->label(fn () => __('filament-flex-fields::default.schema.export_csv_values'))
+                ->icon('hugeicons-table-01')
                 ->visible($record !== null)
                 ->action(function () use ($record) {
                     $definitions = $this->definitionsFromGroup($record);
@@ -34,13 +34,13 @@ trait ManagesFlexFieldValueCsvActions
                     );
                 }),
             Action::make('importValuesCsvDryRun')
-                ->label(__('filament-flex-fields::default.schema.import_csv_values'))
-                ->icon('heroicon-o-arrow-up-tray')
+                ->label(fn () => __('filament-flex-fields::default.schema.import_csv_values'))
+                ->icon('hugeicons-upload-01')
                 ->visible($record !== null)
                 ->schema([
                     Textarea::make('csv')
-                        ->label(__('filament-flex-fields::default.schema.import_csv_values'))
-                        ->helperText(__('filament-flex-fields::default.schema.import_csv_values_help'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.import_csv_values'))
+                        ->helperText(fn () => __('filament-flex-fields::default.schema.import_csv_values_help'))
                         ->required()
                         ->rows(10),
                 ])
@@ -49,7 +49,7 @@ trait ManagesFlexFieldValueCsvActions
                     $imported = app(FlexFieldValueCsvExchange::class)->import((string) $data['csv'], $definitions);
 
                     Notification::make()
-                        ->title(__('filament-flex-fields::default.schema.import_csv_values'))
+                        ->title(fn () => __('filament-flex-fields::default.schema.import_csv_values'))
                         ->body(sprintf('Parsed %d record row(s).', count($imported)))
                         ->success()
                         ->send();

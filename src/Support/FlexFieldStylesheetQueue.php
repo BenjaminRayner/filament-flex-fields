@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support;
 
+use Bjanczak\FilamentFlexFields\Support\Assets\ComponentAssetPlan;
+
 class FlexFieldStylesheetQueue
 {
     use FlexFieldAssetQueue;
@@ -17,12 +19,23 @@ class FlexFieldStylesheetQueue
      */
     protected array $roots = [];
 
-    /**
-     * Livewire-scoped consumer ids already emitted into table/cell HTML this request.
-     *
-     * @var array<string, true>
-     */
-    protected array $domEmittedConsumers = [];
+    /** Explicit SSR requirements for surfaces known to be initially visible. */
+    /** @var array<string, true> */
+    protected array $critical = [];
+
+    /** @param list<string> $capabilities */
+    public static function requireCritical(string $component, array $capabilities = []): void
+    {
+        foreach (ComponentAssetPlan::for($component, $capabilities)->stylesheets as $stylesheet) {
+            app(self::class)->critical[$stylesheet] = true;
+        }
+    }
+
+    /** @return list<string> */
+    public static function criticalStylesheets(): array
+    {
+        return array_keys(app(self::class)->critical);
+    }
 
     /**
      * Queue a component and its declared dependencies, returning only stylesheets
@@ -47,18 +60,17 @@ class FlexFieldStylesheetQueue
     }
 
     /**
-     * Emit one CRG consumer for a root component inside Livewire/table HTML.
+     * Emit a consumer at every rendered cell boundary, including repeated columns.
      * Full stylesheetsFor() + alpineChunksFor() URL sets — form-field ownership model.
      * Marks sheets/chunks emitted so panel BODY_END does not duplicate page-scoped markers.
      */
-    public function emitDomRootConsumer(string $component, string $livewireKey): string
+    public function emitDomRootConsumer(string $component, string $livewireKey, bool $initialCssReady = false): string
     {
-        if ($livewireKey === '' || isset($this->domEmittedConsumers[$livewireKey])) {
+        if ($livewireKey === '') {
             return '';
         }
 
         $resolved = FlexFieldAssets::resolveStylesheetComponent($component);
-        $this->domEmittedConsumers[$livewireKey] = true;
         $this->roots[$resolved] = true;
 
         $stylesheets = FlexFieldAssets::stylesheetsFor($resolved);
@@ -80,6 +92,7 @@ class FlexFieldStylesheetQueue
             'chunks' => $chunks,
             'consumerComponent' => $resolved,
             'livewireKey' => $livewireKey,
+            'initialCssReady' => $initialCssReady && ! request()->hasHeader('X-Livewire'),
         ])->render();
     }
 
@@ -161,12 +174,12 @@ class FlexFieldStylesheetQueue
         $this->enqueued = [];
         $this->emitted = [];
         $this->roots = [];
-        $this->domEmittedConsumers = [];
+        $this->critical = [];
     }
 
-    public static function emitDomRootConsumerMarkup(string $component, string $livewireKey): string
+    public static function emitDomRootConsumerMarkup(string $component, string $livewireKey, bool $initialCssReady = false): string
     {
-        return app(self::class)->emitDomRootConsumer($component, $livewireKey);
+        return app(self::class)->emitDomRootConsumer($component, $livewireKey, $initialCssReady);
     }
 
     /**
@@ -230,51 +243,5 @@ class FlexFieldStylesheetQueue
     public static function markStylesheetsEmitted(array $stylesheets): void
     {
         app(self::class)->markEmitted($stylesheets);
-    }
-
-    /**
-     * Mark playground bundle stylesheets as already loaded so fields do not emit duplicates.
-     *
-     * @param  list<string>  $stylesheets
-     */
-    public static function suppressForPlaygroundBundle(array $stylesheets): void
-    {
-        $queue = app(self::class);
-
-        foreach ($stylesheets as $stylesheet) {
-            $queue->queue($stylesheet);
-        }
-
-        $queue->markEmitted($stylesheets);
-    }
-
-    public function needsTeleportedMenu(): bool
-    {
-        if ($this->hasKey('teleported-menu')) {
-            return true;
-        }
-
-        foreach (array_keys($this->enqueued) as $stylesheet) {
-            if ($stylesheet === 'teleported-menu') {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public static function hasQueuedTeleportedMenu(): bool
-    {
-        return app(self::class)->needsTeleportedMenu();
-    }
-
-    public function needsSelectFamilyPicker(): bool
-    {
-        return $this->hasKey('select-field') || $this->hasKey('icon-picker-field');
-    }
-
-    public static function hasQueuedSelectFamilyPicker(): bool
-    {
-        return app(self::class)->needsSelectFamilyPicker();
     }
 }

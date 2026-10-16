@@ -1,0 +1,3 @@
+/* The interactive renderer runs in its own document, keeping its CSS out of Mintlify. */
+.fff-rtl-frame{display:block;width:100%;height:500px;border:0;background:transparent;border-radius:0;margin:22px 0 18px}
+@media(max-width:800px){.fff-rtl-frame{height:790px}}

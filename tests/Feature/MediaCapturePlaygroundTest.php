@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SignatureField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\VoiceNoteRecorderField;
 use Bjanczak\FilamentFlexFields\Support\Media\MediaCaptureOs;
 use Bjanczak\FilamentFlexFields\Support\Media\SignatureLegalPack;
 use Bjanczak\FilamentFlexFields\Support\Media\VoiceNoteTranscriptionInterface;
@@ -11,7 +12,9 @@ use Bjanczak\FilamentFlexFields\Support\Playground\SignatureFieldPlayground;
 use Bjanczak\FilamentFlexFields\Support\Playground\VoiceNoteRecorderFieldPlayground;
 use Bjanczak\FilamentFlexFields\Tests\Support\TestableSignatureForm;
 use Bjanczak\FilamentFlexFields\Tests\Support\TestableTranslatableForm;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 
 it('renders the file upload playground schema without structural errors', function () {
@@ -21,9 +24,9 @@ it('renders the file upload playground schema without structural errors', functi
 
     expect($html)
         ->toContain('fff-flex-file-upload')
-        ->toContain('fff-flex-file-upload__source-tabs')
-        ->toContain('fff-flex-file-upload__source-panel--url')
-        ->toContain('fff-flex-file-upload__source-panel--webcam')
+        ->toContain('role="tablist"')
+        ->toContain('data-fff-upload-header="url"')
+        ->toContain('data-fff-upload-header="camera"')
         ->toContain('file_upload__sources');
 
     expect(substr_count($html, '<div'))
@@ -126,20 +129,20 @@ it('appends voice note transcript metadata after persist when transcription is r
     });
 
     TestableTranslatableForm::$formSchema = [
-        Bjanczak\FilamentFlexFields\Filament\Forms\Components\VoiceNoteRecorderField::make('voice_note')
+        VoiceNoteRecorderField::make('voice_note')
             ->disk('public')
             ->directory('voice-notes')
             ->storeMetadataIn('voice_note_meta'),
     ];
 
-    $file = Illuminate\Http\UploadedFile::fake()->create('voice-note.webm', 100, 'audio/webm');
-    $fileKey = (string) Illuminate\Support\Str::uuid();
+    $file = UploadedFile::fake()->createWithContent('voice-note.wav', 'RIFF'.pack('V', 36 + 1600).'WAVEfmt '.pack('VvvVVvv', 16, 1, 1, 8000, 16000, 2, 16).'data'.pack('V', 1600).str_repeat(chr(0), 1600));
+    $fileKey = (string) Str::uuid();
 
     $livewire = Livewire::test(TestableTranslatableForm::class)
         ->set('data.voice_note_meta', null)
         ->upload("data.voice_note.{$fileKey}", [$file]);
 
-    /** @var Bjanczak\FilamentFlexFields\Filament\Forms\Components\VoiceNoteRecorderField $field */
+    /** @var VoiceNoteRecorderField $field */
     $field = $livewire->instance()->getSchema('form')->getComponent('voice_note');
     $field->saveUploadedFiles();
 

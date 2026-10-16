@@ -58,14 +58,14 @@ it('supports overnight intervals without false overlap', function () {
         ]))->toBeFalse();
 });
 
-it('treats from >= to as overnight when overnight flag is omitted', function () {
+it('anchors overnight intervals to their start day', function () {
     expect(ScheduleV2::validateNoOverlap([
-        ['from' => '23:00', 'to' => '01:00'],
+        ['from' => '23:00', 'to' => '01:00', 'overnight' => true],
     ]))->toBeTrue()
         ->and(ScheduleV2::validateNoOverlap([
-            ['from' => '23:00', 'to' => '01:00'],
+            ['from' => '23:00', 'to' => '01:00', 'overnight' => true],
             ['from' => '00:30', 'to' => '02:00'],
-        ]))->toBeFalse();
+        ]))->toBeTrue();
 });
 
 it('copies one day schedule to another day', function () {

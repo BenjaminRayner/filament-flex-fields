@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexRadiolist;
+use Bjanczak\FilamentFlexFields\Support\ChoiceLists\State\RadioStateCast;
 use Illuminate\Validation\Rules\In;
 
 it('exposes flex radiolist configuration via fluent api', function () {
@@ -129,19 +130,36 @@ it('accepts desc as an inline option alias for description', function () {
     expect($field->getNormalizedOptions()['standard']['description'])->toBe('4–10 business days');
 });
 
-it('loads shared flex checklist stylesheet from the radiolist blade', function () {
+it('declares independent runtime and reuses the checklist style owner', function () {
+    $definition = require __DIR__.'/../../resources/components/flex-radiolist.php';
+    expect($definition->entry)->toBe('flex-radiolist')
+        ->and($definition->stylesFrom)->toBe(['flex-checklist'])
+        ->and($definition->uses)->toBe([]);
     $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-radiolist.blade.php');
-
-    expect($blade)
-        ->toContain('partials.load-stylesheet')
-        ->and($blade)->toContain("'component' => 'flex-radiolist'");
+    expect($blade)->toContain('choice-lists.field', "'multiple' => false");
 });
 
-it('routes radio clicks through the row handler only', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-radiolist.blade.php');
+it('rejects structured, boolean, floating, unknown and disabled radio values', function (mixed $value) {
+    $field = FlexRadiolist::make('delivery')->options(['a' => 'A', 'locked' => 'Locked'])->disabledOptions(['locked']);
+    expect(validator(['delivery' => $value], ['delivery' => $field->getValidationRules()])->fails())->toBeTrue();
+})->with([
+    'array' => [['a']], 'object' => [(object) ['key' => 'a']], 'bool' => [true],
+    'float' => [1.5], 'unknown' => ['unknown'], 'locked' => ['locked'],
+]);
 
-    expect($blade)
-        ->toContain('x-on:click="select(@js($key))"')
-        ->not->toContain('x-on:click.stop="select')
-        ->not->toContain('<label class="fff-flex-radiolist__radio"');
+it('normalizes numeric keys and resolves options again after configuration changes', function () {
+    $field = FlexRadiolist::make('delivery')->options([0 => 'Zero', '001' => 'Leading zero']);
+    expect($field->getEnabledOptionKeys())->toBe(['0', '001']);
+    $field->disabledOptions([0]);
+    expect($field->getEnabledOptionKeys())->toBe(['001']);
+    $field->options(['new' => 'New']);
+    expect($field->getOptionKeys())->toBe(['new']);
+});
+
+it('transports large integer keys losslessly and preserves malformed state for validation', function () {
+    $cast = new RadioStateCast;
+    expect($cast->get(9007199254740993))->toBe('9007199254740993')
+        ->and($cast->set('001'))->toBe('001')
+        ->and($cast->get(['a']))->toBe(['a'])
+        ->and($cast->get(true))->toBeTrue();
 });

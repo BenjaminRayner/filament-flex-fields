@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\RatingColumn;
+use Bjanczak\FilamentFlexFields\Support\Playground\Contracts\PlaygroundWithComponents;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
 use Filament\Support\Icons\Heroicon;
 
-class RatingColumnPlayground
+class RatingColumnPlayground implements PlaygroundWithComponents
 {
     /**
      * @return array<string, mixed>

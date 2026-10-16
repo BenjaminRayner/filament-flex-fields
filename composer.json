@@ -61,19 +61,22 @@
         }
     ],
     "require": {
-        "php": "^8.3",
         "filament/filament": "^5.0",
         "giggsey/libphonenumber-for-php": "^9.0",
-        "janczakb/blade-gravity-icons": "^1.0",
+        "janczakb/blade-hugeicons": "^1.0",
+        "php": "^8.3",
         "prodstarter/filament-notification-center": "^1.0"
     },
     "require-dev": {
+        "filament/spatie-laravel-media-library-plugin": "^5.0",
+        "laravel/octane": "^2",
         "orchestra/testbench": "^11.1",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0",
         "phpstan/phpstan": "^2.0",
         "spatie/laravel-medialibrary": "^11.0",
-        "spatie/laravel-sluggable": "^4.0"
+        "spatie/laravel-sluggable": "^4.0",
+        "spatie/laravel-tags": "^4.11"
     },
     "autoload": {
         "psr-4": {
@@ -94,13 +97,6 @@
             "aliases": {
                 "FlexFields": "Bjanczak\\FilamentFlexFields\\Facades\\FlexFields"
             }
-        },
-        "suggest": {
-            "spatie/laravel-sluggable": "Optional model-based slug generation for SlugField via spatieModel().",
-            "spatie/laravel-translatable": "Optional JSON translation storage for translatable TitleSlugField titles via spatieTranslatable().",
-            "spatie/laravel-medialibrary": "Optional Spatie Media Library integration via FlexSpatieMediaLibraryFileUpload.",
-            "filament/spatie-laravel-media-library-plugin": "Optional Filament Spatie Media Library file upload base class for FlexSpatieMediaLibraryFileUpload.",
-            "spatie/laravel-tags": "Optional Spatie Tags integration via FlexSpatieTagsField (set use_spatie_tags in field config)."
         }
     },
     "config": {
@@ -114,6 +110,8 @@
     },
     "scripts": {
         "test": "pest",
+        "test:core": "pest --compact tests/Unit/Core tests/Unit/CoreServiceLifecycleTest.php",
+        "test:core:optional": "pest --compact tests/Integration/Core tests/Unit/FlexSpatieMediaLibraryFileUploadTest.php tests/Unit/FlexSpatieTagsFieldTest.php",
         "test:select-atomics": "FFF_SELECT_ATOMICS_FULL=1 pest --compact tests/Feature/PlaygroundSelectVariantAtomicsTest.php tests/Feature/PlaygroundSelectCascadeAtomicsTest.php tests/Feature/PlaygroundSelectLivewireMatrixTest.php tests/Feature/PlaygroundSelectConfigMatrixTest.php",
         "test:filament-compat": [
             "@php vendor/bin/pest --compact tests/Unit/FilamentOverrideCompatibilityTest.php tests/Feature/TranslatableFieldsFilament58SmokeTest.php tests/Unit/TranslatableFieldsTest.php tests/Unit/TranslatableArchitectureTest.php tests/Feature/TranslatableFieldsTest.php tests/Feature/TranslatableFieldsPlaygroundFillTest.php tests/Feature/TitleSlugTranslatableFieldTest.php tests/Feature/SelectFieldCoordinatorRenderTest.php"
@@ -133,14 +131,17 @@
         "build:js": "npm run build:js",
         "build:assets": "npm run build",
         "format": "vendor/bin/pint",
-        "post-install-cmd": [
-            "@npm-install"
-        ],
-        "post-update-cmd": [
-            "@npm-install"
-        ],
         "npm-install": "npm install --ignore-scripts --no-audit --no-fund"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "suggest": {
+        "ext-gd": "Optional native Media OS image conversions; the GD build determines WebP/AVIF availability.",
+        "ext-exif": "JPEG auto orientation in native Media OS image conversions.",
+        "spatie/laravel-sluggable": "Optional model-based slug generation for SlugField via spatieModel().",
+        "spatie/laravel-translatable": "Optional JSON translation storage for translatable TitleSlugField titles via spatieTranslatable().",
+        "spatie/laravel-medialibrary": "Optional Spatie Media Library integration via FlexSpatieMediaLibraryFileUpload.",
+        "filament/spatie-laravel-media-library-plugin": "Optional Filament Spatie Media Library file upload base class for FlexSpatieMediaLibraryFileUpload.",
+        "spatie/laravel-tags": "Optional Spatie Tags integration via FlexSpatieTagsField (set use_spatie_tags in field config)."
+    }
 }

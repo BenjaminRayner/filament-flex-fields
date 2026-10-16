@@ -1,7 +1,7 @@
 # Flex Fields — Commercial Licenses
 
-**Package:** `janczakb/filament-flex-fields`  
-**License:** [LICENSE](LICENSE), version **2.0**, effective **1 October 2026**  
+**Package:** `janczakb/filament-flex-fields`<br>
+**License:** [LICENSE](LICENSE), version **2.0**, effective **1 October 2026**<br>
 **Contact / purchase:** [barek122@gmail.com](mailto:barek122@gmail.com)
 
 Flex Fields is source-available: you can inspect the source and evaluate the package through official public channels. Qualifying internal use and bespoke client work remain free. Commercial hosted products require the appropriate commercial grant; customer installations, OEM, and redistribution require expressly agreed Custom rights.
@@ -76,8 +76,8 @@ Free use includes private repositories/build artifacts, backups, CSS/theme overr
 
 ## 3. Single Product — $249 one-time
 
-**Licensee:** one named natural person or one legal entity.  
-**Scope:** one named, licensee-owned Product in Hosted Use.  
+**Licensee:** one named natural person or one legal entity.<br>
+**Scope:** one named, licensee-owned Product in Hosted Use.<br>
 **Duration:** perpetual within the grant, subject to compliance; no annual renewal.
 
 Your confirmation identifies the Product by name and a short description; include its URL if available. One Product can have unlimited users, tenants, developers, servers, and environments. Commercial scale does not force an upgrade.
@@ -103,8 +103,8 @@ Single Product includes private modifications and your own application branding.
 
 ## 4. Unlimited Company — $699 one-time
 
-**Licensee:** one named legal entity, or a named sole proprietor.  
-**Scope:** all current and future Products owned and operated by that licensee in Hosted Use.  
+**Licensee:** one named legal entity, or a named sole proprietor.<br>
+**Scope:** all current and future Products owned and operated by that licensee in Hosted Use.<br>
 **Duration:** perpetual within the grant, subject to compliance; no annual renewal.
 
 This is the portfolio plan. The company can operate one, five, twenty, or more SaaS applications without another Product fee. Every covered Product has the same unlimited tenant, user, developer, server, and environment allowances as Single Product.
@@ -126,8 +126,8 @@ A subsidiary may supply developers as Authorized Personnel for the licensee's Pr
 
 ## 5. Enterprise Group — $1,499 one-time
 
-**Licensee / administrator:** one named parent legal entity.  
-**Covered Entities:** that parent and its direct/indirect subsidiaries with **100% ownership interests and voting rights** through the qualifying chain.  
+**Licensee / administrator:** one named parent legal entity.<br>
+**Covered Entities:** that parent and its direct/indirect subsidiaries with **100% ownership interests and voting rights** through the qualifying chain.<br>
 **Scope:** unlimited Products owned and operated within that group in Hosted Use.
 
 Enterprise Group adds entity coverage, shared development, internal hosting, and private repository access across the group. It does not add external distribution rights or an SLA. There is no employee, team, Product, or wholly owned subsidiary count limit.

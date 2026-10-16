@@ -1,0 +1,229 @@
+---
+title: "Component routes"
+description: "Declare authenticated controller endpoints in a custom FLEX component definition, with middleware, names, parameters and route-cache support."
+icon: "route"
+---
+
+A component that needs server requests can declare its endpoints alongside its
+assets and shared components. You do not need a separate route registration loop
+in your package provider.
+
+## Declare an endpoint
+
+```php
+use Acme\Widget\Http\Controllers\WidgetLookupController;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\Routing\ComponentRoute;
+
+$definition = new ComponentDefinition(
+    id: 'acme-widget',
+    kind: ComponentKind::Field,
+    entry: 'acme-widget',
+    routes: [
+        new ComponentRoute(
+            id: 'lookup',
+            uri: 'widgets/{record}/lookup',
+            controller: WidgetLookupController::class,
+            methods: ['POST'],
+            middleware: ['web', 'auth', 'throttle:60,1'],
+            where: ['record' => '[0-9]+'],
+        ),
+    ],
+);
+```
+
+Register the definition through the normal [component registration API](/docs/extensions/registration)
+during provider boot. FLEX registers declared routes once, after all component
+providers have booted and the registry has frozen. Endpoint registration does
+not load browser assets or render component HTML.
+
+The generated name is `filament-flex-fields.components.acme-widget.lookup`.
+The default prefix is `flex-fields`.
+
+## Keep routes in their own file
+
+A route file returns a typed declaration list. It contains no `Route::get()` calls
+and does not register endpoints as a side effect.
+
+```php resources/routes/widget.php
+<?php
+
+use Acme\Widget\Http\Controllers\WidgetLookupController;
+use Bjanczak\FilamentFlexFields\Support\Components\Routing\ComponentRoute;
+
+return [
+    new ComponentRoute(
+        id: 'lookup',
+        uri: 'widgets/{record}/lookup',
+        controller: WidgetLookupController::class,
+        middleware: ['web', 'auth', 'throttle:60,1'],
+        where: ['record' => '[0-9]+'],
+    ),
+];
+```
+
+Reference the file from your component definition:
+
+```php resources/components/acme-widget.php
+return new ComponentDefinition(
+    id: 'acme-widget',
+    kind: ComponentKind::Field,
+    entry: 'acme-widget',
+    routes: require dirname(__DIR__).'/routes/widget.php',
+);
+```
+
+The same type, budget, duplicate-ID, authentication and collision checks apply
+to inline declarations and declarations loaded from a file. This is trusted
+package PHP; never accept route-file paths from browser input or saved schemas.
+Controllers may live in `src/Http/Controllers/` within the same package.
+
+## Share endpoints between components
+
+When multiple components call the same server API, declare the endpoints on one
+shared primitive and add that primitive to each consumer's `uses` list. A
+server-only primitive has no browser entry or styles:
+
+```php
+$lookup = new ComponentDefinition(
+    id: 'acme-location-api',
+    kind: ComponentKind::Primitive,
+    routes: require __DIR__.'/routes/location.php',
+);
+
+$map = new ComponentDefinition(
+    id: 'acme-map',
+    kind: ComponentKind::Field,
+    entry: 'acme-map',
+    uses: ['acme-location-api'],
+);
+
+$address = new ComponentDefinition(
+    id: 'acme-address',
+    kind: ComponentKind::Field,
+    entry: 'acme-address',
+    uses: ['acme-location-api'],
+);
+```
+
+Register all three definitions through your package's normal registration API.
+The routes are registered once for the installed component graph. Rendering two
+fields does not register them twice, and sharing this primitive does not load the
+other consumer's CSS or JavaScript. FLEX's Map Picker and Address Autocomplete use
+this approach for their shared geocoding endpoints.
+
+## Controller and browser request
+
+```php
+namespace Acme\Widget\Http\Controllers;
+
+use App\Models\Project;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+
+final class WidgetLookupController
+{
+    public function __invoke(Request $request, string $record): JsonResponse
+    {
+        $project = Project::query()->findOrFail($record);
+        Gate::authorize('view', $project);
+        $data = $request->validate([
+            'query' => ['required', 'string', 'max:100'],
+        ]);
+
+        return response()->json([
+            'matches' => $project->items()
+                ->where('name', 'like', $data['query'].'%')
+                ->limit(20)
+                ->get(['id', 'name']),
+        ]);
+    }
+}
+```
+
+Pass the named route's URL into the rendered instance configuration:
+
+```php
+$endpoint = route(
+    'filament-flex-fields.components.acme-widget.lookup',
+    ['record' => $record->getKey()],
+    absolute: false,
+);
+```
+
+For requests protected by `web`, include Laravel's CSRF token on writes.
+Cancel browser requests with their field owner and reject stale responses.
+Authentication identifies the user; your controller must still authorize each
+record/tenant and validate the submitted payload.
+
+## Complete declaration reference
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `id` | Required | Unique kebab-case endpoint ID within the component; at most 96 characters. |
+| `uri` | Required | Relative path template, up to 1024 characters. Named parameters such as `{record}` or `{record?}` are supported. No leading slash, query string or traversal segments. |
+| `controller` | Required | Instantiable controller class with a public instance handler. |
+| `action` | `__invoke` | Public controller method. Closures and static handlers are not supported. |
+| `methods` | `['POST']` | Unique methods: `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`, `QUERY`. `GET` includes `HEAD`. |
+| `middleware` | `['web', 'auth']` | Bounded list of middleware names/class names. Authentication is required unless public access is explicit. |
+| `requiredMiddleware` | `[]` | Middleware always retained, including when host configuration replaces the regular middleware list. |
+| `name` | `null` | Optional explicit namespaced name. Otherwise generated from component and endpoint IDs. |
+| `prefixConfig` | `null` | Named configuration key supplying a literal prefix. Default key: `filament-flex-fields.routes.prefix`, falling back to `flex-fields`. An empty prefix is allowed. |
+| `middlewareConfig` | `null` | Optional named configuration key replacing the regular middleware list; authentication checks still apply. |
+| `public` | `false` | Explicitly permits a declaration without authentication. Use only for intentionally public, separately protected endpoints. |
+| `domain` | `null` | Optional domain/subdomain restriction, including named domain parameters. |
+| `where` | `[]` | Up to 16 parameter regular expressions, each bounded to 1024 characters. Keys must reference declared parameters. |
+
+A definition accepts up to 32 endpoints; the registry accepts up to 4096 total.
+Use a unique vendor/component prefix in names and paths.
+
+## Configuration and required protections
+
+```php
+new ComponentRoute(
+    id: 'download',
+    uri: 'widgets/download',
+    controller: WidgetDownloadController::class,
+    methods: ['GET'],
+    prefixConfig: 'acme-widget.routes.prefix',
+    middlewareConfig: 'acme-widget.routes.middleware',
+    requiredMiddleware: ['signed:relative'],
+);
+```
+
+Your package configuration can supply:
+
+```php
+'routes' => [
+    'prefix' => 'acme/widgets',
+    'middleware' => ['web', 'auth:admin', 'throttle:30,1'],
+],
+```
+
+Configured middleware cannot silently turn a private endpoint public or remove
+its declared mandatory middleware. Trusted extension authors own controller
+code and route definitions; this API is not a sandbox for untrusted PHP plugins.
+
+## Collisions and deployment
+
+FLEX rejects duplicate route names and matching method/domain/path templates,
+including templates that differ only in URI parameter names. It resolves configured
+prefixes and validates controllers before adding any declared endpoints to the router.
+A failed batch registration leaves the component registry unchanged.
+
+Overlapping wildcard or custom-regex routes still require careful application
+route design; the registry does not prove every possible regex intersection.
+
+Controllers and route declarations support Laravel's route cache. Cached routes
+are used as-is on subsequent application boots. Refresh that cache whenever
+component endpoints, middleware or prefix configuration change:
+
+```bash
+php artisan route:cache
+```
+
+Only use declarations for stable server routes. Record IDs, tenant authorization
+and optional per-instance behavior belong in the request/controller and rendered
+configuration, not in a dynamically mutated definition.

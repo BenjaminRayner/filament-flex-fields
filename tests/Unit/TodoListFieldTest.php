@@ -5,6 +5,9 @@ declare(strict_types=1);
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TodoListField;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
 use Bjanczak\FilamentFlexFields\Support\Playground\TodoListFieldPlayground;
+use Bjanczak\FilamentFlexFields\Support\TodoList\Validation\TodoSelectionRule;
+use Bjanczak\FilamentFlexFields\Tests\Support\TestableTranslatableForm;
+use Filament\Schemas\Schema;
 
 it('exposes todo list api and alpine config', function () {
     $field = TodoListField::make('tasks')
@@ -78,6 +81,9 @@ it('exposes edit api and replaces nested items by id', function () {
             'description' => $data['description'] ?? null,
         ]);
 
+    $form = new TestableTranslatableForm;
+    Schema::make($form)->statePath('data')->components([$field])->fill(['tasks' => $field->seedItemsFromOptions()]);
+
     $present = new ReflectionMethod(TodoListField::class, 'presentItem');
     $present->setAccessible(true);
     $seed = $field->seedItemsFromOptions();
@@ -96,7 +102,7 @@ it('exposes edit api and replaces nested items by id', function () {
 
     $replace = new ReflectionMethod(TodoListField::class, 'mapReplaceItemById');
     $replace->setAccessible(true);
-    $next = $replace->invoke($field, $seed, 'a', ['label' => 'Travel passport']);
+    $next = $replace->invoke($field, $seed, 'pack:a', ['label' => 'Travel passport']);
 
     expect($next[0]['children'][0]['label'])->toBe('Travel passport')
         ->and($next[0]['label'])->toBe('Pack');
@@ -188,7 +194,7 @@ it('normalizes seed options and legacy key lists', function () {
             'inbox' => 'Inbox',
         ]);
 
-    $seeded = $field->normalizeState([]);
+    $seeded = $field->seedItemsFromOptions();
 
     expect($seeded)->toHaveCount(2)
         ->and($seeded[0])->toMatchArray([
@@ -232,9 +238,9 @@ it('validates done counts', function () {
         ->options(['a' => 'A', 'b' => 'B', 'c' => 'C'])
         ->minDone(2);
 
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
+    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof TodoSelectionRule);
     $message = null;
-    $rule('tasks', [
+    $rule->validate('tasks', [
         ['id' => 'a', 'label' => 'A', 'done' => true],
         ['id' => 'b', 'label' => 'B', 'done' => false],
     ], function (string $failMessage) use (&$message): void {
@@ -265,9 +271,9 @@ it('seeds children and exposes undo completion notifications', function () {
         ->and($items[0])->not->toHaveKey('comments')
         ->and($items[0])->not->toHaveKey('tags')
         ->and($field->hasUndoCompletionNotifications())->toBeTrue()
-        ->and($field->getChildrenIcon())->toBe(GravityIcon::CodeTrunk)
+        ->and($field->getChildrenIcon())->toBe('hugeicons-node-add')
         ->and($field->getReorderIcon())->toBe(GravityIcon::Grip)
-        ->and($field->getDateIcon())->toBe(GravityIcon::Calendar);
+        ->and($field->getDateIcon())->toBe('hugeicons-calendar-05');
 
     $field->undoCompletionNotifications(false);
 
@@ -317,6 +323,9 @@ it('runs createUsing, deleteUsing, reorderUsing and afterToggled callbacks', fun
             $toggled = compact('changed', 'items');
         });
 
+    $field->allowCreate();
+    $form = new TestableTranslatableForm;
+    Schema::make($form)->statePath('data')->components([$field])->fill(['tasks' => $field->seedItemsFromOptions()]);
     $parent = $field->seedItemsFromOptions()[0];
 
     expect($field->hasCreateUsing())->toBeTrue()
@@ -335,6 +344,7 @@ it('runs createUsing, deleteUsing, reorderUsing and afterToggled callbacks', fun
             ],
         ]))->toBeTrue();
 
+    $form->data['tasks'][1]['done'] = true;
     $field->todoItemsToggled([
         'changed' => [['id' => 'b', 'label' => 'B', 'done' => true]],
         'items' => [['id' => 'b', 'label' => 'B', 'done' => true]],
@@ -343,7 +353,7 @@ it('runs createUsing, deleteUsing, reorderUsing and afterToggled callbacks', fun
     expect($created['label'])->toBe('New')
         ->and($deleted['id'])->toBe('a')
         ->and($deletedChildren)->toHaveCount(2)
-        ->and($cascadeDeletedIds)->toBe(['a', 'a1', 'a2'])
+        ->and($cascadeDeletedIds)->toBe(['a', 'a:a1', 'a:a2'])
         ->and($reordered[0]['id'])->toBe('b')
         ->and($toggled['changed'][0]['done'])->toBeTrue();
 
@@ -353,6 +363,7 @@ it('runs createUsing, deleteUsing, reorderUsing and afterToggled callbacks', fun
         ->deletable('all')
         ->deleteUsing(fn (): bool => false);
 
+    Schema::make($form)->statePath('data')->components([$blocked])->fill(['blocked' => $blocked->seedItemsFromOptions()]);
     expect($blocked->deleteTodoItem(['item' => ['id' => 'b', 'label' => 'B']]))->toBeFalse();
 
     $blockedReorder = TodoListField::make('blocked_reorder')
@@ -360,6 +371,7 @@ it('runs createUsing, deleteUsing, reorderUsing and afterToggled callbacks', fun
         ->reorderable()
         ->reorderUsing(fn (): bool => false);
 
+    Schema::make($form)->statePath('data')->components([$blockedReorder])->fill(['blocked_reorder' => $blockedReorder->seedItemsFromOptions()]);
     expect($blockedReorder->reorderTodoItems([
         'items' => [
             ['id' => 'b', 'label' => 'B'],
@@ -387,7 +399,7 @@ it('keeps children when replacing a parent by id', function () {
 
     expect($next[0]['label'])->toBe('Packed bag')
         ->and($next[0]['children'])->toHaveCount(2)
-        ->and($next[0]['children'][0]['id'])->toBe('passport')
+        ->and($next[0]['children'][0]['id'])->toBe('pack:passport')
         ->and($next[0]['children'][1]['label'])->toBe('Charger');
 });
 
@@ -405,4 +417,20 @@ it('registers playground hub', function () {
         ->toContain('todo_list__deletable_all')
         ->toContain('todo_list__reorder_locked')
         ->toContain('todo_list__substack');
+});
+
+it('separates numbered pagination from infinite loading', function () {
+    $field = TodoListField::make('tasks')->paginated(8)->virtualizing()->reorderable();
+    expect($field->isPaginated())->toBeTrue()->and($field->isInfiniteScroll())->toBeFalse()
+        ->and($field->getPageSize())->toBe(8)->and($field->isReorderable())->toBeFalse();
+    $field->infiniteScroll(12);
+    expect($field->isPaginated())->toBeFalse()->and($field->isInfiniteScroll())->toBeTrue()->and($field->getPageSize())->toBe(12);
+    $field->paginated(false);
+    expect($field->getPageSize())->toBeNull()->and($field->isInfiniteScroll())->toBeFalse();
+});
+
+it('rejects invalid collection configuration', function () {
+    expect(fn () => TodoListField::make('tasks')->paginated(0)->getPageSize())->toThrow(InvalidArgumentException::class);
+    expect(fn () => TodoListField::make('tasks')->maxItems(-1)->getMaxItems())->toThrow(InvalidArgumentException::class);
+    expect(TodoListField::make('tasks')->allowCreate()->allowDelete()->deletable('none')->getDeletableMode())->toBe('none');
 });

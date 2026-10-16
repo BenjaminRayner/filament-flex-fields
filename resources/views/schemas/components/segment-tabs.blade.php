@@ -1,142 +1,42 @@
 @php
-    use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs\SegmentTab;
+    use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs;
     use Illuminate\Support\Js;
-
     $id = $getId();
-    $tabPersistKey = $getTabPersistKey();
-    $label = $getLabel();
-    $helperText = $getHelperText();
-    $size = $getSize();
-    $variant = $getVariant();
-    $color = $getColor();
-    $hasSeparators = $hasSeparators();
-    $isFullWidth = $isFullWidth();
-    $isIconOnly = $isIconOnly();
-    $expandSelectedLabel = $shouldExpandSelectedLabel();
     $tabs = $getVisibleTabs();
-    $activeTabIndex = $getActiveTab();
-    $activeTabKey = $getActiveTabKey();
-    $tabKeys = collect($tabs)->map(static fn (SegmentTab $tab): string => $tab->getKey(isAbsolute: false))->values()->all();
-
-    $getTabVisibilityJs = function (SegmentTab $tab): ?string {
-        $hiddenJs = $tab->getHiddenJs();
-        $visibleJs = $tab->getVisibleJs();
-
-        return match ([filled($hiddenJs), filled($visibleJs)]) {
-            [true, true] => "(! ({$hiddenJs})) && ({$visibleJs})",
-            [true, false] => "! ({$hiddenJs})",
-            [false, true] => $visibleJs,
-            default => null,
-        };
-    };
+    $items = $getSegmentItems();
+    $helperText = $getHelperText();
 @endphp
 
-<div
-    x-load
-    x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('segment-tabs', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+<div x-fff-load
+    x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('segment-tabs', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
     x-data="segmentTabsSchemaComponent({
-        activeTabIndex: @js(max(0, $activeTabIndex - 1)),
-        activeTabKey: @js($activeTabKey),
-        optionKeys: {{ Js::from($tabKeys) }},
-        separators: @js($hasSeparators),
+        activeTabKey: @js($getActiveTabKey()),
+        optionKeys: {{ Js::from(array_map(static fn ($item) => $item->key, $items)) }},
         isTabPersisted: @js($isTabPersisted() && filled($id)),
-        tabPersistKey: @js($tabPersistKey),
+        tabPersistKey: @js($getTabPersistKey()),
         isTabPersistedInQueryString: @js($isTabPersistedInQueryString()),
-        isTabPersistedFlag: @js($isTabPersisted()),
         tabQueryStringKey: @js($getTabQueryStringKey()),
-        livewireId: @js($this->getId()),
+        livewireId: @js($schemaComponent->getLivewire()->getId()),
         schemaKey: @js($getRootContainer()->getKey()),
-        overflowShell: @js(! $isFullWidth),
     })"
-    x-init="init()"
     wire:ignore.self
-    {{
-        $attributes
-            ->merge([
-                'id' => $id,
-                'wire:key' => $getLivewireKey() . '.container',
-            ], escape: false)
-            ->merge($getExtraAttributes(), escape: false)
-            ->class([
-                'fff-segment-tabs',
-                'w-full' => $isFullWidth,
-            ])
-    }}
+    {{ $attributes->merge(['id' => $id, 'wire:key' => $getLivewireKey().'.container'], escape: false)
+        ->merge($getExtraAttributes(), escape: false)->class(['fff-segment-tabs']) }}
 >
-    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'segment-tabs',
-        'livewireKey' => $getLivewireKey(),
-    ])
-
-    @if ($isFullWidth)
-        <div
-            @class([
-                'fff-segment-control',
-                'fff-segment-tabs__control',
-                'w-full',
-                'fi-color-'.$color => filled($color),
-            ])
-            role="tablist"
-            @if (filled($label))
-                aria-label="{{ $label }}"
-            @endif
-        >
-            @include('filament-flex-fields::forms.components.partials.segment-tabs-track', [
-                'tabs' => $tabs,
-                'size' => $size,
-                'variant' => $variant,
-                'hasSeparators' => $hasSeparators,
-                'isIconOnly' => $isIconOnly,
-                'expandSelectedLabel' => $expandSelectedLabel,
-                'getTabVisibilityJs' => $getTabVisibilityJs,
-                'isTabActive' => $isTabActive,
-                'inShell' => false,
-            ])
-        </div>
-    @else
-        <x-filament-flex-fields::segment-overflow-shell
-            :variant="$variant"
-            :tablist-label="$label"
-            tablist-role="tablist"
-        >
-            <div
-                @class([
-                    'fff-segment-control',
-                    'fff-segment-tabs__control',
-                    'fi-color-'.$color => filled($color),
-                ])
-            >
-                @include('filament-flex-fields::forms.components.partials.segment-tabs-track', [
-                    'tabs' => $tabs,
-                    'size' => $size,
-                    'variant' => $variant,
-                    'hasSeparators' => $hasSeparators,
-                    'isIconOnly' => $isIconOnly,
-                    'expandSelectedLabel' => $expandSelectedLabel,
-                    'getTabVisibilityJs' => $getTabVisibilityJs,
-                    'isTabActive' => $isTabActive,
-                    'inShell' => true,
-                ])
-            </div>
-        </x-filament-flex-fields::segment-overflow-shell>
-    @endif
-
+    <x-filament-flex-fields::assets :component="$getSegmentAssetComponent()"
+        :consumer="$getLivewireKey()" :schema-component="$schemaComponent" />
+    <x-filament-flex-fields::segment-control :items="$items" :identity="$getLivewireKey()" :selected="$getActiveTabKey()"
+        :size="$getSize()" :variant="$getVariant()" :color="$getColor()"
+        :separators="$hasSeparators()" :full-width="$isFullWidth()"
+        :icon-only="$isIconOnly()" :expand-selected-label="$shouldExpandSelectedLabel()"
+        :label="$getLabel()" role="tablist" class="fff-segment-tabs__control"
+    />
     @foreach ($tabs as $tab)
-        @php
-            $tabVisibilityJs = $getTabVisibilityJs($tab);
-        @endphp
-
-        @if ($tabVisibilityJs)
-            <div x-cloak x-show="{!! $tabVisibilityJs !!}">
-                {{ $tab }}
-            </div>
+        @if ($visibility = SegmentTabs::tabVisibilityExpression($tab))
+            <div x-cloak x-show="{!! $visibility !!}">{{ $tab }}</div>
         @else
             {{ $tab }}
         @endif
     @endforeach
-
-    @if (filled($helperText))
-        <div class="fff-segment-tabs__helper-text">
-            {{ $helperText }}
-        </div>
-    @endif
+    @if (filled($helperText)) <div class="fff-segment-tabs__helper-text">{{ $helperText }}</div> @endif
 </div>

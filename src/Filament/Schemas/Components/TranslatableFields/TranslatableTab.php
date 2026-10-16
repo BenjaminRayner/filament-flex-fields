@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields;
 
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs\SegmentTab;
+use Bjanczak\FilamentFlexFields\Support\Translatable\TranslatableLocales;
 
 class TranslatableTab extends SegmentTab
 {
@@ -12,7 +13,8 @@ class TranslatableTab extends SegmentTab
 
     public function locale(string $locale): static
     {
-        $this->locale = strtolower($locale);
+        TranslatableLocales::assertLocale($locale);
+        $this->locale = $locale;
         $this->key($this->locale);
 
         return $this;

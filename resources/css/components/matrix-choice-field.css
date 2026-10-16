@@ -282,3 +282,7 @@
         animation-duration: 0.01ms !important;
     }
 }
+
+.fff-matrix-island { display: contents; }
+.fff-matrix-choice__input[hidden] { display: none; }
+.fff-matrix-choice__schema-cell { padding: 0.5rem; display: flex; align-items: center; justify-content: center; }

@@ -1,0 +1,12 @@
+.fff-icon-select { position: relative; width: 100%; min-width: 0; }
+.fff-icon-select__value { display: flex !important; align-items: center; gap: .5rem; min-width: 0; }
+.fff-icon-select__preview { display: grid; place-items: center; width: 1.25rem; height: 1.25rem; flex: 0 0 1.25rem; }
+.fff-icon-select__preview:empty { display: none; }
+.fff-icon-select__preview svg { width: 100%; height: 100%; }
+.fff-icon-select__name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fff-icon-select--inline { inline-size:100%; block-size:100%; display:flex; align-items:center; }
+.fff-icon-select--inline .fff-icon-select__preview { inline-size:1.1rem; block-size:1.1rem; flex-basis:1.1rem; }
+.fff-icon-select__inline-clear { display:inline-flex; align-items:center; gap:6px; margin:4px 8px; padding:6px 12px; border:0; border-radius:999px; background:rgb(244 244 245); color:rgb(63 63 70); font-size:12px; font-weight:600; cursor:pointer; }
+.fff-icon-select__inline-clear .fi-icon { width:16px; height:16px; }
+.fff-icon-select__inline-clear:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.dark .fff-icon-select__inline-clear { background:rgb(63 63 70); color:rgb(244 244 245); }

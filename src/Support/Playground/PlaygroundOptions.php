@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 
 class PlaygroundOptions
 {
@@ -45,10 +45,10 @@ class PlaygroundOptions
     public static function heroWithIcons(): array
     {
         return [
-            'dashboard' => ['label' => 'Dashboard', 'icon' => GravityIcon::LayoutCells],
-            'analytics' => ['label' => 'Analytics', 'icon' => GravityIcon::ChartBar],
-            'reports' => ['label' => 'Reports', 'icon' => GravityIcon::SquareChartBar],
-            'settings' => ['label' => 'Settings', 'icon' => GravityIcon::Gear],
+            'dashboard' => ['label' => 'Dashboard', 'icon' => FlexIcon::LayoutCells],
+            'analytics' => ['label' => 'Analytics', 'icon' => FlexIcon::ChartBar],
+            'reports' => ['label' => 'Reports', 'icon' => FlexIcon::SquareChartBar],
+            'settings' => ['label' => 'Settings', 'icon' => FlexIcon::Gear],
         ];
     }
 
@@ -58,9 +58,9 @@ class PlaygroundOptions
     public static function devices(): array
     {
         return [
-            'mobile' => ['label' => 'Mobile', 'icon' => GravityIcon::Smartphone],
-            'tablet' => ['label' => 'Tablet', 'icon' => GravityIcon::LayoutColumns],
-            'desktop' => ['label' => 'Desktop', 'icon' => GravityIcon::Display],
+            'mobile' => ['label' => 'Mobile', 'icon' => FlexIcon::Smartphone],
+            'tablet' => ['label' => 'Tablet', 'icon' => FlexIcon::LayoutColumns],
+            'desktop' => ['label' => 'Desktop', 'icon' => FlexIcon::Display],
         ];
     }
 
@@ -70,10 +70,10 @@ class PlaygroundOptions
     public static function iconExpand(): array
     {
         return [
-            'home' => ['label' => 'Home', 'icon' => GravityIcon::House],
-            'chat' => ['label' => 'Chat', 'icon' => GravityIcon::Comments],
-            'video' => ['label' => 'Video', 'icon' => GravityIcon::Video],
-            'print' => ['label' => 'Print', 'icon' => GravityIcon::Printer],
+            'home' => ['label' => 'Home', 'icon' => FlexIcon::House],
+            'chat' => ['label' => 'Chat', 'icon' => FlexIcon::Comments],
+            'video' => ['label' => 'Video', 'icon' => FlexIcon::Video],
+            'print' => ['label' => 'Print', 'icon' => FlexIcon::Printer],
         ];
     }
 }

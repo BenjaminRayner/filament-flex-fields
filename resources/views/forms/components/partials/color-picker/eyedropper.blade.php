@@ -1,0 +1,1 @@
+<button type="button" class="fff-color-small-button" x-cloak x-show="eyedropperSupported" x-bind:disabled="readOnly" x-on:click="pickFromScreen()" aria-label="{{ __('filament-flex-fields::color-picker.eyedropper') }}"><x-filament::icon :icon="'hugeicons-droplet'" /></button>

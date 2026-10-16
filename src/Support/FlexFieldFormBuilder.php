@@ -11,10 +11,15 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support;
 
 use Bjanczak\FilamentFlexFields\Data\FlexFieldDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyRenderContext;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaRenderer;
 use Bjanczak\FilamentFlexFields\Support\Enterprise\FieldRbacMatrix;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\AppliesFieldDefinitionMeta;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\FieldComponentFactory;
 use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldSchemaResolver;
+use Filament\Forms\Components\Field;
 use Filament\Schemas\Components\Component;
 
 class FlexFieldFormBuilder
@@ -26,24 +31,32 @@ class FlexFieldFormBuilder
     ) {}
 
     /**
-     * @param  iterable<FlexFieldDefinition>  $definitions
+     * @param  iterable<FlexFieldDefinition|FamilySchemaDefinition>  $definitions
      * @return list<Component>
      */
     public function build(
         iterable $definitions,
         string $statePathPrefix = 'flex_field_values',
         ?string $rbacUserKey = null,
+        ?string $tenantId = null,
+        ?FamilyRenderContext $familyContext = null,
     ): array {
         $activeDefinitions = [];
         $componentsBySlug = [];
 
         foreach ($definitions as $definition) {
-            if (! $definition->isActive || $this->shouldSkipDefinition($definition, $rbacUserKey)) {
+            if (! $definition->isActive || ($definition instanceof FlexFieldDefinition
+                ? $this->shouldSkipDefinition($definition, $rbacUserKey, $tenantId) : ! $definition->isVisible)) {
                 continue;
             }
 
             $activeDefinitions[] = $definition;
-            $component = $this->makeComponent($definition, $statePathPrefix);
+            if (isset($componentsBySlug[$definition->slug])) {
+                throw new \InvalidArgumentException('Duplicate schema state key: '.$definition->slug);
+            }
+            $component = $this->makeComponent($definition, $statePathPrefix, $definition instanceof FamilySchemaDefinition
+                ? ($familyContext ?? new FamilyRenderContext('form:'.$statePathPrefix, $statePathPrefix, userKey: $rbacUserKey, tenantId: $tenantId))
+                : null);
 
             if ($component !== null) {
                 $componentsBySlug[$definition->slug] = $component;
@@ -53,7 +66,7 @@ class FlexFieldFormBuilder
         $formulas = [];
 
         foreach ($activeDefinitions as $definition) {
-            if ($definition->hasFormula()) {
+            if ($definition instanceof FlexFieldDefinition && $definition->hasFormula()) {
                 $formulas[$definition->slug] = (string) $definition->formula;
             }
         }
@@ -63,8 +76,18 @@ class FlexFieldFormBuilder
         return array_values($componentsBySlug);
     }
 
-    public function makeComponent(FlexFieldDefinition $definition, string $statePathPrefix = 'flex_field_values'): ?Component
+    public function makeComponent(FlexFieldDefinition|FamilySchemaDefinition $definition, string $statePathPrefix = 'flex_field_values', ?FamilyRenderContext $familyContext = null): ?Component
     {
+        if ($definition instanceof FamilySchemaDefinition) {
+            $field = app(FamilySchemaRenderer::class)->make(ComponentKind::Field, $definition,
+                $familyContext ?? new FamilyRenderContext('form:'.$statePathPrefix, $statePathPrefix));
+            if (! $field instanceof Field) {
+                throw new \LogicException('Family field renderer returned a read-only surface.');
+            }
+
+            return $field;
+        }
+
         return $this->factory->makeComponent($definition, $statePathPrefix);
     }
 
@@ -88,14 +111,12 @@ class FlexFieldFormBuilder
         $this->wireFormulaDependencies($componentsBySlug, $formulas, $statePathPrefix);
     }
 
-    protected function shouldSkipDefinition(FlexFieldDefinition $definition, ?string $rbacUserKey = null): bool
+    protected function shouldSkipDefinition(FlexFieldDefinition $definition, ?string $rbacUserKey = null, ?string $tenantId = null): bool
     {
-        if ($rbacUserKey !== null && $rbacUserKey !== '') {
-            $resolver = app(FlexFieldSchemaResolver::class);
+        $resolver = app(FlexFieldSchemaResolver::class);
 
-            if (! $resolver->fieldAllowedForUser($definition, $rbacUserKey, FieldRbacMatrix::ABILITY_EDIT)) {
-                return true;
-            }
+        if (! $resolver->fieldAllowedForUser($definition, $rbacUserKey, FieldRbacMatrix::ABILITY_EDIT, $tenantId)) {
+            return true;
         }
 
         if ($definition->hasDynamicVisibility()) {

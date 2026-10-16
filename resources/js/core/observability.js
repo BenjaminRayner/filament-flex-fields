@@ -1,13 +1,12 @@
 /**
- * Browser bridge for enterprise ObservabilityHooks when PHP cannot be reached
+ * Browser activity notifications when PHP cannot be reached
  * (overlay exclusive open, client-side select.search). Listeners:
  *
  *   window.addEventListener('fff:observability', (e) => {
  *     // e.detail.event — 'overlay.open' | 'select.search' | ...
  *   })
  *
- * PHP `ObservabilityHooks::emit` respects `enterprise.enabled`; this CustomEvent
- * always fires so client tooling can subscribe independently.
+ * These events stay in the browser. PHP activity events use Laravel independently.
  *
  * @param {string} event
  * @param {Record<string, unknown>} [payload]

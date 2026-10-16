@@ -1,283 +1,52 @@
 @php
-    use Bjanczak\FilamentFlexFields\Support\CurrencyRegistry;
-    use Bjanczak\FilamentFlexFields\Support\CurrencyRegistryQueue;
-
+    use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Currency\CurrencySelect;
+    use Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin;
+    use Filament\Support\Facades\FilamentAsset;
     $statePath = $getStatePath();
-    $isDisabled = $isDisabled();
-    $isReadOnly = $isReadOnly();
-    $wrapperClasses = $getWrapperClasses();
-    $hasCurrencySelect = $hasCurrencySelect();
-    $usesCurrencyRegistry = $field->shouldUseCurrencyRegistry();
-    $currencies = $getCurrenciesMetadata();
-    $defaultCurrency = $getDefaultCurrencyCode();
-    $hasError = filled($statePath) && $errors->has($statePath);
-    $livewireKey = $getLivewireKey();
-    $initialDisplay = $field->getInitialDisplay();
+    $disabled = $isDisabled();
+    $readOnly = $isReadOnly();
+    $selectable = $hasCurrencySelect();
+    $size = $getSize();
+    $variant = $getVariant();
+    $initial = $field->getInitialDisplay();
+    $runtime = $field->getCurrencyRuntimeConfiguration();
     $placeholder = $getPlaceholder() ?? __('filament-flex-fields::default.currency.placeholder');
-
-    if ($usesCurrencyRegistry) {
-        CurrencyRegistryQueue::enqueue(CurrencyRegistry::POOL_ISO);
-        $field->getCurrencyFilterKey();
-    }
+    $currencySelect = $selectable ? CurrencySelect::forCurrency($field) : null;
 @endphp
-
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
-    :attributes="
-        \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
-            ->class($wrapperClasses)
-    "
->
-    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'currency-field',
-        'livewireKey' => $getLivewireKey(),
-    ])
-    <div
-        wire:ignore
-        wire:key="{{ $livewireKey }}.{{ substr(md5(serialize([$isDisabled, $isReadOnly, $getSize(), $getVariant(), $hasCurrencySelect])), 0, 64) }}"
-        x-load
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('currency-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-        x-data="currencyFieldFormComponent({
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field"
+    :attributes="\Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())->class($getWrapperClasses())">
+    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'currency-field', 'livewireKey' => $getLivewireKey()])
+    <div wire:ignore wire:key="{{ $getLivewireKey() }}.{{ md5(serialize([$disabled, $readOnly, $size, $variant, $selectable])) }}"
+        x-fff-load x-fff-load-src="{{ FilamentAsset::getAlpineComponentSrc('currency-field', FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+        x-data="currencyFieldFormComponent({ ...@js($runtime),
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
-            statePath: @js($statePath),
-            currencies: @js($currencies),
-            currencyPool: @js($usesCurrencyRegistry ? $field->getCurrencyPool() : null),
-            currencyFilterKey: @js($usesCurrencyRegistry ? $field->getCurrencyFilterKey() : null),
-            selectedCurrencySeed: @js($usesCurrencyRegistry ? $field->getSelectedCurrencySeed() : null),
-            defaultCurrency: @js($defaultCurrency),
-            hasCurrencySelect: @js($hasCurrencySelect),
-            locale: @js($getLocale()),
-            minMinor: @js($getMinMinorUnits()),
-            maxMinor: @js($getMaxMinorUnits()),
-            allowNegative: @js($allowsNegative()),
-            animated: @js($isAnimated()),
-            commitDecimalsOnBlur: @js($shouldCommitDecimalsOnBlur()),
-            searchable: @js($isSearchable()),
-            disabled: @js($isDisabled),
-            readOnly: @js($isReadOnly),
-            placeholder: @js($getPlaceholder() ?? __('filament-flex-fields::default.currency.placeholder')),
-            currencyLabel: @js(__('filament-flex-fields::default.currency.currency')),
-            searchPlaceholder: @js(__('filament-flex-fields::default.currency.search_currencies')),
         })"
-        x-init="init()"
-        x-on:click.outside="if ($refs.currencyMenu?.contains($event.target)) { return }; closeCurrencyMenu()"
-        x-on:keydown.escape.window="closeCurrencyMenu()"
-        @class([
-            'fff-currency-field',
-            'fff-flex-text-input',
-            'fff-currency-field--'.$getSize(),
-            'fff-flex-text-input--'.$getSize(),
-            'fff-currency-field--'.$getVariant(),
-            'fff-flex-text-input--'.$getVariant(),
-            'is-disabled' => $isDisabled,
-            'is-read-only' => $isReadOnly,
-            'has-focus-outline' => $shouldShowFocusOutline(),
-        ])
-        x-bind:class="{ 'is-focused': isFocused }"
-        role="group"
-        aria-label="{{ $getLabel() }}"
-    >
-        {!! CurrencyRegistryQueue::renderScriptOnce() !!}
-        <div @class([
-            'fff-currency-field__shell fff-flex-text-input__shell',
-            'is-invalid' => $hasError,
-        ])>
+        x-on:fff-currency-change.stop="selectCurrency($event.detail)"
+        @class(['fff-currency-field fff-flex-text-input', 'fff-currency-field--'.$size, 'fff-flex-text-input--'.$size,
+            'fff-currency-field--'.$variant, 'fff-flex-text-input--'.$variant, 'is-disabled' => $disabled,
+            'is-read-only' => $readOnly, 'has-focus-outline' => $shouldShowFocusOutline()])
+        x-bind:class="{ 'is-focused': isFocused }" role="group" aria-label="{{ $getLabel() }}">
+        <div @class(['fff-currency-field__shell fff-flex-text-input__shell', 'is-invalid' => $errors->has($statePath)])>
             <div class="fff-currency-field__row fff-flex-text-input__row">
-                @if ($hasCurrencySelect)
-                    <div class="fff-currency-field__currency">
-                        <button
-                            type="button"
-                            class="fff-currency-field__currency-trigger"
-                            x-ref="currencyTrigger"
-                            x-on:click.stop="toggleCurrencyMenu()"
-                            x-bind:disabled="isLocked"
-                            x-bind:aria-expanded="currencyOpen"
-                            aria-haspopup="listbox"
-                            x-bind:aria-label="currencyLabel"
-                        >
-                            <span class="fff-currency-field__currency-code" x-text="activeCurrency?.code">{{ $initialDisplay['currencyCode'] }}</span>
-                            <x-filament::icon
-                                icon="heroicon-m-chevron-up-down"
-                                class="fff-currency-field__currency-chevron"
-                            />
+                @if ($currencySelect)
+                    <div class="fff-currency-field__currency"
+                        x-fff-load x-fff-load-src="{{ FilamentAsset::getAlpineComponentSrc('select-field', FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+                        x-data="fffHeadlessSelectField({ ...@js($currencySelect->getHeadlessAlpineConfig()),
+                            state: currencyState.currency, onChange: values => $dispatch('fff-currency-change', values[0]) })"
+                        x-init="$watch('currencyState.currency', value => { state = value })"
+                        x-on:click.outside="if (!$refs.headlessMenu?.contains($event.target)) comboboxCloseMenu()">
+                        {!! $currencySelect->getSelectCatalogMarkup() !!}
+                        <button type="button" class="fff-currency-field__currency-trigger" x-ref="headlessTrigger" data-fff-open-trigger
+                            x-on:click.stop="onHeadlessTriggerClick($event)" x-on:keydown="onHeadlessControlKeydown($event)"
+                            x-bind:disabled="disabled" x-bind:aria-expanded="comboboxOpen" aria-haspopup="listbox"
+                            aria-label="{{ $currencySelect->getLabel() }}" @disabled($disabled || $readOnly)>
+                            <span class="fff-currency-field__currency-code" x-text="currencyState.currency">{{ $initial['currencyCode'] }}</span>
+                            <x-filament::icon icon="hugeicons-arrow-down-01" class="fff-currency-field__currency-chevron" />
                         </button>
-
-                        <template x-teleport="body">
-                            <div
-                                x-ref="currencyMenu"
-                                x-cloak
-                                x-show="currencyOpen"
-                                x-bind:class="{ 'is-positioned': currencyMenuReady }"
-                                x-on:click.stop
-                                @class([
-                                    'fff-currency-field__currency-menu',
-                                    'fff-teleported-menu',
-                                    'fff-currency-field__currency-menu--'.$getSize(),
-                                    'fff-teleported-menu--'.$getSize(),
-                                ])
-                                role="listbox"
-                            >
-                                @if ($isSearchable())
-                                    <div class="fff-currency-field__currency-search-wrap fff-teleported-menu__search-wrap">
-                                        <input
-                                            type="search"
-                                            class="fff-currency-field__currency-search fff-teleported-menu__search"
-                                            x-ref="currencySearch"
-                                            x-model="currencySearch"
-                                            x-bind:placeholder="searchPlaceholder"
-                                            x-on:keydown.stop="onOverlayMenuSearchKeydown($event)"
-                                        />
-                                    </div>
-                                @endif
-
-                                <ul
-                                    class="fff-currency-field__currency-list"
-                                    x-ref="currencyListScroll"
-                                    x-on:scroll.passive="onVirtualListScroll($event)"
-                                    x-on:keydown="onOverlayMenuKeydown($event)"
-                                >
-                                    <li
-                                        x-show="usesVirtualList()"
-                                        class="fff-currency-field__virtual-spacer"
-                                        x-bind:style="`height: ${virtualSpacerTop()}px`"
-                                        aria-hidden="true"
-                                    ></li>
-                                    <template x-for="entry in countryListEntries()" x-bind:key="entry.item.code">
-                                        <li>
-                                            <button
-                                                type="button"
-                                                class="fff-currency-field__currency-option"
-                                                x-bind:id="overlayMenuOptionId(entry.index)"
-                                                x-on:click="selectCurrency(entry.item.code)"
-                                                x-bind:class="{
-                                                    'is-selected': activeCurrency?.code === entry.item.code,
-                                                    'is-active': entry.index === overlayMenuActiveIndex,
-                                                }"
-                                                role="option"
-                                                x-bind:aria-selected="activeCurrency?.code === entry.item.code"
-                                            >
-                                                <span class="fff-currency-field__currency-option-code" x-text="entry.item.code"></span>
-                                                <span class="fff-currency-field__currency-option-name" x-text="entry.item.name"></span>
-                                                <span class="fff-currency-field__currency-option-symbol" x-text="entry.item.symbol"></span>
-                                            </button>
-                                        </li>
-                                    </template>
-                                    <li
-                                        x-show="usesVirtualList()"
-                                        class="fff-currency-field__virtual-spacer"
-                                        x-bind:style="`height: ${virtualSpacerBottom()}px`"
-                                        aria-hidden="true"
-                                    ></li>
-                                </ul>
-                            </div>
-                        </template>
+                        <x-filament-flex-fields::select-menu :field="$currencySelect" />
                     </div>
                 @endif
-
-                <div
-                    class="fff-currency-field__control fff-flex-text-input__control"
-                    x-on:click="focusInput()"
-                    x-on:mousedown="onHiddenPointerDown($event)"
-                >
-                    <div
-                        @class([
-                            'fff-currency-field__display',
-                            'is-empty' => $initialDisplay['isEmpty'],
-                        ])
-                        x-bind:class="{ 'is-empty': isEmpty && ! isFocused }"
-                    >
-                        <div class="fff-currency-field__digits">
-                            <span
-                                class="fff-currency-field__ssr-display"
-                                x-bind:class="{ 'is-replaced': displayReady }"
-                                aria-hidden="true"
-                            >
-                                @if ($initialDisplay['isEmpty'])
-                                    <span class="fff-currency-field__placeholder">{{ e($placeholder) }}</span>
-                                @else
-                                    @if ($initialDisplay['negative'])
-                                        <span class="fff-currency-field__sign">−</span>
-                                    @endif
-
-                                    @foreach ($initialDisplay['segments'] as $segment)
-                                        <span @class([
-                                            'fff-currency-field__separator' => $segment['type'] === 'separator',
-                                            'fff-currency-field__digit' => $segment['type'] === 'digit',
-                                        ])>
-                                            @if ($segment['type'] === 'digit')
-                                                <span class="fff-currency-field__digit-inner">{{ e($segment['char']) }}</span>
-                                            @else
-                                                {{ e($segment['char']) }}
-                                            @endif
-                                        </span>
-                                    @endforeach
-                                @endif
-                            </span>
-
-                            <span
-                                class="fff-currency-field__live-display"
-                                x-bind:class="{ 'is-ready': displayReady }"
-                            >
-                                <template x-if="isEmpty && ! isFocused && ! edit.negative">
-                                    <span class="fff-currency-field__placeholder" x-text="placeholder"></span>
-                                </template>
-
-                                <template x-if="edit.negative">
-                                    <span class="fff-currency-field__sign">−</span>
-                                </template>
-
-                                <template x-for="item in displayItems" x-bind:key="item.key">
-                                    <span class="fff-currency-field__display-item">
-                                        <span
-                                            x-show="item.type === 'caret' && isFocused && ! isLocked"
-                                            x-cloak
-                                            class="fff-currency-field__caret"
-                                        ></span>
-
-                                        <span
-                                            x-show="item.type !== 'caret'"
-                                            x-bind:class="{
-                                                'fff-currency-field__separator': item.type === 'separator',
-                                                'fff-currency-field__digit': item.type === 'digit',
-                                                'is-animating': item.type === 'digit' && shouldAnimateDigit(item),
-                                            }"
-                                            x-bind:data-fff-cursor-before="item.type !== 'caret' && item.cursorBefore !== undefined ? item.cursorBefore : null"
-                                            x-bind:data-fff-cursor-after="item.type !== 'caret' && item.cursorAfter !== undefined ? item.cursorAfter : null"
-                                        >
-                                            <span
-                                                x-bind:class="item.type === 'digit' ? 'fff-currency-field__digit-inner' : ''"
-                                                x-text="item.char"
-                                            ></span>
-                                        </span>
-                                    </span>
-                                </template>
-
-                                <template x-for="segment in ghostSegments" x-bind:key="segment.key">
-                                    <span class="fff-currency-field__digit is-ghost">
-                                        <span class="fff-currency-field__digit-inner" x-text="segment.char"></span>
-                                    </span>
-                                </template>
-                            </span>
-                        </div>
-
-                        <span class="fff-currency-field__symbol" x-text="activeCurrency?.symbol">{{ e($initialDisplay['symbol']) }}</span>
-                    </div>
-
-                    <input
-                        type="text"
-                        inputmode="decimal"
-                        class="fff-currency-field__hidden-input"
-                        x-ref="hiddenInput"
-                        x-on:mousedown="onHiddenPointerDown($event)"
-                        x-on:focus="onFocus()"
-                        x-on:blur="onBlur($event)"
-                        x-on:keydown="onHiddenKeydown($event)"
-                        x-bind:disabled="isLocked"
-                        autocomplete="off"
-                        tabindex="0"
-                        x-bind:aria-label="{{ json_encode($getLabel()) }}"
-                    />
-                </div>
+                @include('filament-flex-fields::forms.components.currency.amount-editor')
             </div>
         </div>
     </div>

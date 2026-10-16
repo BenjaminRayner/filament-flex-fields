@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'navigation_plural' => 'Groupes de champs',
+    'model_singular' => 'Groupe de champs',
+    'group' => 'Groupe',
+    'sections' => 'Sections',
+    'sections_description' => 'Sections de mise en page facultatives pour regrouper les champs du formulaire.',
+    'section_id' => 'ID de section',
+    'fields_schema' => 'Schéma des champs',
+    'fields_description' => 'Définitions de champs utilisées dans les formulaires, tableaux et listes de détails.',
+    'fields' => 'Champs',
+    'section' => 'Section',
+    'required' => 'Obligatoire',
+    'encrypted' => 'Chiffrer les données stockées',
+    'help_text' => 'Texte d’aide',
+    'tenant_id' => 'ID du locataire',
+    'tenant' => 'Locataire',
+    'tenant_help' => 'Clé de locataire facultative. Laisser vide pour un groupe global.',
+    'name' => 'Nom',
+    'slug' => 'Slug',
+    'order' => 'Ordre',
+    'label' => 'Libellé',
+    'type' => 'Type',
+    'sort' => 'Ordre de tri',
+    'description' => 'Description',
+    'placeholder' => 'Texte indicatif',
+    'width' => 'Largeur',
+    'updated_at' => 'Mis à jour le',
+    'section_type_section' => 'Section',
+    'section_type_fieldset' => 'Ensemble de champs',
+    'section_type_headless' => 'Sans conteneur',
+];

@@ -12,6 +12,7 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Illuminate\Support\Str;
 
 const CONTROL_SIZE_EXEMPT_FIELDS = [
+    'CompositeField', // Composition boundary, not an input control.
     'ChoiceCards',
     'ChoiceCheckboxCards',
     'FlexChecklist',

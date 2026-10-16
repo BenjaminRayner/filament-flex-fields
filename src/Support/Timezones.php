@@ -4,23 +4,13 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support;
 
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
+use Bjanczak\FilamentFlexFields\Support\Select\Catalog\PickerCatalogState;
 use DateTime;
 use DateTimeZone;
 
 class Timezones
 {
-    /**
-     * @var array<string, array<string, array{id: string, label: string, offset: string, offset_seconds: int, region: string}>>
-     */
-    protected static array $metadataCache = [];
-
-    /**
-     * @var array<string, array<string, string>>
-     */
-    protected static array $displayNameCache = [];
-
-    protected static ?string $cachedDate = null;
-
     /**
      * @return list<string>
      */
@@ -66,25 +56,27 @@ class Timezones
     public static function displayName(string $timezone, ?string $locale = null): string
     {
         $locale ??= app()->getLocale();
+        $cache = RequestState::resolve(PickerCatalogState::class);
+        $cache->touchLocale($locale);
 
         if ($timezone === 'UTC') {
-            return self::$displayNameCache[$locale][$timezone] = 'UTC';
+            return $cache->timezoneNames[$locale][$timezone] = 'UTC';
         }
 
-        if (isset(self::$displayNameCache[$locale][$timezone])) {
-            return self::$displayNameCache[$locale][$timezone];
+        if (isset($cache->timezoneNames[$locale][$timezone])) {
+            return $cache->timezoneNames[$locale][$timezone];
         }
 
         $translationKey = 'filament-flex-fields::timezones.'.self::translationKey($timezone);
         $translated = trans($translationKey, [], $locale);
 
         if (is_string($translated) && $translated !== $translationKey) {
-            return self::$displayNameCache[$locale][$timezone] = $translated;
+            return $cache->timezoneNames[$locale][$timezone] = $translated;
         }
 
         $city = self::exemplarCity($timezone, $locale) ?? self::humanizeIdentifier($timezone);
 
-        return self::$displayNameCache[$locale][$timezone] = self::formatCityCountry(
+        return $cache->timezoneNames[$locale][$timezone] = self::formatCityCountry(
             $city,
             self::countryName(self::countryCode($timezone), $locale),
         );
@@ -323,28 +315,21 @@ class Timezones
     public static function metadata(?array $only = null, array $except = [], ?string $locale = null): array
     {
         $locale ??= app()->getLocale();
-        $today = date('Y-m-d');
-
-        if (self::$cachedDate !== $today) {
-            self::$metadataCache = [];
-            self::$displayNameCache = [];
-            self::$cachedDate = $today;
-        }
+        $cache = RequestState::resolve(PickerCatalogState::class);
+        $cache->touchLocale($locale);
+        $now = new DateTime('now', new DateTimeZone('UTC'));
+        $cache->synchronizeTimezoneInstant($now->getTimestamp());
 
         $resolved = self::resolve($only, $except);
         $results = [];
-        $now = null;
 
         foreach ($resolved as $identifier) {
-            if (! isset(self::$metadataCache[$locale][$identifier])) {
-                if ($now === null) {
-                    $now = new DateTime('now', new DateTimeZone('UTC'));
-                }
+            if (! isset($cache->timezoneMetadata[$locale][$identifier])) {
                 $tz = new DateTimeZone($identifier);
                 $offsetSeconds = $tz->getOffset($now);
                 $offset = self::formatOffsetSeconds($offsetSeconds);
 
-                self::$metadataCache[$locale][$identifier] = [
+                $cache->timezoneMetadata[$locale][$identifier] = [
                     'id' => $identifier,
                     'label' => self::label($identifier, $locale),
                     'offset' => $offset,
@@ -353,7 +338,7 @@ class Timezones
                 ];
             }
 
-            $results[] = self::$metadataCache[$locale][$identifier];
+            $results[] = $cache->timezoneMetadata[$locale][$identifier];
         }
 
         return $results;

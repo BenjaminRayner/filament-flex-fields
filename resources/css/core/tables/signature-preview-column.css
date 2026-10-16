@@ -1,51 +1,38 @@
-/* SignaturePreviewColumn (tables) */
+/* Compact ink previews preserve the original SVG proportions in every cell. */
 .fff-signature-preview-column {
-    @apply inline-flex max-w-full items-center;
-    min-height: auto;
+    display: inline-flex;
+    max-width: 100%;
+    vertical-align: middle;
+    color: #18181b;
 }
 
 .fff-signature-preview-column__frame,
 .fff-signature-preview-column__empty {
-    @apply block overflow-hidden rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900;
-}
-
-.fff-signature-preview-column__frame svg,
-.fff-signature-preview-column__empty {
-    @apply block h-auto w-full;
-}
-
-.fff-signature-preview-column--sm .fff-signature-preview-column__frame,
-.fff-signature-preview-column--sm .fff-signature-preview-column__empty {
-    width: 4.5rem;
+    display: grid;
+    place-items: center;
+    width: 7.5rem;
     aspect-ratio: 5 / 2;
+    padding: 6px 10px;
+    overflow: hidden;
+    border: 1px solid #e8e8eb;
+    border-radius: 12px;
+    background: #fafafa;
 }
 
-.fff-signature-preview-column--md .fff-signature-preview-column__frame,
-.fff-signature-preview-column--md .fff-signature-preview-column__empty {
-    width: 6.5rem;
-    aspect-ratio: 5 / 2;
+.fff-signature-preview-column__frame > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
 }
 
-.fff-signature-preview-column--lg .fff-signature-preview-column__frame,
-.fff-signature-preview-column--lg .fff-signature-preview-column__empty {
-    width: 8.5rem;
-    aspect-ratio: 5 / 2;
-}
-
-.fff-signature-preview-column.is-empty .fff-signature-preview-column__empty {
-    background:
-        linear-gradient(135deg, rgb(244 244 245) 25%, transparent 25%) -0.25rem 0 / 0.5rem 0.5rem,
-        linear-gradient(225deg, rgb(244 244 245) 25%, transparent 25%) -0.25rem 0 / 0.5rem 0.5rem,
-        linear-gradient(315deg, rgb(244 244 245) 25%, transparent 25%) 0 0 / 0.5rem 0.5rem,
-        linear-gradient(45deg, rgb(244 244 245) 25%, transparent 25%) 0 0 / 0.5rem 0.5rem,
-        rgb(250 250 250);
-}
-
-.dark .fff-signature-preview-column.is-empty .fff-signature-preview-column__empty {
-    background:
-        linear-gradient(135deg, rgb(63 63 70) 25%, transparent 25%) -0.25rem 0 / 0.5rem 0.5rem,
-        linear-gradient(225deg, rgb(63 63 70) 25%, transparent 25%) -0.25rem 0 / 0.5rem 0.5rem,
-        linear-gradient(315deg, rgb(63 63 70) 25%, transparent 25%) 0 0 / 0.5rem 0.5rem,
-        linear-gradient(45deg, rgb(63 63 70) 25%, transparent 25%) 0 0 / 0.5rem 0.5rem,
-        rgb(39 39 42);
-}
+.fff-signature-preview-column--sm :is(.fff-signature-preview-column__frame, .fff-signature-preview-column__empty) { width: 4.5rem; padding: 4px 6px; border-radius: 9px; }
+.fff-signature-preview-column--lg :is(.fff-signature-preview-column__frame, .fff-signature-preview-column__empty) { width: 10.5rem; padding: 8px 12px; border-radius: 14px; }
+.fff-signature-preview-column__empty { color: #a1a1aa; background: #f4f4f5; border-style: dashed; }
+.fff-signature-preview-column__empty-icon { width: 22px; height: 22px; stroke-width: 1.5; }
+.dark .fff-signature-preview-column { color: #e4e4e7; }
+.dark .fff-signature-preview-column__frame,
+.dark .fff-signature-preview-column__empty { background: #27272a; border-color: #3f3f46; }
+.dark .fff-signature-preview-column__frame > svg:not(:has(rect)) path:is([fill='#18181b' i], [fill='#000000' i], [fill='#000' i]) { fill: currentColor; }
+.dark .fff-signature-preview-column__frame > svg:not(:has(rect)) path:is([stroke='#18181b' i], [stroke='#000000' i], [stroke='#000' i]) { stroke: currentColor; }

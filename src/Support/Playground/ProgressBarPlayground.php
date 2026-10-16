@@ -6,7 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexSlider;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\ProgressBar;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -149,9 +149,9 @@ class ProgressBarPlayground
                         ->label('Delivery route')
                         ->value(38)
                         ->showValue(true)
-                        ->startMarker(GravityIcon::MapPin)
-                        ->currentMarker(GravityIcon::Car)
-                        ->endMarker(GravityIcon::House)
+                        ->startMarker(FlexIcon::MapPin)
+                        ->currentMarker(FlexIcon::Car)
+                        ->endMarker(FlexIcon::House)
                         ->remainingTrackStyle('dashed')
                         ->color('success')
                         ->size('md'),
@@ -176,9 +176,9 @@ class ProgressBarPlayground
                             ProgressBar::make()
                                 ->label('Route progress')
                                 ->value(45)
-                                ->startMarker(GravityIcon::MapPin)
-                                ->currentMarker(GravityIcon::Car)
-                                ->endMarker(GravityIcon::House)
+                                ->startMarker(FlexIcon::MapPin)
+                                ->currentMarker(FlexIcon::Car)
+                                ->endMarker(FlexIcon::House)
                                 ->remainingTrackStyle('dashed')
                                 ->color('primary')
                                 ->size('lg'),

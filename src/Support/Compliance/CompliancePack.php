@@ -6,6 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Support\Compliance;
 
 use Bjanczak\FilamentFlexFields\Enums\FieldType;
 use Bjanczak\FilamentFlexFields\Support\Locale\FlexFieldsLocale;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
 
 /**
  * Product compliance inventory + WCAG 2.2 AA matrix for Flex Fields lazy assets.
@@ -17,9 +18,6 @@ final class CompliancePack
     public const string STATUS_PASS = 'pass';
 
     public const string STATUS_FAIL = 'fail';
-
-    /** @var array<string, 'pending'|'pass'|'fail'> */
-    private static array $overrides = [];
 
     public static function inventoryFields(): int
     {
@@ -66,7 +64,7 @@ final class CompliancePack
             }
         }
 
-        foreach (self::$overrides as $component => $status) {
+        foreach (RequestState::resolve(ComplianceState::class)->overrides as $component => $status) {
             $matrix[$component] = $status;
         }
 
@@ -94,12 +92,14 @@ final class CompliancePack
             return;
         }
 
-        self::$overrides[$component] = $status;
+        RequestState::configure(ComplianceState::class, static function (ComplianceState $state) use ($component, $status): void {
+            $state->overrides[$component] = $status;
+        });
     }
 
     public static function clearOverrides(): void
     {
-        self::$overrides = [];
+        RequestState::resolve(ComplianceState::class)->overrides = [];
     }
 
     /**

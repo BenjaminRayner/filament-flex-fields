@@ -1,0 +1,25 @@
+---
+title: "Import and export schemas"
+description: "Exchange bounded versioned configuration without importing executable PHP."
+---
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaCodec;
+
+$codec = app(FamilySchemaCodec::class);
+$json = $codec->export([$definition]);
+$definitions = $codec->import($json);
+```
+
+The portable format stores installed family IDs, options and version numbers;
+it cannot supply a renderer class, callback or arbitrary method name. Import
+rejects unknown families, unsupported future versions, malformed flags, duplicate
+slugs and unknown options. It runs only the configuration migrations provided by
+your installed adapter. A value-version mismatch rejects; saved-value migration
+is a separate operation. The envelope supports up to 256 definitions and 1 MiB.
+This opt-in format is separate from the existing built-in schema import/export.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

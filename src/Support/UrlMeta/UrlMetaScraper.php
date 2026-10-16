@@ -4,330 +4,117 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\UrlMeta;
 
-use Bjanczak\FilamentFlexFields\Support\Http\SafeRemoteUrlValidator;
+use Bjanczak\FilamentFlexFields\Support\LinkPreview\LinkPreviewUrl;
+use Bjanczak\FilamentFlexFields\Support\UrlMeta\Network\PreviewUrlValidator;
+use GuzzleHttp\Psr7\Uri;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Database\QueryException;
-use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
-use Psr\Http\Message\StreamInterface;
-use Throwable;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class UrlMetaScraper
 {
-    private const int MAX_BYTES = 131_072;
-
-    private const int CHUNK_SIZE = 4_096;
-
-    private const int MAX_REDIRECTS = 5;
-
-    private const string USER_AGENT = 'Mozilla/5.0 (compatible; FilamentFlexFields/1.0; +https://github.com/janczakb/filament-flex-fields)';
-
-    public function __construct(
-        private readonly RedirectUrlResolver $redirectUrlResolver,
-        private readonly SafeRemoteUrlValidator $urlValidator,
-    ) {}
+    public function __construct(private readonly PreviewUrlValidator $validator, private readonly MetadataParser $parser, private readonly RemotePageFetcher $fetcher) {}
 
     public function isScrapableUrl(string $url): bool
     {
-        return $this->urlValidator->isAllowedHttpUrl($url);
+        return LinkPreviewUrl::normalize($url) !== null && $this->validator->isAllowedHttpUrl($url);
     }
 
-    /**
-     * @return array{title?: string, description?: string, image?: string}
+    /** No DNS or network operation occurs during SSR.
+     * @phpstan-impure Cache state can change while another request holds the lock.
+     *
+     * @return array{title?: string, description?: string, image?: string}|null
      */
+    public function cached(string $url): ?array
+    {
+        if (! LinkPreviewUrl::isPublicSyntax($url)) {
+            return null;
+        }
+        try {
+            $value = Cache::get($this->key($url));
+        } catch (QueryException $exception) {
+            report($exception);
+
+            return null;
+        }
+
+        return is_array($value) ? $this->clean($value) : null;
+    }
+
+    /** @return array{title?: string, description?: string, image?: string} */
     public function scrape(string $url): array
     {
-        if (! $this->isScrapableUrl($url)) {
+        if (! LinkPreviewUrl::isPublicSyntax($url)) {
             return [];
         }
-
-        $cacheKey = 'fff_meta_'.hash('sha256', $url);
-        $ttl = (int) config('filament-flex-fields.link_preview.cache_ttl_seconds', 86_400);
-
+        if (($cached = $this->cached($url)) !== null) {
+            return $cached;
+        }
+        $key = $this->key($url);
         try {
-            return Cache::remember($cacheKey, now()->addSeconds($ttl), fn (): array => $this->scrapeUncached($url));
-        } catch (QueryException) {
-            return $this->scrapeUncached($url);
-        }
-    }
+            return Cache::lock($key.'.lock', 20)->block(1, function () use ($url, $key): array {
+                if (($cached = $this->cached($url)) !== null) {
+                    return $cached;
+                }
+                $page = $this->fetcher->fetch($url);
+                $data = $page === null ? [] : $this->parser->parse($page['body'], $page['url']);
+                $ttl = max(0, min(604800, (int) config('filament-flex-fields.link_preview.cache_ttl_seconds', 86400)));
+                if ($ttl > 0) {
+                    Cache::put($key, $data, $data === [] ? min(30, $ttl) : $ttl);
+                }
 
-    /**
-     * @return array{title?: string, description?: string, image?: string}
-     */
-    private function scrapeUncached(string $url): array
-    {
-        $html = $this->fetchHeadHtml($url);
+                return $data;
+            });
+        } catch (LockTimeoutException) {
+            $cached = $this->cached($url);
+            if ($cached !== null) {
+                return $cached;
+            }
+            throw new ServiceUnavailableHttpException(1, 'Preview metadata is being prepared.');
+        } catch (QueryException $exception) {
+            report($exception);
 
-        if ($html === null || $html === '') {
             return [];
         }
-
-        return $this->parseFromHtml($html, $url);
     }
 
-    /**
-     * @return array{title?: string, description?: string, image?: string}
-     */
+    /** @return array{title?: string, description?: string, image?: string} */
     public function parseFromHtml(string $html, string $baseUrl): array
     {
-        $headHtml = $this->extractHeadHtml($html);
-        $meta = $this->extractMetaMap($headHtml);
-        $links = $this->extractLinkMap($headHtml);
-        $titleTag = $this->extractTitleTag($headHtml);
+        return $this->parser->parse($html, $baseUrl);
+    }
 
-        $title = $meta['og:title']
-            ?? $meta['twitter:title']
-            ?? $titleTag;
-
-        $description = $meta['description']
-            ?? $meta['og:description']
-            ?? $meta['twitter:description']
-            ?? null;
-
-        $image = $meta['og:image']
-            ?? $meta['og:image:url']
-            ?? $meta['og:image:secure_url']
-            ?? $meta['twitter:image']
-            ?? $meta['twitter:image:src']
-            ?? $links['image_src']
-            ?? $links['icon']
-            ?? $links['shortcut icon']
-            ?? null;
-
+    /** @param array<array-key, mixed> $data
+     * @return array{title?: string, description?: string, image?: string}
+     */
+    private function clean(array $data): array
+    {
         $result = [];
-
-        if ($normalizedTitle = $this->normalizeText($title)) {
-            $result['title'] = $normalizedTitle;
+        foreach (['title' => 256, 'description' => 1024] as $key => $limit) {
+            if (is_string($data[$key] ?? null) && trim($data[$key]) !== '') {
+                $result[$key] = mb_substr($data[$key], 0, $limit);
+            }
         }
-
-        if ($normalizedDescription = $this->normalizeText($description)) {
-            $result['description'] = $normalizedDescription;
-        }
-
-        if ($normalizedImage = $this->normalizeImageUrl($baseUrl, $image)) {
-            $result['image'] = $normalizedImage;
+        if (is_string($data['image'] ?? null) && LinkPreviewUrl::isPublicSyntax($data['image'])) {
+            $result['image'] = $data['image'];
         }
 
         return $result;
     }
 
-    private function fetchHeadHtml(string $url): ?string
+    private function key(string $url): string
     {
-        $currentUrl = $url;
-        $timeout = (int) config('filament-flex-fields.link_preview.timeout_seconds', 3);
-
-        for ($redirects = 0; $redirects <= self::MAX_REDIRECTS; $redirects++) {
-            if (! $this->urlValidator->isAllowedHttpUrl($currentUrl)) {
-                return null;
-            }
-
-            try {
-                $response = Http::timeout($timeout)
-                    ->withUserAgent(self::USER_AGENT)
-                    ->withOptions([
-                        'stream' => true,
-                        'allow_redirects' => false,
-                    ])
-                    ->get($currentUrl);
-            } catch (ConnectionException) {
-                return null;
-            } catch (Throwable) {
-                return null;
-            }
-
-            if ($response->redirect()) {
-                $location = $response->header('Location');
-
-                if (! is_string($location) || $location === '') {
-                    return null;
-                }
-
-                $currentUrl = $this->redirectUrlResolver->resolve($currentUrl, $location);
-
-                continue;
-            }
-
-            if (! $response->successful()) {
-                return null;
-            }
-
-            return $this->readUntilHeadClosed($response);
-        }
-
-        return null;
-    }
-
-    private function readUntilHeadClosed(Response $response): ?string
-    {
-        $stream = $response->toPsrResponse()->getBody();
-
-        if (! $stream instanceof StreamInterface) {
-            return null;
-        }
-
-        $buffer = '';
-        $bytesRead = 0;
-
         try {
-            while (! $stream->eof() && $bytesRead < self::MAX_BYTES) {
-                $chunk = $stream->read(self::CHUNK_SIZE);
-
-                if ($chunk === '') {
-                    break;
-                }
-
-                $buffer .= $chunk;
-                $bytesRead += strlen($chunk);
-
-                if (stripos($buffer, '</head>') !== false) {
-                    break;
-                }
+            $uri = (new Uri($url))->withFragment('');
+            if ($uri->getPath() === '') {
+                $uri = $uri->withPath('/');
             }
-        } finally {
-            $stream->close();
+            $url = (string) $uri;
+        } catch (\InvalidArgumentException) {
+            // Syntax admission rejects malformed values before key use.
         }
 
-        return $buffer !== '' ? $buffer : null;
-    }
-
-    private function extractHeadHtml(string $html): string
-    {
-        if (preg_match('/<head\b[^>]*>(.*?)<\/head>/is', $html, $matches) === 1) {
-            return $matches[1];
-        }
-
-        return $html;
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function extractMetaMap(string $headHtml): array
-    {
-        $map = [];
-
-        if (preg_match_all('/<meta\s+([^>]+)>/i', $headHtml, $matches) === false) {
-            return $map;
-        }
-
-        foreach ($matches[1] as $attributeString) {
-            $key = $this->matchAttribute($attributeString, 'property')
-                ?? $this->matchAttribute($attributeString, 'name');
-            $content = $this->matchAttribute($attributeString, 'content');
-
-            if ($key === null || $content === null || isset($map[$key])) {
-                continue;
-            }
-
-            $map[$key] = $this->decodeHtml($content);
-        }
-
-        return $map;
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function extractLinkMap(string $headHtml): array
-    {
-        $map = [];
-
-        if (preg_match_all('/<link\s+([^>]+)>/i', $headHtml, $matches) === false) {
-            return $map;
-        }
-
-        foreach ($matches[1] as $attributeString) {
-            $rel = $this->matchAttribute($attributeString, 'rel');
-            $href = $this->matchAttribute($attributeString, 'href');
-
-            if ($rel === null || $href === null || isset($map[$rel])) {
-                continue;
-            }
-
-            $map[$rel] = $this->decodeHtml($href);
-        }
-
-        return $map;
-    }
-
-    private function extractTitleTag(string $headHtml): ?string
-    {
-        if (preg_match('/<title[^>]*>(.*?)<\/title>/is', $headHtml, $matches) !== 1) {
-            return null;
-        }
-
-        return $this->normalizeText($this->decodeHtml($matches[1]));
-    }
-
-    private function matchAttribute(string $attributeString, string $name): ?string
-    {
-        $pattern = '/\b'.preg_quote($name, '/').'\s*=\s*(["\'])(.*?)\1/is';
-
-        if (preg_match($pattern, $attributeString, $matches) !== 1) {
-            return null;
-        }
-
-        return $matches[2];
-    }
-
-    private function decodeHtml(string $value): string
-    {
-        return html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    }
-
-    private function normalizeText(?string $value): ?string
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        $normalized = trim(preg_replace('/\s+/u', ' ', $value) ?? '');
-
-        return $normalized === '' ? null : $normalized;
-    }
-
-    private function normalizeImageUrl(string $baseUrl, ?string $image): ?string
-    {
-        if ($image === null || trim($image) === '') {
-            return null;
-        }
-
-        $image = trim($image);
-
-        if (Str::startsWith($image, 'data:')) {
-            return null;
-        }
-
-        if (Str::startsWith($image, ['http://', 'https://'])) {
-            return $image;
-        }
-
-        return $this->resolveAbsoluteUrl($baseUrl, $image);
-    }
-
-    private function resolveAbsoluteUrl(string $baseUrl, string $relativeUrl): string
-    {
-        if (parse_url($relativeUrl, PHP_URL_SCHEME) !== null) {
-            return $relativeUrl;
-        }
-
-        $parts = parse_url($baseUrl) ?: [];
-        $scheme = $parts['scheme'] ?? 'https';
-        $host = $parts['host'] ?? '';
-
-        if (str_starts_with($relativeUrl, '//')) {
-            return $scheme.':'.$relativeUrl;
-        }
-
-        if (str_starts_with($relativeUrl, '/')) {
-            return $scheme.'://'.$host.$relativeUrl;
-        }
-
-        $path = $parts['path'] ?? '/';
-        $directory = rtrim(str_replace('\\', '/', dirname($path)), '/');
-
-        return $scheme.'://'.$host.($directory !== '' ? $directory.'/' : '/').ltrim($relativeUrl, '/');
+        return 'fff_meta_schema2_'.hash('sha256', $url);
     }
 }

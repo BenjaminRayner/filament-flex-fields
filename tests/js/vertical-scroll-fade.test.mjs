@@ -79,3 +79,17 @@ describe('vertical-scroll-fade', () => {
         assert.equal(element.attributes[SCROLL_FADE_ATTR], undefined)
     })
 })
+
+describe('continuous scroll fade lengths', () => {
+    it('moves continuously at both edges and clamps overscroll', async () => {
+        const {resolveScrollFadeLengths} = await import('../../resources/js/core/vertical-scroll-fade.js')
+        for (let position=0;position<=100;position+=0.5) {
+            const lengths=resolveScrollFadeLengths({scrollTop:position,scrollHeight:200,clientHeight:100})
+            assert.equal(lengths.top,Math.min(28,position))
+            assert.equal(lengths.bottom,Math.min(28,100-position))
+        }
+        assert.deepEqual(resolveScrollFadeLengths({scrollTop:-20,scrollHeight:200,clientHeight:100}),{top:0,bottom:28})
+        assert.deepEqual(resolveScrollFadeLengths({scrollTop:1000,scrollHeight:200,clientHeight:100}),{top:28,bottom:0})
+        assert.deepEqual(resolveScrollFadeLengths({scrollTop:50,scrollHeight:100,clientHeight:100}),{top:0,bottom:0})
+    })
+})

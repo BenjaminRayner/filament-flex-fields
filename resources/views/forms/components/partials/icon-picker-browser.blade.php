@@ -10,6 +10,7 @@
         'placeholderBinding' => 'labels.search',
         'searchLabel' => 'Icon search',
         'activeIndexKey' => 'activeIconIndex',
+        'activeDescendantExpression' => 'iconActiveDescendant()',
         'optionIdPrefix' => 'componentKey + \'-option-\'',
     ])
 
@@ -41,6 +42,19 @@
     </div>
 </div>
 
+    @include('filament-flex-fields::forms.components.partials.picker-request-error', [
+        'errorExpression' => 'iconSearchError',
+        'retryHandler' => 'retryIconSearch()',
+        'busyExpression' => 'searchPending || requestRetryRemaining > 0 || readOnly',
+        'cooldownExpression' => 'requestRetryRemaining',
+    ])
+    @include('filament-flex-fields::forms.components.partials.picker-request-error', [
+        'errorExpression' => '! iconSearchError && iconSvgError',
+        'retryHandler' => 'retryIconPreviews()',
+        'busyExpression' => 'requestRetryRemaining > 0 || readOnly',
+        'cooldownExpression' => 'requestRetryRemaining',
+    ])
+
 <div class="fff-icon-picker__divider" aria-hidden="true"></div>
 
 <div
@@ -63,7 +77,7 @@
 >
     <div
         class="fff-icon-picker__status"
-        x-show="loadedIconItems.length === 0 && ! iconSkeletonVisible && ! initialLoadPending && ! iconResultsLoading && ! searchPending"
+        x-show="! iconSearchError && loadedIconItems.length === 0 && ! iconSkeletonVisible && ! initialLoadPending && ! iconResultsLoading && ! searchPending"
         x-cloak
         x-text="labels.noResults"
     ></div>
@@ -108,7 +122,7 @@
             class="fff-icon-picker__grid"
             x-bind:style="iconResultsGridStyle"
         >
-            <template x-for="entry in visibleIconEntries" x-bind:key="'icon-option-' + entry.item.name + '-' + entry.index">
+            <template x-for="entry in visibleIconEntries" x-bind:key="'icon-option-' + entry.item.name">
                 @include('filament-flex-fields::forms.components.partials.icon-picker-option')
             </template>
         </div>

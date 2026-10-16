@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Select;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 /**
  * Rate-limits Select / Tags / IconPicker Livewire search endpoints.
@@ -44,13 +46,29 @@ final class SelectSearchRateLimiter
         return true;
     }
 
+    /** Throws a transport-level failure, never a successful empty result page. */
+    public function requireAttempt(string $fieldName): void
+    {
+        if ($this->attempt($fieldName)) {
+            return;
+        }
+
+        throw new TooManyRequestsHttpException(
+            max(1, RateLimiter::availableIn($this->key($fieldName))),
+            'Select search is temporarily rate limited.',
+        );
+    }
+
     public function key(string $fieldName): string
     {
         $request = $this->request ?? request();
-        $actor = $request->user()?->getAuthIdentifier() ?? $request->ip() ?? 'guest';
+        $user = $request->user();
+        $actor = $user?->getAuthIdentifier() ?? $request->ip() ?? 'guest';
         $field = $fieldName !== '' ? $fieldName : 'field';
 
-        return 'fff-select-search:'.$actor.':'.$field;
+        return 'fff-select-search:'.hash('sha256', serialize([
+            Auth::getDefaultDriver(), $user !== null ? $user::class : 'guest', $actor, $field,
+        ]));
     }
 
     public function maxAttempts(): int

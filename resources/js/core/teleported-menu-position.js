@@ -60,26 +60,29 @@ export function resolveTeleportedMenuVerticalPlacement({
     viewportPadding = 16,
     windowHeight,
     forcedPlacement = null,
+    viewportTop = viewportPadding,
+    viewportBottom = null,
 } = {}) {
     const viewport = windowHeight ?? (typeof window !== 'undefined' ? window.innerHeight : 0)
+    const bottom = viewportBottom ?? viewport - viewportPadding
     const belowTop = triggerRect.bottom + gap
     const aboveTop = triggerRect.top - panelHeight - gap
 
     if (forcedPlacement === 'top') {
-        return { top: aboveTop, opensAbove: true }
+        return { top: Math.max(viewportTop, aboveTop), opensAbove: true }
     }
 
     if (forcedPlacement === 'bottom') {
-        return { top: belowTop, opensAbove: false }
+        return { top: Math.max(viewportTop, Math.min(belowTop, bottom - panelHeight)), opensAbove: false }
     }
 
     let top = belowTop
     let opensAbove = false
 
-    if (belowTop + panelHeight > viewport - viewportPadding && aboveTop >= viewportPadding) {
+    if (belowTop + panelHeight > bottom && triggerRect.top - gap - viewportTop > bottom - belowTop) {
         top = aboveTop
         opensAbove = true
     }
 
-    return { top, opensAbove }
+    return { top: Math.max(viewportTop, Math.min(top, bottom - panelHeight)), opensAbove }
 }

@@ -33,6 +33,8 @@ trait CustomizesTranslatableComponents
      */
     protected ?Closure $translatableLocaleFieldUsing = null;
 
+    protected bool $translatableUseTemplateStatePath = false;
+
     /**
      * @var Closure(Field, string): string|null|null
      */
@@ -69,6 +71,8 @@ trait CustomizesTranslatableComponents
             $this->translatableTabModifiers = [$closure];
         }
 
+        $this->clearCachedChildSchemas();
+
         return $this;
     }
 
@@ -79,6 +83,8 @@ trait CustomizesTranslatableComponents
         } else {
             $this->translatableFieldModifiers = [$closure];
         }
+
+        $this->clearCachedChildSchemas();
 
         return $this;
     }
@@ -96,9 +102,10 @@ trait CustomizesTranslatableComponents
      *
      * @param  Closure(Field $template, string $locale, TranslatableTab $tab): Field|null  $callback
      */
-    public function localeFieldUsing(Closure $callback): static
+    public function localeFieldUsing(Closure $callback, bool $useTemplateStatePath = false): static
     {
         $this->translatableLocaleFieldUsing = $callback;
+        $this->translatableUseTemplateStatePath = $useTemplateStatePath;
         $this->clearCachedChildSchemas();
 
         return $this;

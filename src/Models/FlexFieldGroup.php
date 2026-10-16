@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Admin-managed JSON flex-field group (M8 schema product).
@@ -169,16 +168,17 @@ class FlexFieldGroup extends Model
             $actor,
             $state,
             $this->id,
+            $this->getConnectionName(),
         );
     }
 
     /**
      * @return array{version: int, schema: array<string, mixed>, checksum: string, actor: ?string, state: string, published_at: string}
      */
-    public function rollbackRegistryVersion(int $version): array
+    public function rollbackRegistryVersion(int $version, ?string $actor = null): array
     {
-        return DB::transaction(function () use ($version): array {
-            $record = SchemaRegistry::rollback($this->registrySchemaId(), $version, $this->id);
+        return $this->getConnection()->transaction(function () use ($version, $actor): array {
+            $record = SchemaRegistry::rollback($this->registrySchemaId(), $version, $this->id, $actor, $this->getConnectionName());
 
             $schema = $record['schema'];
             $fields = $schema['fields'] ?? [];

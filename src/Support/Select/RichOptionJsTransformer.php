@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Select;
 
 use Bjanczak\FilamentFlexFields\Support\HtmlSanitizer;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionTree;
 use Closure;
+use InvalidArgumentException;
 
 class RichOptionJsTransformer
 {
@@ -30,27 +32,18 @@ class RichOptionJsTransformer
         Closure $isRichOptionArray,
         Closure $sanitizeHtml,
         string $optionLayout = 'list',
+        int $depth = 0,
     ): array {
-        $transformed = [];
+        if ($depth > 32) {
+            throw new InvalidArgumentException('Select option groups exceed the maximum depth of 32.');
+        }
 
-        foreach ($options as $value => $label) {
-            if (is_array($label) && $isOptionGroupArray($label)) {
-                $transformed[] = [
-                    'label' => (string) $value,
-                    'options' => $this->transform(
-                        $label,
-                        $normalizeOption,
-                        $formatOptionLabelForJs,
-                        $isOptionGroupArray,
-                        $isRichOptionArray,
-                        $sanitizeHtml,
-                        $optionLayout,
-                    ),
-                ];
-
-                continue;
+        return (new OptionTree)->map($options, $isOptionGroupArray, function (string|int $value, mixed $label) use (
+            $normalizeOption, $formatOptionLabelForJs, $sanitizeHtml, $optionLayout,
+        ): array {
+            if (! is_string($label) && ! is_array($label)) {
+                throw new InvalidArgumentException('Select options must contain strings, rich records or groups.');
             }
-
             $normalized = $normalizeOption($value, $label);
             $dropdownLabel = $sanitizeHtml($formatOptionLabelForJs($normalized, false));
             $triggerLabel = $sanitizeHtml($formatOptionLabelForJs($normalized, true));
@@ -81,10 +74,8 @@ class RichOptionJsTransformer
                 }
             }
 
-            $transformed[] = $option;
-        }
-
-        return $transformed;
+            return $option;
+        }, depth: $depth);
     }
 
     /**

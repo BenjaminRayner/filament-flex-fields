@@ -80,8 +80,8 @@ test('usesIconPickerVirtualTrack keeps list threshold semantics', () => {
 })
 
 test('buildSearchResultsCacheKey normalizes query set and page', () => {
-    assert.equal(buildSearchResultsCacheKey('star', 'heroicons', 2), 'star|heroicons|2')
-    assert.equal(buildSearchResultsCacheKey(null, null, null), '||1')
+    assert.equal(buildSearchResultsCacheKey('star', 'heroicons', 2), JSON.stringify(['star','heroicons',2]))
+    assert.equal(buildSearchResultsCacheKey(null, null, null), JSON.stringify(['','',1]))
 })
 
 test('resolveVirtualWindow returns a bounded slice with stable track height', () => {

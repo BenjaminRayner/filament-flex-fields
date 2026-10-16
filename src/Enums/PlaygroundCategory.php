@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Enums;
 
+use Bjanczak\FilamentFlexFields\Support\Catalog\CatalogValue;
+use Bjanczak\FilamentFlexFields\Support\Catalog\CategoryDefinition;
+use Bjanczak\FilamentFlexFields\Support\Catalog\CategoryRegistry;
+
 enum PlaygroundCategory: string
 {
     case Guides = 'guides';
@@ -19,39 +23,19 @@ enum PlaygroundCategory: string
     case Media = 'media';
     case Location = 'location';
 
+    /** Legacy names delegate to the official v4 taxonomy. */
     public function label(): string
     {
-        return match ($this) {
-            self::Guides => 'Guides',
-            self::Navigation => 'Navigation',
-            self::Buttons => 'Buttons',
-            self::Pickers => 'Pickers',
-            self::DateAndTime => 'Date and Time',
-            self::Colors => 'Colors',
-            self::Controls => 'Controls',
-            self::Collections => 'Collections',
-            self::TextInput => 'Text Input',
-            self::DataDisplay => 'Data Display',
-            self::Media => 'Media',
-            self::Location => 'Location',
-        };
+        return CatalogValue::localized($this->definition()->label);
     }
 
     public function sort(): int
     {
-        return match ($this) {
-            self::Guides => 10,
-            self::Navigation => 20,
-            self::Buttons => 30,
-            self::Pickers => 40,
-            self::DateAndTime => 50,
-            self::Colors => 60,
-            self::Controls => 70,
-            self::Collections => 80,
-            self::TextInput => 90,
-            self::DataDisplay => 100,
-            self::Media => 110,
-            self::Location => 120,
-        };
+        return $this->definition()->sort;
+    }
+
+    private function definition(): CategoryDefinition
+    {
+        return app(CategoryRegistry::class)->all()[str_replace('_', '-', $this->value)];
     }
 }

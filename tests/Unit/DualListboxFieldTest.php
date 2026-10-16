@@ -130,7 +130,7 @@ it('formats lean options via formatOptionsForJs helper', function () {
     ], lean: true);
 
     expect($formatted)->toBe([
-        ['value' => 'a', 'label' => 'Alpha'],
+        ['value' => 'a', 'label' => 'Alpha', 'description' => 'First'],
     ]);
 });
 
@@ -189,7 +189,7 @@ it('exposes virtual scroll threshold constant', function () {
         ->and(DualListboxField::VIRTUAL_SCROLL_THRESHOLD)->toBe(100);
 });
 
-it('caches normalized options and evaluates closure only once', function () {
+it('reevaluates dynamic options rather than retaining stale dependencies', function () {
     $evaluations = 0;
     $field = DualListboxField::make('permissions')
         ->options(function () use (&$evaluations) {
@@ -210,34 +210,15 @@ it('caches normalized options and evaluates closure only once', function () {
 
     // Second resolution (should hit cache)
     $options2 = $field->getNormalizedOptions();
-    expect($evaluations)->toBe(1)
+    expect($evaluations)->toBe(2)
         ->and($options2)->toBe($options1);
 });
 
-it('uses stacked transfer icons on narrow layouts and has no drag-handle markup', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/dual-listbox-field.blade.php');
-
-    expect($blade)
-        ->toContain('fff-dual-listbox__transfer-icon--stacked')
-        ->toContain('GravityIcon::ArrowChevronDown')
-        ->toContain('GravityIcon::ArrowUpArrowDown')
-        ->toContain('onAvailablePointerDown')
-        ->toContain('onSelectedPointerDown')
-        ->toContain('data-fff-dual-listbox-pane="selected"')
-        ->not->toContain('fff-dual-listbox__drag-handle');
-});
-
-it('matches flex text input tokens on dual listbox search fields', function () {
-    $css = file_get_contents(__DIR__.'/../../resources/css/components/dual-listbox.css');
-
-    expect($css)
-        ->toContain('.fff-dual-listbox__search-input')
-        ->toContain('font-size: var(--fff-text-md);')
-        ->toContain('height: var(--fff-dual-listbox-search-h);')
-        ->toContain('--fff-dual-listbox-search-h: var(--fff-track-h-sm);')
-        ->toContain('border: var(--fff-field-border-width, 1px) solid var(--fff-field-border, #e5e7eb);')
-        ->toContain('outline: var(--fff-field-focus-ring-width) solid var(--fff-field-focus-ring);')
-        ->toContain('outline-offset: 0;');
+it('reuses shared input presentation without copying its control', function (): void {
+    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/dual-listbox/pane.blade.php');
+    $definition = file_get_contents(__DIR__.'/../../resources/components/dual-listbox.php');
+    expect($blade)->toContain('x-filament-flex-fields::text-input.shell')->toContain('x-filament-flex-fields::text-input.control')
+        ->and($definition)->toContain("stylesFrom: ['text-input-presentation', 'checklist-indicator']");
 });
 
 it('includes a playground demo for locked options', function () {
@@ -248,4 +229,19 @@ it('includes a playground demo for locked options', function () {
     $source = file_get_contents(__DIR__.'/../../src/Support/Playground/DualListboxPlayground.php');
 
     expect($source)->toContain("disabledOptions(['users.view', 'users.delete'])");
+});
+
+it('preserves disabled flags and descriptions in large option lists', function (): void {
+    $options = array_fill_keys(range(1, 150), 'Option');
+    $options[100] = ['label' => 'Locked', 'description' => 'Important detail', 'disabled' => true];
+    $field = DualListboxField::make('values')->options($options);
+    expect(collect($field->getOptionsForJs())->firstWhere('value', '100'))
+        ->toMatchArray(['description' => 'Important detail', 'disabled' => true]);
+});
+
+it('rejects malformed configuration limits and heights', function (): void {
+    expect(fn () => DualListboxField::make('a')->listHeight('1rem; color:red')->getListHeight())->toThrow(InvalidArgumentException::class);
+    expect(fn () => DualListboxField::make('a')->maxItems(-1)->getMaxItems())->toThrow(InvalidArgumentException::class);
+    expect(fn () => DualListboxField::make('a')->virtualThreshold(0)->getVirtualScrollThreshold())->toThrow(InvalidArgumentException::class);
+    expect(fn () => DualListboxField::make('a')->minItems(3)->maxItems(1)->getRuntimeConfiguration())->toThrow(InvalidArgumentException::class);
 });

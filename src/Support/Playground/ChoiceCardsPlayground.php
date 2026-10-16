@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ChoiceCards;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -42,7 +42,7 @@ class ChoiceCardsPlayground
                             ->default('pro'),
                         ChoiceCards::make('choice_cards__no_indicator')
                             ->label('Select a plan')
-                            ->helperText('Border-only selection without radio indicator')
+                            ->helperText('Border-only selection without a selection indicator')
                             ->options($this->planOptions())
                             ->indicator('none')
                             ->default('pro'),
@@ -60,19 +60,19 @@ class ChoiceCardsPlayground
                                     'label' => 'Standard',
                                     'description' => '4–10 business days',
                                     'price' => '$5.00',
-                                    'icon' => GravityIcon::Box,
+                                    'icon' => FlexIcon::Box,
                                 ],
                                 'express' => [
                                     'label' => 'Express',
                                     'description' => '2–5 business days',
                                     'price' => '$16.00',
-                                    'icon' => GravityIcon::Car,
+                                    'icon' => FlexIcon::Car,
                                 ],
                                 'super-fast' => [
                                     'label' => 'Super Fast',
                                     'description' => '1 business day',
                                     'price' => '$25.00',
-                                    'icon' => GravityIcon::Rocket,
+                                    'icon' => FlexIcon::Rocket,
                                 ],
                             ]),
                     ]),
@@ -87,17 +87,17 @@ class ChoiceCardsPlayground
                                 'visa' => [
                                     'label' => '**** 0123',
                                     'description' => 'Exp. on 01/2026',
-                                    'icon' => GravityIcon::CreditCard,
+                                    'icon' => FlexIcon::CreditCard,
                                 ],
                                 'mastercard' => [
                                     'label' => '**** 8304',
                                     'description' => 'Exp. on 06/2028',
-                                    'icon' => GravityIcon::CreditCard,
+                                    'icon' => FlexIcon::CreditCard,
                                 ],
                                 'paypal' => [
                                     'label' => 'PayPal',
                                     'description' => 'Pay with PayPal',
-                                    'icon' => GravityIcon::CircleDollar,
+                                    'icon' => FlexIcon::CircleDollar,
                                 ],
                             ]),
                     ]),
@@ -114,7 +114,7 @@ class ChoiceCardsPlayground
                                     'description' => 'For freelancers and solo makers shipping fast.',
                                     'price' => '$12',
                                     'price_suffix' => 'per month',
-                                    'icon' => GravityIcon::Cube,
+                                    'icon' => FlexIcon::Cube,
                                     'badge' => 'Most popular',
                                     'badge_color' => 'success',
                                 ],
@@ -123,14 +123,14 @@ class ChoiceCardsPlayground
                                     'description' => 'For small teams scaling their product.',
                                     'price' => '$29',
                                     'price_suffix' => 'per month',
-                                    'icon' => GravityIcon::Flame,
+                                    'icon' => FlexIcon::Flame,
                                 ],
                                 'business' => [
                                     'label' => 'Business',
                                     'description' => 'For companies with advanced compliance needs.',
                                     'price' => '$59',
                                     'price_suffix' => 'per month',
-                                    'icon' => GravityIcon::Briefcase,
+                                    'icon' => FlexIcon::Briefcase,
                                 ],
                             ]),
                     ]),

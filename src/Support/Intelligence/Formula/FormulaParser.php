@@ -21,10 +21,27 @@ final class FormulaParser
 {
     /**
      * @param  list<string>  $tokens
-     * @return array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}
+     * @return array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}
      */
     public static function parse(array $tokens): array
     {
+        if (count($tokens) > 2048) {
+            throw new InvalidArgumentException('Formula exceeds the token budget.');
+        }
+
+        $depth = 0;
+
+        foreach ($tokens as $token) {
+            if ($token === '(') {
+                $depth++;
+                self::assertDepth($depth);
+            }
+
+            if ($token === ')') {
+                $depth--;
+            }
+        }
+
         $index = 0;
         $ast = self::parseComparison($tokens, $index);
 
@@ -37,7 +54,7 @@ final class FormulaParser
 
     /**
      * @param  list<string>  $tokens
-     * @return array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}
+     * @return array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}
      */
     private static function parseComparison(array $tokens, int &$index): array
     {
@@ -55,7 +72,7 @@ final class FormulaParser
 
     /**
      * @param  list<string>  $tokens
-     * @return array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}
+     * @return array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}
      */
     private static function parseAddSub(array $tokens, int &$index): array
     {
@@ -73,7 +90,7 @@ final class FormulaParser
 
     /**
      * @param  list<string>  $tokens
-     * @return array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}
+     * @return array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}
      */
     private static function parseMulDiv(array $tokens, int &$index): array
     {
@@ -91,7 +108,7 @@ final class FormulaParser
 
     /**
      * @param  list<string>  $tokens
-     * @return array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}
+     * @return array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}
      */
     private static function parseUnary(array $tokens, int &$index): array
     {
@@ -110,7 +127,7 @@ final class FormulaParser
 
     /**
      * @param  list<string>  $tokens
-     * @return array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}
+     * @return array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}
      */
     private static function parsePrimary(array $tokens, int &$index): array
     {
@@ -137,6 +154,12 @@ final class FormulaParser
             return $value;
         }
 
+        if (preg_match('/^\{([a-zA-Z_][a-zA-Z0-9_]*)\}$/', $token, $matches) === 1) {
+            $index++;
+
+            return ['ref', $matches[1]];
+        }
+
         if (is_numeric($token)) {
             $index++;
 
@@ -148,7 +171,7 @@ final class FormulaParser
 
     /**
      * @param  list<string>  $tokens
-     * @return array{0: 'call', 1: string, 2: list<array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}>}
+     * @return array{0: 'call', 1: string, 2: list<array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}>}
      */
     private static function parseFunctionCall(string $name, array $tokens, int &$index): array
     {
@@ -177,5 +200,12 @@ final class FormulaParser
         $index++;
 
         return ['call', $name, $arguments];
+    }
+
+    private static function assertDepth(int $depth): void
+    {
+        if ($depth > 64) {
+            throw new InvalidArgumentException('Formula exceeds the nesting limit.');
+        }
     }
 }

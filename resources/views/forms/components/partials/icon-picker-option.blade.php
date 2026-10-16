@@ -8,13 +8,16 @@
     x-bind:class="iconOptionClasses(entry.index)"
     x-bind:data-icon-index="entry.index"
     x-on:click="selectIcon(entry.item.name)"
-    x-on:mouseenter="activeIconIndex = entry.index"
+    x-on:pointermove="onIconOptionPointerMove($event, entry.index)"
     x-bind:disabled="readOnly"
     x-bind:aria-label="entry.item.name"
     x-bind:title="layout === 'icons' ? entry.item.name : null"
     role="option"
-    x-bind:id="componentKey + '-option-' + entry.index"
-    x-bind:aria-selected="activeIconIndex === entry.index"
+    x-bind:id="iconOptionDomId(entry.index)"
+    x-bind:aria-selected="state === entry.item.name"
+    x-bind:aria-posinset="entry.index + 1"
+    x-bind:aria-setsize="hasMore ? -1 : loadedIconItems.length"
+    tabindex="-1"
 >
     <span class="fff-icon-picker__option-icon" x-bind:data-icon-name="entry.item.name">
         <span

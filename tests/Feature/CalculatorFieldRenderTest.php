@@ -3,13 +3,11 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CalculatorField;
-use Bjanczak\FilamentFlexFields\Support\CalculatorPanelMount;
 use Bjanczak\FilamentFlexFields\Tests\Support\TestableCalculatorForm;
 use Livewire\Livewire;
 
 beforeEach(function (): void {
     TestableCalculatorForm::$formSchema = [];
-    CalculatorPanelMount::reset();
 });
 
 it('renders calculator field shell and shared panel mount once', function (): void {
@@ -22,11 +20,12 @@ it('renders calculator field shell and shared panel mount once', function (): vo
 
     expect($html)
         ->toContain('fff-calculator-field')
-        ->toContain('calculatorFieldFormComponent({')
-        ->toContain('fff-calculator-field__trigger')
-        ->toContain('data-fff-calculator-panel-host')
-        ->toContain('panelLabels')
-        ->toContain('x-teleport="body"');
+        ->toContain('calculatorFieldFormComponent()')
+        ->toContain('fff-flex-text-input__shell')
+        ->toContain('fff-calculator-open')
+        ->toContain('data-fff-calculator-options')
+        ->toContain('data-fff-calculator-portal-host');
 
-    expect(substr_count($html, 'data-fff-calculator-panel-host'))->toBe(1);
+    expect(substr_count($html, 'data-fff-calculator-template'))->toBe(2);
+    expect($html)->toContain('Weight')->toContain('Quantity');
 });

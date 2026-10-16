@@ -1,0 +1,79 @@
+---
+title: "Upgrade and deprecate components"
+description: "Expose origins, announce replacements and migrate packages without time-based disabling."
+---
+
+Keep existing `ComponentDefinition`, `register()`, `registerFamily()`,
+`stylesFrom`, `uses` and per-instance Blade asset markers while moving your
+package to a sealed `AssetPackage`. These declarations compile into the same
+owned resource plan. Do not create a second injector, request the same module
+through another loader or initialize a renderer twice during migration.
+
+1. Generate/build the manifest with the tools shipped in the installed Composer
+   package. Declare static imports, deferred imports and worker/binary resources;
+   use the public SDK rather than bundling FLEX sources into your output.
+2. Register the package identity, independent ABI/configuration/value versions
+   and installed renderer classes. Declare child slots and use their existing
+   renderer, state and validation contracts.
+3. Publish the complete asset release and run `fff:assets:doctor --published`.
+   Use `fff:assets:explain your-component --json` to inspect the active plan and
+   ownership. A failed version/ABI or unknown wire format stays unready and offers
+   recovery; it is never silently interpreted as an empty successful plan.
+4. Authorize and prepare configuration/value migrations separately. Retain the
+   original stored snapshot and use your application transaction for persistence.
+   Rollback requires an explicitly declared reverse migration if values changed.
+5. Retain old releases for open documents and other deployment nodes. Remove a
+   package only after reviewing the unavailable-family diagnostics and stored
+   configuration/value inventory. Uninstalling it does not erase those values.
+
+The starter demonstrates the small default package. The executable installed
+package acceptance additionally exercises field/column/entry, two configured
+parents, deferred child dialogs, public SDK externalization, worker/WASM,
+source-built update, rollback and removal. Support beyond the locally verified
+profiles remains subject to your deployment's [compatibility checks](/docs/requirements).
+
+Attach optional installation metadata when registering your package. This helps
+operators find the owning declaration and plan upgrades without exposing server
+paths to a browser. Existing registrations remain supported when metadata is omitted.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Registration\ComponentDeprecation;
+use Bjanczak\FilamentFlexFields\Support\Components\Registration\DefinitionOrigin;
+use Bjanczak\FilamentFlexFields\Support\Components\Registration\RegistrationMetadata;
+
+$components->collectComponentFamily($family, $definitions, [
+    'acme-rating-field' => new RegistrationMetadata(
+        origin: new DefinitionOrigin(__FILE__, __LINE__),
+        deprecation: new ComponentDeprecation(
+            replacement: 'acme-rating-v2-field',
+            removalNotBefore: '2027-06-01',
+            message: 'Migrate saved rating schemas before replacing this field.',
+        ),
+    ),
+]);
+```
+
+Use your actual replacement identity and compatibility deadline. A future
+replacement can be absent; diagnostics make that explicit. A notice does not
+disable a component on the deadline or migrate saved values automatically.
+Source locations identify the declaration you supply. Generated starter providers
+already supply their provider file and registration line for each surface.
+
+Inspect one component or the installed catalog:
+
+```shell
+php artisan fff:assets:explain acme-rating-field --json
+php artisan fff:assets:explain acme-rating-field --locations --json
+php artisan fff:assets:doctor --definitions --json
+php artisan fff:assets:doctor --definitions --locations --json
+```
+
+Only the explicit `--locations` option includes local files. Legacy registrations
+without a source declaration report an unknown origin; their asset checks still
+run normally. Do not expose operator reports containing local paths through a
+public application endpoint.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

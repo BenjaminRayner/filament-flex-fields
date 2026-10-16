@@ -1,0 +1,121 @@
+---
+title: "Package and family contracts"
+description: "Describe your package, surfaces and independently versioned configuration and values."
+---
+
+For a manifest-backed family, declare the package version, namespace and supported
+core protocol separately from configuration and saved-value versions. The current
+protocol accepts PHP ABI `1` and JS ABI `1`; these are not Filament versions. A
+mismatch is rejected before the family can enter the registry. Composer continues
+to resolve PHP package dependency versions.
+
+The following example uses your `RatingField`, `RatingColumn` and `RatingEntry`
+classes. Load their views as usual in your provider. Their classes must extend the
+appropriate Filament field, column or entry base; FLEX validates the class without
+constructing a field or resolving a record.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Assets\Manifest\AssetManifestCompiler;
+use Bjanczak\FilamentFlexFields\Support\Assets\Manifest\AssetPackage;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentRegistrar;
+use Bjanczak\FilamentFlexFields\Support\Components\Contracts\ComponentFamily;
+use Bjanczak\FilamentFlexFields\Support\Components\Contracts\ComponentPackage;
+use Bjanczak\FilamentFlexFields\Support\Components\Contracts\ComponentSurface;
+
+public function boot(ComponentRegistrar $components): void
+{
+    $manifest = (new AssetManifestCompiler)->load(
+        __DIR__.'/../resources/asset-manifest.json',
+    );
+
+    $package = new ComponentPackage(
+        assets: new AssetPackage($manifest, __DIR__.'/../resources/dist'),
+        namespace: 'acme-rating',
+        version: '1.0.0',
+        phpAbi: 1,
+        jsAbi: 1,
+    );
+
+    $family = new ComponentFamily(
+        package: $package,
+        id: 'acme-rating-family',
+        surfaces: [
+            'field' => 'acme-rating-field',
+            'column' => 'acme-rating-column',
+            'entry' => 'acme-rating-entry',
+        ],
+        configurationVersion: 1,
+        valueVersion: 1,
+    );
+
+    $components->collectComponentFamily($family, [
+        new ComponentDefinition(
+            id: 'acme-rating-display',
+            kind: ComponentKind::Primitive,
+            styles: ['acme-rating-display'],
+        ),
+        new ComponentDefinition(
+            id: 'acme-rating-field',
+            kind: ComponentKind::Field,
+            stylesFrom: ['acme-rating-display'],
+            entry: 'acme-rating-field',
+            surface: new ComponentSurface(
+                $family, ComponentKind::Field, RatingField::class,
+            ),
+        ),
+        new ComponentDefinition(
+            id: 'acme-rating-column',
+            kind: ComponentKind::Column,
+            stylesFrom: ['acme-rating-display'],
+            surface: new ComponentSurface(
+                $family, ComponentKind::Column, RatingColumn::class,
+            ),
+        ),
+        new ComponentDefinition(
+            id: 'acme-rating-entry',
+            kind: ComponentKind::Entry,
+            stylesFrom: ['acme-rating-display'],
+            surface: new ComponentSurface(
+                $family, ComponentKind::Entry, RatingEntry::class,
+            ),
+        ),
+    ]);
+}
+```
+
+You can supply only the surfaces your package offers; `field`, `column`, `entry`,
+`display` and `action` are supported. Include every declared surface in this family
+collection. Shared style owners or helpers may accompany them. Each surface has a
+different component identity and an independent asset consumer. A column or entry
+loads only the runtime it explicitly declares through its definition and dependencies.
+
+Namespaces are lowercase kebab-case, up to 48 characters. Component identities and
+manifest entry/style/helper roots belong under that prefix. Packages cannot occupy
+another package's namespace or register conflicting package versions in the same
+boot snapshot. Package versions use bounded SemVer release identifiers, including
+prerelease/build metadata. Configuration and value versions are independent
+positive integers up to 65535. These numbers identify formats; they do not migrate
+or validate saved data automatically. Keep your field validation in the server-side
+save path. The opt-in [family schema adapter](/docs/extensions/schema-adapter) provides typed configuration,
+configuration migration and dispatch through form/table/infolist builders.
+
+After boot you can inspect the frozen definitions through `ComponentRegistry`:
+
+```php
+$family = app(ComponentRegistry::class)->family('acme-rating-family');
+$surface = app(ComponentRegistry::class)->surface('acme-rating-column');
+$rendererClass = $surface->class;
+```
+
+Import `Bjanczak\FilamentFlexFields\Support\Components\ComponentRegistry` in
+that example. Lookup returns metadata and does not instantiate or configure the
+renderer. Use your class's normal lifecycle when building a form, table or infolist.
+The compatibility `registerFamily()`/`collectFamily()` APIs remain available for
+existing registrations that do not yet declare semantic surfaces.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

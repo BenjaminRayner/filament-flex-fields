@@ -1,15 +1,125 @@
 ---
 title: "ScheduleField"
+description: "Configure weekly opening hours, breaks, overnight shifts and time limits in Filament forms, with matching table and infolist displays."
+icon: "calendar-days"
+"canonical": "https://flex-fields.bjanczak.com/docs/schedule-field"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/schedule-field.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "ScheduleField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/schedule-field-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/schedule-field-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/schedule-field.webp"
+"twitter:image:alt": "ScheduleField in the FLEX Fields playground"
 ---
 
-![ScheduleField](/art/sc-27.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/schedule-field#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/schedule-field",
+      "name": "ScheduleField",
+      "description": "Configure weekly opening hours, breaks, overnight shifts and time limits in Filament forms, with matching table and infolist displays.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/schedule-field#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/schedule-field#article",
+      "url": "https://flex-fields.bjanczak.com/docs/schedule-field",
+      "headline": "ScheduleField",
+      "description": "Configure weekly opening hours, breaks, overnight shifts and time limits in Filament forms, with matching table and infolist displays.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/schedule-field#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/schedule-field-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/schedule-field-motion.mp4#video",
+      "name": "ScheduleField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of ScheduleField in the FLEX Fields playground for Filament. Configure weekly opening hours, breaks, overnight shifts and time limits in Filament forms, with matching table and infolist displays.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/schedule-field.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT5.05S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/schedule-field-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/schedule-field#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/schedule-field-motion.mp4"
+  poster="/art/previews/schedule-field.webp"
+  width="1920"
+  height="1080"
+  aria-label="ScheduleField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/schedule-field-motion.mp4">Watch the ScheduleField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
 
 ### Summary
 
-Weekly **availability / opening-hours editor** with per-day toggles, **from/to time slots**, optional **break** entries, **copy-to-weekdays**, searchable **timezone selector**, and **locked days**. Time pickers use the compact **FlexTimeSegmentsField** dropdown (hour + minute columns). Default control size is **`sm`**; the timezone selector always renders at **`md`**.
+Weekly **availability / opening-hours editor** with per-day toggles, **from/to time slots**, optional **break** entries, **copy-to-weekdays**, searchable **timezone selector**, and **locked days**. From/To use the shared **FLEX Select** control. Default control size is **`sm`**; the timezone selector always renders at **`md`**.
 
 | | |
 |---|---|
@@ -35,12 +145,12 @@ ScheduleField::make('opening_hours')
 Filament resource example:
 
 ```php
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ScheduleField;
 
-public static function form(Form $form): Form
+public static function form(Schema $schema): Schema
 {
-    return $form->schema([
+    return $schema->components([
         ScheduleField::make('opening_hours')
             ->label('Business hours')
             ->timezone('Europe/Warsaw')
@@ -504,88 +614,15 @@ ScheduleField::make('opening_hours')
 
 ---
 
-### UI behaviour
+### Editing a schedule
 
-| Feature | Detail |
-|---------|--------|
-| Day toggle | Switch per day — expands/collapses slot editor with animation (`is-day-animated`) |
-| Time pickers | FlexTimeSegments dropdown — separate hour and minute columns |
-| Add slot / Add break | Compact toolbar buttons per day |
-| Remove slot | Trash icon when more than `minSlots()` or day would still satisfy rules |
-| Copy to weekdays | Visible only on `copySourceDay()` when `allowCopyToWeekdays(true)` and workdays overlap |
-| SSR + hydration | Server-rendered markup for enabled days; Alpine replaces with live UI (`displayReady`) |
-| State sync | `wire:ignore` + `$entangle` — full schedule JSON synced to Livewire |
+Enable a day to reveal its periods. From and To use the FLEX Select control with your configured time step. Add working periods or breaks, reorder them, or remove periods while respecting your slot limits. Overnight periods can finish on the next day. Copying a day's periods to your chosen workdays keeps their existing open/closed status.
 
 ---
 
-### CSS classes
+### Responsive layout
 
-| Class | Role |
-|-------|------|
-| `fff-schedule-field` | Root wrapper |
-| `fff-schedule-field--{sm\|md\|lg}` | Size modifier (time inputs) |
-| `fff-schedule-field--{variant}` | Variant modifier |
-| `fff-schedule-field--has-copy-column` | Grid includes copy column |
-| `fff-schedule-field__days` | Bordered week container |
-| `fff-schedule-field__day` | Single day block |
-| `fff-schedule-field__day-header` | Day label + status + copy + switch |
-| `fff-schedule-field__slot` | Work slot row |
-| `fff-schedule-field__slot--break` | Break slot row (dashed) |
-| `fff-schedule-field__time-shell` | FlexTimeSegments shell |
-| `fff-schedule-field__action-btn` | Add slot / Add break buttons |
-| `fff-schedule-field__day-switch` | Inline switch wrapper |
-
-Timezone block reuses **TimezoneField** classes (`fff-timezone-field`, teleported menu classes).
-
----
-
-### Assets
-
-Lazy-loaded bundles (`FlexFieldAssets::stylesheetsFor('schedule-field')`):
-
-- `flex-text-input`
-- `switch`
-- `teleported-menu`
-- `timezone-field`
-- `flex-time-segments`
-
-Alpine components:
-
-- `schedule-field` (main coordinator)
-- `flex-time-segments` (preloaded per slot — shared chunk)
-
-Uses `wire:ignore` on the field root. After deploy, run:
-
-```bash
-cd packages/filament-flex-fields && npm run build
-php artisan filament:assets
-```
-
----
-
-### Playground
-
-Slug: **`schedule-field`**
-
-| Demo field | Shows |
-|------------|-------|
-| Default block | Weekday 09:00–17:00 default, timezone selector |
-| Copy-to-weekdays | `copySourceDay('mon')` + workday targets |
-| Locked weekends | `lockedDays(['sat', 'sun'])` |
-| No timezone | `timezone(null)` — local hours only |
-| Size / variant | `size('md')`, `variant('soft')` |
-
-`/admin/flex-fields-playground/schedule-field` — see [Playground](/docs/index#playground).
-
----
-
-### Implementation notes
-
-- Normalization: `ScheduleNormalizer` — pads times, drops invalid slots, coerces `type` to `slot` or `break`.
-- Validation: `ScheduleValidator` — overlap detection sorts slots by start time.
-- Day constants: `ScheduleDays::ALL`, `ScheduleDays::WEEKDAYS`.
-- Click-outside on the field closes open time menus and the timezone dropdown.
-- Mobile layout reflows day header (copy button moves below label row).
+The editor adapts to its own width. Inside a narrow card or on a phone, From and To use two equal columns with their labels above the controls. Large controls retain their size without forcing the card wider than its container. Text direction follows your page unless you set `rtl()` explicitly.
 
 ---
 
@@ -595,6 +632,105 @@ Slug: **`schedule-field`**
 |-----------|---------------------|
 | [Date & time fields](/docs/date-and-time-fields) | Single date/time pickers, not weekly schedules |
 | [TimezoneField](/docs/timezonefield) | Standalone IANA timezone selector |
-| [FlexTimeSegments](/docs/date-and-time-fields#granularity-and-time-precision) | Inline HH:MM segments inside other fields |
+| [FlexTimeSegments](/docs/time-picker#compact-api) | Inline HH:MM segments inside other fields |
 
 ---
+
+
+## Table column
+
+Use the same JSON attribute in a table. Only enabled days containing a working slot appear as circular badges. Hover a badge or focus it with the keyboard to see the day, all periods and timezone. A closed schedule shows “Closed” without inactive badges.
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\ScheduleColumn;
+
+ScheduleColumn::make('opening_hours')
+    ->label('Business hours')
+    ->locale('en')
+    ->hourCycle(24);
+```
+
+## Infolist entry
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Infolists\Components\ScheduleEntry;
+
+ScheduleEntry::make('opening_hours')
+    ->label('Opening hours')
+    ->heading('Business hours')
+    ->description('Opening and closing times.')
+    ->showClosedDays()
+    ->showTimezone();
+```
+
+By default the entry lists all seven days and shows the saved timezone when present. Hide closed days or timezone independently:
+
+```php
+ScheduleEntry::make('opening_hours')
+    ->heading('Available hours')
+    ->showClosedDays(false)
+    ->showTimezone(false)
+    ->hourCycle(12)
+    ->locale('pl')
+    ->days(['mon', 'wed', 'fri']);
+```
+
+Both displays accept `days()` in the order you want, `locale()`, `hourCycle(12|24)` and `showBreaks(false)`. Configuration values can be closures for per-record settings. Breaks appear with a separate label by default; a day containing only breaks does not count as open. Overnight periods include `(+1)` for the following day. Multiple periods are retained. Heading and description are optional and escaped as text. Use the `array` model cast for `opening_hours`; JSON strings and empty values are also handled.
+
+The table and infolist are read-only presentations. Configure editing and validation with `ScheduleField`. They share the saved `days`/`timezone` structure. They do not infer holiday exceptions or perform availability/reservation checks.
+
+
+## Week order, language and text direction
+
+Use `weekStartsOn(0)` for Sunday first or `weekStartsOn(1)` for Monday first. Without this option, `days()` preserves your chosen order. The option works on the field, table column and infolist entry. It changes presentation, not the stored day keys.
+
+```php
+ScheduleField::make('opening_hours')
+    ->weekStartsOn(0)
+    ->size('lg')
+    ->variant('secondary');
+
+ScheduleColumn::make('opening_hours')
+    ->locale('pl')
+    ->weekStartsOn(1)
+    ->hourCycle(24);
+
+ScheduleEntry::make('opening_hours')
+    ->locale('ar')
+    ->weekStartsOn(0)
+    ->rtl()
+    ->hourCycle(12);
+```
+
+Columns translate both the short weekday labels and the full names in their tooltips. Entries translate full weekday names. The field uses your application's translation language. `locale()` changes the language of a display; it does not change the stored schedule. `rtl()` enables right-to-left layout, `rtl(false)` sets left-to-right, and `rtl(null)` inherits the page direction. Hour values and timezone identifiers remain readable in either direction.
+
+Table tooltips are centered badges without an arrow. They wrap long schedules, stay within the screen width, and appear on keyboard focus as well as hover. Only enabled days containing working slots produce day circles.
+
+## Validation when saving
+
+Use the normal Filament form save flow (`getState()`), which validates the submitted schedule before returning the value to save. Supported checks include required availability, timezone identifiers, missing days, hour and minute bounds, period order, per-day slot limits, overlapping periods, and overnight overlaps between adjacent days, including Sunday to Monday.
+
+Submitted times must be hour/minute values such as `09:00` or `9:00`. Relative expressions, numeric timestamps and arbitrary text are rejected. Slot data must be a list; a slot type is `slot` or `break`. Invalid flags and malformed retained slots on closed days are rejected too. Closed days do not require a period. `requireSlotsForEnabledDays(false)` makes the minimum optional for enabled days; `maxSlots()` still applies.
+
+```php
+ScheduleField::make('opening_hours')
+    ->required()
+    ->minSlots(1)
+    ->maxSlots(3)
+    ->requireSlotsForEnabledDays()
+    ->lockedDays(['sat', 'sun']);
+```
+
+`lockedDays()` protects each selected day's enabled/closed status both in the interface and during validation. Its time periods remain editable when the day is enabled. On edit, the protected status comes from the record's attribute; on create, it comes from the field default.
+
+For a custom fill, nested data or storage outside the record attribute, supply the original schedule from your trusted storage:
+
+```php
+ScheduleField::make('opening_hours')
+    ->lockedDays(['sat', 'sun'])
+    ->lockedScheduleUsing(
+        fn () => $businessHoursService->originalSchedule(),
+    );
+```
+
+Keep that resolver independent of the submitted form data. Custom business rules can be added with Filament's `rules()` API. Model authorization, preventing concurrent reservation conflicts and validating writes made outside the Filament form remain responsibilities of your application.

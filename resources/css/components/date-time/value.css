@@ -1,0 +1,31 @@
+[data-fff-date-presentation] .fff-date-value { position:absolute; inset:0; display:none; align-items:center; white-space:pre; pointer-events:none; overflow:hidden; }
+[data-fff-date-presentation].has-value-motion .fff-date-value { display:flex; color:var(--fff-input-text); font-size:var(--fff-flex-text-input-text-size); font-weight:400; line-height:1.5; }
+[data-fff-date-presentation].has-value-motion .fff-flex-text-input__input { color:transparent; caret-color:transparent; }
+[data-fff-civil-date] .fff-flex-text-input__leading-icon svg [stroke],
+[data-clock-input-row] .fff-flex-text-input__leading-icon svg [stroke],
+[data-clock-input-row] [data-clock-seconds] svg [stroke],
+[data-clock-input-row] .fff-date-disclosure svg [stroke],
+.fff-dt-clock .fff-flex-text-input__leading-icon svg [stroke] { stroke-width:2; }
+[data-fff-date-presentation] .fff-date-disclosure { display:grid; place-items:center; pointer-events:none; }
+[data-fff-civil-date]:has(input[readonly][aria-haspopup="dialog"]):not(.is-disabled):not(.is-read-only) .fff-flex-text-input__shell,
+[data-fff-civil-date]:has(input[readonly][aria-haspopup="dialog"]):not(.is-disabled):not(.is-read-only) .fff-flex-text-input__input { cursor:pointer; }
+[data-clock-input-row]:has(input[readonly]):not(.is-disabled):not(.is-read-only) .fff-flex-text-input__shell,
+[data-clock-input-row]:has(input[readonly]):not(.is-disabled):not(.is-read-only) .fff-flex-text-input__input { cursor:pointer; }
+.fff-date-value__part { display:inline-grid; flex:none; position:relative; }
+.fff-date-value__part > span { grid-area:1 / 1; }
+.fff-date-value__part > [data-retiring] { position:absolute; inset-inline-start:0; white-space:pre; }
+
+/* Editable dates reuse the Text Input shell and its size/variant tokens. */
+[data-fff-civil-date].has-date-segments .fff-flex-text-input__input { opacity:0; pointer-events:none; }
+[data-fff-civil-date] .fff-date-segments { position:absolute; inset:0; display:flex; align-items:center; min-width:0; overflow-x:auto; scrollbar-width:none; font:inherit; color:var(--fff-input-text); font-weight:400; font-size:var(--fff-flex-text-input-text-size); line-height:1.5; white-space:pre; font-variant-numeric:tabular-nums; }
+[data-fff-civil-date] .fff-date-segments__part { display:inline-block; flex:none; padding:2px; margin-block:2px; unicode-bidi:isolate; border-radius:5px; outline:none; cursor:text; caret-color:transparent; user-select:none; -webkit-user-select:none; }
+[data-fff-civil-date] .fff-date-segments__part[data-empty="true"] { color:var(--fff-flex-text-input-placeholder-color,#71717a); }
+[data-fff-civil-date] .fff-date-segments__part:focus { background:color-mix(in srgb,var(--primary-500,#3b82f6) 16%,transparent); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--primary-500,#3b82f6) 35%,transparent); color:var(--fff-input-text); }
+[data-fff-civil-date] .fff-date-segments__part::selection { background:transparent; }
+[data-fff-civil-date] .fff-date-segments__literal { flex:none; pointer-events:none; }
+[data-range-surface-active] .fff-date-segments { visibility:hidden!important; }
+[data-fff-civil-date].is-disabled .fff-date-segments__part { cursor:not-allowed; }
+[data-fff-civil-date].is-read-only .fff-date-segments__part { cursor:default; }
+@media (pointer:coarse) { [data-fff-civil-date] .fff-date-segments { font-size:max(16px,var(--fff-flex-text-input-text-size)); } }
+[data-fff-civil-date] .fff-date-segments { text-align:start; }
+

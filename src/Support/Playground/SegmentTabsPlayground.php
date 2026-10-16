@@ -7,7 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Support\Playground;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs\SegmentTab;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -41,7 +41,7 @@ class SegmentTabsPlayground
                         SegmentTabs::make('Account')
                             ->tabs([
                                 SegmentTab::make('General')
-                                    ->icon(GravityIcon::Person)
+                                    ->icon(FlexIcon::Person)
                                     ->schema([
                                         FlexTextInput::make('segment_tabs__general_name')
                                             ->label('Name'),
@@ -49,7 +49,7 @@ class SegmentTabsPlayground
                                             ->label('Email'),
                                     ]),
                                 SegmentTab::make('Advanced')
-                                    ->icon(GravityIcon::Gear)
+                                    ->icon(FlexIcon::Gear)
                                     ->schema([
                                         FlexTextInput::make('segment_tabs__advanced_api_key')
                                             ->label('API key'),
@@ -74,6 +74,11 @@ class SegmentTabsPlayground
                                     ]),
                             ]),
                     ]),
+                SegmentTabs::make('Overflow · nine tabs')->activeTab(5)->tabs(
+                    array_map(static fn (string $label): SegmentTab => SegmentTab::make($label)
+                        ->schema([FlexTextInput::make('overflow_'.strtolower($label))->label($label.' content')]),
+                        ['Overview', 'Analytics', 'Reports', 'Performance', 'Engagement', 'Audience', 'Acquisition', 'Retention', 'Settings']),
+                ),
             ]);
     }
 
@@ -85,43 +90,6 @@ class SegmentTabsPlayground
         return [
             PlaygroundRelatedHubs::view('segment-tabs'),
             $this->section(),
-            PlaygroundCodeSnippet::make(<<<'PHP'
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
-use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs;
-use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs\SegmentTab;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
-
-SegmentTabs::make('Account')
-    ->tabs([
-        SegmentTab::make('General')
-            ->icon(GravityIcon::Person)
-            ->schema([
-                FlexTextInput::make('name')->label('Name'),
-                FlexTextInput::make('email')->label('Email'),
-            ]),
-        SegmentTab::make('Advanced')
-            ->icon(GravityIcon::Gear)
-            ->schema([
-                FlexTextInput::make('api_key')->label('API key'),
-                FlexTextInput::make('webhook')->label('Webhook URL'),
-            ]),
-    ]);
-
-SegmentTabs::make('Profile')
-    ->variant('ghost')
-    ->separators(false)
-    ->fullWidth()
-    ->tabs([
-        SegmentTab::make('Details')
-            ->schema([
-                FlexTextInput::make('display_name')->label('Display name'),
-            ]),
-        SegmentTab::make('Bio')
-            ->schema([
-                FlexTextInput::make('bio')->label('Short bio'),
-            ]),
-    ]);
-PHP, filename: 'segment-tabs.php'),
         ];
     }
 }

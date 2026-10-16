@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Media;
 
-use Bjanczak\FilamentFlexFields\Support\Enterprise\ObservabilityHooks;
+use Bjanczak\FilamentFlexFields\Support\Events\ActivityDispatcher;
+use Bjanczak\FilamentFlexFields\Support\Events\RetentionPruned;
 
 final class CaptureRetentionAuditor
 {
@@ -17,11 +18,8 @@ final class CaptureRetentionAuditor
             return;
         }
 
-        ObservabilityHooks::record(ObservabilityHooks::EVENT_RETENTION_PRUNE, [
-            'category' => $category,
-            'count' => count($items),
-            'dry_run' => $dryRun,
-            'items' => array_slice($items, 0, 25),
-        ]);
+        app(ActivityDispatcher::class)->dispatch(new RetentionPruned(
+            $category, count($items), array_slice($items, 0, 25), $dryRun,
+        ));
     }
 }

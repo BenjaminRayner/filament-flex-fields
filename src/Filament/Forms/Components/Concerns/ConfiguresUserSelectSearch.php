@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns;
 
+use Bjanczak\FilamentFlexFields\Support\Select\Configuration\PickerConfiguration;
 use Closure;
 
 trait ConfiguresUserSelectSearch
@@ -46,17 +47,17 @@ trait ConfiguresUserSelectSearch
 
     public function getMaxVisibleAvatars(): int
     {
-        return max(1, (int) $this->evaluate($this->maxVisibleAvatars));
+        return max(1, PickerConfiguration::integer($this->evaluate($this->maxVisibleAvatars), 'maxVisibleAvatars'));
     }
 
     public function getMinSearchLength(): int
     {
-        return max(0, (int) $this->evaluate($this->minSearchLength));
+        return max(0, PickerConfiguration::integer($this->evaluate($this->minSearchLength), 'minSearchLength'));
     }
 
     public function getDefaultSuggestionsLimit(): int
     {
-        $limit = (int) $this->evaluate($this->defaultSuggestionsLimit);
+        $limit = PickerConfiguration::integer($this->evaluate($this->defaultSuggestionsLimit), 'defaultSuggestionsLimit');
 
         return max(1, $limit);
     }

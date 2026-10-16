@@ -14,6 +14,14 @@
     }
 }
 
+/* Native tabs containing FLEX reserve their normal framework nav before Alpine
+   removes x-cloak. No native geometry tokens are copied or changed. */
+.fi-sc-tabs[data-fff-initial-layout="native-tabs"] > .fi-tabs[x-cloak],
+.fi-sc-tabs[data-fff-initial-layout="native-tabs"] > .fi-tabs[x-cloak] > .fi-tabs-item[x-cloak] {
+    display: flex !important;
+    visibility: hidden;
+}
+
 /*
  * Modal pending: hide live content; bones are real DOM nodes injected by the
  * asset injector (rounded rects + one synchronized shimmer pass).
@@ -44,7 +52,7 @@
     pointer-events: none;
     overflow: hidden;
     border-radius: inherit;
-    background: transparent;
+    background: #fff;
 }
 
 .fff-flex-fields-assets-skeleton::before {
@@ -94,6 +102,7 @@
 html.dark .fff-flex-fields-assets-skeleton,
 .dark .fff-flex-fields-assets-skeleton {
     --fff-assets-skeleton-bone: rgb(63 63 70 / 0.85);
+    background: #18181b;
 }
 
 html.dark .fff-flex-fields-assets-skeleton::before,
@@ -143,6 +152,22 @@ html.dark .fff-flex-fields-assets-skeleton::before,
     content: none;
 }
 
+.fff-flex-fields-assets-pending:not(.fi-modal) > .fff-flex-fields-assets-skeleton--deferred {
+    justify-content: flex-start;
+    padding: 0;
+    border-radius: 0;
+}
+
+[data-fff-deferred-panel].fff-flex-fields-assets-pending {
+    height: var(--fff-deferred-loading-height, 8rem);
+}
+
+[data-fff-deferred-panel].fff-flex-fields-assets-pending > :not(.fff-flex-fields-assets-skeleton) {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+}
+
 .fff-flex-fields-assets-ready:not(.fi-modal) > *:not(.fff-flex-fields-assets-skeleton) {
     opacity: 1;
     pointer-events: auto;
@@ -159,49 +184,96 @@ html.dark .fff-flex-fields-assets-skeleton::before,
     }
 }
 
-/*
- * Anti-FOUC: Filament paints .fi-input-wrp with ring-gray-950/10 before lazy
- * component CSS arrives — reads as a black flash on reload/focus restore.
- * Tokens come from base.css (always in core); match lazy component chrome so
- * late stylesheet injection cannot animate a border/bg jump.
- */
-.fff-flex-text-input .fff-flex-text-input__wrapper.fi-input-wrp,
-.fff-flex-text-input .fff-flex-text-input__wrapper.fi-input-wrp:focus-within,
-.fff-flex-text-input .fff-flex-text-input__wrapper.fi-input-wrp:not(.fi-disabled):not(:has(.fi-ac-action:focus)):focus-within,
-.fff-phone-field .fff-flex-text-input__wrapper.fi-input-wrp,
-.fff-phone-field .fff-flex-text-input__wrapper.fi-input-wrp:focus-within,
-.fff-phone-field .fff-flex-text-input__wrapper.fi-input-wrp:not(.fi-disabled):not(:has(.fi-ac-action:focus)):focus-within,
-.fff-social-links .fff-flex-text-input__wrapper.fi-input-wrp,
-.fff-social-links .fff-flex-text-input__wrapper.fi-input-wrp:focus-within,
-.fff-social-links .fff-flex-text-input__wrapper.fi-input-wrp:not(.fi-disabled):not(:has(.fi-ac-action:focus)):focus-within {
-    background-color: transparent !important;
-    border-width: 0 !important;
-    box-shadow: none !important;
-    --tw-ring-shadow: 0 0 #0000 !important;
-    --tw-ring-offset-shadow: 0 0 #0000 !important;
+/* Each renderer keeps its SSR footprint while its declared plan is prepared.
+   This also covers static displays and cells, without preloading hidden tabs. */
+/* Named CSSOM groups let the shared style coordinator retire only the legacy
+   descendant selectors after both native scope rules have actually parsed.
+   Without JS, scope support or stylesheet access, the fallback stays intact. */
+@supports (--fff-asset-paint-guard: 1) {
+    :where(*:not(html):not(body)):has(> [data-fff-asset-batch]:not([data-fff-assets-ready=""])) {
+        visibility: hidden;
+        /* A child can override inherited visibility; opacity seals that leak. */
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    @supports (--fff-asset-paint-fallback: 1) {
+        :where(*:not(html):not(body)):has(> [data-fff-asset-batch]:not([data-fff-assets-ready=""])) * {
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        :where(*:not(html):not(body)):has(> [data-fff-asset-batch]:not([data-fff-assets-ready=""])),
+        :where(*:not(html):not(body)):has(> [data-fff-asset-batch]:not([data-fff-assets-ready=""])) *,
+        :where(*:not(html):not(body)):has(> [data-fff-assets-settling]),
+        :where(*:not(html):not(body)):has(> [data-fff-assets-settling]) * {
+            transition: none !important;
+        }
+    }
+
+    @scope (:where(*:not(html):not(body)):has(> [data-fff-asset-batch]:not([data-fff-assets-ready=""]))) {
+        /* Repeated :scope preserves the fallback's two-attribute specificity. */
+        :scope:scope * {
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        :scope:scope,
+        :scope:scope * {
+            transition: none !important;
+        }
+    }
+
+    @scope (:where(*:not(html):not(body)):has(> [data-fff-assets-settling])) {
+        :scope,
+        :scope * {
+            transition: none !important;
+        }
+    }
 }
 
-/* FlexTextInput / Phone shell chrome before lazy flex-text-input.css. */
-.fff-flex-text-input__shell {
-    border: var(--fff-field-border-width, 1px) solid var(--fff-field-border, #e5e7eb);
-    border-radius: var(--fff-global-radius, 0.75rem);
-    background: var(--fff-field-bg, #fff);
-    box-shadow: var(--fff-field-shadow, none);
-    transition: none;
+/* A returning FLEX panel retains its last styled size until its CSS is restored.
+   Native Filament tabs and first deferred loading keep their own presentation. */
+.fff-segment-tabs__panel[data-fff-panel-preparing] {
+    position: relative;
+    height: var(--fff-panel-ready-height);
+    box-sizing: border-box;
+}
+.fff-segment-tabs__panel[data-fff-panel-preparing] > *:not([data-fff-panel-retry]) {
+    position: absolute;
+    inset-inline: 0;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+.fff-segment-tabs__panel[data-fff-panel-preparing] > *:not([data-fff-panel-retry]) * {
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+.fff-segment-tabs__panel[data-fff-panel-preparing] > [data-fff-panel-retry] {
+    position: absolute;
+    visibility: visible;
+    inset: 0;
+    margin: auto;
+    width: fit-content;
+    height: fit-content;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: #18181b;
+    color: #fff;
+    cursor: pointer;
 }
 
-/* Select chrome lives on .fi-input-wrp — kill Filament ring AND paint final chrome. */
-.fi-input-wrp.fff-select-field,
-.fi-input-wrp.fff-select-field:focus-within,
-.fi-input-wrp.fff-select-field:not(.fi-disabled):not(:has(.fi-ac-action:focus)):focus-within {
-    --tw-ring-shadow: 0 0 #0000 !important;
-    --tw-ring-offset-shadow: 0 0 #0000 !important;
-    --tw-ring-color: transparent !important;
-    --tw-ring-width: 0px !important;
-    --tw-shadow: 0 0 #0000 !important;
-    border: var(--fff-field-border-width, 1px) solid var(--fff-field-border, #e5e7eb);
-    border-radius: var(--fff-global-radius, 0.75rem);
-    background-color: var(--fff-field-bg, #fff);
-    box-shadow: var(--fff-field-shadow, none) !important;
-    transition: none;
-}
+.fff-flex-fields-assets-failed .fff-flex-fields-assets-skeleton { pointer-events:auto; justify-content:center; align-items:center; background:var(--fff-surface, #fff); }
+.fff-flex-fields-assets-failed .fff-flex-fields-assets-skeleton::before { display:none; }
+.fff-flex-fields-assets-failed .fff-flex-fields-assets-skeleton button { padding:8px 16px; border-radius:999px; background:#18181b; color:#fff; cursor:pointer; }
+.dark .fff-flex-fields-assets-failed .fff-flex-fields-assets-skeleton { background:#27272a; color:#fff; }
+
+.fff-flex-fields-assets-skeleton__bone--heading { height:1.125rem; border-radius:8px; margin-bottom:12px; }
+.fff-flex-fields-assets-skeleton__bone--content { flex:1; min-height:3rem; max-height:10rem; margin-top:8px; }
+.fff-flex-fields-assets-skeleton__bone--action { height:2.25rem; border-radius:10px; margin-top:auto; }
+
+/* Explicit fullscreen media presentation: no form bones, shimmer or modal geometry. */
+.fi-modal.fff-flex-fields-assets-pending .fi-modal-window[data-fff-loading-presentation="lightbox"] { position:fixed; inset:0; width:100%; max-width:none; height:100dvh; margin:0; padding:0; border-radius:0; background:transparent; }
+.fi-modal .fff-flex-fields-assets-skeleton--lightbox { position:fixed; inset:0; border-radius:0; padding:0; background:transparent; }
+.fi-modal .fff-flex-fields-assets-skeleton--lightbox::before { display:none; }

@@ -6,9 +6,11 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
+use Bjanczak\FilamentFlexFields\Support\VerificationCode\CodePolicy;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Field;
+use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -16,6 +18,7 @@ use InvalidArgumentException;
 class FlexVerificationCode extends Field
 {
     use HasControlSize;
+    use HasExtraAlpineAttributes;
     use HasFieldRounding;
 
     protected string $view = 'filament-flex-fields::forms.components.flex-verification-code';
@@ -50,61 +53,40 @@ class FlexVerificationCode extends Field
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->default('');
-
-        $this->afterStateHydrated(function (FlexVerificationCode $component, mixed $state): void {
+        $this->afterStateHydrated(static function (FlexVerificationCode $component, mixed $state): void {
             $component->state($component->normalizeState(is_string($state) ? $state : ''));
         });
-
-        $this->dehydrateStateUsing(fn (FlexVerificationCode $component, mixed $state): string => $component->normalizeState(is_string($state) ? $state : ''));
-
-        $this->afterStateUpdated(function (FlexVerificationCode $component, mixed $state): void {
-            if (! $component->shouldAutoSubmitUsingServerCallback()) {
-                return;
-            }
-
-            $normalized = $component->normalizeState(is_string($state) ? $state : '');
-
-            if (strlen($normalized) !== $component->getLength()) {
-                return;
-            }
-
-            $component->evaluate($component->autoSubmitUsing, [
-                'state' => $normalized,
-                'code' => $normalized,
-            ]);
-        });
-
-        $this->rule(function (FlexVerificationCode $component): Closure {
-            return function (string $attribute, mixed $value, Closure $fail) use ($component): void {
-                $raw = is_string($value) ? $value : '';
-
-                if ($component->isRequired() && $raw === '') {
-                    $fail(__('validation.required', ['attribute' => $attribute]));
-
+        $this->dehydrateStateUsing(static fn (FlexVerificationCode $component, mixed $state): string => $component->normalizeState(is_string($state) ? $state : ''));
+        $this->rules([
+            'nullable', 'string',
+            fn (FlexVerificationCode $component): Closure => static function (string $attribute, mixed $value, Closure $fail) use ($component): void {
+                if ($value === null || $value === '') {
                     return;
                 }
-
-                if ($raw === '') {
-                    return;
-                }
-
-                if (! preg_match($component->getInputValidationPattern(), $raw)) {
+                if (! is_string($value) || preg_match($component->getInputValidationPattern(), $value) !== 1) {
                     $fail(__('filament-flex-fields::default.validation.verification_code.invalid_characters'));
-
-                    return;
+                } elseif (strlen($value) !== $component->getLength()) {
+                    $fail(__('filament-flex-fields::default.validation.verification_code.incomplete', ['length' => $component->getLength()]));
                 }
-
-                $normalized = $component->normalizeState($raw);
-
-                if (strlen($normalized) !== $component->getLength()) {
-                    $fail(__('filament-flex-fields::default.validation.verification_code.incomplete', [
-                        'length' => $component->getLength(),
-                    ]));
-                }
-            };
+            },
+        ]);
+        $this->afterStateUpdated(static function (FlexVerificationCode $component, mixed $state, mixed $old): void {
+            if ($component->isDisabled() || ! $component->shouldAutoSubmitUsingServerCallback()
+                || ! $component->policy()->accepts($state)) {
+                return;
+            }
+            $code = $component->normalizeState($state);
+            if (is_string($old) && $component->policy()->accepts($old) && $component->normalizeState($old) === $code) {
+                return;
+            }
+            $component->evaluate($component->autoSubmitUsing, ['state' => $code, 'code' => $code]);
         });
+    }
+
+    private function policy(): CodePolicy
+    {
+        return new CodePolicy($this->getLength(), $this->getAllowedCharacters());
     }
 
     public function length(int|Closure $length): static
@@ -259,7 +241,7 @@ class FlexVerificationCode extends Field
     {
         if ($action instanceof Closure) {
             $action = Action::make($this->getDefaultFooterActionName())
-                ->label(__('filament-flex-fields::default.verification_code.resend'))
+                ->label(fn () => __('filament-flex-fields::default.verification_code.resend'))
                 ->link()
                 ->action($action);
         }
@@ -318,51 +300,18 @@ class FlexVerificationCode extends Field
 
     public function getLength(): int
     {
-        $length = (int) $this->evaluate($this->length);
-
-        if ($length < 1) {
-            throw new InvalidArgumentException('Verification code length must be at least 1.');
-        }
-
-        if ($length > 16) {
-            throw new InvalidArgumentException('Verification code length cannot exceed 16.');
+        $length = $this->evaluate($this->length);
+        if (! is_int($length) || $length < 1 || $length > 16) {
+            throw new InvalidArgumentException('Verification code length must be an integer between 1 and 16.');
         }
 
         return $length;
     }
 
-    /**
-     * @return list<int>
-     */
+    /** @return list<int> */
     public function getResolvedGroups(): array
     {
-        $groups = $this->evaluate($this->groups);
-        $length = $this->getLength();
-
-        if ($groups === null || $groups === []) {
-            return [$length];
-        }
-
-        if (! is_array($groups)) {
-            throw new InvalidArgumentException('Verification code groups must be an array of positive integers.');
-        }
-
-        $normalized = array_map(
-            fn (mixed $size): int => (int) $size,
-            $groups,
-        );
-
-        foreach ($normalized as $size) {
-            if ($size < 1) {
-                throw new InvalidArgumentException('Each verification code group must contain at least one field.');
-            }
-        }
-
-        if (array_sum($normalized) !== $length) {
-            throw new InvalidArgumentException("Verification code groups must sum to {$length}.");
-        }
-
-        return $normalized;
+        return $this->policy()->groups($this->evaluate($this->groups));
     }
 
     public function getGroupSeparator(): ?string
@@ -442,51 +391,42 @@ class FlexVerificationCode extends Field
 
     public function getValidationPattern(): string
     {
-        $length = $this->getLength();
-
-        return match ($this->getAllowedCharacters()) {
-            'numeric' => '/^\d{'.$length.'}$/',
-            'alphanumeric' => '/^[A-Za-z0-9]{'.$length.'}$/',
-        };
+        return $this->policy()->pattern();
     }
 
     public function getInputValidationPattern(): string
     {
-        return match ($this->getAllowedCharacters()) {
-            'numeric' => '/^\d*$/',
-            'alphanumeric' => '/^[A-Za-z0-9]*$/',
-        };
+        return $this->policy()->pattern(complete: false);
     }
 
     public function getAllowedCharacterPattern(): string
     {
-        return match ($this->getAllowedCharacters()) {
-            'numeric' => '/[0-9]/',
-            'alphanumeric' => '/[A-Za-z0-9]/',
-        };
+        return '/'.$this->policy()->characterClass().'/';
     }
 
     public function normalizeState(string $state): string
     {
-        $length = $this->getLength();
-        $pattern = $this->getAllowedCharacterPattern();
-        $characters = [];
+        return $this->policy()->normalize($state);
+    }
 
-        foreach (mb_str_split($state) as $character) {
-            if (! preg_match($pattern, $character)) {
-                continue;
-            }
-
-            $characters[] = $this->isNumeric()
-                ? $character
-                : strtoupper($character);
-
-            if (count($characters) >= $length) {
-                break;
-            }
+    /**
+     * @return array{length: int, allowedCharacters: string, disabled: bool, autoSubmitEnabled: bool, autoSubmitMethod: ?string, autoSubmitUsesServerCallback: bool}
+     */
+    public function getClientConfiguration(): array
+    {
+        $method = $this->getAutoSubmitMethod();
+        if ($method !== null && (preg_match('/\\A[A-Za-z][A-Za-z0-9_]{0,127}\\z/D', $method) !== 1 || str_starts_with($method, '__'))) {
+            throw new InvalidArgumentException('Verification code auto-submit requires a public Livewire method name.');
+        }
+        if ($method !== null && $this->shouldAutoSubmitUsingServerCallback()) {
+            throw new InvalidArgumentException('Choose autoSubmitMethod or submitUsing for one verification field.');
         }
 
-        return implode('', $characters);
+        return [
+            'length' => $this->getLength(), 'allowedCharacters' => $this->getAllowedCharacters(),
+            'disabled' => $this->isDisabled(), 'autoSubmitEnabled' => $this->shouldAutoSubmit(),
+            'autoSubmitMethod' => $method, 'autoSubmitUsesServerCallback' => $this->shouldAutoSubmitUsingServerCallback(),
+        ];
     }
 
     /**

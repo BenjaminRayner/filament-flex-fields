@@ -181,8 +181,7 @@ it('renders lazy stylesheet include in progress bar blade', function () {
 
     expect($pillsPartial)
         ->toContain('fff-progress-bar__pills--auto')
-        ->toContain('ResizeObserver')
-        ->toContain('pillIndices')
+        ->not->toContain('ResizeObserver', 'x-data', 'x-for')
         ->toContain('fff-progress-bar__pill');
 });
 
@@ -225,3 +224,19 @@ it('rejects invalid progress bar pill counts', function () {
         ->pillCount(0)
         ->getPillCount();
 })->throws(InvalidArgumentException::class);
+
+it('rejects non finite progress configuration', function (float $value): void {
+    expect(fn () => ProgressBar::make()->value($value)->getProgressRatio())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => ProgressBar::make()->max($value)->getMax())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => ProgressBar::make()->activeSegmentProgress($value)->getActiveSegmentProgress())->toThrow(InvalidArgumentException::class);
+})->with([INF, -INF, NAN]);
+
+it('rejects malformed segment text and state without coercing arrays', function (): void {
+    expect(fn () => ProgressBar::make()->segments([['label' => ['invalid']]])->getNormalizedSegments())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => ProgressBar::make()->segments([['state' => ['invalid']]])->getNormalizedSegments())->toThrow(InvalidArgumentException::class);
+});
+
+it('reports the visible segment completion in its render snapshot', function (): void {
+    $data = ProgressBar::make()->segments(['One', 'Two', 'Three'])->activeSegment(1)->activeSegmentProgress(0.5)->getPresentation();
+    expect($data['progress']->current)->toBe(50.0)->and($data['value'])->toBe('50%');
+});

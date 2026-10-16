@@ -170,13 +170,59 @@ it('renders brand icon svgs for configured platforms', function (): void {
 });
 
 it('enables shell focus outline by default like flex text input', function (): void {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/social-links-field.blade.php');
+    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/social-links/row.blade.php');
 
     expect(SocialLinksField::make('socials')->shouldShowFocusOutline())->toBeTrue()
         ->and(SocialLinksField::make('socials')->focusOutline(false)->shouldShowFocusOutline())->toBeFalse()
         ->and(SocialLinksField::make('socials')->rounding('full')->getWrapperClasses())
         ->toHaveKey('fff-rounding-full')
         ->and($blade)
-        ->toContain("'has-focus-outline' => \$shouldShowFocusOutline()")
-        ->toContain("'fff-rounding-'.\$getRounding()");
+        ->toContain("\$shouldShowFocusOutline() ? 'has-focus-outline' : ''")
+        ->toContain('fff-rounding-{{ $getRounding() }}');
+});
+
+it('uses Hugeicons for built-in social brands', function (): void {
+    foreach (SocialPlatform::cases() as $platform) {
+        expect($platform->brandIcon())->toStartWith('hugeicons-');
+        expect(SocialLinksField::make('socials')->platforms([$platform])->getBrandIconSvgs()[$platform->value])->toContain('<svg');
+    }
+});
+
+it('supports an explicit empty allowlist without widening to defaults', function (): void {
+    expect(SocialLinksField::make('socials')->platforms([])->getPlatformValues())->toBe([]);
+});
+
+it('rejects unknown platform configuration', function (): void {
+    expect(fn () => SocialLinksField::make('socials')->platforms(['typo'])->getPlatformValues())->toThrow(InvalidArgumentException::class);
+    expect(fn () => SocialLinksField::make('socials')->maxLinks(0)->getMaxLinks())->toThrow(InvalidArgumentException::class);
+});
+
+it('maps requested brand variants exactly', function (): void {
+    expect(SocialPlatform::LinkedIn->brandIcon())->toBe('hugeicons-linkedin-02')
+        ->and(SocialPlatform::Facebook->brandIcon())->toBe('hugeicons-facebook-02')
+        ->and(SocialPlatform::TikTok->brandIcon())->toBe('hugeicons-tiktok')
+        ->and(SocialPlatform::Vk->brandIcon())->toBe('hugeicons-vk')
+        ->and(SocialPlatform::WhatsApp->brandIcon())->toBe('hugeicons-whatsapp')
+        ->and(SocialPlatformDefinition::fromArray(['value' => 'mastodon'])->iconName())->toBe('hugeicons-mastodon');
+});
+
+it('offers only custom platforms when explicitly selected', function (): void {
+    $field = SocialLinksField::make('socials')->customPlatforms([
+        ['value' => 'mastodon', 'hosts' => ['mastodon.social']],
+        ['value' => 'portal', 'hosts' => ['portal.example.com']],
+    ])->platforms(['mastodon', 'portal']);
+    expect($field->getPlatformValues())->toBe(['mastodon', 'portal']);
+    expect(SocialLinkValidator::validateLink('mastodon', 'https://mastodon.social/@a', $field->getPlatformValues(), $field->getPlatformDefinitionMap()))->toBeNull();
+    expect(SocialLinkValidator::validateLink('portal', 'https://random.example/a', $field->getPlatformValues(), $field->getPlatformDefinitionMap()))->not->toBeNull();
+});
+
+it('checks domain boundaries for every built-in portal', function (): void {
+    foreach (SocialPlatform::cases() as $platform) {
+        $definitions = [$platform->value => SocialPlatformDefinition::fromEnum($platform)];
+        foreach ($platform->hostPatterns() as $host) {
+            expect(SocialLinkValidator::validateLink($platform->value, 'https://'.$host.'/profile', [], $definitions))->toBeNull();
+            expect(SocialLinkValidator::validateLink($platform->value, 'https://'.$host.'.evil.example/profile', [], $definitions))->not->toBeNull();
+            expect(SocialLinkValidator::validateLink($platform->value, 'https://'.$host.'@evil.example/profile', [], $definitions))->not->toBeNull();
+        }
+    }
 });

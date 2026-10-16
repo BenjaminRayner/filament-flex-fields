@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextareaField;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Notifications\Notification;
@@ -81,13 +81,13 @@ class FlexTextareaPlayground
                         ->toolbarSelect(
                             'flex_textarea__model',
                             self::modelOptions(),
-                            GravityIcon::Globe,
+                            FlexIcon::Globe,
                             'Model',
                         )
                         ->toolbarActions([
                             Action::make('attach')
                                 ->label('Attach file')
-                                ->icon(GravityIcon::Paperclip)
+                                ->icon(FlexIcon::Paperclip)
                                 ->iconButton()
                                 ->action(fn () => Notification::make()
                                     ->title('Attach action')
@@ -97,7 +97,7 @@ class FlexTextareaPlayground
                             ActionGroup::make([
                                 Action::make('insertThanks')
                                     ->label('Insert thanks')
-                                    ->icon(GravityIcon::FilePlus)
+                                    ->icon(FlexIcon::FilePlus)
                                     ->action(fn () => Notification::make()
                                         ->title('Snippet inserted')
                                         ->body('Thanks for your message!')
@@ -105,7 +105,7 @@ class FlexTextareaPlayground
                                         ->send()),
                                 Action::make('clearMessage')
                                     ->label('Clear message')
-                                    ->icon(GravityIcon::TrashBin)
+                                    ->icon(FlexIcon::TrashBin)
                                     ->color('danger')
                                     ->requiresConfirmation()
                                     ->action(fn () => Notification::make()
@@ -115,13 +115,13 @@ class FlexTextareaPlayground
                                         ->send()),
                             ])
                                 ->label('More actions')
-                                ->icon(GravityIcon::Circles3Plus)
+                                ->icon(FlexIcon::Circles3Plus)
                                 ->iconButton(),
                         ])
                         ->submitAction(
                             Action::make('send')
                                 ->label('Send message')
-                                ->icon(GravityIcon::ArrowUp)
+                                ->icon(FlexIcon::ArrowUp)
                                 ->iconButton()
                                 ->color('primary')
                                 ->action(function (Get $get): void {
@@ -155,7 +155,7 @@ class FlexTextareaPlayground
                                 ->submitAction(
                                     Action::make('send')
                                         ->label('Send message')
-                                        ->icon(GravityIcon::ArrowUp)
+                                        ->icon(FlexIcon::ArrowUp)
                                         ->iconButton()
                                         ->color('primary')
                                         ->action(fn () => Notification::make()->title('Sent')->success()->send()),
@@ -170,7 +170,7 @@ class FlexTextareaPlayground
                                 ->submitAction(
                                     Action::make('send_soft')
                                         ->label('Send message')
-                                        ->icon(GravityIcon::ArrowUp)
+                                        ->icon(FlexIcon::ArrowUp)
                                         ->iconButton()
                                         ->color('primary')
                                         ->action(fn () => Notification::make()->title('Sent')->success()->send()),
@@ -202,14 +202,14 @@ class FlexTextareaPlayground
                                 ->toolbarActions([
                                     Action::make('attach')
                                         ->label('Attach file')
-                                        ->icon(GravityIcon::Paperclip)
+                                        ->icon(FlexIcon::Paperclip)
                                         ->iconButton()
                                         ->action(fn () => Notification::make()->title('Attach')->info()->send()),
                                 ])
                                 ->submitAction(
                                     Action::make('send')
                                         ->label('Send message')
-                                        ->icon(GravityIcon::ArrowUp)
+                                        ->icon(FlexIcon::ArrowUp)
                                         ->iconButton()
                                         ->color('primary')
                                         ->action(fn () => Notification::make()->title('Sent')->success()->send()),

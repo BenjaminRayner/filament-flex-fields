@@ -1,7 +1,9 @@
 @import "../utilities-baseline.css";
 @import "../base.css";
 
-@source "../../src/Filament/Actions/Concerns/CanRequireHoldConfirm.php";
-@source "../views/actions/hold-confirm.blade.php";
+@source "../../../src/Filament/Actions/Concerns/CanRequireHoldConfirm.php";
+@source "../../views/actions/hold-confirm.blade.php";
+@source "../../views/actions/confirmation/*.blade.php";
+@source "../../../src/Filament/Actions/Concerns/HoldConfirm/*.php";
 
 @import "../components/hold-confirm-action.css";

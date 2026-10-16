@@ -72,6 +72,7 @@ class FlexMatrixTablePlayground
                     ->schema([
                         SelectField::make('priority')
                             ->label('Importance')
+                            ->wrapOptionLabels(false)
                             ->options([
                                 'high' => 'High',
                                 'medium' => 'Medium',

@@ -6,7 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ChoiceCheckboxCards;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -135,22 +135,22 @@ class ChoiceCheckboxCardsPlayground
                                         'content' => [
                                             'label' => 'Content Management',
                                             'description' => 'Create, edit, and delete content',
-                                            'icon' => GravityIcon::Cloud,
+                                            'icon' => FlexIcon::Cloud,
                                         ],
                                         'analytics' => [
                                             'label' => 'Analytics Access',
                                             'description' => 'View and export reports',
-                                            'icon' => GravityIcon::ChartColumn,
+                                            'icon' => FlexIcon::ChartColumn,
                                         ],
                                         'users' => [
                                             'label' => 'User Administration',
                                             'description' => 'Manage team members and roles',
-                                            'icon' => GravityIcon::Persons,
+                                            'icon' => FlexIcon::Persons,
                                         ],
                                         'settings' => [
                                             'label' => 'Settings',
                                             'description' => 'Configure system preferences',
-                                            'icon' => GravityIcon::Lock,
+                                            'icon' => FlexIcon::Lock,
                                         ],
                                     ]),
                                 ChoiceCheckboxCards::make('choice_checkbox_cards__featured')
@@ -163,19 +163,19 @@ class ChoiceCheckboxCardsPlayground
                                         'two_factor' => [
                                             'label' => '2FA',
                                             'description' => 'Two-factor authentication for all user accounts.',
-                                            'icon' => GravityIcon::Lock,
+                                            'icon' => FlexIcon::Lock,
                                             'badge' => 'Recommended',
                                             'badge_color' => 'success',
                                         ],
                                         'encryption' => [
                                             'label' => 'Encryption',
                                             'description' => 'End-to-end encryption for sensitive data.',
-                                            'icon' => GravityIcon::ShieldCheck,
+                                            'icon' => FlexIcon::ShieldCheck,
                                         ],
                                         'backup' => [
                                             'label' => 'Cloud Backup',
                                             'description' => 'Automatic cloud backups every hour.',
-                                            'icon' => GravityIcon::CloudArrowUpIn,
+                                            'icon' => FlexIcon::CloudArrowUpIn,
                                         ],
                                     ]),
                             ]),

@@ -2,66 +2,51 @@
 
 declare(strict_types=1);
 
-/**
- * @author Bartłomiej Janczak <barek122@gmail.com>
- * @copyright Copyright (c) 2026 Bartłomiej Janczak. All rights reserved.
- * @license Proprietary
- */
-
 namespace Bjanczak\FilamentFlexFields\Support\Intelligence;
 
-/**
- * Per-user remembered defaults and tenant-level default maps (in-memory foundation).
- */
+use Bjanczak\FilamentFlexFields\Support\Intelligence\Defaults\SmartDefaultsState;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
+
+/** Request-local defaults. Persisted preferences belong in an application-owned store. */
 final class SmartDefaults
 {
-    /**
-     * @var array<string, array<string, mixed>>
-     */
-    private static array $userMemory = [];
-
-    /**
-     * @var array<string, array<string, mixed>>
-     */
-    private static array $tenantDefaults = [];
-
-    public static function remember(string $userKey, string $fieldKey, mixed $value): void
+    public static function remember(string $userKey, string $fieldKey, mixed $value, string $tenant = ''): void
     {
-        self::$userMemory[$userKey][$fieldKey] = $value;
+        self::state()->users[$tenant][$userKey][$fieldKey] = $value;
     }
 
-    public static function recall(string $userKey, string $fieldKey): mixed
+    public static function recall(string $userKey, string $fieldKey, string $tenant = ''): mixed
     {
-        return self::$userMemory[$userKey][$fieldKey] ?? null;
+        return self::state()->users[$tenant][$userKey][$fieldKey] ?? null;
     }
 
-    /**
-     * @param  array<string, mixed>  $map
-     */
+    /** @param array<string, mixed> $map */
     public static function tenantDefaults(string|int $tenantId, array $map): void
     {
-        self::$tenantDefaults[(string) $tenantId] = $map;
+        self::state()->tenants[(string) $tenantId] = $map;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public static function getTenantDefaults(string|int $tenantId): array
     {
-        return self::$tenantDefaults[(string) $tenantId] ?? [];
+        return self::state()->tenants[(string) $tenantId] ?? [];
     }
 
-    public static function clearUser(string $userKey): void
+    public static function clearUser(string $userKey, ?string $tenant = null): void
     {
-        unset(self::$userMemory[$userKey]);
+        foreach ($tenant === null ? array_keys(self::state()->users) : [$tenant] as $scope) {
+            unset(self::state()->users[$scope][$userKey]);
+        }
     }
 
-    /**
-     * @internal test helper
-     */
     public static function reset(): void
     {
-        self::$userMemory = [];
-        self::$tenantDefaults = [];
+        self::state()->users = [];
+        self::state()->tenants = [];
+    }
+
+    private static function state(): SmartDefaultsState
+    {
+        return RequestState::resolve(SmartDefaultsState::class);
     }
 }

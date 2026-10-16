@@ -22,19 +22,15 @@
     box-shadow: var(--fff-select-menu-shadow) !important;
     padding: 0.375rem;
     background: var(--fff-select-menu-bg, rgb(255 255 255 / 0.9)) !important;
-    backdrop-filter: var(--fff-select-menu-blur, blur(16px) saturate(180%)) !important;
     -webkit-backdrop-filter: var(--fff-select-menu-blur, blur(16px) saturate(180%)) !important;
+    backdrop-filter: var(--fff-select-menu-blur, blur(16px) saturate(180%)) !important;
 }
 
-:root:has(.fi-modal.fi-modal-open) {
-    --fff-z-dropdown: var(--fff-z-dropdown-modal, 60);
-}
+/* The instance's overlay owner resolves page/modal/nested stacking when it
+   positions the panel. A document-wide :has() here invalidates every field
+   when interactive portal content changes and overrides nested owner layers. */
 
-:root:has(.fi-modal.fi-modal-open) .fff-teleported-menu {
-    z-index: var(--fff-z-dropdown-modal, 60) !important;
-}
-
-.fff-teleported-menu:not(.fi-dropdown-panel) {
+.fff-teleported-menu:not(.fff-teleported-menu--sheet):not(.fff-overlay-sheet) {
     opacity: 0;
     pointer-events: none;
     transform: scale(0.96);
@@ -44,40 +40,56 @@
         transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.fff-teleported-menu:not(.fi-dropdown-panel).fff-teleported-menu--below:not(.is-open) {
+/* Invisible remains measurable: placement never reads a collapsed first frame. */
+.fff-teleported-menu:not(.is-positioned):not(.fff-overlay-sheet) {
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Platform/time renderers retain their content layout, sharing Select states. */
+.fff-select-menu-choice:not(:disabled):hover,
+.fff-select-menu-choice.is-highlighted {
+    background: var(--fff-select-menu-hover) !important;
+}
+.fff-select-menu-choice.is-active,
+.fff-select-menu-choice.is-selected {
+    background: var(--fff-select-menu-selected) !important;
+}
+
+.fff-teleported-menu:not(.fff-teleported-menu--sheet):not(.fff-overlay-sheet):is(.fff-teleported-menu--below, .fff-select-dropdown-panel--below):not(.is-open) {
     transform: scale(0.96) translateY(-0.375rem);
     transform-origin: top center;
 }
 
-.fff-teleported-menu:not(.fi-dropdown-panel).fff-teleported-menu--above:not(.is-open) {
+.fff-teleported-menu:not(.fff-teleported-menu--sheet):not(.fff-overlay-sheet):is(.fff-teleported-menu--above, .fff-select-dropdown-panel--above):not(.is-open) {
     transform: scale(0.96) translateY(0.375rem);
     transform-origin: bottom center;
 }
 
-.fff-teleported-menu:not(.fi-dropdown-panel).is-open {
+.fff-teleported-menu:not(.fff-teleported-menu--sheet):not(.fff-overlay-sheet).is-open {
     opacity: 1;
     pointer-events: auto;
     transform: scale(1) translateY(0);
 }
 
-.fff-teleported-menu:not(.fi-dropdown-panel).is-closing {
+.fff-teleported-menu:not(.fff-teleported-menu--sheet):not(.fff-overlay-sheet).is-closing {
     transition:
         opacity 0.15s cubic-bezier(0.4, 0, 1, 1),
         transform 0.15s cubic-bezier(0.4, 0, 1, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .fff-teleported-menu:not(.fi-dropdown-panel),
-    .fff-teleported-menu:not(.fi-dropdown-panel).is-closing {
+    .fff-teleported-menu:not(.fff-teleported-menu--sheet):not(.fff-overlay-sheet),
+    .fff-teleported-menu:not(.fff-teleported-menu--sheet):not(.fff-overlay-sheet).is-closing {
         transition-duration: 0.01ms !important;
         transform: none !important;
     }
 
-    .fff-teleported-menu:not(.fi-dropdown-panel):not(.is-open) {
+    .fff-teleported-menu:not(.fff-teleported-menu--sheet):not(.fff-overlay-sheet):not(.is-open) {
         opacity: 0;
     }
 
-    .fff-teleported-menu:not(.fi-dropdown-panel).is-open {
+    .fff-teleported-menu:not(.fff-teleported-menu--sheet):not(.fff-overlay-sheet).is-open {
         opacity: 1;
     }
 }
@@ -244,8 +256,8 @@
     overflow: hidden !important;
     padding-bottom: var(--fff-overlay-sheet-pad-bottom) !important;
     /* iOS: no backdrop-filter — glass samples page gray under the sheet. */
-    backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     background: #ffffff !important;
     box-shadow: none !important;
     --tw-shadow: 0 0 #0000 !important;
@@ -326,9 +338,7 @@ body > .fi-dropdown-panel.fff-select-headless-menu.fff-teleported-menu:not(.is-p
     visibility: hidden !important;
     pointer-events: none !important;
     overflow: hidden !important;
-    max-height: 0 !important;
     margin: 0 !important;
-    padding-block: 0 !important;
     opacity: 0 !important;
 }
 

@@ -61,7 +61,7 @@ test('T36 / REQ-3 / I27: same livewireKey on page + modal → refCount 2, modal 
     assert.equal(headHas(head, 'select-field'), true)
 })
 
-test('T37 / I36: duplicate batch nodes same instanceId count URL once in refCount', async () => {
+test('T37 / I36: independent batch nodes sharing a logical key retain independent consumers', async () => {
     const { document, window, head } = createDom()
     const injector = createFlexFieldAssetInjector({ document, window })
     const href = css('select-field')
@@ -74,7 +74,7 @@ test('T37 / I36: duplicate batch nodes same instanceId count URL once in refCoun
     await pending
 
     const url = normalizeAssetUrl(href, document.baseURI)
-    assert.equal(injector.getConsumerGraph().getRefCount(url), 1)
+    assert.equal(injector.getConsumerGraph().getRefCount(url), 2)
     assert.equal(stylesheetHrefs(head).filter((href) => href.includes('select-field')).length, 1)
 })
 

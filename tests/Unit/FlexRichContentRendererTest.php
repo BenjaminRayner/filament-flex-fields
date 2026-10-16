@@ -384,6 +384,11 @@ it('registers paste cleanup plugin lazily when enabled', function () {
 it('renders flex rich editor blade with enhancement assets', function () {
     $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-rich-editor-field.blade.php');
 
+    foreach (['toolbar', 'image-actions', 'panels', 'footer'] as $partial) {
+        expect($blade)->toContain("@include('filament-flex-fields::forms.components.partials.rich-editor.{$partial}')");
+        $blade .= file_get_contents(__DIR__."/../../resources/views/forms/components/partials/rich-editor/{$partial}.blade.php");
+    }
+
     expect($blade)
         ->toContain('flex-rich-editor')
         ->toContain('flexRichEditorFormComponent')

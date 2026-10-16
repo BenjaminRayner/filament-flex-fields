@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns;
 
 use BackedEnum;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Closure;
 use Illuminate\Contracts\Support\Htmlable;
 
@@ -46,7 +46,7 @@ trait HasSelectFieldIcons
             return $icon;
         }
 
-        return GravityIcon::CircleChevronDown;
+        return FlexIcon::CircleChevronDown;
     }
 
     public function getDefaultClearIcon(): string|BackedEnum|Htmlable
@@ -57,7 +57,7 @@ trait HasSelectFieldIcons
             return $icon;
         }
 
-        return GravityIcon::CircleXmark;
+        return FlexIcon::CircleXmark;
     }
 
     public function getChevronIcon(): string|BackedEnum|Htmlable
@@ -82,7 +82,7 @@ trait HasSelectFieldIcons
             return $icon;
         }
 
-        return GravityIcon::Check;
+        return FlexIcon::Check;
     }
 
     public function getSelectedOptionCheckIcon(): string|BackedEnum|Htmlable

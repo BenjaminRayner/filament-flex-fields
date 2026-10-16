@@ -4,17 +4,25 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectField;
 
-use BackedEnum;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionLabelIndex;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionValue;
+use Filament\Support\Components\Attributes\ExposedLivewireMethod;
+use Livewire\Attributes\Renderless;
 
 /**
  * @mixin SelectField
  */
 trait InteractsWithSelectTriggerPresentation
 {
+    public function hasDynamicSelectedOptionLabels(): bool
+    {
+        return $this->getOptionLabelUsing !== null || $this->getOptionLabelsUsing !== null;
+    }
+
     public function getInitialTriggerLabel(): ?string
     {
-        if ($this->isNative() || $this->getVariant() === 'item-card' || $this->isMultiple()) {
+        if (! $this->shouldUseHeadlessEngine() || $this->getVariant() === 'item-card' || $this->isMultiple()) {
             return null;
         }
 
@@ -26,7 +34,7 @@ trait InteractsWithSelectTriggerPresentation
      */
     public function getInitialTriggerBadges(): array
     {
-        if ($this->isNative() || $this->getVariant() === 'item-card' || ! $this->isMultiple()) {
+        if (! $this->shouldUseHeadlessEngine() || $this->getVariant() === 'item-card' || ! $this->isMultiple()) {
             return [];
         }
 
@@ -36,61 +44,21 @@ trait InteractsWithSelectTriggerPresentation
             return [];
         }
 
-        if ($this->hasDynamicOptions() && ! $this->isPreloaded()) {
-            $badges = [];
-
-            foreach ($state as $value) {
-                if ($value instanceof BackedEnum) {
-                    $value = $value->value;
-                }
-
-                $badges[] = [
-                    'value' => (string) $value,
-                    'label' => (string) $value,
-                ];
-            }
-
-            return $badges;
-        }
-
-        $badges = [];
-        $options = $this->getOptions();
-
-        foreach ($state as $value) {
-            if ($value instanceof BackedEnum) {
-                $value = $value->value;
-            }
-
-            $label = $this->findOptionLabel($options, $value);
-
-            if (is_array($label)) {
-                $badges[] = [
-                    'value' => (string) $value,
-                    'label' => $this->formatOptionLabelForJs($this->normalizeOption($value, $label), compact: true),
-                ];
-
-                continue;
-            }
-
-            $badges[] = [
-                'value' => (string) $value,
-                'label' => is_string($label) ? $label : (string) $value,
-            ];
-        }
-
-        return $badges;
+        return array_map(static fn (array $entry): array => [
+            'value' => $entry['value'], 'label' => $entry['triggerLabel'] ?? $entry['label'],
+        ], $this->getHeadlessInitialOptionLabelsForJs());
     }
 
     protected function resolveInitialTriggerLabel(): string
     {
-        $state = $this->resolveStateForItemCardTrigger();
-
-        if ($state instanceof BackedEnum) {
-            $state = $state->value;
-        }
+        $state = OptionValue::normalize($this->resolveStateForItemCardTrigger());
 
         if (blank($state)) {
             return (string) ($this->getPlaceholder() ?? '');
+        }
+
+        if ($this->getOptionLabelUsing && filled($this->getState())) {
+            return (string) (parent::getOptionLabel() ?? $state);
         }
 
         if ($this->hasDynamicOptions() && ! $this->isPreloaded()) {
@@ -163,12 +131,19 @@ trait InteractsWithSelectTriggerPresentation
         return filled($state);
     }
 
+    #[ExposedLivewireMethod]
+    #[Renderless]
     public function getOptionLabel(bool $withDefault = true): ?string
     {
-        $state = $this->getState();
+        // Filament's explicit resolver is authoritative, including null used
+        // to reject an unavailable selection during server validation.
+        if ($this->getOptionLabelUsing) {
+            return parent::getOptionLabel($withDefault);
+        }
 
-        if ($state instanceof BackedEnum) {
-            $state = $state->value;
+        $state = OptionValue::normalize($this->getState());
+        if ($state === null) {
+            return null;
         }
 
         $label = $this->findOptionLabel($this->getOptions(), $state);
@@ -192,7 +167,7 @@ trait InteractsWithSelectTriggerPresentation
 
     /**
      * @param  array<mixed>|null  $options
-     * @return array<string, string>
+     * @return array<string|int, string>
      */
     public function getOptionLabels(bool $withDefaults = true, ?array $options = null): array
     {
@@ -205,27 +180,22 @@ trait InteractsWithSelectTriggerPresentation
 
         $labels = [];
         $options ??= $this->getOptions();
-
-        foreach ($this->getState() ?? [] as $value) {
-            if ($value instanceof BackedEnum) {
-                $value = $value->value;
+        $state = $this->getState();
+        if (! is_array($state)) {
+            return [];
+        }
+        $index = new OptionLabelIndex($options, fn (array $label): bool => $this->isOptionGroupArray($label));
+        foreach ($state as $candidate) {
+            $value = OptionValue::normalize($candidate);
+            if ($value === null) {
+                continue;
             }
-
-            $label = $this->findOptionLabel($options, $value);
-
+            $label = $index->find($value);
             if (is_array($label)) {
                 $labels[$value] = $this->formatOptionLabelForJs($this->normalizeOption($value, $label), compact: true);
-
-                continue;
-            }
-
-            if (is_string($label)) {
+            } elseif (is_string($label)) {
                 $labels[$value] = $label;
-
-                continue;
-            }
-
-            if ($withDefaults) {
+            } elseif ($withDefaults) {
                 $labels[$value] = (string) $value;
             }
         }
@@ -239,22 +209,6 @@ trait InteractsWithSelectTriggerPresentation
      */
     protected function findOptionLabel(array $options, mixed $state): array|string|null
     {
-        foreach ($options as $value => $label) {
-            if (is_array($label) && $this->isOptionGroupArray($label)) {
-                $found = $this->findOptionLabel($label, $state);
-
-                if ($found !== null) {
-                    return $found;
-                }
-
-                continue;
-            }
-
-            if ((string) $value === (string) $state) {
-                return $label;
-            }
-        }
-
-        return null;
+        return (new OptionLabelIndex($options, fn (array $label): bool => $this->isOptionGroupArray($label)))->find($state);
     }
 }

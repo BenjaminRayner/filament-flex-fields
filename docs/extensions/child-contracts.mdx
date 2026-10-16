@@ -1,0 +1,106 @@
+---
+title: "Publish reusable child options"
+description: "Let every parent use one child-owned configuration contract and method binding map."
+---
+
+An author declares the child configuration once in its `ComponentDefinition`:
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildComponentContract;
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationOption;
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationSchema;
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationType;
+
+$child = new ComponentDefinition(
+    id: 'acme-name-field',
+    kind: ComponentKind::Field,
+    // Keep this component's normal assets, surface and view registration.
+    childContract: new ChildComponentContract(
+        kind: ComponentKind::Field,
+        renderer: AcmeNameField::class,
+        configuration: new ConfigurationSchema([
+            'label' => new ConfigurationOption(ConfigurationType::String, max: 200),
+            'maxLength' => new ConfigurationOption(
+                ConfigurationType::Integer,
+                default: 80,
+                min: 1,
+                max: 500,
+            ),
+            'required' => new ConfigurationOption(ConfigurationType::Boolean),
+        ]),
+    ),
+);
+```
+
+`AcmeNameField` is the author's actual field class. The default `FluentChildFactory`
+creates it through `make()` and automatically binds declared option names to
+same-name public, non-static fluent methods. The approved methods are checked
+once when the contract is constructed. No caller can choose a method by submitting
+its name. Every parent can now use a three-argument `ChildSlot` for this child.
+
+When a method takes multiple arguments, map them once in the child contract:
+
+```php
+$contract = new ChildComponentContract(
+    ComponentKind::Field,
+    AcmeNameField::class,
+    new ConfigurationSchema([
+        'caption' => new ConfigurationOption(ConfigurationType::String),
+        'inlineCaption' => new ConfigurationOption(ConfigurationType::Boolean),
+    ]),
+    bindings: ['prefix' => ['caption', 'inlineCaption']],
+);
+```
+
+Provide the entire argument group or omit it. Partial groups reject. A custom
+typed `ChildFactory` can implement transformations instead of the default fluent
+factory. Locked bound options are reapplied after the per-instance PHP callback;
+state ownership and parent readonly restrictions are enforced last. For a child
+without a published data contract, an explicit renderer plus `configure` still
+allows its full public PHP API without a parent-specific factory.
+
+For example, declare an existing Text Input in the parent's `children` map:
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+
+$nameSlot = new ChildSlot(
+    'name',
+    'flex-text-input',
+    ComponentKind::Field,
+    renderer: FlexTextInput::class,
+);
+
+// After registering that slot in the parent definition:
+$name = $children->render(
+    'name',
+    'main',
+    configure: fn (FlexTextInput $input) => $input
+        ->label('Name')
+        ->maxLength(120)
+        ->required(),
+);
+```
+
+Data contracts intentionally expose only declared options. The system does not
+turn every public method of every component into a JSON endpoint. PHP-only
+callbacks, query builders and application authorization stay in trusted PHP.
+[Explicit slot factories and schemas](/docs/extensions/custom-child-factories) remain supported;
+they cannot discard a registered locked option or substitute a different
+registered renderer.
+
+## Configuration snapshots and limits
+
+Declared configuration is retained independently of your source arrays, including
+arrays containing PHP references. Later changes to those arrays cannot change
+option defaults, locked policies, child mappings or resolved instance options.
+The schema accepts up to 128 declared options and eight ordered layers. Each data
+payload is limited to 4,096 nodes, 16 levels and 64 KiB of compact JSON, including
+escaping and punctuation. Objects and callbacks belong in trusted PHP configuration,
+not saved option data. Family schema exchange preserves `1.0` as a number with a
+fractional part and supports UTF-8 text within its separate 1 MiB export limit.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

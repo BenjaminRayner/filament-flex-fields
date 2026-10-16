@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TagsField;
+use Bjanczak\FilamentFlexFields\Support\Translatable\TranslatableLocales;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -22,6 +24,72 @@ class FlexSpatieTagsField extends TagsField
     protected string|Closure|null $spatieTagType = null;
 
     protected bool $allowAnySpatieTagType = true;
+
+    protected string|Closure|null $spatieTagLocale = null;
+
+    protected string|Closure|null $spatieTagFallbackLocale = null;
+
+    protected int|Closure $spatieTagSearchLimit = 20;
+
+    protected ?Closure $modifySpatieTagSearchQuery = null;
+
+    public function tagLocale(string|Closure|null $locale): static
+    {
+        $this->spatieTagLocale = $locale;
+
+        return $this;
+    }
+
+    public function getTagLocale(): string
+    {
+        $locale = $this->evaluate($this->spatieTagLocale) ?? app()->getLocale();
+        TranslatableLocales::assertLocale($locale);
+
+        return $locale;
+    }
+
+    /** Fallback labels preserve tag identities; missing translations are never copied on save. */
+    public function tagFallbackLocale(string|Closure|null $locale): static
+    {
+        $this->spatieTagFallbackLocale = $locale;
+
+        return $this;
+    }
+
+    public function getTagFallbackLocale(): ?string
+    {
+        $locale = $this->evaluate($this->spatieTagFallbackLocale);
+        if ($locale !== null) {
+            TranslatableLocales::assertLocale($locale);
+        }
+
+        return $locale;
+    }
+
+    public function tagSearchLimit(int|Closure $limit): static
+    {
+        $this->spatieTagSearchLimit = $limit;
+
+        return $this;
+    }
+
+    public function getTagSearchLimit(): int
+    {
+        $limit = $this->evaluate($this->spatieTagSearchLimit);
+        if (! is_int($limit) || $limit < 1 || $limit > 100) {
+            throw new InvalidArgumentException('Spatie tag search limit must be between 1 and 100.');
+        }
+
+        return $limit;
+    }
+
+    /** Scope suggestions only; enforce tenant ownership in the configured Tag model for writes too. */
+    public function modifyTagSearchQueryUsing(?Closure $callback): static
+    {
+        $this->modifySpatieTagSearchQuery = $callback;
+
+        return $this;
+    }
 
     protected function setUp(): void
     {
@@ -40,10 +108,25 @@ class FlexSpatieTagsField extends TagsField
 
             $tagClass = $component->getTagClassName();
             $type = $component->getSpatieTagType();
+            $locale = $component->getTagLocale();
             $escaped = addcslashes($search, '%_\\');
 
-            $query = $tagClass::query()
-                ->where('name', 'like', '%'.$escaped.'%');
+            $fallback = $component->getTagFallbackLocale();
+            $query = $tagClass::query()->where(function (Builder $query) use ($component, $locale, $fallback, $escaped): void {
+                $query->where('name->'.$locale, 'like', '%'.$escaped.'%');
+                if ($fallback !== null && $fallback !== $locale) {
+                    $query->orWhere(fn (Builder $query) => $component->withoutTagTranslation($query, $locale)
+                        ->where('name->'.$fallback, 'like', '%'.$escaped.'%'));
+                }
+            });
+
+            if ($component->modifySpatieTagSearchQuery !== null) {
+                $scoped = $component->evaluate($component->modifySpatieTagSearchQuery, ['query' => $query, 'search' => $search, 'locale' => $locale]);
+                if ($scoped !== null && ! $scoped instanceof Builder) {
+                    throw new InvalidArgumentException('Tag search query callback must return a Builder or mutate it in place.');
+                }
+                $query = $scoped ?? $query;
+            }
 
             if (! $component->allowsAnySpatieTagType()) {
                 $query->when(
@@ -54,11 +137,90 @@ class FlexSpatieTagsField extends TagsField
             }
 
             return $query
-                ->orderBy('name')
-                ->limit(20)
-                ->pluck('name')
+                ->orderBy('name->'.$locale)
+                ->limit($component->getTagSearchLimit())
+                ->get()
+                ->map(fn (Model $tag): string => $component->translatedTagName($tag))
                 ->all();
         });
+    }
+
+    private function translatedTagName(Model $tag): string
+    {
+        if (! method_exists($tag, 'getTranslation')) {
+            throw new RuntimeException('The configured Spatie Tag model must support translated names.');
+        }
+        $fallback = $this->getTagFallbackLocale();
+        $name = $tag->getTranslation('name', $this->getTagLocale(), $fallback === null);
+        if ($fallback !== null && $name === '') {
+            $name = $tag->getTranslation('name', $fallback, false);
+        }
+        if (! is_string($name)) {
+            throw new RuntimeException('A translated tag name must be a string.');
+        }
+
+        return $name;
+    }
+
+    /** @param Builder<Model> $query
+     * @return Builder<Model>
+     */
+    private function withoutTagTranslation(Builder $query, string $locale): Builder
+    {
+        return $query->where(fn (Builder $query) => $query->whereNull('name->'.$locale)->orWhere('name->'.$locale, ''));
+    }
+
+    /** @param list<string> $names
+     * @return list<Model>
+     */
+    private function resolveSpatieTags(Model $record, array $names): array
+    {
+        if (! method_exists($record, 'tags')) {
+            throw new RuntimeException('Spatie Tags requires a model with a tags relationship.');
+        }
+        $tagClass = $this->getTagClassName();
+        $locale = $this->getTagLocale();
+        $type = $this->getSpatieTagType();
+        $fallback = $this->getTagFallbackLocale();
+        // Re-read owned associations instead of trusting client IDs or stale relation state.
+        $existing = $record->tags()->get()->filter(fn (Model $tag): bool => $this->allowsAnySpatieTagType() || $tag->getAttribute('type') === $type);
+        $resolved = [];
+        foreach ($names as $name) {
+            $associated = $existing->filter(fn (Model $tag): bool => $this->translatedTagName($tag) === $name);
+            if ($associated->isNotEmpty()) {
+                array_push($resolved, ...$associated->all());
+
+                continue;
+            }
+            $query = $tagClass::query()->where('name->'.$locale, $name);
+            if (! $this->allowsAnySpatieTagType()) {
+                $query->where('type', $type);
+            }
+            $matches = $query->get();
+            if ($matches->isEmpty() && $fallback !== null && $fallback !== $locale) {
+                $query = $this->withoutTagTranslation($tagClass::query(), $locale)->where('name->'.$fallback, $name);
+                if (! $this->allowsAnySpatieTagType()) {
+                    $query->where('type', $type);
+                }
+                $matches = $query->get();
+            }
+            if ($matches->isEmpty()) {
+                $matches->push($tagClass::findOrCreate($name, $this->allowsAnySpatieTagType() ? null : $type, $locale));
+            }
+            foreach ($matches as $tag) {
+                if (! $tag instanceof Model) {
+                    throw new RuntimeException('Tag queries must return Eloquent models.');
+                }
+                $resolved[] = $tag;
+            }
+        }
+
+        $byIdentity = [];
+        foreach ($resolved as $tag) {
+            $byIdentity[(string) $tag->getKey()] = $tag;
+        }
+
+        return array_values($byIdentity);
     }
 
     protected function configureSpatieRelationship(): void
@@ -76,22 +238,24 @@ class FlexSpatieTagsField extends TagsField
                 $tags = $record->tagsWithType($component->getSpatieTagType());
             }
 
-            $component->state($tags->pluck('name')->all());
+            $component->state($tags->map(fn (Model $tag): string => $component->translatedTagName($tag))->values()->all());
         });
 
         $this->saveRelationshipsUsing(static function (FlexSpatieTagsField $component, ?Model $record, array $state): void {
-            if (! $record || ! method_exists($record, 'syncTagsWithType') || ! method_exists($record, 'syncTags')) {
+            if (! $record || ! method_exists($record, 'syncTagsWithType') || ! method_exists($record, 'syncTags') || ! method_exists($record, 'tags')) {
                 return;
             }
 
-            if (! $component->allowsAnySpatieTagType()) {
-                $record->syncTagsWithType($state, $component->getSpatieTagType());
+            if ($component->allowsAnySpatieTagType()) {
+                $component->syncSpatieTagsWithAnyType($record, $state);
                 $record->unsetRelation('tags');
 
                 return;
             }
-
-            $component->syncSpatieTagsWithAnyType($record, $state);
+            $record->getConnection()->transaction(function () use ($component, $record, $state): void {
+                $tags = $component->resolveSpatieTags($record, array_values($state));
+                $record->syncTagsWithType($tags, $component->getSpatieTagType());
+            });
             $record->unsetRelation('tags');
         });
 
@@ -171,22 +335,9 @@ class FlexSpatieTagsField extends TagsField
             return;
         }
 
-        $tagClassName = $this->getTagClassName();
-
-        $tags = collect($state)->map(function (string $tagName) use ($tagClassName) {
-            $locale = $tagClassName::getLocale();
-
-            $tag = $tagClassName::findFromStringOfAnyType($tagName, $locale);
-
-            if ($tag?->isEmpty() ?? true) {
-                $tag = $tagClassName::create([
-                    'name' => [$locale => $tagName],
-                ]);
-            }
-
-            return $tag;
-        })->flatten();
-
-        $record->tags()->sync($tags->pluck('id'));
+        $record->getConnection()->transaction(function () use ($record, $state): void {
+            $tags = $this->resolveSpatieTags($record, array_values($state));
+            $record->tags()->sync(collect($tags)->map(fn (Model $tag): mixed => $tag->getKey())->all());
+        });
     }
 }

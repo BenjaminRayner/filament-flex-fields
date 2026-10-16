@@ -243,7 +243,7 @@ describe('select headless cartesian — remote fetch soft-fail', () => {
         it(`shouldApplyRemoteOptionsFromFetchResult(${JSON.stringify(results)})`, () => {
             assert.equal(
                 shouldApplyRemoteOptionsFromFetchResult(results),
-                results !== null,
+                Array.isArray(results),
             )
         })
     }

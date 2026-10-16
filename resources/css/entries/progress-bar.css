@@ -1,7 +1,7 @@
 @import "../utilities-baseline.css";
 @import "../base.css";
 
-@source "../../src/Filament/Schemas/Components/ProgressBar.php";
-@source "../views/schemas/components/progress-bar.blade.php";
+@source "../../../src/Filament/Schemas/Components/ProgressBar.php";
+@source "../../views/schemas/components/progress-bar.blade.php";
 
 @import "../components/progress-bar.css";

@@ -1,0 +1,61 @@
+---
+title: "Own your JavaScript factory"
+description: "Initialize each rendered instance and release its effects on destruction."
+---
+
+Use a unique package prefix in your Alpine factory name, such as `acmeRatingField`.
+Export the factory itself as the module's default export:
+
+```javascript
+export const fffFactoryIdentity = Object.freeze({
+    package: 'acme/rating',
+    component: 'acme-rating-field',
+    export: 'default',
+    abi: 1,
+});
+
+export default function acmeRatingField(config = {}) {
+    return {
+        value: config.value ?? null,
+
+        init() {
+            // Initialize this rendered instance.
+        },
+
+        destroy() {
+            // Release listeners, streams and other instance resources.
+        },
+    };
+}
+```
+
+The component identity must match the entry in your package manifest. `abi: 1`
+declares the currently supported JavaScript integration protocol. This declaration
+is optional for a factory loaded through its registered asset boundary: FLEX
+already receives its owner from the installed package. If supplied, the declaration
+must agree with that owner.
+
+The lazy loader prepares the exported factory, waits for its `init()` result and
+keeps its readiness tied to the rendered instance. `init()` can return a Promise.
+When a module or instance is replaced, its previous asynchronous result cannot
+mark the replacement ready.
+
+Two packages cannot replace one another's factory under the same Alpine name.
+A conflict reports an error and preserves the first source. Reusing the same
+module and factory does not register or wrap it again. If your existing module
+self-registers a factory, use the exact exported function rather than a separate
+anonymous forwarding function. A different forwarding function is a different
+source and will be reported as a conflict during preparation.
+
+<Note>
+These rules apply to factories registered through FLEX. Installed packages are
+trusted application code; direct registrations made outside FLEX are not
+intercepted. Loading two different releases under the same global alias requires
+an explicit upgrade strategy. FLEX preserves the current source rather than
+silently replacing it.
+</Note>
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

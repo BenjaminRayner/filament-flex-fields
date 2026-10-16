@@ -6,7 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
 use Bjanczak\FilamentFlexFields\Enums\DateTimeFieldMode;
 
-class FlexDateField extends FlexDateTimeField
+class FlexDateField extends FlexCivilDateField
 {
     public function getMode(): DateTimeFieldMode
     {

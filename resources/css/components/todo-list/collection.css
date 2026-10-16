@@ -1,0 +1,32 @@
+/* Structural layout belongs to Todo List; shared search control CSS belongs to Flex Text Input. */
+.fff-todo-list-field [hidden] { display: none !important; }
+.fff-todo-list-field__search { width: 100%; }
+.fff-todo-list-field__list { gap: 0; padding-block: 4px 6px; }
+.fff-todo-list-field__list > .fff-todo-list-field__group { margin-top: 0; margin-bottom: var(--fff-todo-list-list-gap); }
+.fff-todo-list-field__list > .fff-todo-list-field__group:has(+ [data-todo-spacer="bottom"]) { margin-bottom: 0; }
+.fff-todo-list-field__viewport { overflow-anchor: none; }
+.fff-todo-list-field__list.is-windowed { position: relative; display: block; flex: none; }
+.fff-todo-list-field__list.is-windowed > .fff-todo-list-field__group {
+    position: absolute;
+    inset-inline: 0;
+    margin: 0;
+}
+/* Recycled rows present their existing state; only user completion animates. */
+.fff-todo-list-field__row.is-window-presented,
+.fff-todo-list-field__row.is-window-presented .fff-todo-list-field__checkbox-svg,
+.fff-todo-list-field__row.is-window-presented .fff-todo-list-field__shape,
+.fff-todo-list-field__row.is-window-presented .fff-todo-list-field__tick,
+.fff-todo-list-field__row.is-window-presented .fff-todo-list-field__tick-fill {
+    transition: none !important;
+}
+.fff-todo-list-field__meta:has(> [hidden]:first-child):has(> [hidden]:last-child) { display: none; }
+.fff-todo-list-field__pagination { display:flex; align-items:center; justify-content:center; gap:.75rem; padding:.625rem; color:var(--fff-todo-list-muted); font-size:.8125rem; }
+.fff-todo-list-field__pagination button { display:inline-flex; align-items:center; justify-content:center; width:1.875rem; height:1.875rem; border:0; border-radius:50%; background:var(--fff-todo-list-row-hover); color:var(--fff-todo-list-label); cursor:pointer; transition:opacity 150ms; }
+.fff-todo-list-field__pagination button svg { width:1rem; height:1rem; }
+.fff-todo-list-field__pagination button:disabled { opacity:.4; cursor:default; }
+.fff-todo-list-field__pagination button:focus-visible,.fff-todo-list-field__retry:focus-visible { outline:2px solid var(--fff-todo-list-accent); outline-offset:2px; }
+.fff-todo-list-field__pagination:dir(rtl) svg { transform:rotate(180deg); }
+.fff-todo-list-field__empty { margin:0; padding:1.5rem; text-align:center; font-size:.875rem; color:var(--fff-todo-list-muted); }
+.fff-todo-list-field__retry { align-self:center; border:0; padding:.375rem .75rem; border-radius:999px; margin:.5rem; background:var(--fff-todo-list-row-hover); color:var(--fff-todo-list-label); cursor:pointer; }
+.fff-todo-list-field__create-icon { border:0; padding:0; background:transparent; }
+@media (hover:none) { .fff-todo-list-field__action { opacity:1; pointer-events:auto; transform:none; } }

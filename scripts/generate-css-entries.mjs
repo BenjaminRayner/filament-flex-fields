@@ -41,12 +41,12 @@ const components = [
     {
         name: 'bubble-choice',
         imports: ['../components/bubble-choice.css'],
-        sources: ['../../src/Filament/Forms/Components/BubbleChoiceField.php', '../views/forms/components/bubble-choice-field.blade.php'],
+        sources: ['../../src/Filament/Forms/Components/BubbleChoiceField.php', '../views/forms/components/bubble-choice-field.blade.php', '../views/forms/components/bubble-choice/*.blade.php'],
     },
     {
         name: 'todo-list-field',
         imports: ['../components/todo-list-field.css'],
-        sources: ['../../src/Filament/Forms/Components/TodoListField.php', '../views/forms/components/todo-list-field.blade.php'],
+        sources: ['../../src/Filament/Forms/Components/TodoListField.php', '../views/forms/components/todo-list-field.blade.php', '../views/forms/components/todo-list/*.blade.php'],
     },
     {
         name: 'price-range',
@@ -81,7 +81,7 @@ const components = [
     {
         name: 'credit-card',
         imports: ['../components/credit-card.css'],
-        sources: ['../../src/Filament/Forms/Components/CreditCardField.php', '../views/forms/components/credit-card-field.blade.php'],
+        sources: ['../../src/Filament/Forms/Components/CreditCardField.php', '../views/forms/components/credit-card-field.blade.php', '../views/forms/components/credit-card/*.blade.php'],
     },
     {
         name: 'phone-field',
@@ -89,14 +89,9 @@ const components = [
         sources: ['../../src/Filament/Forms/Components/PhoneField.php', '../views/forms/components/phone-field.blade.php'],
     },
     {
-        name: 'country-field',
-        imports: ['../components/country-field.css'],
-        sources: ['../../src/Filament/Forms/Components/CountryField.php', '../views/forms/components/country-field.blade.php'],
-    },
-    {
         name: 'timezone-field',
         imports: ['../components/timezone-field.css'],
-        sources: ['../../src/Filament/Forms/Components/TimezoneField.php', '../views/forms/components/timezone-field.blade.php'],
+        sources: ['../../src/Filament/Forms/Components/TimezoneField.php', '../views/forms/components/schedule-field.blade.php'],
     },
     {
         name: 'flex-date-time-field',

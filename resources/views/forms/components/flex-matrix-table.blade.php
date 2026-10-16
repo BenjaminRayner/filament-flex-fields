@@ -1,98 +1,36 @@
 @php
-    $statePath = $getStatePath();
     $rows = $getNormalizedRows();
-    $isDisabled = $isDisabled();
-    $wrapperClasses = $getWrapperClasses();
-    
-    $containers = $getChildComponentContainers();
-    $firstContainer = head($containers);
-    $schemaComponents = $firstContainer ? $firstContainer->getComponents() : [];
-    $columnCount = count($schemaComponents);
-    
-    $columnWidths = $getColumnWidths();
-    $gridColumnsTemplate = null;
-    
-    if (count($schemaComponents) > 0) {
-        $widths = [];
-        foreach ($schemaComponents as $component) {
-            $name = $component->getName();
-            $widths[] = $columnWidths[$name] ?? 'minmax(0, 1fr)';
-        }
-        $gridColumnsTemplate = 'var(--fff-matrix-choice-row-label-width) ' . implode(' ', $widths);
-    }
+    $disabled = $isDisabled();
+    $containers = $getItems();
+    $first = reset($containers);
+    $fields = $first ? $first->getComponents() : [];
+    $widths = $getColumnWidths();
+    $tracks = [];
+    foreach ($fields as $cellField) $tracks[] = $widths[$cellField->getName()] ?? 'minmax(0, 1fr)';
+    $styles = [...$getMatrixSizeStyles(), '--fff-matrix-choice-columns' => count($fields)];
+    if ($tracks !== []) $styles['--fff-matrix-choice-columns-template'] = 'var(--fff-matrix-choice-row-label-width) '.implode(' ', $tracks);
 @endphp
-
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
->
-    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'matrix-choice-field',
-        'livewireKey' => $getLivewireKey(),
-    ])
-    
-    <div
-        @class([
-            ...$wrapperClasses,
-            'is-disabled' => $isDisabled,
-        ])
-        @style([
-            ...$getMatrixSizeStyles(),
-            '--fff-matrix-choice-columns: '.$columnCount,
-            '--fff-matrix-choice-columns-template: '.$gridColumnsTemplate => $gridColumnsTemplate !== null,
-        ])
-    >
-        <div class="fff-matrix-choice__frame">
-            <div class="fff-matrix-choice__header">
-                <div class="fff-matrix-choice__corner"></div>
-
-                @foreach ($schemaComponents as $component)
-                    <div class="fff-matrix-choice__column-header">
-                        <span class="fff-matrix-choice__column-label">{{ $component->getLabel() }}</span>
-                    </div>
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
+    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'flex-matrix-table', 'livewireKey' => $getLivewireKey()])
+    <div {{ \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())->class([...$getWrapperClasses(), 'is-disabled' => $disabled])->style(array_map(fn ($value, $key) => $key.': '.$value, $styles, array_keys($styles))) }}>
+        <x-filament-flex-fields::matrix.frame>
+            <x-slot:header>
+                @foreach ($fields as $cellField)
+                    <div class="fff-matrix-choice__column-header"><span class="fff-matrix-choice__column-label">{{ $cellField->getLabel() }}</span></div>
                 @endforeach
-            </div>
-
-            <div class="fff-matrix-choice__body">
-                @foreach ($rows as $rowKey => $row)
-                    @php
-                        $isRowInitiallyDisabled = $isDisabled || $row['disabled'];
-                        $itemContainer = $containers[$rowKey] ?? null;
-                    @endphp
-
-                    <div
-                        class="fff-matrix-choice__row"
-                        wire:key="{{ $statePath }}-matrix-choice-row-{{ $rowKey }}"
-                        @class([
-                            'is-disabled' => $isRowInitiallyDisabled,
-                        ])
-                    >
-                        <div class="fff-matrix-choice__row-label">
-                            <span class="fff-matrix-choice__row-title">{{ $row['label'] }}</span>
-
-                            @if (filled($row['description']))
-                                <span class="fff-matrix-choice__row-description">{{ $row['description'] }}</span>
-                            @endif
-                        </div>
-
-                        @if ($itemContainer)
-                            @foreach ($itemContainer->getComponents() as $component)
-                            <div
-                                class="fff-matrix-choice__cell"
-                                wire:key="{{ $itemContainer->getStatePath() }}-cell-{{ $component->getName() }}"
-                                @class([
-                                    'is-disabled' => $isRowInitiallyDisabled,
-                                ])
-                                style="padding: 0.5rem; display: flex; align-items: center; justify-content: center;"
-                            >
-                                <div class="w-full">
-                                    {{ $component }}
-                                </div>
+            </x-slot:header>
+            @foreach ($rows as $rowKey => $row)
+                <div @class(['fff-matrix-choice__row', 'is-disabled' => $disabled || $row['disabled']]) wire:key="{{ $getLivewireKey() }}-table-row-{{ hash('xxh128', (string) $rowKey) }}">
+                    @include('filament-flex-fields::forms.components.matrix.row-label')
+                    @if ($item = $containers[$rowKey] ?? null)
+                        @foreach ($item->getComponents() as $cellField)
+                            <div @class(['fff-matrix-choice__cell', 'fff-matrix-choice__schema-cell', 'is-disabled' => $disabled || $row['disabled']]) wire:key="{{ $item->getStatePath() }}-cell-{{ $cellField->getName() }}">
+                                <div class="w-full">{{ $cellField }}</div>
                             </div>
-                            @endforeach
-                        @endif
-                    </div>
-                @endforeach
-            </div>
-        </div>
+                        @endforeach
+                    @endif
+                </div>
+            @endforeach
+        </x-filament-flex-fields::matrix.frame>
     </div>
 </x-dynamic-component>

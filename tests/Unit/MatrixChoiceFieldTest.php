@@ -215,40 +215,18 @@ it('validates conditionally disabled cells on submit', function () {
     expect($validator->fails())->toBeTrue();
 });
 
-it('serializes conditional disable rules to alpine', function () {
+it('delegates matrix interaction to owned modules and renders static cells', function () {
     $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/matrix-choice-field.blade.php');
-    $js = file_get_contents(__DIR__.'/../../resources/js/components/matrix-choice-field.js');
-
-    expect($blade)->toContain('conditionalDisableRules')
-        ->and($js)->toContain('matchesConditionalRule')
-        ->and($js)->toContain('pruneDisabledSelections');
-});
-
-it('routes checkbox and radio clicks through the cell handler only', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/matrix-choice-field.blade.php');
-
-    expect($blade)->toContain('x-on:click="interact(@js($rowKey), @js($columnKey))"')
-        ->and($blade)->not->toContain('x-on:click.stop="toggleCheckbox')
-        ->and($blade)->not->toContain('x-on:click.stop="selectRadio');
-});
-
-it('imports shared matrix keyboard into the alpine entry', function () {
-    $entry = file_get_contents(__DIR__.'/../../resources/js/components/matrix-choice-field.js');
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/matrix-choice-field.blade.php');
-
-    expect($entry)
-        ->toContain("from '../core/matrix-keyboard.js'")
-        ->toContain('createMatrixKeyboardController')
-        ->and($blade)
-        ->toContain('matrix-choice-field')
-        ->toContain('onMatrixKeydown');
+    $runtime = file_get_contents(__DIR__.'/../../resources/js/matrix-choice/runtime.js');
+    expect($blade)->toContain('conditionalDisableRules', 'data-matrix-config', 'x-ignore')->not->toContain('x-init', 'x-on:click');
+    expect($runtime)->toContain('createMatrixSelection', 'matrixDestination', 'watchOwnedAlpineValue', 'scope?.dispose()');
 });
 
 it('rejects unsupported matrix choice modes', function () {
     MatrixChoiceField::make('mood')->mode('toggle')->getMode();
 })->throws(InvalidArgumentException::class);
 
-it('caches normalized rows, columns, and disabled cells map', function () {
+it('reevaluates reactive matrix configuration without stale cache', function () {
     $rowEvaluations = 0;
     $colEvaluations = 0;
     $cellsEvaluations = 0;
@@ -288,9 +266,9 @@ it('caches normalized rows, columns, and disabled cells map', function () {
     $cols2 = $field->getNormalizedColumns();
     $cells2 = $field->getDisabledCellsMap();
 
-    expect($rowEvaluations)->toBe(1)
-        ->and($colEvaluations)->toBe(1)
-        ->and($cellsEvaluations)->toBe(1)
+    expect($rowEvaluations)->toBe(2)
+        ->and($colEvaluations)->toBe(2)
+        ->and($cellsEvaluations)->toBe(2)
         ->and($rows2)->toBe($rows1)
         ->and($cols2)->toBe($cols1)
         ->and($cells2)->toBe($cells1);

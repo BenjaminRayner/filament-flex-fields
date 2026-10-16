@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support;
 
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
+use Bjanczak\FilamentFlexFields\Support\Select\Catalog\PickerCatalogState;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
@@ -11,26 +13,11 @@ use libphonenumber\PhoneNumberUtil;
 class PhoneCountries
 {
     /**
-     * @var array<string, array<string, array{code: string, name: string, dial_code: string, flag_url: string}>>
-     */
-    protected static array $metadataCache = [];
-
-    public const FLAG_CDN = 'https://cdn.jsdelivr.net/gh/HatScripts/circle-flags@latest/flags/%s.svg';
-
-    /**
-     * circle-flags CDN aliases that return plain text instead of SVG content.
-     *
      * @var array<string, string>
      */
-    private const FLAG_SLUG_OVERRIDES = [
-        'AC' => 'sh-ac',
-        'BQ' => 'bq-bo',
-        'TA' => 'sh-ta',
-    ];
+    /** @var list<string>|null */
+    private static ?array $supportedCodes = null;
 
-    /**
-     * @var array<string, string>
-     */
     private const LANGUAGE_COUNTRY_MAP = [
         'pl' => 'PL',
         'de' => 'DE',
@@ -59,28 +46,23 @@ class PhoneCountries
      */
     public static function allSupportedCodes(): array
     {
-        $regions = PhoneNumberUtil::getInstance()->getSupportedRegions();
-        sort($regions);
+        if (self::$supportedCodes === null) {
+            $regions = PhoneNumberUtil::getInstance()->getSupportedRegions();
+            sort($regions);
+            self::$supportedCodes = $regions;
+        }
 
-        return $regions;
+        return self::$supportedCodes;
     }
 
     public static function flagUrl(string $countryCode): string
     {
-        $code = strtoupper($countryCode);
-        $slug = self::FLAG_SLUG_OVERRIDES[$code] ?? strtolower($code);
-
-        return sprintf(self::FLAG_CDN, $slug);
+        return CountryFlags::url($countryCode);
     }
 
     public static function name(string $countryCode, ?string $locale = null): string
     {
-        $code = strtoupper($countryCode);
-        $locale ??= app()->getLocale();
-        $translationKey = "filament-flex-fields::countries.{$code}";
-        $translated = trans($translationKey, [], $locale);
-
-        return is_string($translated) ? $translated : $translationKey;
+        return Countries::name($countryCode, $locale);
     }
 
     public static function dialCode(string $countryCode): string
@@ -221,17 +203,19 @@ class PhoneCountries
     public static function metadata(?array $only = null, array $except = [], ?string $locale = null): array
     {
         $locale ??= app()->getLocale();
+        $cache = RequestState::resolve(PickerCatalogState::class);
+        $cache->touchLocale($locale);
 
-        if (! isset(self::$metadataCache[$locale])) {
-            self::$metadataCache[$locale] = [];
+        if (! isset($cache->phoneMetadata[$locale])) {
+            $cache->phoneMetadata[$locale] = [];
         }
 
         $resolved = self::resolve($only, $except);
         $results = [];
 
         foreach ($resolved as $code) {
-            if (! isset(self::$metadataCache[$locale][$code])) {
-                self::$metadataCache[$locale][$code] = [
+            if (! isset($cache->phoneMetadata[$locale][$code])) {
+                $cache->phoneMetadata[$locale][$code] = [
                     'code' => $code,
                     'name' => self::name($code, $locale),
                     'dial_code' => self::dialCode($code),
@@ -239,7 +223,7 @@ class PhoneCountries
                 ];
             }
 
-            $results[] = self::$metadataCache[$locale][$code];
+            $results[] = $cache->phoneMetadata[$locale][$code];
         }
 
         return $results;

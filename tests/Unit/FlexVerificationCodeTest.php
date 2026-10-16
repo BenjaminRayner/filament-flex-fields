@@ -26,7 +26,7 @@ it('exposes verification code configuration via fluent api', function () {
         ->and($field->getSize())->toBe('md')
         ->and($field->getColor())->toBe('primary')
         ->and($field->getInputMode())->toBe('text')
-        ->and($field->getValidationPattern())->toBe('/^[A-Za-z0-9]{6}$/');
+        ->and($field->getValidationPattern())->toBe('/\\A[A-Za-z0-9]{6}\\z/D');
 });
 
 it('aliases groupSizes to groups', function () {
@@ -121,7 +121,7 @@ it('supports eight digit codes split into four and four groups', function () {
 
     expect($field->getLength())->toBe(8)
         ->and($field->getResolvedGroups())->toBe([4, 4])
-        ->and($field->getValidationPattern())->toBe('/^\d{8}$/');
+        ->and($field->getValidationPattern())->toBe('/\A[0-9]{8}\z/D');
 });
 
 it('exposes auto submit and loading configuration', function () {
@@ -196,4 +196,30 @@ it('registers verification code playground variants', function () {
         'verification_code__md',
         'verification_code__lg',
     ]);
+});
+
+it('rejects fractional, boolean, numeric-string and associative groups', function (array $groups): void {
+    expect(fn () => FlexVerificationCode::make('code')->length(6)->groups($groups)->getResolvedGroups())
+        ->toThrow(InvalidArgumentException::class);
+})->with([[[3.5, 2.5]], [[true, 5]], [['3', 3]], [['a' => 3, 'b' => 3]], [[0, 6]], [[7, -1]]]);
+
+it('rejects forged optional state and overlong or trailing-newline codes without truncating validation', function (mixed $value): void {
+    $field = FlexVerificationCode::make('code')->length(6);
+    expect(validator(['code' => $value], ['code' => $field->getValidationRules()])->fails())->toBeTrue();
+})->with(['array' => [['123456']], 'number' => [123456], 'boolean' => [true], 'too long' => ['1234567'], 'newline' => ["123456\n"], 'non-ascii' => ['١٢٣٤٥٦'], 'incomplete' => ['12345']]);
+
+it('accepts only configured complete codes or optional empty state', function (): void {
+    $field = FlexVerificationCode::make('code');
+    foreach (['012345', '', null] as $value) {
+        expect(validator(['code' => $value], ['code' => $field->getValidationRules()])->passes())->toBeTrue();
+    }
+    $field->required();
+    expect(validator(['code' => ''], ['code' => $field->getValidationRules()])->fails())->toBeTrue();
+});
+
+it('validates deferred length and the auto-submit configuration', function (): void {
+    expect(fn () => FlexVerificationCode::make('code')->length(fn () => '6')->getLength())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => FlexVerificationCode::make('code')->length(17)->getLength())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => FlexVerificationCode::make('code')->autoSubmitMethod('verify.code')->getClientConfiguration())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => FlexVerificationCode::make('code')->autoSubmitMethod('verify')->submitUsing(fn () => null)->getClientConfiguration())->toThrow(InvalidArgumentException::class);
 });

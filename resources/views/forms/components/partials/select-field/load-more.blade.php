@@ -1,3 +1,4 @@
+<div class="fff-select-pagination-tail" x-show="hasPaginatedSearchResults && shouldShowHeadlessDropdownOptions()">
                             <div
                                 x-ref="headlessLoadMoreSentinel"
                                 x-show="shouldShowHeadlessLoadMoreSentinel()"
@@ -12,6 +13,12 @@
                                 role="status"
                                 aria-live="polite"
                             >
-                                <x-filament::loading-indicator class="fff-select-load-more__spinner" />
-                                <span class="fff-select-load-more__label" x-text="headlessLoadMoreLabel()"></span>
+                                @if ($headlessLoadMoreView ?? null)
+                                    @include($headlessLoadMoreView, $headlessRendererData ?? [])
+                                @else
+                                    <x-filament::loading-indicator class="fff-select-load-more__spinner" />
+                                    <span class="fff-select-load-more__label" x-text="headlessLoadMoreLabel()"></span>
+                                @endif
                             </div>
+
+</div>

@@ -1,0 +1,16 @@
+{
+    "name": "{{PACKAGE}}",
+    "description": "{{CLASS}} field, table column and infolist entry for FLEX",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.3",
+        "janczakb/filament-flex-fields": "^3.1.19"
+    },
+    "autoload": {
+        "psr-4": { "{{JSON_NAMESPACE}}\\": "src/" }
+    },
+    "extra": {
+        "laravel": { "providers": [ "{{JSON_NAMESPACE}}\\{{CLASS}}ServiceProvider" ] }
+    }
+}

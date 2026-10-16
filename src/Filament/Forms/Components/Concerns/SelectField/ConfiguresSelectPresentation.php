@@ -5,14 +5,20 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectField;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
+use Bjanczak\FilamentFlexFields\Support\Select\Configuration\PickerConfiguration;
 use Closure;
 use InvalidArgumentException;
 
 /**
+ * Select appearance configuration; rendering mode and wrapper have separate owners.
+ *
  * @mixin SelectField
  */
 trait ConfiguresSelectPresentation
 {
+    use PresentsSelectWrapper;
+    use ResolvesSelectRenderingMode;
+
     protected string|Closure $variant = 'bordered';
 
     protected string|Closure|null $color = null;
@@ -25,15 +31,44 @@ trait ConfiguresSelectPresentation
 
     protected string|Closure $optionLayout = 'list';
 
+    protected string|Closure $optionDescriptionPosition = 'below';
+
     protected bool|Closure $inlineFieldLabel = false;
 
     protected bool|Closure $inlineSearch = false;
 
     protected bool|Closure|null $richListTriggerDisplay = null;
 
-    protected ?bool $usesRichOptionHtmlResolved = null;
-
     protected string|Closure|null $dropdownAlign = null;
+
+    protected bool|Closure $selectionIndicator = true;
+
+    protected bool|Closure $plainTrigger = false;
+
+    public function selectionIndicator(bool|Closure $condition = true): static
+    {
+        $this->selectionIndicator = $condition;
+
+        return $this;
+    }
+
+    public function showsSelectionIndicator(): bool
+    {
+        return (bool) $this->evaluate($this->selectionIndicator);
+    }
+
+    /** Render selected content and prefix without a chip or affix divider. */
+    public function plainTrigger(bool|Closure $condition = true): static
+    {
+        $this->plainTrigger = $condition;
+
+        return $this;
+    }
+
+    public function hasPlainTrigger(): bool
+    {
+        return (bool) $this->evaluate($this->plainTrigger);
+    }
 
     public function dropdownAlign(string|Closure $align): static
     {
@@ -45,7 +80,7 @@ trait ConfiguresSelectPresentation
     public function getDropdownAlign(): string
     {
         if ($this->dropdownAlign !== null) {
-            $align = (string) $this->evaluate($this->dropdownAlign);
+            $align = PickerConfiguration::text($this->evaluate($this->dropdownAlign), 'dropdownAlign');
 
             if (! in_array($align, ['start', 'end'], true)) {
                 throw new InvalidArgumentException("Select dropdown align [{$align}] is not supported.");
@@ -134,8 +169,22 @@ trait ConfiguresSelectPresentation
     public function optionLayout(string|Closure $layout): static
     {
         $this->optionLayout = $layout;
+        $this->forgetUsesRichOptionHtmlCache();
 
         return $this;
+    }
+
+    /** Place secondary text beneath the name or at the logical end of a single row. */
+    public function optionDescriptionPosition(string|Closure $position): static
+    {
+        $this->optionDescriptionPosition = $position;
+
+        return $this;
+    }
+
+    public function getOptionDescriptionPosition(): string
+    {
+        return PickerConfiguration::choice($this->evaluate($this->optionDescriptionPosition), ['below', 'trailing'], 'optionDescriptionPosition');
     }
 
     public function inlineFieldLabel(bool|Closure $condition = true): static
@@ -166,7 +215,7 @@ trait ConfiguresSelectPresentation
 
     public function getOptionLayout(): string
     {
-        $layout = (string) $this->evaluate($this->optionLayout);
+        $layout = PickerConfiguration::text($this->evaluate($this->optionLayout), 'optionLayout');
 
         if (! in_array($layout, ['list', 'grid'], true)) {
             throw new InvalidArgumentException("Select option layout [{$layout}] is not supported.");
@@ -177,151 +226,18 @@ trait ConfiguresSelectPresentation
 
     public function getVariant(): string
     {
-        $variant = (string) $this->evaluate($this->variant);
-
-        if (! in_array($variant, ['bordered', 'secondary', 'flat', 'faded', 'soft', 'underlined', 'item-card'], true)) {
-            throw new InvalidArgumentException("Select variant [{$variant}] is not supported.");
-        }
-
-        return $variant;
+        return PickerConfiguration::choice($this->evaluate($this->variant), ['bordered', 'secondary', 'flat', 'faded', 'soft', 'underlined', 'item-card'], 'variant');
     }
 
     public function getColor(): ?string
     {
-        $color = $this->evaluate($this->color);
+        $color = PickerConfiguration::optionalText($this->evaluate($this->color), 'color');
 
         return filled($color) ? (string) $color : null;
     }
 
     public function getChipColor(): string
     {
-        return (string) $this->evaluate($this->chipColor);
-    }
-
-    public function usesRichOptionHtml(): bool
-    {
-        if ($this->usesRichOptionHtmlResolved !== null) {
-            return $this->usesRichOptionHtmlResolved;
-        }
-
-        if ($this->getOptionLayout() === 'grid') {
-            return $this->usesRichOptionHtmlResolved = true;
-        }
-
-        if ($this->isHtmlAllowed()) {
-            return $this->usesRichOptionHtmlResolved = true;
-        }
-
-        if ($this->hasOptionView()) {
-            return $this->usesRichOptionHtmlResolved = true;
-        }
-
-        if ($this->usesRichOptions !== null) {
-            return $this->usesRichOptionHtmlResolved = (bool) $this->evaluate($this->usesRichOptions);
-        }
-
-        return $this->usesRichOptionHtmlResolved = $this->optionsContainRichShape($this->getOptions());
-    }
-
-    protected function forgetUsesRichOptionHtmlCache(): void
-    {
-        $this->usesRichOptionHtmlResolved = null;
-    }
-
-    public function hasClientSideOptionList(): bool
-    {
-        if ($this->hasRelationship()) {
-            return false;
-        }
-
-        if ($this->isPreloaded()) {
-            return false;
-        }
-
-        if ($this->options instanceof Closure) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function hasDynamicOptions(): bool
-    {
-        if ($this->hasClientSideOptionList()) {
-            return false;
-        }
-
-        return parent::hasDynamicOptions();
-    }
-
-    public function hasInitialNoOptionsMessage(): bool
-    {
-        if ($this->hasClientSideOptionList()) {
-            return false;
-        }
-
-        if ($this->options instanceof Closure) {
-            return true;
-        }
-
-        return parent::hasInitialNoOptionsMessage();
-    }
-
-    /**
-     * @return array<int|string, bool|string>
-     */
-    public function getWrapperClasses(): array
-    {
-        $classes = [
-            'fff-select-field',
-            'fff-select-field--'.$this->getSize(),
-            'fff-rounding-'.$this->getRounding(),
-            'fff-select-field--'.$this->getVariant(),
-            'fff-select-field--layout-'.$this->getOptionLayout(),
-            'fff-select-field--chips-'.$this->getChipColor(),
-        ];
-
-        if ($color = $this->getColor()) {
-            $classes['fi-color-'.$color] = $color;
-        }
-
-        if ($this->hasInlineFieldLabel() && filled($this->getLabel()) && ! $this->isLabelHidden()) {
-            $classes['fff-select-field--inline-field-label'] = true;
-        }
-
-        if ($this->hasInlineSearch()) {
-            $classes['fff-select-field--inline-search'] = true;
-        }
-
-        if ($this->isMultiple()) {
-            $classes['fff-select-field--multiple'] = true;
-        }
-
-        if (! $this->isClearableInUi()) {
-            $classes['fff-select-field--not-clearable'] = true;
-        } elseif ($this->hasSelectedValueForClearButton() && ! $this->isLocallyDisabled()) {
-            $classes['fff-select-field--clearable-has-value'] = true;
-        }
-
-        if ($this->shouldUseRichListTriggerDisplay()) {
-            $classes['fff-select-field--rich-list-trigger'] = true;
-        }
-
-        if ($this->shouldShowFocusOutline()) {
-            $classes['has-focus-outline'] = true;
-        }
-
-        return $classes;
-    }
-
-    public function getSearchableOptionFields(): array
-    {
-        $fields = parent::getSearchableOptionFields();
-
-        if ($this->usesRichOptionHtml()) {
-            $fields = array_values(array_unique([...$fields, 'description']));
-        }
-
-        return $fields;
+        return PickerConfiguration::text($this->evaluate($this->chipColor), 'chipColor');
     }
 }

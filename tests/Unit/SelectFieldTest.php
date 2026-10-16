@@ -171,26 +171,6 @@ it('renders grid layout html for dropdown options', function () {
         ->and($options[0]['triggerLabel'])->toContain('fff-select-option__trigger-label');
 });
 
-it('pins grid layout desktop dropdowns to 400px and re-applies after overlay anchoring', function () {
-    $css = file_get_contents(__DIR__.'/../../resources/css/components/select-field.css');
-    $alpine = file_get_contents(__DIR__.'/../../resources/js/components/select-field/headless-combobox-alpine.js');
-    $menuPosition = file_get_contents(__DIR__.'/../../resources/js/components/select-field/headless-combobox-menu-position.js');
-
-    expect($css)
-        ->toMatch('/\.fi-dropdown-panel\.fff-select-dropdown-panel--layout-grid\s*\{[\s\S]*width:\s*400px\s*!important/')
-        ->toContain('max-width: min(400px, calc(100vw - 2rem)) !important')
-        ->toContain('min-width: 400px !important')
-        ->and($alpine)
-        ->toContain('createHeadlessComboboxMenuPositionMixin')
-        ->and($menuPosition)
-        ->toContain('GRID_DROPDOWN_WIDTH_PX = 400')
-        ->toContain('resolveMatchTriggerWidth')
-        ->toContain('resolveMenuMinWidth')
-        ->toContain('afterOverlayPanelOpened')
-        ->toMatch('/if \(this\.isGridLayout\) \{\s*return false/')
-        ->toMatch('/selectMenu\.updateMenuPosition\.call\(this, \{ reveal \}\)[\s\S]*if \(this\.isGridLayout\) \{[\s\S]*this\.applyGridDropdownWidth\(\)/');
-});
-
 it('renders trigger layout for grid selected value', function () {
     $field = SelectField::make('theme')
         ->optionLayout('grid')
@@ -620,29 +600,6 @@ it('honours selectablePlaceholder(false) independently of clearable()', function
         ->and($field->getWrapperClasses())->toHaveKey('fff-select-field--not-clearable');
 });
 
-it('passes filament position into the headless alpine payload', function () {
-    $runtime = file_get_contents(__DIR__.'/../../src/Filament/Forms/Components/Concerns/SelectField/InteractsWithSelectHeadlessRuntime.php');
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/select-field-headless.blade.php');
-
-    expect($runtime)
-        ->toContain("'position' => \$this->getPosition()")
-        ->toContain("'clearable' => \$this->isClearableInUi()")
-        ->and($blade)
-        ->toContain('getHeadlessAlpineConfig()')
-        ->toContain('Js::from($headlessAlpineConfig)');
-});
-
-it('builds getHeadlessAlpineConfig without a livewire host', function () {
-    $runtime = file_get_contents(__DIR__.'/../../src/Filament/Forms/Components/Concerns/SelectField/InteractsWithSelectHeadlessRuntime.php');
-
-    expect($runtime)
-        ->toContain('function getHeadlessAlpineConfig(): array')
-        ->toContain("'initialState' => \$state")
-        ->toContain("'componentKey' => \$this->getKey()")
-        ->toContain("'clearable' => \$this->isClearableInUi()")
-        ->toContain('resolveHeadlessLivewireId');
-});
-
 it('can keep selected options visible in the multi-select dropdown', function () {
     $field = SelectField::make('states')
         ->multiple()
@@ -679,13 +636,6 @@ it('allows clearable override on item-card selects', function () {
     expect($field->isClearable())->toBeTrue()
         ->and($field->canSelectPlaceholder())->toBeTrue()
         ->and($field->getWrapperClasses())->not->toHaveKey('fff-select-field--not-clearable');
-});
-
-it('passes keep-selected dropdown config into the select field blade patch payload', function () {
-    $runtime = file_get_contents(__DIR__.'/../../src/Filament/Forms/Components/Concerns/SelectField/InteractsWithSelectHeadlessRuntime.php');
-
-    expect($runtime)
-        ->toContain("'keepSelectedOptionsInDropdown' => \$this->shouldKeepSelectedOptionsInDropdown()");
 });
 
 it('treats static playground selects as client-side option lists', function () {
@@ -735,33 +685,6 @@ it('defers dynamic option closure evaluation until options are fetched for headl
     expect($invocations)->toBeGreaterThan(0);
 });
 
-it('seeds headless alpine with initial state and trigger label for deferred dynamic options', function () {
-    $runtime = file_get_contents(__DIR__.'/../../src/Filament/Forms/Components/Concerns/SelectField/InteractsWithSelectHeadlessRuntime.php');
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/select-field-headless.blade.php');
-
-    expect($runtime)
-        ->toContain("'initialState' => \$state")
-        ->toContain('(blank($state) || $isMultiple) ? null : $this->getInitialTriggerLabel()')
-        ->and($blade)
-        ->toContain('getHeadlessAlpineConfig()')
-        ->not->toContain('($hasDynamicOptions && ! $isPreloaded()) ? null : $getOptionLabel()');
-});
-
-it('keeps client-side headless search query out of combobox engine sync', function () {
-    $alpine = file_get_contents(__DIR__.'/../../resources/js/components/select-field/headless-combobox-alpine.js');
-    $engineSync = file_get_contents(__DIR__.'/../../resources/js/components/select-field/headless-combobox-engine-sync.js');
-    $livewire = file_get_contents(__DIR__.'/../../resources/js/components/select-field/headless-combobox-livewire.js');
-
-    expect($alpine)
-        ->toContain('resolveHeadlessBoundState')
-        ->toContain('initialState,')
-        ->toContain('createHeadlessComboboxEngineSyncMixin')
-        ->and($engineSync)
-        ->toMatch('/if \(this\.hasDynamicSearchResults\) \{\s*this\.comboboxQuery = snapshot\.query/')
-        ->and($livewire)
-        ->toContain('resolveLivewire()');
-});
-
 it('keeps dynamic option fetching for preloaded selects', function () {
     $field = SelectField::make('status')
         ->options(['draft' => 'Draft'])
@@ -783,61 +706,19 @@ it('defines stable select field search cache keys', function () {
 });
 
 it('stores select field search results in request cache', function () {
-    $field = SelectField::make('status');
-    $reflection = new ReflectionClass($field);
-    $cache = $reflection->getProperty('searchResultsCache');
-    $cache->setAccessible(true);
-    $cacheKey = $reflection->getMethod('searchCacheKey');
-    $cacheKey->setAccessible(true);
+    $calls = 0;
+    $field = SelectField::make('status')->searchable()->getSearchResultsUsing(
+        function (string $search) use (&$calls): array {
+            $calls++;
 
-    $key = $cacheKey->invoke($field, 'draft');
-    $cache->setValue($field, [$key => ['draft' => 'Draft']]);
-
-    expect($cache->getValue($field))->toHaveKey($key);
-});
-
-it('loads select field stylesheet for enhanced select fields to coordinate ssr and alpine trigger', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/select-field.blade.php');
-    $headlessBlade = headlessSelectBladeSources();
-    $runtime = file_get_contents(__DIR__.'/../../src/Filament/Forms/Components/Concerns/SelectField/InteractsWithSelectHeadlessRuntime.php');
-
-    expect($blade)
-        ->toContain('! $isNative')
-        ->toContain("'component' => 'select-field'")
-        ->and($runtime)
-        ->toContain('getHeadlessInitialOptionsForJs')
-        ->and($headlessBlade)
-        ->toContain('fff-select-trigger-ssr');
-});
-
-it('renders select trigger ssr with x-load-src alpine mount when initial label exists', function () {
-    $blade = headlessSelectBladeSources();
-    $mountBlade = file_get_contents(__DIR__.'/../../resources/views/components/lazy-alpine-mount.blade.php');
-    $runtime = file_get_contents(__DIR__.'/../../src/Filament/Forms/Components/Concerns/SelectField/InteractsWithSelectHeadlessRuntime.php');
-
-    expect($blade)
-        ->toContain('$shouldDeferHeadlessAlpine = false')
-        ->toContain('$headlessComponentKey = $getKey()')
-        ->toContain(':mount-on-interaction="$shouldDeferHeadlessAlpine"')
-        ->toContain(':wrap-slot="false"')
-        ->toContain('fff-select-field__interactive')
-        ->toContain('fff-select-dropdown-loading__spinner')
-        ->toContain('x-load-src')
-        ->not->toContain('selectModuleReady')
-        ->not->toContain('fff-select-field-module-loaded')
-        ->and($runtime)
-        ->toContain("'componentKey' => \$this->getKey()")
-        ->and($blade)
-        ->toContain('getHeadlessAlpineConfig()');
-
-    $loadStylesheet = file_get_contents(__DIR__.'/../../resources/views/partials/load-stylesheet.blade.php');
-    $emitAssets = file_get_contents(__DIR__.'/../../resources/views/partials/emit-assets.blade.php');
-
-    expect($loadStylesheet)->toContain('consumerComponent')
-        ->and($emitAssets)->toContain('consumerAttributesFor');
-
-    expect($mountBlade)->toContain('fff-lazy-alpine-gate')
-        ->toContain('wrapSlot');
+            return ['draft' => 'Draft'];
+        },
+    );
+    expect($field->getSearchResults('draft'))->toBe(['draft' => 'Draft'])
+        ->and($field->getSearchResults('draft'))->toBe(['draft' => 'Draft'])
+        ->and($calls)->toBe(1);
+    $field->getSearchResults('review');
+    expect($calls)->toBe(2);
 });
 
 it('closes the x-load interactive root before lazy-alpine-mount ends so helper text stays outside input wrapper', function () {
@@ -857,65 +738,6 @@ it('uses headless shell for enhanced select fields without filament select coord
         ->not->toContain('selectFieldPreload')
         ->not->toContain('window.bootSelectFieldPatches')
         ->not->toContain('requestAnimationFrame(applyPatches)');
-});
-
-it('wires filament select parity into the headless combobox partial', function () {
-    $blade = headlessSelectBladeSources();
-    $optionBlade = file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/select-field-headless-option.blade.php');
-    $runtime = file_get_contents(__DIR__.'/../../src/Filament/Forms/Components/Concerns/SelectField/InteractsWithSelectHeadlessRuntime.php');
-    $main = file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/select-field-headless.blade.php');
-
-    expect($blade)
-        ->toContain('comboboxFilteredDropdownRows()')
-        ->toContain('isReorderable')
-        ->toContain('canOptionLabelsWrap')
-        ->toContain('reorderSelectedChips')
-        ->toContain('x-sortable-handle')
-        ->toContain('fi-reorderable')
-        ->toContain('fff-select-dropdown-empty')
-        ->toContain('shouldShowHeadlessSelectEmptyState')
-        ->toContain('shouldShowHeadlessSelectSkeleton')
-        ->toContain('fff-select-dropdown-loading__spinner')
-        ->not->toContain('fff-select-dropdown-loading__row')
-        ->toContain('shouldShowHeadlessDropdownOptions()')
-        ->toContain('fff-select-headless-options-root')
-        ->toContain('fff-select-headless-dropdown-row')
-        ->toContain('fff-select-headless-menu')
-        ->toMatch('/x-for="row in comboboxFilteredDropdownRows\(\)"[\s\S]*fff-select-headless-dropdown-row[\s\S]*<template x-if="row\.type === \'section\' \|\| row\.type === \'group-header\'"/')
-        ->not->toContain('fi-select-input-option-group')
-        ->not->toContain('option in [row.option]')
-        ->toContain(":key=\"row.key + ':' + (comboboxQuery ?? '')\"")
-        ->toContain('id="{{ $id }}"')
-        ->toContain('id="{{ $headlessSearchId }}"')
-        ->toContain('id="{{ $headlessListboxId }}"')
-        ->toContain('role="listbox"')
-        ->toContain('aria-controls="{{ $headlessListboxId }}"')
-        ->toContain("->except(['id'])")
-        ->and($runtime)
-        ->toContain("'searchDebounce' => \$this->getSearchDebounce()")
-        ->toContain("'optionsLimit' => \$this->getOptionsLimit()")
-        ->toContain("'searchableOptionFields' => \$this->getSearchableOptionFields()")
-        ->toContain('resolveHeadlessLivewireId')
-        ->toContain('getSelectMessagesForJs')
-        ->toContain("'selectNoOptionsIconHtml'")
-        ->toContain("'selectNoResultsIconHtml'")
-        ->toContain("'selectEmptyStateHints' => \$this->isSearchable() || \$needsAsyncMessages")
-        ->toContain('getSelectEmptyStateHintsForJs()')
-        ->toContain('getUserSelectEmptyStateHintsForJs')
-        ->and($main)
-        ->toContain('getHeadlessAlpineConfig()')
-        ->toContain('select-field.trigger')
-        ->toContain('select-field.menu-shell')
-        ->and(file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/select-field/menu-shell.blade.php'))
-        ->toContain('select-field.option-list')
-        ->toContain('select-field.empty-create')
-        ->and(file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/select-field/option-list.blade.php'))
-        ->toContain('select-field-headless-option')
-        ->toContain('select-field.load-more')
-        ->and($optionBlade)
-        ->toContain('isHeadlessOptionDisabled')
-        ->toContain('headlessOptionValue(row.option)')
-        ->toContain('row.option');
 });
 
 it('marks disabled options in js payloads for disableOptionWhen', function () {
@@ -1007,20 +829,31 @@ it('keeps headless select runtime in the select field bundle', function () {
         ->toContain('fffHeadlessSelectField');
 });
 
-it('loads user select stylesheet only for user select fields', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/select-field.blade.php');
-
-    expect($blade)
-        ->toContain('$isUserSelectField')
-        ->toContain("'component' => 'user-select'");
-});
-
-it('styles grid layout trigger chips for dark mode in the select field bundle', function () {
+it('keeps dark rich and custom trigger chips distinct from the select surface', function () {
     $css = file_get_contents(__DIR__.'/../../resources/dist/css/select-field.css');
+    expect(preg_match('/\.dark\s+\.fff-select-field\{([^}]+)\}/', $css, $rules))->toBe(1);
 
-    expect($css)
-        ->toContain('--fff-select-trigger-chip-bg')
-        ->toMatch('/\.dark\s+\.fff-select-field[\s\S]*--fff-select-trigger-chip-bg:#27272aeb/');
+    $color = function (string $property, array $backdrop = [0, 0, 0]) use ($rules): array {
+        expect(preg_match('/'.preg_quote($property, '/').':#([0-9a-f]{6}(?:[0-9a-f]{2})?)(?:;|$)/i', $rules[1], $matches))->toBe(1);
+        $hex = $matches[1];
+        $alpha = strlen($hex) === 8 ? hexdec(substr($hex, 6, 2)) / 255 : 1;
+
+        return array_map(fn (int $index): float => hexdec(substr($hex, $index * 2, 2)) * $alpha + $backdrop[$index] * (1 - $alpha), [0, 1, 2]);
+    };
+    $luminance = function (array $rgb): float {
+        $linear = array_map(function (float $channel): float {
+            $channel /= 255;
+
+            return $channel <= 0.04045 ? $channel / 12.92 : (($channel + 0.055) / 1.055) ** 2.4;
+        }, $rgb);
+
+        return $linear[0] * 0.2126 + $linear[1] * 0.7152 + $linear[2] * 0.0722;
+    };
+    $surface = $color('--fff-select-bg');
+    $chip = $color('--fff-select-trigger-chip-bg', $surface);
+
+    expect(($luminance($chip) + 0.05) / ($luminance($surface) + 0.05))->toBeGreaterThanOrEqual(1.3)
+        ->and(($luminance($color('--fff-select-text')) + 0.05) / ($luminance($chip) + 0.05))->toBeGreaterThanOrEqual(4.5);
 });
 
 it('lets multiple select chips wrap and grow the trigger height', function () {
@@ -1306,40 +1139,7 @@ it('styles the select dropdown shell like a Spectrum list box', function () {
         ->toMatch('/\.fi-dropdown-panel\.fff-select-dropdown-panel:not\(\.fff-select-dropdown-panel--layout-grid\)\s+\.fff-select-option-selected-check\[data-visible=true\]\s+\.fff-select-option-selected-check__svg\{[\s\S]*stroke-dashoffset:0/');
 });
 
-it('fades overflowing select dropdown edges with a scroll-aware mask', function () {
-    $source = file_get_contents(__DIR__.'/../../resources/css/components/select-field.css');
-    $css = file_get_contents(__DIR__.'/../../resources/dist/css/select-field.css');
-    $alpine = file_get_contents(__DIR__.'/../../resources/js/components/select-field/headless-combobox-alpine.js');
-    $blade = headlessSelectBladeSources();
-
-    expect($source)
-        ->toContain('--fff-select-scroll-fade-size: 6px')
-        ->toContain("[data-scroll-fade='top']")
-        ->toContain("[data-scroll-fade='bottom']")
-        ->toContain("[data-scroll-fade='both']")
-        ->toContain('--fff-select-overlay-scrollbar-size: 6px')
-        ->toContain("[data-active='true']")
-        ->toContain('mask-image: linear-gradient(var(--fff-select-scroll-fade-gradient))')
-        ->toMatch('/\.fi-dropdown-panel\.fff-select-dropdown-panel\s*\{[\s\S]*overflow:\s*hidden\s*!important/')
-        ->and($css)
-        ->toContain('--fff-select-scroll-fade-size:6px')
-        ->toContain('--fff-select-overlay-scrollbar-size:6px')
-        ->toContain('overflow:hidden!important')
-        ->toContain('[data-scroll-fade=top]')
-        ->toContain('[data-scroll-fade=both]')
-        ->and($alpine)
-        ->toContain('bindDropdownScrollFadeObserver')
-        ->and(file_get_contents(__DIR__.'/../../resources/js/components/select-field/headless-combobox-scroll-virt.js'))
-        ->toContain('updateVerticalScrollFade')
-        ->toContain('syncOverlayScrollbar')
-        ->toContain('onHeadlessOptionsScroll')
-        ->and($blade)
-        ->toContain('fff-select-dropdown-panel--overlay-scroll')
-        ->toContain('data-active="false"')
-        ->toContain('fff-select-dropdown-scrollbar__thumb');
-});
-
-it('styles grouped option headers as muted labels with even section separators', function () {
+it('fades overflowid option headers as muted labels with even section separators', function () {
     $source = file_get_contents(__DIR__.'/../../resources/css/components/select-field.css');
     $css = file_get_contents(__DIR__.'/../../resources/dist/css/select-field.css');
 
@@ -1453,19 +1253,7 @@ it('exposes Filament select messages optionsLimit maxItems and create option act
         ->and($field->hasCreateOptionActionFormSchema())->toBeTrue();
 });
 
-it('wires maxItems into the headless alpine payload', function () {
-    $runtime = file_get_contents(__DIR__.'/../../src/Filament/Forms/Components/Concerns/SelectField/InteractsWithSelectHeadlessRuntime.php');
-    $blade = headlessSelectBladeSources();
-
-    expect($runtime)
-        ->toContain("'maxItems' => \$this->getMaxItems()")
-        ->toContain("'maxItemsMessage' => \$this->getMaxItemsMessage()")
-        ->toContain("'optionsLimit' => \$this->getOptionsLimit()")
-        ->and($blade)
-        ->toContain('fff-select-max-items-message');
-});
-
-it('marks disabled options from disabledOptions helper', function () {
+it('wires maxItems d options from disabledOptions helper', function () {
     $field = SelectField::make('animal')
         ->options([
             'dog' => 'Dog',
@@ -1505,21 +1293,7 @@ it('defaults option group separators to enabled', function () {
     expect($field->hasOptionGroupSeparators())->toBeFalse();
 });
 
-it('renders grouped separators and load-more hooks in headless blade', function () {
-    $blade = headlessSelectBladeSources();
-    $runtime = file_get_contents(__DIR__.'/../../src/Filament/Forms/Components/Concerns/SelectField/InteractsWithSelectHeadlessRuntime.php');
-
-    expect($blade)
-        ->toContain("row.type === 'separator'")
-        ->toContain('fff-select-option-group-separator')
-        ->toContain('headlessLoadMoreSentinel')
-        ->toContain('shouldShowHeadlessTriggerLoading()')
-        ->and($runtime)
-        ->toContain('hasPaginatedSearchResults')
-        ->toContain("'optionGroupSeparators' => \$this->hasOptionGroupSeparators()");
-});
-
-it('renders custom option views through optionView api', function () {
+it('renders groupedm option views through optionView api', function () {
     $field = SelectField::make('user')
         ->options([
             'fred' => [

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
+use Bjanczak\FilamentFlexFields\Filament\Pages\FlexFieldsPlaygroundCluster;
 use Bjanczak\FilamentFlexFields\Filament\Pages\FlexFieldsPlaygroundComponentPage;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundRegistry;
 use Filament\Schemas\Components\View;
 use Throwable;
 
 /**
- * Cross-links between layout playground hubs (composition, translatable, tabs, form layouts, item cards).
+ * Cross-links between related layout playground pages.
  */
 final class PlaygroundRelatedHubs
 {
@@ -18,10 +19,8 @@ final class PlaygroundRelatedHubs
      * @var list<string>
      */
     private const LAYOUT_HUBS = [
-        'composition-recipes',
         'translatable-fields',
         'segment-tabs',
-        'form-layouts',
         'item-card-group',
     ];
 
@@ -79,7 +78,7 @@ final class PlaygroundRelatedHubs
         try {
             return FlexFieldsPlaygroundComponentPage::getUrl(configuration: $slug);
         } catch (Throwable) {
-            return '/admin/flex-fields-playground/'.$slug;
+            return '/admin/'.FlexFieldsPlaygroundCluster::SLUG.'/'.$slug;
         }
     }
 }

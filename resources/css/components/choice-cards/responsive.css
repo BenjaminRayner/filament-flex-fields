@@ -1,0 +1,48 @@
+/* Media cards respect the requested column count without compressing their copy. */
+.fff-choice-cards--media.fff-choice-cards--grid {
+    --fff-choice-cards-media-cols: var(--fff-choice-cards-cols-default);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, max(14rem, calc((100% - (var(--fff-choice-cards-media-cols) - 1) * var(--fff-choice-cards-gap)) / var(--fff-choice-cards-media-cols)))), 1fr));
+}
+
+@media (min-width: 640px) {
+    .fff-choice-cards--media.fff-choice-cards--grid {
+        --fff-choice-cards-media-cols: var(--fff-choice-cards-cols-sm);
+    }
+}
+
+@media (min-width: 768px) {
+    .fff-choice-cards--media.fff-choice-cards--grid {
+        --fff-choice-cards-media-cols: var(--fff-choice-cards-cols-md);
+    }
+}
+
+@media (min-width: 1024px) {
+    .fff-choice-cards--media.fff-choice-cards--grid {
+        --fff-choice-cards-media-cols: var(--fff-choice-cards-cols-lg);
+    }
+}
+
+.fff-choice-cards--media .fff-choice-cards__item {
+    display: flex;
+    align-items: center;
+}
+
+.fff-choice-cards--media .fff-choice-cards__content--media {
+    width: 100%;
+    column-gap: .5rem;
+}
+
+.fff-choice-cards--media .fff-choice-cards__copy {
+    flex: 1 1 0;
+    gap: .625rem;
+}
+
+.fff-choice-cards--media .fff-choice-cards__text {
+    overflow-wrap: anywhere;
+}
+
+.fff-choice-cards--media .fff-choice-cards__price {
+    flex: 0 0 auto;
+    max-width: 100%;
+    margin-top: 0;
+}

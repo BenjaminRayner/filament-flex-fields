@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ImageChoiceCards;
+use Bjanczak\FilamentFlexFields\Support\ChoiceLists\State\ChecklistStateCast;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
 use Bjanczak\FilamentFlexFields\Support\Playground\ImageChoiceCardsPlayground;
 use Bjanczak\FilamentFlexFields\Support\Playground\ImageChoiceCardsPlaygroundSilhouettes;
-use Filament\Schemas\Components\StateCasts\OptionsArrayStateCast;
 
 it('exposes image choice cards configuration via fluent api', function () {
     $field = ImageChoiceCards::make('body_type')
@@ -59,20 +59,20 @@ it('uses alt from label when alt is omitted', function () {
     expect($field->getNormalizedOptions()['slim']['alt'])->toBe('Slim');
 });
 
-it('casts multi state with OptionsArrayStateCast', function () {
+it('casts multi state with ChecklistStateCast', function () {
     $field = ImageChoiceCards::make('focus')->multiple();
 
     $casts = collect($field->getDefaultStateCasts());
 
-    expect($casts->contains(fn ($cast): bool => $cast instanceof OptionsArrayStateCast))->toBeTrue();
+    expect($casts->contains(fn ($cast): bool => $cast instanceof ChecklistStateCast))->toBeTrue();
 });
 
-it('does not add OptionsArrayStateCast for single select', function () {
+it('does not add ChecklistStateCast for single select', function () {
     $field = ImageChoiceCards::make('body')->multiple(false);
 
     $casts = collect($field->getDefaultStateCasts());
 
-    expect($casts->contains(fn ($cast): bool => $cast instanceof OptionsArrayStateCast))->toBeFalse();
+    expect($casts->contains(fn ($cast): bool => $cast instanceof ChecklistStateCast))->toBeFalse();
 });
 
 it('prunes a single selection that became disabled', function () {
@@ -217,31 +217,8 @@ it('uses pexels playground photos outside body-type silhouette demos', function 
     }
 });
 
-it('server renders selected state before alpine hydrates', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/image-choice-cards.blade.php');
-    $css = file_get_contents(__DIR__.'/../../resources/css/core/image-choice-cards.css');
-    $js = file_get_contents(__DIR__.'/../../resources/js/components/image-choice-cards.js');
-
-    expect($blade)
-        ->toContain('$currentState = $getState()')
-        ->toContain('$isInitiallySelected')
-        ->toContain("'is-selected' => \$isInitiallySelected")
-        ->toContain('@checked($isInitiallySelected)')
-        ->toContain('loading="eager"')
-        ->toContain('fetchpriority')
-        ->toContain("onload=\"this.classList.add('is-loaded')\"");
-
-    expect($css)
-        ->toContain('.fff-image-choice-cards:not(.is-hydrated)')
-        ->toContain('.fff-image-choice-cards--overlay')
-        ->toContain('backdrop-filter: blur(20px) saturate(1.5)')
-        ->toContain('--fff-image-choice-cards-overlay-fade')
-        ->toContain(':has(> .fff-image-choice-cards__input:checked)')
-        ->toContain('(pointer: coarse)')
-        ->toContain('.fff-image-choice-cards__image.is-loaded');
-
-    expect($js)
-        ->toContain("this.\$root.classList.add('is-hydrated')")
-        ->toContain('syncFromDomIfNeeded')
-        ->toContain('warmNearbyImages');
+it('uses shared server-rendered cards and an instance-owned lazy factory', function () {
+    $shared = file_get_contents(__DIR__.'/../../resources/views/forms/components/choice-cards/field.blade.php');
+    expect($shared)->toContain('data-card-config', '@checked($isInitiallySelected)', 'data-card-option', 'x-ignore', 'x-fff-load')
+        ->not->toContain('x-init', 'x-bind:checked', 'x-on:change');
 });

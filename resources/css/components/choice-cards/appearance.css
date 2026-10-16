@@ -1,0 +1,75 @@
+.fff-choice-cards.fff-choice-cards--stack:is(.fff-choice-cards--indicator-check, .fff-choice-cards--indicator-checkbox) .fff-choice-cards__indicator {
+    top: calc(var(--fff-choice-cards-indicator-inset) - 2px);
+    right: calc(var(--fff-choice-cards-indicator-inset) - 2px);
+    width: var(--fff-choice-cards-indicator-check-size);
+    height: var(--fff-choice-cards-indicator-check-size);
+}
+.fff-choice-cards.fff-choice-cards--indicator-checkbox .fff-selection-indicator {
+    --fff-selection-size: var(--fff-choice-cards-indicator-check-size);
+    animation: none;
+}
+.fff-choice-cards.fff-choice-cards--indicator-checkbox .fff-selection-indicator > svg {
+    width: 100%;
+    height: 100%;
+    transform: scale(.45);
+    color: inherit;
+    transition: opacity .18s ease, transform .32s cubic-bezier(.34,1.56,.64,1);
+}
+.fff-choice-cards.fff-choice-cards--indicator-checkbox .fff-selection-indicator[data-checked="true"] > svg { color: #fff; transform: scale(1); }
+.fff-choice-cards.fff-choice-cards--indicator-checkbox .fff-selection-indicator > svg [stroke] { stroke-width: 3; }
+.fff-choice-cards.fff-choice-cards--stack:is(.fff-choice-cards--indicator-check, .fff-choice-cards--indicator-checkbox):dir(rtl) .fff-choice-cards__indicator {
+    right: auto;
+    left: calc(var(--fff-choice-cards-indicator-inset) - 2px);
+}
+.fff-choice-cards :is(.fff-choice-cards__media-icon, .fff-choice-cards__icon-box) {
+    width: calc(var(--fff-choice-cards-icon-box-size) * 1.15);
+    height: calc(var(--fff-choice-cards-icon-box-size) * 1.15);
+    background: rgb(228 228 231);
+    color: rgb(63 63 70);
+    box-shadow: none;
+}
+.fff-choice-cards .fff-choice-cards__icon {
+    width: calc((var(--fff-choice-cards-icon-size) + .25rem) * 1.15);
+    height: calc((var(--fff-choice-cards-icon-size) + .25rem) * 1.15);
+    color: inherit;
+}
+.fff-choice-cards .fff-choice-cards__icon [stroke] { stroke-width: 2; }
+.fff-choice-cards .fff-choice-cards__content:not(.fff-choice-cards__content--featured),
+.fff-choice-cards .fff-choice-cards__copy:not(.fff-choice-cards__content--media .fff-choice-cards__copy) { gap: 2px; }
+.fff-choice-cards.fff-choice-cards--featured .fff-choice-cards__description { margin-top: 2px; }
+.fff-choice-cards.fff-choice-cards--lg .fff-choice-cards__item {
+    --fff-choice-cards-p: 1.125rem;
+    --fff-choice-cards-indicator-inset: 1.125rem;
+}
+.fff-choice-cards .fff-choice-cards__meta {
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    margin-top: 6px;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    background: rgb(228 228 231 / .65);
+    color: rgb(82 82 91);
+    font-family: inherit;
+    font-size: .75rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+}
+.dark .fff-choice-cards :is(.fff-choice-cards__media-icon, .fff-choice-cards__icon-box) { background: rgb(63 63 70); color: rgb(228 228 231); }
+.dark .fff-choice-cards .fff-choice-cards__meta { background: rgb(63 63 70); color: rgb(212 212 216); }
+/* Both indicator shapes use identical spring timing, without a hydration replay. */
+.fff-choice-cards .fff-choice-cards__item[data-card-motion="selected"] .fff-choice-cards__indicator,
+.fff-choice-cards .fff-choice-cards__item[data-card-motion="cleared"] .fff-choice-cards__indicator {
+    animation: fff-card-indicator-spring .32s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes fff-card-indicator-spring {
+    0% { transform: scale(.88); }
+    55% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+}
+.fff-choice-cards:not(.is-hydrated) .fff-selection-indicator,
+.fff-choice-cards:not(.is-hydrated) .fff-selection-indicator > svg { animation: none; transition: none; }
+@media (prefers-reduced-motion: reduce) {
+    .fff-choice-cards .fff-selection-indicator > svg { transition: none; }
+    .fff-choice-cards .fff-choice-cards__indicator { animation: none !important; }
+}

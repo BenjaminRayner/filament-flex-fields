@@ -7,7 +7,7 @@ use Bjanczak\FilamentFlexFields\Enums\FieldType;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CurrencyField;
 use Bjanczak\FilamentFlexFields\Support\CurrencyCountries;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldFormBuilder;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
+use Bjanczak\FilamentFlexFields\Support\Playground\CurrencyFieldPlayground;
 
 it('exposes currency field configuration api', function () {
     $field = CurrencyField::make('price')
@@ -184,11 +184,10 @@ it('includes wrapper classes for size', function () {
         'fff-currency-field',
         'fff-flex-text-input-field',
         'fff-currency-field--sm',
-        'fff-rounding-md',
         'fff-flex-text-input-field--sm',
-        'fff-rounding-md',
         'fff-currency-field--primary',
         'fff-flex-text-input-field--primary',
+        'fff-rounding-md',
     ]);
 });
 
@@ -221,7 +220,7 @@ it('builds currency field from flex field definition', function () {
 });
 
 it('registers currency field playground variants', function () {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
+    $builder = app(CurrencyFieldPlayground::class);
     $state = $builder->defaultState();
 
     expect($state)->toHaveKeys([

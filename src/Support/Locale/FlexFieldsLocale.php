@@ -45,10 +45,20 @@ final class FlexFieldsLocale
         return $normalized;
     }
 
+    /** Formatting is independent of the languages shipped with the FLEX UI. */
+    public static function formattingLocale(?string $locale = null): string
+    {
+        $locale = $locale === null || trim($locale) === '' ? self::applicationLocale() : $locale;
+
+        $locale = trim($locale ?? 'en');
+
+        return (new LocaleIdentifier($locale === '' ? 'en' : $locale))->php;
+    }
+
     public static function formatMoney(float|string $amount, string $currency, ?string $locale = null): string
     {
         $numericAmount = is_string($amount) ? (float) $amount : $amount;
-        $locale = self::resolve($locale);
+        $locale = self::formattingLocale($locale);
 
         if (class_exists(NumberFormatter::class)) {
             $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
@@ -64,7 +74,7 @@ final class FlexFieldsLocale
 
     public static function formatDate(DateTimeInterface|string $date, ?string $locale = null): string
     {
-        $resolvedLocale = self::resolve($locale);
+        $resolvedLocale = self::formattingLocale($locale);
         $dateTime = self::resolveDateTime($date);
 
         if (extension_loaded('intl')) {

@@ -1,0 +1,57 @@
+---
+title: "Inspect package removal"
+description: "Find graph and stored-schema dependencies before uninstalling an extension."
+---
+
+Removing a package can affect components that reuse its styles, render its fields
+or offer them as optional capabilities. Inspect that graph before uninstalling it:
+
+```shell
+php artisan fff:components:removal acme/rating --json
+```
+
+This command does not remove files, data or Composer packages. It returns a failure
+status when registered external components depend on that package. Its scope is
+the installed definition graph; it does not scan application databases.
+
+Supply your saved schemas to check the impact on persisted configuration too:
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Assets\Diagnostics\ComponentRemovalImpact;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentRegistry;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaDefinition;
+
+$definitions = [
+    new FamilySchemaDefinition(
+        family: 'acme-rating-family',
+        slug: 'product_rating',
+        label: 'Product rating',
+        configurationVersion: 1,
+        valueVersion: 1,
+    ),
+];
+
+$report = app(ComponentRemovalImpact::class)->inspect(
+    app(ComponentRegistry::class),
+    'acme/rating',
+    $definitions,
+);
+
+$dependents = $report['dependentComponents'];
+$affectedSchemas = $report['affectedSchemas'];
+```
+
+Include inactive schemas in that inventory: their saved values may still need the
+package later. Each call accepts up to 256 typed definitions with unique slugs;
+inspect all batches across all relevant records before removal. Reports contain
+schema identities and format versions, not labels, settings or saved values.
+`readyWithinSuppliedScope` describes only the graph and schemas passed to that
+call. Your application remains responsible for complete record inventories,
+explicit migrations, backups and retaining published releases used by existing
+pages. Saved snapshots can be retained without the package using
+`FamilyValueSnapshotCodec`; normal saves must not silently discard them.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

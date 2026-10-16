@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "banners": [
+    {
+      "id": "load-less-reuse-more",
+      "eyebrow": {
+        "en": "FLEX Asset Manager",
+        "pl": "FLEX Asset Manager"
+      },
+      "title": {
+        "en": "Load less. Reuse more.",
+        "pl": "Ładuj mniej. Wykorzystuj więcej."
+      },
+      "description": {
+        "en": "Load assets for active FLEX components. Share dependencies across fields, tabs and modals without managing separate bundles.",
+        "pl": "Ładuj zasoby aktywnych komponentów FLEX. Współdziel zależności pól, zakładek i modali bez zarządzania osobnymi paczkami."
+      },
+      "url": "https://flex-fields.bjanczak.com/docs/asset-loading",
+      "action": {
+        "en": "Explore asset loading",
+        "pl": "Poznaj ładowanie zasobów"
+      }
+    },
+    {
+      "id": "connected-media-workflows",
+      "eyebrow": {
+        "en": "FLEX Media OS",
+        "pl": "FLEX Media OS"
+      },
+      "title": {
+        "en": "More than an upload.",
+        "pl": "Więcej niż upload."
+      },
+      "description": {
+        "en": "Upload, edit and preview files in one connected workflow. Use Laravel disks or keep your existing Spatie Media Library setup.",
+        "pl": "Wgrywaj, edytuj i podglądaj pliki w jednym procesie. Korzystaj z dysków Laravel lub swojej obecnej konfiguracji Spatie Media Library."
+      },
+      "url": "https://flex-fields.bjanczak.com/docs/media-capture-os",
+      "action": {
+        "en": "Discover Media OS",
+        "pl": "Poznaj Media OS"
+      },
+      "theme": "dark"
+    }
+  ],
+  "slider": {
+    "autoplay": true,
+    "interval": 7000,
+    "arrows": true,
+    "dots": true
+  },
+  "sponsors": []
+}

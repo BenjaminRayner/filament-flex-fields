@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
 use Bjanczak\FilamentFlexFields\Enums\DateTimeFieldMode;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\DateTime\ConfiguresDateTimeEvents;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\InteractsWithDateTimeConfiguration;
 use Bjanczak\FilamentFlexFields\Support\DateTime\DateTimeAlpineConfiguration;
 use Bjanczak\FilamentFlexFields\Support\DateTime\DateTimeConstraintResolver;
@@ -17,6 +18,7 @@ use Filament\Forms\Components\Field;
 abstract class FlexDateTimeField extends Field
 {
     use CanBeReadOnly;
+    use ConfiguresDateTimeEvents;
     use HasPlaceholder;
     use InteractsWithDateTimeConfiguration;
 
@@ -47,7 +49,7 @@ abstract class FlexDateTimeField extends Field
                 $normalized = $component->normalizeState($value);
 
                 if ($normalized === null) {
-                    $fail(__('filament-flex-fields::default.date_time.validation.invalid'));
+                    $fail($component->getInvalidTemporalValueMessage());
 
                     return;
                 }
@@ -59,7 +61,22 @@ abstract class FlexDateTimeField extends Field
 
     public function getRequiredValidationRule(): string|Closure
     {
-        return 'nullable';
+        return $this->isRequired() ? 'required' : 'nullable';
+    }
+
+    protected function getInvalidTemporalValueMessage(): string
+    {
+        $message = $this->getSegmentInvalidMessage() ?? __($this->getInvalidTemporalTranslationKey());
+        if (! is_string($message)) {
+            throw new \LogicException('Temporal validation messages must be strings.');
+        }
+
+        return $message;
+    }
+
+    protected function getInvalidTemporalTranslationKey(): string
+    {
+        return 'filament-flex-fields::default.date_time.validation.invalid';
     }
 
     public function normalizeState(mixed $state): string|array|null

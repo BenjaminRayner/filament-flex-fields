@@ -6,7 +6,6 @@ use Bjanczak\FilamentFlexFields\Data\FlexFieldDefinition;
 use Bjanczak\FilamentFlexFields\Enums\FieldType;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ColorSwatchField;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldFormBuilder;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
 use Bjanczak\FilamentFlexFields\Support\Playground\ColorSwatchPlayground;
 use Filament\Support\Icons\Heroicon;
@@ -74,7 +73,7 @@ it('registers color swatch playground variants', function () {
 });
 
 it('merges color swatch playground state into the builder', function () {
-    $state = app(FlexFieldsPlaygroundBuilder::class)->defaultState();
+    $state = app(ColorSwatchPlayground::class)->defaultState();
 
     expect($state)->toHaveKeys([
         'color_swatch__sm',
@@ -133,4 +132,27 @@ it('builds color field type as a color swatch from flex field definition', funct
         ->and($field->getSize())->toBe('sm')
         ->and($field->getSectionLabel())->toBe('Predefined')
         ->and($field->hasTooltips())->toBeTrue();
+});
+
+it('rejects forged values and compound payloads while preserving nullable and required behavior', function (): void {
+    $field = ColorSwatchField::make('accent')->colors(['white' => '#fff', 'black' => '#000']);
+    foreach (['white', 'black', null] as $value) {
+        expect(validator(['accent' => $value], ['accent' => $field->getValidationRules()])->passes())->toBeTrue();
+    }
+    foreach (['#fff', 'unknown', ['white'], ['key' => 'white'], 0, true] as $value) {
+        expect(validator(['accent' => $value], ['accent' => $field->getValidationRules()])->fails())->toBeTrue();
+    }
+    $field->required();
+    expect(validator(['accent' => null], ['accent' => $field->getValidationRules()])->fails())->toBeTrue();
+});
+
+it('rejects CSS declaration injection in both static and evaluated palettes', function (string $color): void {
+    $field = ColorSwatchField::make('accent')->colors(fn (): array => ['bad' => $color]);
+    expect(fn () => $field->getColors())->toThrow(InvalidArgumentException::class);
+})->with(['#fff;position:fixed', '#fff}</style>', "rgb(0 0 0)\n", '', 'url(\\path)']);
+
+it('keeps CSS color formats and deferred palette configuration compatible', function (): void {
+    $colors = ['white' => 'white', 'black' => '#000', 'alpha' => '#12345678', 'rgb' => 'rgb(255 255 255)', 'hsl' => 'hsl(240 100% 50%)', 'theme' => 'var(--brand-color, #f00)'];
+    $field = ColorSwatchField::make('accent')->colors(fn (): array => $colors);
+    expect($field->getColors())->toBe($colors);
 });

@@ -22,6 +22,9 @@ class BarcodeScannerFieldPlayground
             'barcode__continuous' => null,
             'barcode__checksum' => null,
             'barcode__manual_only' => 'SKU-128-TEST',
+            'barcode__structured' => null,
+            'barcode__confirm' => null,
+            'barcode__readonly' => 'WH-READONLY',
         ];
     }
 
@@ -32,7 +35,7 @@ class BarcodeScannerFieldPlayground
     {
         return [
             Section::make('Barcode scanner field')
-                ->description('FlexTextInput shell with camera scan modal, multi-format support, optional checksum validation, torch toggle, and manual entry fallback.')
+                ->description('Shared FLEX text input with a full camera surface, format restrictions, checksum validation and optional manual entry.')
                 ->schema([
                     BarcodeScannerField::make('barcode__default')
                         ->label('Product barcode')
@@ -62,6 +65,24 @@ class BarcodeScannerFieldPlayground
                         ->label('Scan only (manual disabled)')
                         ->allowManualInput(false)
                         ->variant('flat'),
+
+                    BarcodeScannerField::make('barcode__confirm')
+                        ->label('Preview and confirm the scan')
+                        ->confirmScan()
+                        ->helperText('One confirmation sound, a frozen camera frame and Save / Scan again controls.'),
+
+                    BarcodeScannerField::make('barcode__structured')
+                        ->label('QR code with detected format')
+                        ->formats([BarcodeFormat::Qr])
+                        ->storeDetectedFormat()
+                        ->size('sm')
+                        ->rounding('full')
+                        ->helperText('Camera scans keep the detected format; manual input stores format as null.'),
+
+                    BarcodeScannerField::make('barcode__readonly')
+                        ->label('Read-only code')
+                        ->readOnly()
+                        ->size('lg'),
                 ]),
         ];
     }

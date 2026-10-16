@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Icons;
 
-use Illuminate\Support\Facades\Cache;
+use Bjanczak\FilamentFlexFields\Support\Runtime\OptionalSharedCache;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
 
 class IconSvgCache
 {
@@ -16,7 +17,7 @@ class IconSvgCache
     public function rememberMany(array $iconNames, callable $renderMissing): array
     {
         $iconNames = array_values(array_unique(array_filter(
-            array_map(static fn (mixed $icon): string => trim((string) $icon), $iconNames),
+            array_map(static fn (mixed $icon): string => is_string($icon) ? trim($icon) : '', $iconNames),
             static fn (string $icon): bool => $icon !== '',
         )));
 
@@ -32,7 +33,11 @@ class IconSvgCache
             $keyMap[$this->cacheKey($icon)] = $icon;
         }
 
-        $cachedByKey = Cache::many(array_keys($keyMap));
+        $cache = RequestState::resolve(OptionalSharedCache::class);
+        $cachedByKey = [];
+        foreach (array_chunk(array_keys($keyMap), 128) as $keys) {
+            $cachedByKey += $cache->readMany($keys, static fn (mixed $value): bool => is_string($value) && $value !== '' && strlen($value) <= 262144);
+        }
 
         foreach ($keyMap as $cacheKey => $icon) {
             $cached = $cachedByKey[$cacheKey] ?? null;
@@ -50,13 +55,21 @@ class IconSvgCache
             $rendered = $renderMissing($missing);
             $ttl = $this->ttl();
 
+            $writes = [];
+            $requested = array_fill_keys($missing, true);
             foreach ($rendered as $icon => $html) {
-                if (! is_string($html) || $html === '') {
+                if (! isset($requested[$icon]) || ! is_string($html) || $html === '') {
                     continue;
                 }
-
-                Cache::put($this->cacheKey($icon), $html, $ttl);
                 $resolved[$icon] = $html;
+                if (strlen($html) <= 262144) {
+                    $writes[$this->cacheKey($icon)] = $html;
+                }
+            }
+            if ($writes !== []) {
+                foreach (array_chunk($writes, 128, true) as $batch) {
+                    $cache->writeMany($batch, $ttl);
+                }
             }
         }
 
@@ -65,13 +78,13 @@ class IconSvgCache
 
     protected function cacheKey(string $icon): string
     {
-        return 'fff.icon-svg.'.md5(mb_strtolower(trim($icon)));
+        return 'fff.icon-svg.'.IconCatalogFingerprint::namespace().'.'.hash('sha256', trim($icon));
     }
 
-    protected function ttl(): \DateTimeInterface|\DateInterval|int|null
+    protected function ttl(): int
     {
         $days = (int) config('filament-flex-fields.ui.icon_picker_svg_cache_days', 30);
 
-        return now()->addDays(max(1, $days));
+        return min(90, max(1, $days)) * 86400;
     }
 }

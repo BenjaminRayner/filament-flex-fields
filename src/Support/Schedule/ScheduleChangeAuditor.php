@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Schedule;
 
+use Bjanczak\FilamentFlexFields\Support\Translations;
+
 final class ScheduleChangeAuditor
 {
     /**
@@ -34,7 +36,7 @@ final class ScheduleChangeAuditor
                 'type' => 'timezone',
                 'before' => $beforeTimezone,
                 'after' => $afterTimezone,
-                'message' => __('filament-flex-fields::default.schedule.audit.timezone_changed', [
+                'message' => Translations::get('filament-flex-fields::default.schedule.audit.timezone_changed', [
                     'from' => $beforeTimezone ?? '—',
                     'to' => $afterTimezone ?? '—',
                 ]),
@@ -49,7 +51,7 @@ final class ScheduleChangeAuditor
                 continue;
             }
 
-            $dayLabel = __("filament-flex-fields::default.schedule.days.{$day}");
+            $dayLabel = Translations::get("filament-flex-fields::default.schedule.days.{$day}");
             $type = $this->resolveDayChangeType($beforeDay, $afterDay);
 
             $changes[] = [
@@ -58,9 +60,9 @@ final class ScheduleChangeAuditor
                 'before' => $beforeDay,
                 'after' => $afterDay,
                 'message' => match ($type) {
-                    'day_enabled' => __('filament-flex-fields::default.schedule.audit.day_enabled', ['day' => $dayLabel]),
-                    'day_disabled' => __('filament-flex-fields::default.schedule.audit.day_disabled', ['day' => $dayLabel]),
-                    default => __('filament-flex-fields::default.schedule.audit.day_slots_changed', ['day' => $dayLabel]),
+                    'day_enabled' => Translations::get('filament-flex-fields::default.schedule.audit.day_enabled', ['day' => $dayLabel]),
+                    'day_disabled' => Translations::get('filament-flex-fields::default.schedule.audit.day_disabled', ['day' => $dayLabel]),
+                    default => Translations::get('filament-flex-fields::default.schedule.audit.day_slots_changed', ['day' => $dayLabel]),
                 },
             ];
         }

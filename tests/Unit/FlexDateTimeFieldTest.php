@@ -13,8 +13,9 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTimeField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTimeRangeField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexYearPicker;
 use Bjanczak\FilamentFlexFields\Support\DateTime\DateTimeSegmentHydrator;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
+use Bjanczak\FilamentFlexFields\Support\Playground\DateTimeFieldPlayground;
 use Carbon\Carbon;
+use Filament\Schemas\Schema;
 
 it('exposes date field configuration api', function () {
     $field = FlexDateField::make('starts_on')
@@ -137,11 +138,10 @@ it('includes wrapper classes for size and variant', function () {
         'fff-flex-text-input-field',
         'fff-date-time-field--date',
         'fff-date-time-field--sm',
-        'fff-rounding-md',
         'fff-flex-text-input-field--sm',
-        'fff-rounding-md',
         'fff-date-time-field--secondary',
         'fff-flex-text-input-field--secondary',
+        'fff-rounding-md',
     ]);
 });
 
@@ -200,22 +200,30 @@ it('accepts minDate and maxDate as aliases for minValue and maxValue', function 
 });
 
 it('registers date time field playground variants', function () {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
+    $builder = app(DateTimeFieldPlayground::class);
     $state = $builder->defaultState();
 
     expect($state)->toHaveKeys([
-        'date_time__date_field',
-        'date_time__date_picker',
-        'date_time__date_range',
-        'date_time__date_range_day',
-        'date_time__time_field',
-        'date_time__time_field_24h',
-        'date_time__date_time_field',
-        'date_time__picker_validation',
-        'date_time__range_validation',
-        'date_time__picker_format_options',
-        'date_time__range_format_options',
-        'date_time__indian_calendar',
+        'date_time__date',
+        'date_time__range',
+        'date_time__time',
+        'date_time__datetime',
+        'date_time__datetime_seconds',
+        'date_time__appointment',
+        'date_time__month',
+        'date_time__year',
+        'date_time__duration',
+        'date_time__timed_range',
+        'date_time__time_range',
+        'date_time__localized',
+        'date_time__required',
+        'date_time__bounded',
+        'date_time__allowed',
+        'date_time__small',
+        'date_time__secondary',
+        'date_time__flat',
+        'date_time__timezone',
+        'date_time__schedule',
     ]);
 });
 
@@ -268,13 +276,13 @@ it('resolves display and storage formats', function () {
         ->showSeconds();
 
     expect($dateTimeField->getStorageFormat())->toBe('Y-m-d\TH:i:s')
-        ->and($dateTimeField->getDisplayFormat())->toBe('m/d/Y H:i:s');
+        ->and($dateTimeField->getDisplayFormat())->toBe('M j, Y H:i:s');
 
     $hourField = FlexDateTimePicker::make('starts_at')
         ->granularity(DateTimeGranularity::Hour)
         ->hourCycle(12);
 
-    expect($hourField->getDisplayFormat())->toBe('m/d/Y g:i A')
+    expect($hourField->getDisplayFormat())->toBe('M j, Y h:i A')
         ->and($hourField->getStorageFormat())->toBe('Y-m-d\TH:00:00');
 });
 
@@ -379,16 +387,23 @@ it('normalizes duration and month values', function () {
     ]);
 });
 
-it('includes unavailable dates in alpine configuration when callback is set', function () {
+it('resolves callback availability through the bounded server API', function () {
     $field = FlexDatePicker::make('starts_on')
         ->minValue('2026-06-01')
         ->maxValue('2026-06-07')
         ->isDateUnavailable(fn (Carbon $date): bool => $date->isWeekend());
 
     $config = $field->getAlpineConfiguration();
+    Schema::make()->components([$field])->getComponents();
 
     expect($config['hasDateUnavailable'])->toBeTrue()
-        ->and($config['unavailableDates'])->toContain('2026-06-06', '2026-06-07');
+        ->and($config['unavailableDates'])->toBe([])
+        ->and($field->getCivilDateAvailability('2026-06-01', '2026-06-07'))->toBe([
+            'start' => '2026-06-01',
+            'end' => '2026-06-07',
+            'unavailable' => ['2026-06-06', '2026-06-07'],
+            'status' => 'ready',
+        ]);
 });
 
 it('uses locale-aware date segment order in view segments', function () {

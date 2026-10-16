@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\PhoneField;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -227,8 +227,8 @@ class PhoneFieldPlayground
                             PhoneField::make('phone__custom_icon')
                                 ->label('Custom suffix icon')
                                 ->defaultCountry('PL')
-                                ->suffixIcon(GravityIcon::Handset)
-                                ->helperText('Override with any icon set: gravityui-*, heroicon-o-*, ri-*, etc.'),
+                                ->suffixIcon(FlexIcon::Handset)
+                                ->helperText('Override with any icon set: hugeicons-*, heroicon-o-*, ri-*, etc.'),
                         ]),
                     Grid::make(['default' => 1, 'sm' => 2, 'lg' => 3])
                         ->extraAttributes(['class' => 'fff-playground-variants'])
@@ -255,59 +255,6 @@ class PhoneFieldPlayground
                                 ->disabled(),
                         ]),
                 ]),
-            PlaygroundCodeSnippet::make(<<<'PHP'
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\PhoneField;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
-
-// Basic — searchable country picker, E.164 validation
-PhoneField::make('phone')
-    ->label('Phone number')
-    ->defaultCountry('PL')
-    ->required();
-
-// Limited countries + mobile only
-PhoneField::make('phone')
-    ->label('Limited countries')
-    ->countries(['PL', 'US', 'DE', 'GB', 'FR'])
-    ->defaultCountry('PL')
-    ->mobileOnly();
-
-// Browser locale default + sort-first
-PhoneField::make('phone')
-    ->label('Browser locale')
-    ->browserLocaleDefault()
-    ->browserLocaleSortFirst();
-
-// Localized country names
-PhoneField::make('phone')
-    ->countries(['PL', 'US', 'DE'])
-    ->locale('pl');
-
-// Fixed line only / except countries / non-searchable / read-only
-PhoneField::make('phone')->defaultCountry('PL')->fixedLineOnly();
-PhoneField::make('phone')->defaultCountry('PL')->exceptCountries(['RU', 'BY', 'CN']);
-PhoneField::make('phone')->defaultCountry('PL')->searchable(false);
-PhoneField::make('phone')->defaultCountry('PL')->readOnly();
-
-// Opt-in storage / validation (P2)
-PhoneField::make('phone')->defaultCountry('PL')->nationalDigitsOnly();
-PhoneField::make('phone')->defaultCountry('PL')->validateForRegion();
-PhoneField::make('phone')
-    ->defaultCountry('PL')
-    ->includeFormats(['international', 'rfc3966'])
-    ->includeMetadata(['carrier', 'geo', 'timezones', 'type']);
-PhoneField::make('phone')
-    ->defaultCountry('US')
-    ->allowTypes(['VOIP', 'MOBILE']);
-
-// Presentation
-PhoneField::make('phone')->defaultCountry('FR')->internationalPrefix(false);
-PhoneField::make('phone')->defaultCountry('PL')->suffixIcon(GravityIcon::Handset);
-PhoneField::make('phone')->size('sm')->defaultCountry('DE');
-PhoneField::make('phone')->variant('secondary')->defaultCountry('PL');
-PhoneField::make('phone')->variant('soft')->defaultCountry('PL');
-PhoneField::make('phone')->size('lg')->defaultCountry('GB');
-PHP, filename: 'phone-field-usage.php'),
         ];
     }
 }

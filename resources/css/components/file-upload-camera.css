@@ -1,0 +1,44 @@
+/* Shared shell for owner-scoped native camera dialogs in the browser top layer. */
+.fff-camera { position: fixed; width: min(900px,calc(100vw - 48px)); height: min(680px,calc(100dvh - 48px)); max-width: none; max-height: none; margin: auto; padding: 0; border: 0; border-radius: 24px; overflow: hidden; background: #171719; color: #fff; isolation: isolate; container-type: size; }
+.fff-camera::backdrop { background: #10101480; backdrop-filter: blur(12px); }
+.fff-camera__view { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: min(100cqw,calc((100cqh - 160px) * var(--fff-camera-ratio,1.777778))); aspect-ratio: var(--fff-camera-ratio,1.777778); background: #171719; overflow: hidden; }
+.fff-camera__video, .fff-camera__review { display: block; width: 100%; height: 100%; object-fit: cover; }
+.fff-camera__video.is-mirrored { transform: scaleX(-1); }
+.fff-camera__view.has-hardware-zoom { touch-action: none; }
+.fff-camera__close, .fff-camera__control { display: grid; place-items: center; width: 44px; height: 44px; border: 0; padding: 0; border-radius: 50%; color: #fff; background: #29292dbf; backdrop-filter: blur(16px); cursor: pointer; }
+.fff-camera__close { position: absolute; z-index: 3; right: 20px; top: 20px; }
+.fff-camera__close > svg, .fff-camera__control > svg { width: 22px; height: 22px; }
+.fff-camera__control[aria-pressed="true"] { color: #111; background: #ffce32; }
+.fff-camera__settings { position: absolute; z-index: 3; top: 20px; left: 20px; display: flex; gap: 10px; }
+.fff-camera__dock { position: absolute; bottom: max(24px,env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); display: grid; grid-template-columns: 44px 76px 44px; gap: 32px; align-items: center; }
+.fff-camera__shutter { width: 76px; height: 76px; border: 3px solid #fff; border-radius: 50%; padding: 4px; background: transparent; cursor: pointer; }
+.fff-camera__shutter > span { display: block; width: 100%; height: 100%; border-radius: 50%; background: #fff; transition: transform 130ms ease; }
+.fff-camera__shutter:active > span { transform: scale(.9); }
+.fff-camera__grid { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to right,transparent calc(33.333% - .5px),#ffffff60 33.333%,transparent calc(33.333% + .5px),transparent calc(66.666% - .5px),#ffffff60 66.666%,transparent calc(66.666% + .5px)),linear-gradient(to bottom,transparent calc(33.333% - .5px),#ffffff60 33.333%,transparent calc(33.333% + .5px),transparent calc(66.666% - .5px),#ffffff60 66.666%,transparent calc(66.666% + .5px)); }
+.fff-camera__status { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 72px 24px 112px; text-align: center; background: #171719d9; }
+.fff-camera__pill { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; padding: 10px 20px; border: 0; border-radius: 999px; background: #ffffffeb; color: #171719; cursor: pointer; font-size: 14px; font-weight: 550; }
+.fff-camera__pill--primary { background: #ffce32; }
+.fff-camera__review-actions { position: absolute; left: 24px; right: 24px; bottom: max(24px,env(safe-area-inset-bottom)); display: flex; justify-content: space-between; gap: 12px; }
+.fff-camera__spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: fff-camera-spin 700ms linear infinite; }
+.fff-camera__hardware { position: absolute; z-index: 4; top: 76px; left: 20px; width: min(320px,calc(100% - 40px)); max-height: calc(100% - 284px); overflow-y: auto; overscroll-behavior: contain; padding: 16px; border: 1px solid #ffffff20; border-radius: 20px; background: #242428ee; backdrop-filter: blur(20px); box-shadow: 0 8px 32px #0005; }
+.fff-camera__setting { display: flex; flex-direction: column; gap: 8px; padding: 10px 0; color: #fff; font-size: 13px; }
+.fff-camera__setting > span { display: flex; justify-content: space-between; gap: 12px; }
+.fff-camera__setting output { color: #ffce32; font-variant-numeric: tabular-nums; }
+.fff-camera__hardware-error { position: absolute; z-index: 5; top: 80px; left: 50%; transform: translateX(-50%); width: min(440px,calc(100% - 40px)); padding: 12px 16px; border-radius: 14px; color: #fff; background: #9a342de8; font-size: 13px; text-align: center; pointer-events: none; }
+.fff-camera__zoom { position: absolute; bottom: max(116px,calc(env(safe-area-inset-bottom) + 108px)); left: 50%; transform: translateX(-50%); width: min(320px,calc(100% - 40px)); padding: 8px 14px; border-radius: 24px; background: #242428cc; backdrop-filter: blur(16px); }
+.fff-camera__zoom-presets { display: flex; justify-content: center; gap: 12px; }
+.fff-camera__zoom-presets button { min-width: 36px; min-height: 36px; border: 0; border-radius: 50%; color: #fff; background: transparent; font-size: 12px; font-weight: 600; }
+.fff-camera__zoom-presets button[aria-pressed="true"] { color: #ffce32; background: #ffffff15; }
+.fff-camera button:disabled { opacity: .45; cursor: default; }
+.fff-camera button:focus-visible { outline: 2px solid #ffce32; outline-offset: 4px; }
+@keyframes fff-camera-spin { to { transform: rotate(360deg); } }
+@media (max-width: 640px), (pointer: coarse) and (max-width: 1024px) { .fff-camera { width: 100vw; height: 100dvh; border-radius: 0; } .fff-camera__close, .fff-camera__settings { top: max(16px,env(safe-area-inset-top)); } .fff-camera__close { right: 16px; } .fff-camera__settings { left: 16px; } }
+@media (prefers-reduced-motion: reduce) { .fff-camera__shutter > span { transition: none; } }
+
+.fff-camera__setting .fff-select-field { --fff-select-bg: #333338; --fff-select-border: #ffffff25; --fff-select-text: #fff; --fff-select-value-label: #fff; --fff-field-bg: #333338; --fff-field-border: #ffffff25; }
+.fff-camera__setting .fff-flex-slider { --fff-flex-slider-accent: #ffce32; margin-block: 4px; }
+.fff-camera__toggle { width: 40px; height: 24px; padding: 3px; border: 0; border-radius: 99px; background: #ffffff30; }
+.fff-camera__toggle > span { display: block; width: 18px; height: 18px; border-radius: 50%; background: white; transition: transform 160ms ease; }
+.fff-camera__toggle[aria-checked="true"] { background: #ffce32; }
+.fff-camera__toggle[aria-checked="true"] > span { transform: translateX(16px); }
+@media (prefers-reduced-motion: reduce) { .fff-camera__toggle > span { transition: none; } }

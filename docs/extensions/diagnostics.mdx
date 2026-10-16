@@ -1,0 +1,51 @@
+---
+title: "Inspect dependencies"
+description: "Explain registered dependencies, inspect live owners and diagnose missing assets."
+---
+
+```bash
+php artisan fff:assets:doctor
+php artisan fff:assets:explain acme-summary-field
+php artisan fff:assets:explain flex-text-input \
+  --capability=emoji-picker --json
+```
+
+`doctor` checks built bytes and metadata. `explain` reads the registered graph and
+shows why dependencies are required, who owns each stylesheet, the selected
+runtime components and the package's version, ABI and content release. It marks
+lazy package resources separately from eager dependencies. Declared child slots
+are reported without making their JavaScript eager.
+
+This command reports the installation, rather than a particular open browser.
+Use the live asset diagnostics to inspect active instance owners, generations and
+readiness blockers. Neither command submits a form or publishes assets.
+
+For a specific mounted component, pass its element to the browser runtime:
+
+```javascript
+const report = window.FffAssetInjector.explainOwner(componentElement);
+
+console.log(report.status);
+console.log(report.owners);
+console.log(report.factories);
+```
+
+The report describes the nearest component instance. Nested components have their
+own report. Each owner shows whether it is active and retained, its rendered plan
+generation, resource types, reference counts and loaded state. Factories report
+`pending`, `ready` or `failed`. A missing retained resource list does not mean a
+deferred component has no declared dependencies. Inspect the installation graph
+for its declaration. The generation comes from the rendered plan and does not
+identify a factory's private initialization attempt.
+
+Reports hide file URLs, form values and raw identifiers. They are immutable snapshots;
+request another report after a change. Reads do not start uploads, load missing
+assets or acquire consumers. Large component trees return `truncated: true`. An owner with a truncated resource
+list retains its full `retainedResourceCount` and reports `resourcesTruncated: true`.
+Use the runtime for the element's document; elements from another document reject.
+A retired runtime returns `status: 'disposed'` without inspecting the element.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

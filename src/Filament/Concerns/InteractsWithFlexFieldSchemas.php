@@ -34,7 +34,7 @@ trait InteractsWithFlexFieldSchemas
             return $layout[0];
         }
 
-        return Section::make($label ?? __('filament-flex-fields::default.schema.custom_fields_section'))
+        return Section::make(fn () => $label ?? __('filament-flex-fields::default.schema.custom_fields_section'))
             ->schema($layout);
     }
 
@@ -90,7 +90,7 @@ trait InteractsWithFlexFieldSchemas
             return $layout[0];
         }
 
-        return Section::make($label ?? __('filament-flex-fields::default.schema.custom_fields_section'))
+        return Section::make(fn () => $label ?? __('filament-flex-fields::default.schema.custom_fields_section'))
             ->schema($layout);
     }
 

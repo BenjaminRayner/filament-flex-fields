@@ -10,19 +10,18 @@ use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\InteractsWithFlexRichEditorEnhancements;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\InteractsWithFlexRichEditorFileAttachments;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\InteractsWithFlexRichEditorYoutube;
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\FlexRichEditorTool;
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\FlexToolbarButtonGroup;
-use Bjanczak\FilamentFlexFields\Support\RichEditorGravityIcons;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\Actions\AttachFilesAction;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\Actions\NativeActionTranslations;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\Concerns\BuildsRichEditorToolbar;
 use Bjanczak\FilamentFlexFields\Support\Translations;
 use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\RichEditor\RichEditorTool;
-use Filament\Forms\Components\RichEditor\ToolbarButtonGroup;
-use Filament\Support\Icons\Heroicon;
 use InvalidArgumentException;
 
 class FlexRichEditor extends RichEditor
 {
+    use BuildsRichEditorToolbar;
     use HasControlSize;
     use HasFieldFocusOutline;
     use HasFieldRounding;
@@ -47,6 +46,8 @@ class FlexRichEditor extends RichEditor
     {
         parent::setUp();
 
+        $this->configureDefaultRichEditorTranslations();
+
         $this->json();
 
         $this->toolbarButtons($this->getFlexDefaultToolbarButtons());
@@ -58,95 +59,15 @@ class FlexRichEditor extends RichEditor
         $this->registerFlexRichEditorEnhancementHooks();
     }
 
-    /**
-     * @return array<RichEditorTool>
-     */
-    public static function getFlexExtraTools(): array
+    /** @return array<Action> */
+    public function getDefaultActions(): array
     {
-        return [
-            FlexRichEditorTool::make('clearFormatting')
-                ->label(Translations::get('filament-forms::components.rich_editor.tools.clear_formatting'))
-                ->jsHandler('$getEditor()?.chain().focus().clearNodes().unsetAllMarks().run()')
-                ->icon(RichEditorGravityIcons::icon('clear_formatting'))
-                ->iconAlias('filament-flex-fields::flex-rich-editor.toolbar.clear-formatting'),
-            FlexRichEditorTool::make('clearContent')
-                ->label(Translations::get('filament-flex-fields::default.rich_editor.clear_content'))
-                ->jsHandler('$getEditor()?.chain().focus().clearContent().run()')
-                ->icon(RichEditorGravityIcons::icon('clear_content'))
-                ->iconAlias('filament-flex-fields::flex-rich-editor.toolbar.clear-content'),
-        ];
-    }
-
-    /**
-     * @return array<string, RichEditorTool>
-     */
-    public function getTools(): array
-    {
-        $tools = parent::getTools();
-        $flexTools = [];
-
-        foreach ($tools as $name => $tool) {
-            $flexTool = FlexRichEditorTool::fromParentTool($tool);
-
-            $gravityIcon = RichEditorGravityIcons::iconForToolName($name);
-
-            if (is_string($gravityIcon) && $gravityIcon !== '') {
-                $flexTool->icon($gravityIcon);
-            }
-
-            $flexTools[$name] = $flexTool->editor($this);
-        }
-
-        if ($this->shouldEnableRichEditorFullscreen()) {
-            $flexTools['flexFullscreen'] = FlexRichEditorTool::make('flexFullscreen')
-                ->label(Translations::get('filament-flex-fields::default.rich_editor.fullscreen.toggle'))
-                ->jsHandler('toggleRichEditorFullscreen()')
-                ->icon(RichEditorGravityIcons::icon('fullscreen'))
-                ->iconAlias('filament-flex-fields::flex-rich-editor.toolbar.fullscreen')
-                ->activeJsExpression('isRichEditorFullscreen')
-                ->editor($this);
-        }
-
-        return $flexTools;
-    }
-
-    /**
-     * @return array<int, string|array<int, string|ToolbarButtonGroup>>
-     */
-    public function getToolbarButtons(): array
-    {
-        $groups = parent::getToolbarButtons();
-
-        if ($this->shouldEnableRichEditorFullscreen()) {
-            $groups = $this->appendRichEditorFullscreenButton($groups);
-        }
-
-        return $this->filterDisabledRichEditorToolbarButtons($groups);
-    }
-
-    /**
-     * @param  array<int, string|array<int, string|ToolbarButtonGroup>>  $groups
-     * @return array<int, string|array<int, string|ToolbarButtonGroup>>
-     */
-    protected function appendRichEditorFullscreenButton(array $groups): array
-    {
-        $lastIndex = array_key_last($groups);
-
-        if ($lastIndex === null) {
-            return [['flexFullscreen']];
-        }
-
-        $lastGroup = $groups[$lastIndex];
-
-        if (is_array($lastGroup)) {
-            $groups[$lastIndex] = [...$lastGroup, 'flexFullscreen'];
-
-            return $groups;
-        }
-
-        $groups[] = ['flexFullscreen'];
-
-        return $groups;
+        return array_map(
+            fn (Action $action): Action => $action->getName() === 'attachFiles'
+                ? AttachFilesAction::make()
+                : NativeActionTranslations::apply($action),
+            parent::getDefaultActions(),
+        );
     }
 
     /**
@@ -220,131 +141,6 @@ class FlexRichEditor extends RichEditor
     public function getDistractionFreeHiddenToolsForJs(): array
     {
         return $this->getDistractionFreeHiddenTools();
-    }
-
-    /**
-     * @return array<RichEditorTool>
-     */
-    public static function getNativeExtraTools(): array
-    {
-        return [
-            RichEditorTool::make('clearContent')
-                ->label(Translations::get('filament-flex-fields::default.rich_editor.clear_content'))
-                ->jsHandler('$getEditor()?.chain().focus().clearContent().run()')
-                ->icon(Heroicon::Trash),
-        ];
-    }
-
-    /**
-     * @return array<int, string|array<int, string|ToolbarButtonGroup>>
-     */
-    public function getNativeComparisonToolbarButtons(): array
-    {
-        return [
-            ['undo', 'redo'],
-            ['bold', 'italic', 'underline', 'strike', 'code'],
-            [
-                ToolbarButtonGroup::make(
-                    Translations::get('filament-flex-fields::default.rich_editor.toolbar_groups.heading'),
-                    ['h1', 'h2', 'h3'],
-                ),
-            ],
-            [
-                ToolbarButtonGroup::make(
-                    Translations::get('filament-flex-fields::default.rich_editor.toolbar_groups.alignment'),
-                    ['alignStart', 'alignCenter', 'alignEnd', 'alignJustify'],
-                ),
-            ],
-            ['blockquote', 'codeBlock'],
-            [
-                ToolbarButtonGroup::make(
-                    Translations::get('filament-flex-fields::default.rich_editor.toolbar_groups.lists'),
-                    ['bulletList', 'orderedList'],
-                ),
-            ],
-            ['link', 'attachFiles'],
-            ['clearFormatting', 'clearContent'],
-        ];
-    }
-
-    /**
-     * @return array<int, string|array<int, string|FlexToolbarButtonGroup>>
-     */
-    public function getFlexDefaultToolbarButtons(): array
-    {
-        return [
-            ['undo', 'redo'],
-            ['bold', 'italic', 'underline', 'strike', 'code'],
-            [
-                FlexToolbarButtonGroup::make(
-                    Translations::get('filament-flex-fields::default.rich_editor.toolbar_groups.heading'),
-                    ['h1', 'h2', 'h3'],
-                ),
-            ],
-            [
-                FlexToolbarButtonGroup::make(
-                    Translations::get('filament-flex-fields::default.rich_editor.toolbar_groups.alignment'),
-                    ['alignStart', 'alignCenter', 'alignEnd', 'alignJustify'],
-                ),
-            ],
-            ['blockquote', 'codeBlock'],
-            [
-                FlexToolbarButtonGroup::make(
-                    Translations::get('filament-flex-fields::default.rich_editor.toolbar_groups.lists'),
-                    ['bulletList', 'orderedList'],
-                ),
-            ],
-            ['link'],
-            ['clearFormatting', 'clearContent'],
-        ];
-    }
-
-    /**
-     * @return array<int, string|array<int, string|FlexToolbarButtonGroup>>
-     */
-    public function getFlexFullToolbarButtons(): array
-    {
-        return [
-            ['undo', 'redo'],
-            ['bold', 'italic', 'underline', 'strike', 'code'],
-            [
-                FlexToolbarButtonGroup::make(
-                    Translations::get('filament-flex-fields::default.rich_editor.toolbar_groups.heading'),
-                    ['h1', 'h2', 'h3'],
-                ),
-            ],
-            [
-                FlexToolbarButtonGroup::make(
-                    Translations::get('filament-flex-fields::default.rich_editor.toolbar_groups.alignment'),
-                    ['alignStart', 'alignCenter', 'alignEnd', 'alignJustify'],
-                ),
-            ],
-            ['blockquote', 'codeBlock'],
-            [
-                FlexToolbarButtonGroup::make(
-                    Translations::get('filament-flex-fields::default.rich_editor.toolbar_groups.lists'),
-                    ['bulletList', 'orderedList'],
-                ),
-            ],
-            ['link', 'attachFiles'],
-            ['clearFormatting', 'clearContent'],
-        ];
-    }
-
-    /**
-     * @return array<string, list<string>>
-     */
-    public function getFlexDefaultFloatingToolbars(): array
-    {
-        return [
-            'paragraph' => [
-                'bold',
-                'italic',
-                'underline',
-                'strike',
-                'link',
-            ],
-        ];
     }
 
     public function getJsonBadgeLabel(): string

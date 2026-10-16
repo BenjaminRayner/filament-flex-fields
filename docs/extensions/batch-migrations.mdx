@@ -1,0 +1,32 @@
+---
+title: "Migrate related fields together"
+description: "Validate a related batch against real state paths while keeping persistence application-owned."
+---
+
+```php
+$results = app(FamilySchemaMigration::class)->prepareMany(
+    snapshots: $storedSnapshots,
+    context: $context,
+    authorizeMigration: fn ($field, $context): bool =>
+        $fieldPolicy->canMigrate($actor, $record, $field->family),
+);
+```
+
+The batch accepts at most 256 snapshots and an aggregate 8 MiB input/result value
+budget. It rejects duplicate state paths. All metadata, migration support,
+authorization and rule declarations are checked before value converters run.
+Target rules validate the complete converted payload on its actual field paths,
+so dependent rules can compare fields in the same batch. The method returns all
+results only after successful validation; it never returns a partial successful
+batch. The application still owns the atomic database transaction.
+
+For a rollback, reinstall the compatible older package and explicitly migrate
+the newer snapshot using a declared reverse conversion. Alternatively, validate
+and restore the retained `before` snapshot under the older installed contract.
+Unrecognized newer versions are never relabeled as older versions automatically.
+Keep a record revision check when restoring history to avoid overwriting later edits.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

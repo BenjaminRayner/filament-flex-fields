@@ -1,0 +1,36 @@
+---
+title: "Locales and RTL"
+description: "Choose formatting locale and translation fallback while preserving script-aware direction."
+---
+
+Formatting accepts bounded language/script/region/variant locale IDs with RFC5646
+extension groups and private-use tails attached to a language. Both separators
+are accepted; browser tags use hyphens and PHP IDs use underscores:
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Locale\LocaleContext;
+
+$locale = new LocaleContext(
+    locale: 'en-US-u-ca-buddhist-nu-thai',
+    translationLocales: ['en', 'en_US', 'pl'],
+    fallback: 'en',
+);
+
+$locale->formatting->tag; // en-US-u-ca-buddhist-nu-thai
+$locale->translationChain; // ['en_US', 'en']
+```
+
+A missing exact translation drops the complete extension block before trying
+region/script/variant parents. No dangling `en_US_u` or partial extension becomes
+a translation candidate. Explicit scripts determine direction (`ar-Latn` is LTR).
+`FamilyRenderContext` uses the same locale admission as ordinary formatting.
+Duplicate extension singletons, empty extension values, malformed variants and
+oversized IDs reject. The syntax contract does not bundle the IANA/Unicode
+registries or claim every calendar/numbering option exists in the installed ICU
+or browser. Grandfathered tags, extlang forms and private-use-only locale IDs
+remain unsupported. See [RFC5646](https://www.rfc-editor.org/rfc/rfc5646.html).
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

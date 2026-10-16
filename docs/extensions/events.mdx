@@ -1,0 +1,87 @@
+---
+title: "Custom lifecycle events"
+description: "Declare validated notifications and synchronous guards for your extension."
+---
+
+Import the public API through your package's configured SDK build adapter:
+
+```javascript
+import {
+    createLifecycleEvents,
+    createResourceScope,
+} from '@bjanczak/flex-fields/sdk/v1';
+
+const effects = createResourceScope();
+const events = createLifecycleEvents({
+    signal: effects.signal,
+    events: {
+        'acme.photo:changed': {
+            kind: 'notification',
+            validate: value => typeof value.id === 'string',
+        },
+        'acme.photo:before-save': {
+            kind: 'guard',
+            validate: value => typeof value.id === 'string',
+        },
+    },
+    onError: ({ name, reason }) => reportComponentError(name, reason),
+});
+
+const unsubscribe = events.subscribe('acme.photo:changed', ({ id }) => {
+    refreshPreview(id);
+});
+
+const removeGuard = events.subscribe('acme.photo:before-save', ({ id }) => {
+    return isAllowedToSave(id); // Synchronous boolean.
+});
+
+if (events.allow('acme.photo:before-save', { id: photoId })) {
+    savePhoto(photoId);
+    events.notify('acme.photo:changed', { id: photoId });
+}
+
+// Invoke when the rendered component is destroyed.
+effects.dispose();
+```
+
+Notifications can return promises; they do not delay other subscribers or asset
+readiness. A guard returns `true` to allow or `false` to prevent your operation.
+Exceptions, asynchronous guards and invalid decisions prevent it. Validators
+must return synchronous booleans and should check all expected payload keys,
+lengths and nested types. Payloads are shallow copied and frozen before validation;
+the validator and subscribers receive the same snapshot. Event declarations and
+payloads reject accessor properties, symbols and non-enumerable properties without
+executing their getters. Use plain objects with enumerable data properties. Retain immutable
+nested values. Subscribe with `{ signal: anotherOwner.signal }` to cancel just
+that registration. Every subscription also has its own idempotent unsubscribe
+function. Repeated callbacks registered by different owners remain independent.
+Callbacks added during delivery run on the next delivery. Recursive delivery of
+the same event is rejected. Error reports contain the event name and a reason,
+without submitted values or exceptions from your callback.
+
+These browser callbacks do not invoke PHP automatically and do not authorize a
+server write. Keep server validation and authorization on the application's save
+path. Your component decides when to call `allow()` and `notify()`.
+
+Use owned effects instead of retaining timers or observers after removal:
+
+```javascript
+const cancelRefresh = effects.timeout(refreshPreview, 200);
+const cancelFrame = effects.frame(renderPreview);
+const cancelPoll = effects.interval(refreshStatus, 5_000);
+const disconnect = effects.trackObserver(observer);
+const terminate = effects.trackWorker(worker);
+```
+
+Each method returns a release function. Completed one-shot effects release their
+bookkeeping. You can also pass `{ signal: parentSignal }` to
+`createResourceScope()`; aborting the parent disposes the scope. Use
+`effects.signal` with cancellable asynchronous APIs and check `effects.disposed`
+before publishing an async result. Disposal cannot interrupt code that is already
+running. Shared workers or observers need a separate shared owner; tracking a
+resource here ends that supplied resource when this component closes.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

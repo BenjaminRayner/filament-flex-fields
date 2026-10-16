@@ -1,0 +1,109 @@
+---
+title: "Definition and registration reference"
+description: "Every ComponentDefinition and ComponentRegistration parameter, component kind and registration choice."
+---
+
+`ComponentDefinition` declares structural metadata. Values for a particular record,
+user or tenant belong to a rendered instance rather than the registration.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+
+$definition = new ComponentDefinition(
+    id: 'acme-summary-field',
+    kind: ComponentKind::Field,
+    stylesFrom: ['acme-summary-display'],
+    entry: 'acme-summary-field',
+);
+```
+
+## ComponentDefinition
+
+| Parameter | Default | Meaning and accepted value |
+| --- | --- | --- |
+| `id` | Required | Unique lowercase kebab-case identity, up to 96 characters. Use your package prefix. |
+| `kind` | Required | A `ComponentKind` case matching the surface you register. |
+| `styles` | `[]` | Stylesheet identities owned by this definition. Supply their built files through registration or the manifest. |
+| `stylesFrom` | `[]` | Component identities supplying shared CSS. Does not load those components' JS. |
+| `uses` | `[]` | Components required for complete runtime composition, including styles and runtime entries. Does not render HTML by itself. |
+| `entry` | `null` | Logical manifest/module entry identity. `null` means this definition has no JS entry. |
+| `capabilities` | `[]` | Map of optional feature name to dependency identities. Select features on each rendered instance. |
+| `ssrScripts` | `[]` | Registered classic-script helper identities for server-rendered first-paint preparation. Keep helpers small and tied to declared use. |
+| `publications` | `[]` | Typed `PublishedResource` directories for the compatibility publication path. |
+| `catalog` | `null` | Optional `ComponentPresentation` for discovery. See [catalog metadata](/docs/extensions/catalog). |
+| `surface` | `null` | `ComponentSurface` connecting this definition to a typed family and PHP renderer. Its kind and identity must match. |
+| `children` | `[]` | Map of slot name to typed `ChildSlot`. Rendering a child remains explicit and independently owned. |
+| `routes` | `[]` | Up to 32 typed `ComponentRoute` controller endpoints; see [Component routes](/docs/extensions/routes). |
+| `childContract` | `null` | Reusable `ChildComponentContract` owned by this component, so parents reference its configuration rather than copying it. |
+
+Dependency lists contain at most 128 unique identities each; capability maps and
+child maps contain at most 128 entries each. Duplicate identities, unknown graph
+dependencies, cycles and competing stylesheet owners reject. All optional edges
+participate in graph validation, but are not thereby made eager.
+
+### ComponentKind
+
+| Case | Value | Surface |
+| --- | --- | --- |
+| `Field` | `field` | `Filament\Forms\Components\Field` subclass |
+| `Column` | `column` | `Filament\Tables\Columns\Column` subclass |
+| `Entry` | `entry` | `Filament\Infolists\Components\Entry` subclass |
+| `Display` | `display` | Schema `Component` subclass, excluding field and entry classes |
+| `Action` | `action` | `Filament\Actions\Action` subclass |
+| `Primitive` | `primitive` | Shared asset owner; no family renderer or interactive child composition |
+
+## ComponentRegistration
+
+Use the class from `Bjanczak\FilamentFlexFields\Support\Components`.
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `definition` | Required | Your typed definition. |
+| `styles` | `[]` | Map of owned stylesheet identity to a local built CSS file. |
+| `entryPath` | `null` | Local built JavaScript for a compatibility entry. |
+| `assetPackage` | `null` | Portable manifest plus installed source root for a complete asset package. |
+| `metadata` | `null` | Optional `RegistrationMetadata` for origin and deprecation diagnostics. |
+
+Do not register the same local file again under another owner. With a manifest-backed
+package, use its declared roots instead of maintaining a second path map.
+
+## ComponentRegistrar
+
+Register in your service provider's `boot(ComponentRegistrar $components)`.
+
+| Method | Inputs | When to use it |
+| --- | --- | --- |
+| `register()` | Definition, optional styles, entry path, asset package and metadata | A simple immediate registration whose dependencies are already available. |
+| `registerFamily()` | List of `ComponentRegistration` | Atomically validate related definitions with immediate dependency availability. |
+| `collectFamily()` | List of `ComponentRegistration` | Collect provider-order-independent registrations before boot completes. |
+| `collectPackage()` | `AssetPackage`, definitions, metadata keyed by definition ID | Collect a complete manifest package without semantic family surfaces. |
+| `collectComponentFamily()` | `ComponentFamily`, definitions, metadata map | Recommended for a typed family with form/table/infolist surfaces. Include every declared surface. |
+| `selectPackage()` | `ComponentPackageSelection` | Application decision between complete alternative packages before the collection barrier. |
+| `appliedPackageSelections()` | None | Read the applied structural selection report. |
+
+Collection calls admit 1–128 definitions per call. The graph is frozen after providers
+boot; registration during rendering, a queue job or a later request is not supported.
+The application bootstrap completes collection; an extension should not force that
+barrier inside its own provider.
+
+## PublishedResource
+
+| Parameter | Meaning |
+| --- | --- |
+| `id` | Bounded unique resource identity. |
+| `sourceDirectory` | Installed directory containing the resource; use an absolute package-local path for an external extension. |
+| `publicDirectory` | Safe relative directory under `filament-flex-fields-assets/` or `js/janczakb/filament-flex-fields/`. No traversal segments. |
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\PublishedResource;
+
+$resource = new PublishedResource(
+    id: 'acme-summary-images',
+    sourceDirectory: __DIR__.'/../resources/images',
+    publicDirectory: 'filament-flex-fields-assets/acme-summary/images',
+);
+```
+
+Use the [manifest build](/docs/extensions/build) for workers, fonts and resources that
+need dependency capture, immutable releases and rollback.

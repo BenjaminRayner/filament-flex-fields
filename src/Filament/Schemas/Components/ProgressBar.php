@@ -8,8 +8,10 @@ use BackedEnum;
 use Bjanczak\FilamentFlexFields\Concerns\AnimatesProgressFill;
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasProgressAccentColor;
+use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\Concerns\Progress\ConfiguresProgressBar;
+use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\Concerns\Progress\HasProgressValue;
+use Bjanczak\FilamentFlexFields\Support\Progress\ProgressValue;
 use Bjanczak\FilamentFlexFields\Support\ProgressColor;
-use Closure;
 use Filament\Schemas\Components\Component;
 use Illuminate\Contracts\Support\Htmlable;
 use InvalidArgumentException;
@@ -17,57 +19,12 @@ use InvalidArgumentException;
 class ProgressBar extends Component
 {
     use AnimatesProgressFill;
+    use ConfiguresProgressBar;
     use HasControlSize;
     use HasProgressAccentColor;
+    use HasProgressValue;
 
     protected string $view = 'filament-flex-fields::schemas.components.progress-bar';
-
-    protected float|int|Closure|null $value = null;
-
-    protected float|int|Closure $max = 100;
-
-    protected string|Closure|null $label = null;
-
-    protected string|Closure|null $displayValue = null;
-
-    protected bool|Closure $shouldShowValue = true;
-
-    protected bool|Closure $isIndeterminate = false;
-
-    /**
-     * @var array<int, array<string, mixed>>|Closure|null
-     */
-    protected array|Closure|null $segments = null;
-
-    protected int|Closure|null $activeSegment = null;
-
-    protected string|BackedEnum|Htmlable|Closure|null $startMarker = null;
-
-    protected string|BackedEnum|Htmlable|Closure|null $endMarker = null;
-
-    protected string|BackedEnum|Htmlable|Closure|null $currentMarker = null;
-
-    protected float|Closure $activeSegmentProgress = 0.62;
-
-    protected bool|Closure|null $shouldShowSegmentThumb = null;
-
-    protected string|Closure $remainingTrackStyle = 'solid';
-
-    protected string|Closure $variant = 'track';
-
-    protected int|Closure|null $pillCount = null;
-
-    protected string|Closure|null $gradientFrom = null;
-
-    protected string|Closure|null $gradientTo = null;
-
-    protected bool|Closure $hasShell = false;
-
-    protected string|Closure|null $description = null;
-
-    protected string|Closure|null $footer = null;
-
-    protected bool|Closure $shouldShowValueBadge = false;
 
     public static function make(): static
     {
@@ -83,218 +40,6 @@ class ProgressBar extends Component
 
         $this->gap(false);
         $this->columns(1);
-    }
-
-    public function value(float|int|Closure|null $value): static
-    {
-        $this->value = $value;
-
-        return $this;
-    }
-
-    public function max(float|int|Closure $max): static
-    {
-        $this->max = $max;
-
-        return $this;
-    }
-
-    public function label(string|Closure|null $label): static
-    {
-        $this->label = $label;
-
-        return $this;
-    }
-
-    public function displayValue(string|Closure|null $value): static
-    {
-        $this->displayValue = $value;
-
-        return $this;
-    }
-
-    public function showValue(bool|Closure $condition = true): static
-    {
-        $this->shouldShowValue = $condition;
-
-        return $this;
-    }
-
-    public function indeterminate(bool|Closure $condition = true): static
-    {
-        $this->isIndeterminate = $condition;
-
-        return $this;
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>|Closure|null  $segments
-     */
-    public function segments(array|Closure|null $segments): static
-    {
-        $this->segments = $segments;
-
-        return $this;
-    }
-
-    public function activeSegment(int|Closure|null $index): static
-    {
-        $this->activeSegment = $index;
-
-        return $this;
-    }
-
-    public function startMarker(string|BackedEnum|Htmlable|Closure|null $icon): static
-    {
-        $this->startMarker = $icon;
-
-        return $this;
-    }
-
-    public function endMarker(string|BackedEnum|Htmlable|Closure|null $icon): static
-    {
-        $this->endMarker = $icon;
-
-        return $this;
-    }
-
-    public function currentMarker(string|BackedEnum|Htmlable|Closure|null $icon): static
-    {
-        $this->currentMarker = $icon;
-
-        return $this;
-    }
-
-    public function activeSegmentProgress(float|Closure $progress): static
-    {
-        $this->activeSegmentProgress = $progress;
-
-        return $this;
-    }
-
-    public function segmentThumb(bool|Closure $condition = true): static
-    {
-        $this->shouldShowSegmentThumb = $condition;
-
-        return $this;
-    }
-
-    public function remainingTrackStyle(string|Closure $style): static
-    {
-        $this->remainingTrackStyle = $style;
-
-        return $this;
-    }
-
-    public function variant(string|Closure $variant): static
-    {
-        $this->variant = $variant;
-
-        return $this;
-    }
-
-    public function pillCount(int|Closure $count): static
-    {
-        $this->pillCount = $count;
-
-        return $this;
-    }
-
-    public function gradientFrom(string|Closure|null $color): static
-    {
-        $this->gradientFrom = $color;
-
-        return $this;
-    }
-
-    public function gradientTo(string|Closure|null $color): static
-    {
-        $this->gradientTo = $color;
-
-        return $this;
-    }
-
-    public function shell(bool|Closure $condition = true): static
-    {
-        $this->hasShell = $condition;
-
-        return $this;
-    }
-
-    public function description(string|Closure|null $description): static
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function footer(string|Closure|null $footer): static
-    {
-        $this->footer = $footer;
-
-        return $this;
-    }
-
-    public function valueBadge(bool|Closure $condition = true): static
-    {
-        $this->shouldShowValueBadge = $condition;
-
-        return $this;
-    }
-
-    public function getValue(): float
-    {
-        $value = $this->evaluate($this->value);
-
-        if ($value === null) {
-            return 0.0;
-        }
-
-        return (float) $value;
-    }
-
-    public function getMax(): float
-    {
-        $max = (float) $this->evaluate($this->max);
-
-        if ($max <= 0) {
-            throw new InvalidArgumentException('Progress bar max must be greater than 0.');
-        }
-
-        return $max;
-    }
-
-    public function getLabel(): ?string
-    {
-        $label = $this->evaluate($this->label);
-
-        return filled($label) ? (string) $label : null;
-    }
-
-    public function getDisplayValue(): ?string
-    {
-        $value = $this->evaluate($this->displayValue);
-
-        if (filled($value)) {
-            return (string) $value;
-        }
-
-        return null;
-    }
-
-    public function shouldShowValue(): bool
-    {
-        return (bool) $this->evaluate($this->shouldShowValue);
-    }
-
-    public function getColor(): string
-    {
-        return $this->getResolvedColor();
-    }
-
-    public function isIndeterminate(): bool
-    {
-        return (bool) $this->evaluate($this->isIndeterminate);
     }
 
     public function hasSegments(): bool
@@ -343,13 +88,21 @@ class ProgressBar extends Component
             }
 
             if (! is_array($segment)) {
-                continue;
+                throw new InvalidArgumentException('Each progress segment must be a string or configuration array.');
+            }
+            foreach (['label', 'description'] as $textKey) {
+                if (isset($segment[$textKey]) && ! is_string($segment[$textKey])) {
+                    throw new InvalidArgumentException('Progress segment text must be a string.');
+                }
+            }
+            if (isset($segment['icon']) && ! is_string($segment['icon']) && ! $segment['icon'] instanceof BackedEnum && ! $segment['icon'] instanceof Htmlable) {
+                throw new InvalidArgumentException('Progress segment icon must be an icon name, enum or Htmlable.');
             }
 
             $state = $segment['state'] ?? $this->resolveSegmentState($index, $activeIndex);
 
             if (! in_array($state, ['complete', 'active', 'pending'], true)) {
-                throw new InvalidArgumentException("Progress bar segment state [{$state}] is not supported.");
+                throw new InvalidArgumentException('Progress segment state must be complete, active or pending.');
             }
 
             $normalized[] = [
@@ -405,12 +158,7 @@ class ProgressBar extends Component
             return 0.0;
         }
 
-        return max(0.0, min(1.0, $this->getValue() / $this->getMax()));
-    }
-
-    public function getPercentage(): int
-    {
-        return (int) round($this->getProgressRatio() * 100);
+        return $this->getProgressValue()->ratio;
     }
 
     public function getFormattedValue(): string
@@ -523,7 +271,7 @@ class ProgressBar extends Component
 
         $activePillCount = $this->getActivePillCount();
 
-        if ($index >= $activePillCount) {
+        if ($index < 0 || $index >= $activePillCount) {
             return null;
         }
 
@@ -622,7 +370,7 @@ class ProgressBar extends Component
 
     public function getActiveSegmentProgress(): float
     {
-        $progress = (float) $this->evaluate($this->activeSegmentProgress);
+        $progress = $this->finiteProgressNumber($this->evaluate($this->activeSegmentProgress));
 
         return max(0.0, min(1.0, $progress));
     }
@@ -682,5 +430,45 @@ class ProgressBar extends Component
     public function getSegmentThumbPosition(): float
     {
         return $this->getSegmentFillPercentage();
+    }
+
+    /** @return array<string, mixed> */
+    public function getPresentation(): array
+    {
+        $progress = $this->getProgressValue();
+        $indeterminate = $this->isIndeterminate();
+        $segments = $this->getNormalizedSegments();
+        $activeProgress = $this->getActiveSegmentProgress();
+        $fills = array_map(static fn (array $segment): float => match ($segment['state']) {
+            'complete' => 100.0, 'active' => $activeProgress * 100.0, default => 0.0,
+        }, $segments);
+        $hasLabels = false;
+        $hasIcons = false;
+        foreach ($segments as $segment) {
+            $hasLabels = $hasLabels || filled($segment['label']) || filled($segment['description']) || filled($segment['icon']);
+            $hasIcons = $hasIcons || filled($segment['icon']);
+        }
+        if ($segments !== []) {
+            $progress = new ProgressValue($progress->max * array_sum($fills) / count($segments) / 100.0, $progress->max);
+        }
+        $pills = $segments === [] && $this->getVariant() === 'pills';
+        $count = $pills ? $this->getPillCount() : null;
+        $label = $this->getLabel();
+        $showValue = $this->shouldShowValue() && ! $indeterminate;
+
+        return [
+            'progress' => $progress, 'percentage' => $indeterminate ? 0 : $progress->percentage,
+            'value' => $this->getDisplayValue() ?? $progress->percentage.'%',
+            'label' => $label, 'size' => $this->getSize(), 'showValue' => $showValue,
+            'description' => $this->getDescription(), 'footer' => $this->getFooter(),
+            'shell' => $this->hasShell(), 'indeterminate' => $indeterminate,
+            'segments' => $segments, 'fills' => $fills, 'hasLabels' => $hasLabels, 'hasIcons' => $hasIcons,
+            'segmentThumb' => $this->shouldShowSegmentThumb(), 'pills' => $pills, 'pillCount' => $count,
+            'activePills' => $count === null || $indeterminate ? 0 : (int) round($count * $progress->ratio),
+            'gradientFrom' => $this->getGradientFrom(), 'gradientTo' => $this->getGradientTo(),
+            'badge' => $this->shouldShowValueBadge(),
+            'startMarker' => $this->getStartMarker(), 'endMarker' => $this->getEndMarker(), 'currentMarker' => $this->getCurrentMarker(),
+            'dashed' => ! $pills && $segments === [] && $this->getRemainingTrackStyle() === 'dashed',
+        ];
     }
 }

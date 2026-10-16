@@ -47,7 +47,7 @@
     overflow: hidden;
 }
 
-/* Hard-hide while scroll pins; single fade-in once settled (no multi-flash). */
+/* SSR cells are adopted and positioned before the owning factory resolves. */
 .fff-bubble-choice__scrollable {
     position: absolute;
     top: 0;
@@ -63,16 +63,18 @@
     overscroll-behavior: contain;
     overflow-anchor: none;
     scroll-behavior: auto;
+    visibility: hidden;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease;
+    direction: ltr;
 }
 
 .fff-bubble-choice:not(.is-scroll-settled) .fff-bubble-choice__scrollable {
     transition: none;
 }
 
-.fff-bubble-choice.is-scroll-settled .fff-bubble-choice__scrollable {
+.fff-bubble-choice.is-scroll-settled.is-revealed .fff-bubble-choice__scrollable {
+    visibility: visible;
     opacity: 1;
     pointer-events: auto;
 }
@@ -247,7 +249,6 @@
 
 .fff-bubble-choice__bubble.is-selected {
     z-index: 2;
-    will-change: transform;
     background-color: var(--fff-bubble-choice-selected-color, var(--fff-bubble-choice-selected));
     color: var(--fff-bubble-choice-selected-text-resolved, var(--fff-bubble-choice-selected-text));
     /* Clip morph is owned by Alpine (avoids CSS scallop snap → JS circle restart flash). */
@@ -365,4 +366,25 @@
 .dark .fff-bubble-choice-field--solid .fff-bubble-choice {
     --fff-bubble-choice-idle: var(--primary-500, #3b82f6);
     --fff-bubble-choice-selected: var(--primary-200, #bfdbfe);
+}
+
+.fff-bubble-choice__bubble:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 4px var(--primary-500, #6366f1);
+}
+
+.fff-bubble-choice-field--outline .fff-bubble-choice__bubble:not(.has-image-bg) {
+    background-color: transparent;
+    box-shadow: inset 0 0 0 2px var(--fff-bubble-choice-color, var(--fff-bubble-choice-idle));
+    color: var(--fff-bubble-choice-color, var(--fff-bubble-choice-idle));
+}
+
+.fff-bubble-choice-field--outline .fff-bubble-choice__bubble.is-selected:not(.has-image-bg) {
+    background-color: var(--fff-bubble-choice-selected-color, var(--fff-bubble-choice-selected));
+    color: var(--fff-bubble-choice-selected-text-resolved, var(--fff-bubble-choice-selected-text));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fff-bubble-choice__bubble, .fff-bubble-choice__bubble::before,
+    .fff-bubble-choice__inner, .fff-bubble-choice__mask { transition: none; }
 }

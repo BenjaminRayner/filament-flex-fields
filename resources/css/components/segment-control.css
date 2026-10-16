@@ -1,3 +1,11 @@
+/* The Alpine owner is a constrained grid child, never a max-content wrapper. */
+.fff-segment-field {
+    min-width: 0;
+    max-width: 100%;
+    width: fit-content;
+}
+.fff-segment-field--full { width: 100%; }
+
 /* Segment control — SaaS-style sliding pill */
 .fff-segment-control {
     @apply block w-fit max-w-max justify-self-start;
@@ -378,9 +386,6 @@
     height: 0;
 }
 
-.fff-segment-scroll-shadow--horizontal.fff-segment-scroll-shadow--preparing {
-    visibility: hidden;
-}
 
 .fff-segment-scroll-shadow--fade.fff-segment-scroll-shadow--horizontal:where(
     [data-left-scroll='true'],
@@ -482,4 +487,85 @@
 .fff-segment-overflow-shell:dir(rtl) .fff-segment-overflow-shell__scroll-prev svg,
 .fff-segment-overflow-shell:dir(rtl) .fff-segment-overflow-shell__scroll-next svg {
     transform: rotate(180deg);
+}
+
+/* Neutral ghost controls share one color contract across fields and schema tabs. */
+.fff-segment-control.fi-color-gray {
+    --fff-segment-ghost-surface: rgb(244 244 245);
+    --fff-segment-ghost-ink: rgb(24 24 27);
+}
+.dark .fff-segment-control.fi-color-gray {
+    --fff-segment-ghost-surface: rgb(63 63 70);
+    --fff-segment-ghost-ink: rgb(250 250 250);
+}
+.fff-segment-control.fi-color-gray .fff-segment-indicator--ghost,
+.fff-segment-control.fi-color-gray .fff-segment-track--ghost:not(.is-hydrated) .fff-segment-item[data-segment-selected='true'] {
+    background-color: var(--fff-segment-ghost-surface);
+    box-shadow: none;
+}
+.fff-segment-control.fi-color-gray .fff-segment-track--ghost .fff-segment-item[data-segment-selected='true'] {
+    color: var(--fff-segment-ghost-ink);
+}
+
+/* Expanded labels have the same SSR and hydrated selection rule. */
+.fff-segment-item:not([data-segment-selected='true']) .fff-segment-item__label--selected {
+    display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .fff-segment-track.is-animated .fff-segment-item,
+    .fff-segment-indicator.is-animated,
+    .fff-segment-separator { transition: none; }
+}
+
+/* Command groups reuse the track and keyboard owner with a joined-button skin. */
+.fff-segment-control--commands {
+    --fff-command-height: 2.25rem;
+    --fff-command-padding: 1rem;
+    --fff-command-font: .875rem;
+    --fff-command-icon: 1rem;
+    --fff-command-background: rgb(244 244 245);
+    --fff-command-hover: rgb(228 228 231);
+    --fff-command-foreground: rgb(24 24 27);
+}
+.dark .fff-segment-control--commands {
+    --fff-command-background: rgb(39 39 42);
+    --fff-command-hover: rgb(63 63 70);
+    --fff-command-foreground: rgb(244 244 245);
+}
+.fff-segment-control--commands:has(.fff-segment-track--sm) {
+    --fff-command-height: 2rem; --fff-command-padding: .75rem;
+    --fff-command-font: .8125rem; --fff-command-icon: .875rem;
+}
+.fff-segment-control--commands:has(.fff-segment-track--lg) {
+    --fff-command-height: 2.5rem; --fff-command-padding: 1.125rem;
+    --fff-command-font: 1rem; --fff-command-icon: 1.125rem;
+}
+.fff-segment-control--commands .fff-segment-track {
+    position: relative; min-height: 0; padding: 0; gap: 0;
+    border-radius: 1.5rem; overflow: hidden; background: var(--fff-command-background);
+}
+.fff-segment-control--commands .fff-segment-item {
+    height: var(--fff-command-height); width: fit-content;
+    padding: 0 var(--fff-command-padding); margin: 0; border: 0; border-radius: 0;
+    gap: .5rem; font-size: var(--fff-command-font); font-weight: 500; line-height: 1;
+    color: var(--fff-command-foreground); background: var(--fff-command-background);
+    transition: background-color 100ms ease, opacity 100ms ease;
+}
+.fff-segment-control--commands .fff-segment-item:hover:not(:disabled) {
+    background: var(--fff-command-hover); color: var(--fff-command-foreground);
+}
+.fff-segment-control--commands .fff-segment-item:focus-visible {
+    outline: 2px solid var(--color-500, var(--primary-500)); outline-offset: -2px;
+}
+.fff-segment-control--commands .fff-segment-item svg {
+    width: var(--fff-command-icon); height: var(--fff-command-icon);
+}
+.fff-segment-control--commands .fff-segment-separator {
+    width: 1px; height: calc(var(--fff-command-height) * .5); margin: 0 -1px 0 0;
+    background: var(--fff-command-foreground); opacity: .15;
+}
+.fff-segment-control--commands .fff-segment-separator.is-hidden { display: none; }
+.fff-segment-control--commands .fff-segment-indicator { display: none; }
+.fff-segment-control--commands.fff-segment-control--icon-only .fff-segment-item {
+    width: var(--fff-command-height); padding-inline: 0;
 }

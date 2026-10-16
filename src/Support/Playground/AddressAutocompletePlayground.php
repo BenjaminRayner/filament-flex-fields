@@ -17,6 +17,7 @@ class AddressAutocompletePlayground
     public function defaultState(): array
     {
         return [
+            'address_autocomplete__editable' => ['street' => 'plac Defilad', 'city' => 'Warszawa', 'postcode' => '00-901', 'country' => 'PL', 'place_name' => 'plac Defilad, Warszawa, Polska'],
             'address_autocomplete__full' => [
                 'street' => 'plac Defilad',
                 'city' => 'Warszawa',
@@ -35,6 +36,15 @@ class AddressAutocompletePlayground
     public function components(): array
     {
         return [
+            Section::make('Address studio v4')
+                ->description('Correct structured address details manually, or search within a configured region. Provider-selected coordinates are retained; editing address text clears stale coordinates.')
+                ->extraAttributes(['class' => 'fff-playground-section'])
+                ->schema([
+                    AddressAutocompleteField::make('address_autocomplete__editable')->label('Address with details')
+                        ->editableAddress()->addressDetails()->fields(['lat', 'lng', 'street', 'city', 'region', 'postcode', 'country', 'country_name', 'place_name'])
+                        ->requiredFields(['city', 'country'])->countries(['PL'])->searchLimit(8)
+                        ->searchBounds([14.0, 49.0, 24.5, 55.0])->searchProximity([21.0122, 52.2297])->columnSpanFull(),
+                ]),
             Section::make('Address autocomplete')
                 ->description('Mapbox-powered address search without a map. Set MAPBOX_ACCESS_TOKEN in .env.')
                 ->extraAttributes(['class' => 'fff-playground-section'])

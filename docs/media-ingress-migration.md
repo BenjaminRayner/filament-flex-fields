@@ -1,108 +1,51 @@
-# Media Ingress migration (major)
+---
+title: "Updating existing media integrations"
+description: "Move existing application storage configuration to the typed Media OS API."
+icon: "arrow-right-left"
+---
 
-Upgrade notes when moving from field-local helpers / `MediaCaptureOs`-as-product to **Media Ingress**.
+Existing capture helpers remain available as compatibility entry points. For new application storage code, prefer `FlexMedia::store()` with `MediaSource`, `MediaWrite` and typed failure handling. This guide concerns your application API usage; it does not require you to move existing files automatically.
 
-Full product docs with examples: [Media Ingress](/docs/media-capture-os).
-
-## What changed
-
-| Before | After |
-|--------|--------|
-| Field-local virus scan / observability | Shared `MediaIngress` capsules |
-| `SpatieMediaCaptureAdapter` as public SoT | Internal path; prefer `FlexMedia` / `MediaIngress`. Adapter kept as deprecated BC wrapper (stream-safe) |
-| `addMediaFromString($file->get())` | Path / stream Spatie ingest |
-| Spatie post-AV = delete Media only | Quarantine file + delete Media row when quarantine disk configured |
-| `use_spatie_media_library` | Prefer `storage_driver: 'disk'\|'spatie'` |
-| `SignatureStorage` as public API | Internal store behind `SignatureField::disk()` |
-| One class for disk + Spatie | **Not supported** — keep `FlexFileUpload` + `FlexSpatieMediaLibraryFileUpload` |
-
-## App code checklist
-
-### 1. FormBuilder / JSON schemas
-
-```php
-// Before
-'config' => ['use_spatie_media_library' => true, 'media_collection' => 'docs'],
-
-// After
-'config' => ['storage_driver' => 'spatie', 'media_collection' => 'docs'],
-```
-
-### 2. Field construction
-
-```php
-// Before (still valid)
-FlexSpatieMediaLibraryFileUpload::make('docs')->collection('documents');
-
-// After (sugar)
-FlexFileUpload::spatie('docs')->collection('documents');
-
-// Voice notes
-VoiceNoteRecorderField::spatie('note')->collection('voice-notes');
-```
-
-### 3. Signature optional Media copy
-
-```php
-SignatureField::make('sig')
-    ->disk()
-    ->spatieSink('signatures', uuidStatePath: 'sig_uuid');
-// Do NOT store Spatie UUIDs as the signature field state
-```
-
-### 4. Host scanners / signed URLs
+## Replace capture-style persistence
 
 ```php
 use Bjanczak\FilamentFlexFields\Support\Media\FlexMedia;
+use Bjanczak\FilamentFlexFields\Support\Media\Data\MediaWrite;
+use Bjanczak\FilamentFlexFields\Support\Media\Sources\MediaSource;
 
-FlexMedia::registerVirusScanCallback(...);
-FlexMedia::registerSignedUploadUrlResolver(...);
-
-// MediaCaptureOs::register* aliases still work
-```
-
-### 5. Custom Spatie persist
-
-```php
-// Before — avoid
-$record->addMediaFromString($temporaryUploadedFile->get())->toMediaCollection(...);
-
-// After
-use Bjanczak\FilamentFlexFields\Support\Media\FlexMedia;
-use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaContext;
-use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaKind;
-use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaPayload;
-use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaStorageDriver;
-
-FlexMedia::persist(
-    MediaPayload::fromTemporaryUploadedFile($temporaryUploadedFile),
-    new MediaContext(
-        kind: MediaKind::Upload,
-        driver: MediaStorageDriver::Spatie,
-        field: 'docs',
-        record: $record,
-        collection: 'documents',
-    ),
+$receipt = FlexMedia::store(
+    MediaSource::path($filePath, 'document.pdf'),
+    new MediaWrite(disk: 'local', directory: 'documents'),
 );
 ```
 
-## State contracts (unchanged intent)
+A typed storage operation throws `MediaFailure` on rejection rather than returning an unqualified null result. [Failure handling](/docs/media-os-api#handle-rejection).
 
-| Field | Disk state | Spatie state |
-|-------|------------|--------------|
-| File / Image / VoiceNote | relative path(s) | Media UUID(s) |
-| Signature | SVG or `ffstage:` | **unchanged** + optional sink UUID in metadata |
-| RichEditor attachments | provider IDs / disk paths | Spatie provider UUIDs in document JSON |
+## Replace scanner callbacks
 
-## Deprecations (supported this major)
+Implement and register `MediaScanner` through `MediaExtensions::scanner()`. The old boolean callback must return exactly true to certify a clean file; the new contract returns normally or throws. [Scanner example](/docs/media-os-extensions#antivirus-scanner).
 
-- Public use of `SpatieMediaCaptureAdapter` (still works)
-- Public `SignatureStorage` (still works; prefer field APIs)
-- `MediaCaptureOs` as the documented product name (hooks still work)
-- `use_spatie_media_library` config key
+## Existing paths and historical thumbnails
 
-## Not deprecated
+Existing path-only attachments remain readable. New named conversion bundles retain owned receipts for their original and derivatives. Historical thumbnails are not inferred from a guessed filename: inventory and migrate your old derivative references explicitly before expecting bundle deletion to remove them.
 
-- `FlexSpatieMediaLibraryFileUpload` as a first-class type
-- Filament `FileAttachmentProvider` on rich editor
-- Spatie `registerMediaConversions()` on your models (unchanged, fully supported)
+## Existing form fields
+
+Disk state remains paths; Spatie state remains Media UUIDs. Add per-operation policies or callbacks without replacing the native field's storage callback:
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexFileUpload;
+
+FlexFileUpload::make('documents')->multiple()
+    ->mediaMetadata(['purpose' => 'customer-documents']);
+```
+
+If your application replaces Filament's save lifecycle, call `completeMediaUploadsAfterSave($record)` on the mounted field after persisting its reference. [Save integration](/docs/file-upload-events-and-recovery#create-and-edit-forms).
+
+## Queue changes
+
+Synchronous disk conversions remain the default. Enable background conversion explicitly only after configuring shared storage and a durable worker. Spatie continues using its native model-defined conversion jobs. [Native queue setup](/docs/media-os-images#background-conversions) · [Spatie queues](/docs/media-os-spatie#queued-conversions).
+
+## Originals
+
+Named conversions and optimization preserve originals. An optimized preview/path is not evidence that the source has been deleted. Choose your source-normalization policy before permanent storage if you want a smaller master. [Original retention](/docs/media-os-images#original-retention).

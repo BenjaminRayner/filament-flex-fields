@@ -115,6 +115,12 @@ class FlexFieldSchema
     /**
      * @return list<FlexFieldDefinition>
      */
+    public function getStorageFields(): array
+    {
+        return $this->fields;
+    }
+
+    /** @return list<FlexFieldDefinition> */
     public function getFields(): array
     {
         /** @var list<FlexFieldDefinition> $fields */

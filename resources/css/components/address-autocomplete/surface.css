@@ -1,0 +1,5 @@
+.fff-address-autocomplete { position: relative; width: 100%; }
+.fi-fo-field:has([data-validation-error]) .fff-address-autocomplete .fff-flex-text-input__shell,
+.fi-fo-field-wrp:has([data-validation-error]) .fff-address-autocomplete .fff-flex-text-input__shell {
+    border-color: var(--fff-field-error-border, #dc2626);
+}

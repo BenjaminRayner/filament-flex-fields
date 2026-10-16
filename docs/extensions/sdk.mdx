@@ -1,0 +1,135 @@
+---
+title: "Use the public JavaScript SDK"
+description: "Share the installed SDK instead of bundling private FLEX implementations."
+---
+
+Import SDK ABI 1 in your component source. Its implementation belongs to the
+installed FLEX runtime; your package contains a small versioned facade.
+
+```javascript
+import { createResourceScope } from '@bjanczak/flex-fields/sdk/v1';
+
+export default function acmeRatingField() {
+    let effects;
+
+    return {
+        init() {
+            effects = createResourceScope();
+            effects.listen(this.$el, 'acme-rating-change', event => {
+                this.value = event.detail.value;
+            });
+        },
+
+        destroy() {
+            effects?.dispose();
+        },
+    };
+}
+```
+
+| Export | Purpose |
+| --- | --- |
+| `sdkABI` | The supported version, currently `1`. |
+| `createResourceScope(options)` | Own listeners, cleanup callbacks, streams and object URLs. `dispose()` is safe to call repeatedly. |
+| `createOwnedSubscriptions(options)` | Create named subscription channels with independent unsubscribe handles and a configurable registration limit. |
+| `isMountedFactoryReady(element)` | Check whether this mounted factory has completed initialization. |
+| `isAssetElementActive(element, options)` | Check whether its tab, modal, wizard step or section is active. A field below the visible screen remains active. |
+| `waitForAssetActivation(element, { signal })` | Wait for activation. An aborted or disconnected owner resolves `false`. |
+| `createAssetSurface(root, { signal, parent })` | Register a custom dialog or drawer with independent asset ownership, preparation, suspension and disposal. |
+
+For example, release a pending activation wait with the same owner:
+
+```javascript
+const effects = createResourceScope();
+const controller = new AbortController();
+
+effects.defer(() => controller.abort());
+
+const active = await waitForAssetActivation(this.$el, {
+    signal: controller.signal,
+});
+
+if (!active) return;
+```
+
+Import both functions in that example. `createResourceScope()` supports
+`onCleanupError` and `onEffectError` callbacks. It exposes `defer(callback)`,
+`listen(target, event, callback, options)`, `trackStream(stream)`,
+`timeout(callback, milliseconds)`, `interval(callback, milliseconds)`,
+`frame(callback)`, `trackObserver(observer)`, `trackWorker(worker)`,
+`objectUrl(blob)` returning `{ url, revoke }`, `dispose()`, `disposed` and
+`signal`. The optional constructor `signal` disposes the whole scope when aborted.
+Every registration returns an idempotent release function; completed one-shot
+effects remove their bookkeeping immediately. `snapshot()` reports only the
+resource count and disposed state.
+One failed cleanup does not prevent the remaining cleanups.
+
+Set `limit` to bound the number of simultaneously owned effects (default `4096`,
+accepted range `1`–`65536`). Completed timers and released listeners leave this
+budget immediately. If adoption fails, a supplied worker, observer, stream or
+new object URL is cleaned up. A rejected `defer(callback)` has not acquired the
+callback; it does not run it. Treat a budget error as initialization failure and
+dispose the partially initialized owner before retrying.
+
+For channels, supply their names and retain the returned unsubscribe handle:
+
+```javascript
+const channels = createOwnedSubscriptions({
+    names: ['changed'],
+    limit: 100,
+});
+
+const unsubscribe = channels.subscribe({ changed: value => {
+    console.log(value);
+} });
+
+channels.notify('changed', [42]);
+unsubscribe();
+channels.dispose();
+```
+
+Use the esbuild adapter shipped in your installed Composer package:
+
+```javascript
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { build } from 'esbuild';
+import { createFlexSdkPlugin } from
+    '../../vendor/janczakb/filament-flex-fields/scripts/assets/flex-sdk-plugin.mjs';
+
+const result = await build({
+    entryPoints: { rating: 'resources/js/rating.js' },
+    outdir: 'resources/dist',
+    bundle: true,
+    splitting: true,
+    format: 'esm',
+    metafile: true,
+    write: false,
+    plugins: [createFlexSdkPlugin()],
+});
+
+// Write only after the build and SDK verification have succeeded.
+for (const output of result.outputFiles) {
+    await fs.mkdir(path.dirname(output.path), { recursive: true });
+    await fs.writeFile(output.path, output.contents);
+}
+
+await fs.writeFile('metafile.json', JSON.stringify(result.metafile));
+```
+
+Adjust the Composer path to your build directory. Both `metafile: true` and
+`write: false` are required. Then run the [portable manifest compiler](/docs/extensions/build). There is no import map or deployment URL to configure for the SDK facade.
+The adapter rejects unsupported SDK imports and builds containing installed FLEX
+private JavaScript, including symlink aliases. Use the public import rather than
+copying source files. Installed packages remain trusted application code.
+
+Mount the default factory through its registered FLEX consumer boundary. The SDK
+is installed before that factory is imported. Calling the facade outside a
+compatible runtime raises an explicit error. Main factories already receive
+FLEX readiness handling; do not register a second factory wrapper under their name.
+SDK versioning does not merge incompatible versions of your own libraries.
+
+## Continue reading
+
+[SDK reference](/docs/extensions/sdk-reference) · [Factories and lifecycle](/docs/extensions/factories)
+

@@ -20,9 +20,10 @@ it('pins whisper runtime files with sha256 checksums and no source maps', functi
     expect(WhisperRuntimeManifest::FILES)
         ->toHaveKey('transformers.min.js')
         ->not->toHaveKey('transformers.min.js.map')
-        ->and(WhisperRuntimeManifest::VERSION)->toBe('2.17.2')
+        ->toHaveKeys(['ort-wasm-simd-threaded.mjs', 'ort-wasm-simd-threaded.wasm'])
+        ->and(WhisperRuntimeManifest::VERSION)->toBe('4.3.1')
         ->and(WhisperRuntimeManifest::downloadUrl('transformers.min.js'))
-        ->toContain('@xenova/transformers@2.17.2/dist/transformers.min.js');
+        ->toContain('@huggingface/transformers@4.3.1/dist/transformers.min.js');
 });
 
 it('reports whisper runtime as missing when public files are absent', function (): void {
@@ -54,80 +55,6 @@ it('rejects whisper installs when a download fails sha256 verification', functio
         ->toThrow(RuntimeException::class, 'SHA-256 mismatch');
 });
 
-it('installs whisper runtime when downloads match the manifest hashes', function (): void {
-    $backup = null;
-    $candidates = [
-        dirname(__DIR__, 3).'/.cursor/backups',
-        '/Users/bartek/STRONY LOKALNE LARAVEL/wyachts-super-app/.cursor/backups',
-    ];
-
-    foreach ($candidates as $dir) {
-        if (! is_dir($dir)) {
-            continue;
-        }
-
-        $matches = glob($dir.'/packages-filament-flex-fields-resources-dist-assets-whisper.*.tar.gz') ?: [];
-
-        if ($matches !== []) {
-            rsort($matches);
-            $backup = $matches[0];
-            break;
-        }
-    }
-
-    if ($backup === null) {
-        $this->markTestSkipped('Whisper backup tarball not available for golden install test.');
-    }
-
-    $filesystem = app(Filesystem::class);
-    $extract = sys_get_temp_dir().'/fff-whisper-golden-'.uniqid();
-    $directory = sys_get_temp_dir().'/fff-whisper-install-ok-'.uniqid();
-    $filesystem->ensureDirectoryExists($extract);
-    $filesystem->ensureDirectoryExists($directory);
-    WhisperRuntime::usePublicDirectory($directory);
-
-    exec('tar xzf '.escapeshellarg($backup).' -C '.escapeshellarg($extract), $out, $code);
-    expect($code)->toBe(0);
-
-    $golden = $extract.'/whisper';
-    $fake = [];
-
-    foreach (WhisperRuntimeManifest::FILES as $filename => $expectedHash) {
-        $path = $golden.'/'.$filename;
-        expect(is_file($path))->toBeTrue()
-            ->and(hash_file('sha256', $path))->toBe($expectedHash);
-
-        $fake[WhisperRuntimeManifest::downloadUrl($filename)] = Http::response((string) file_get_contents($path), 200);
-    }
-
-    Http::fake($fake);
-
-    WhisperRuntime::install($filesystem);
-
-    expect(WhisperRuntime::verify()['ok'])->toBeTrue()
-        ->and(is_file(WhisperRuntime::lockPath()))->toBeTrue()
-        ->and(is_file($directory.'/transformers.min.js.map'))->toBeFalse();
-});
-
-it('never publishes whisper paths from the static asset publisher', function (): void {
-    $source = FlexFieldAssets::staticAssetsSourceDirectory().'/whisper';
-    $filesystem = app(Filesystem::class);
-    $filesystem->ensureDirectoryExists($source);
-    $filesystem->put($source.'/should-not-copy.txt', 'nope');
-
-    $destination = FlexFieldAssets::staticAssetsPublicDirectory().'/whisper/should-not-copy.txt';
-
-    if (is_file($destination)) {
-        unlink($destination);
-    }
-
-    FlexFieldAssets::publishStaticAssetsIfStale($filesystem);
-
-    expect(is_file($destination))->toBeFalse();
-
-    $filesystem->deleteDirectory($source);
-});
-
 it('does not auto-publish stale package assets on staging http requests', function (): void {
     app()->detectEnvironment(fn (): string => 'staging');
 
@@ -139,4 +66,59 @@ it('still auto-publishes stale package assets on local http requests', function 
     app()->detectEnvironment(fn (): string => 'local');
 
     expect(FlexFieldAssets::shouldPublishStalePackageAssets(runningInConsole: false))->toBeTrue();
+});
+
+it('pins ONNX loaders and binaries to the same resolved runtime release', function (): void {
+    foreach (['ort-wasm-simd-threaded.mjs', 'ort-wasm-simd-threaded.wasm'] as $filename) {
+        expect(WhisperRuntimeManifest::downloadUrl($filename))
+            ->toBe('https://cdn.jsdelivr.net/npm/onnxruntime-web@'.WhisperRuntimeManifest::ONNX_VERSION.'/dist/'.$filename);
+    }
+    foreach (WhisperRuntimeManifest::FILES as $hash) {
+        expect($hash)->toMatch('/^[a-f0-9]{64}$/');
+    }
+    expect(fn () => WhisperRuntimeManifest::downloadUrl('../unexpected.js'))
+        ->toThrow(InvalidArgumentException::class);
+});
+
+it('isolates installed runtime versions without changing explicit directory overrides', function (): void {
+    expect(WhisperRuntime::publicDirectory())->toEndWith('/whisper/'.WhisperRuntimeManifest::VERSION)
+        ->and(FlexFieldAssets::whisperRuntimeModuleSrc())->toContain('/whisper/'.WhisperRuntimeManifest::VERSION.'/transformers.min.js');
+    WhisperRuntime::usePublicDirectory('/tmp/explicit-runtime');
+    expect(WhisperRuntime::publicDirectory())->toBe('/tmp/explicit-runtime');
+});
+
+it('verifies real installed bytes and rejects a corrupted ONNX loader', function (): void {
+    $root = dirname(__DIR__, 2).'/node_modules/@huggingface/transformers';
+    $onnx = is_dir($root.'/node_modules/onnxruntime-web')
+        ? $root.'/node_modules/onnxruntime-web'
+        : dirname(__DIR__, 2).'/node_modules/onnxruntime-web';
+    $sources = [
+        'transformers.min.js' => $root.'/dist/transformers.min.js',
+        'ort-wasm-simd-threaded.mjs' => $onnx.'/dist/ort-wasm-simd-threaded.mjs',
+        'ort-wasm-simd-threaded.wasm' => $onnx.'/dist/ort-wasm-simd-threaded.wasm',
+    ];
+    foreach ($sources as $source) {
+        if (! is_file($source)) {
+            $this->markTestSkipped('The pinned npm runtime must be installed for the real-byte verification probe.');
+        }
+    }
+    $directory = sys_get_temp_dir().'/fff-whisper-valid-'.bin2hex(random_bytes(8));
+    $filesystem = app(Filesystem::class);
+    WhisperRuntime::usePublicDirectory($directory);
+    $responses = [];
+    foreach ($sources as $filename => $source) {
+        $responses[WhisperRuntimeManifest::downloadUrl($filename)] = Http::response((string) file_get_contents($source));
+    }
+    Http::fake($responses);
+    try {
+        WhisperRuntime::install($filesystem);
+        expect(WhisperRuntime::verify()['ok'])->toBeTrue()
+            ->and(WhisperRuntime::verify()['version'])->toBe(WhisperRuntimeManifest::VERSION);
+        Http::assertSentCount(3);
+        $filesystem->put($directory.'/ort-wasm-simd-threaded.mjs', 'corrupt loader');
+        expect(WhisperRuntime::verify()['ok'])->toBeFalse()
+            ->and(WhisperRuntime::verify()['mismatched'])->toBe(['ort-wasm-simd-threaded.mjs']);
+    } finally {
+        $filesystem->deleteDirectory($directory);
+    }
 });

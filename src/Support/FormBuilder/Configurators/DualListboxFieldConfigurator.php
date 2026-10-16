@@ -24,6 +24,10 @@ final class DualListboxFieldConfigurator implements FieldConfigurator
             ->size($config['size'] ?? config('filament-flex-fields.ui.dual_listbox_size', 'md'))
             ->variant($config['variant'] ?? config('filament-flex-fields.ui.dual_listbox_variant', 'bordered'));
 
+        if (isset($config['virtual_threshold'])) {
+            $field->virtualThreshold($config['virtual_threshold']);
+        }
+
         if (isset($config['list_height'])) {
             $field->listHeight((string) $config['list_height']);
         }

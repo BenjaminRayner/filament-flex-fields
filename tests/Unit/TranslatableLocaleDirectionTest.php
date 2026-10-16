@@ -8,7 +8,9 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ImageChoiceCards;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields;
 use Bjanczak\FilamentFlexFields\Support\Translatable\TranslatableLocaleDirection;
+use Bjanczak\FilamentFlexFields\Tests\Support\TestableTranslatableForm;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 
 it('detects rtl locales by exact code and primary language subtag', function (): void {
     expect(TranslatableLocaleDirection::isRtlLocale('ar'))->toBeTrue()
@@ -94,11 +96,9 @@ it('applies directionByLocale preset to cloned translatable fields via input att
             FlexTextInput::make('title'),
         ]);
 
-    $field = FlexTextInput::make('title');
-
-    foreach ($component->getTranslatableFieldModifiers() as $modifier) {
-        $field->evaluate($modifier, ['locale' => 'ar']);
-    }
+    Schema::make(new TestableTranslatableForm)->components([$component])->getComponents();
+    $tab = $component->getVisibleTabs()[0];
+    $field = $tab->getChildSchema()->getComponents()[0];
 
     expect($field->getExtraInputAttributes()['dir'] ?? null)->toBe('rtl')
         ->and($field->getExtraAttributes()['dir'] ?? null)->toBeNull();
@@ -112,11 +112,9 @@ it('applies directionByLocale field scope to the wrapper when requested', functi
             FlexTextInput::make('title'),
         ]);
 
-    $field = FlexTextInput::make('title');
-
-    foreach ($component->getTranslatableFieldModifiers() as $modifier) {
-        $field->evaluate($modifier, ['locale' => 'ar']);
-    }
+    Schema::make(new TestableTranslatableForm)->components([$component])->getComponents();
+    $tab = $component->getVisibleTabs()[0];
+    $field = $tab->getChildSchema()->getComponents()[0];
 
     expect($field->getExtraAttributes()['dir'] ?? null)->toBe('rtl')
         ->and($field->getExtraInputAttributes()['dir'] ?? null)->toBeNull();

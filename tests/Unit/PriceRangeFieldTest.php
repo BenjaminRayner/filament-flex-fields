@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\PriceRangeField;
+use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\PriceRangeFieldConfigurator;
+use Bjanczak\FilamentFlexFields\Support\PriceRange\Histogram;
 
 it('exposes price range styling and configuration api', function () {
     $field = PriceRangeField::make('budget')
@@ -90,17 +92,16 @@ it('uses translated default input labels', function () {
         ->and($field->getMaxInputLabel())->toBe(__('filament-flex-fields::default.price_range.max'));
 });
 
-it('styles inputs and histogram caps from global rounding tokens', function () {
+it('reuses text input markup and its sole stylesheet owner', function () {
+    $view = file_get_contents(__DIR__.'/../../resources/views/forms/components/price-range/inputs.blade.php');
     $css = file_get_contents(__DIR__.'/../../resources/css/components/price-range.css');
+    $definition = require __DIR__.'/../../resources/components/price-range.php';
 
-    expect($css)
-        ->toContain('--fff-price-range-radius: var(--fff-global-radius, 0.75rem)')
-        ->toContain('border-radius: var(--fff-price-range-radius)')
-        ->toContain('--fff-price-range-text-size: var(--fff-text-lg)')
-        ->toContain('--fff-price-range-input-p: 0.75rem')
-        ->toContain('transition-[border-color,box-shadow]')
-        ->toContain('outline: var(--fff-field-focus-ring-width) solid transparent')
-        ->not->toContain('transition-[border-color,box-shadow,outline-color]');
+    expect($view)->toContain('text-input.shell', 'text-input.control', 'fff-flex-text-input--', 'fff-rounding-')
+        ->not->toContain('<input');
+    expect($css)->toContain('--fff-price-range-radius: var(--fff-global-radius, 0.75rem)')
+        ->not->toContain('--fff-price-range-input-bg', '.fff-price-range__input:focus');
+    expect($definition->capabilities)->toBe(['inputs' => ['text-input-presentation']]);
 });
 
 it('supports explicit rounding api values', function () {
@@ -108,4 +109,32 @@ it('supports explicit rounding api values', function () {
         ->toContain('fff-rounding-full')
         ->and(PriceRangeField::make('budget')->rounding('native')->getWrapperClasses())
         ->toContain('fff-rounding-native');
+});
+
+it('shares the default whole-input focus outline with FlexTextInput', function () {
+    expect(PriceRangeField::make('budget')->shouldShowFocusOutline())->toBeTrue()
+        ->and(PriceRangeField::make('budget')->focusOutline(false)->shouldShowFocusOutline())->toBeFalse();
+});
+
+it('prepares width-specific histogram profiles of the full distribution before JS', function () {
+    $histogram = Histogram::presentation([10, 20, 30, 40, 50, 60, 70, 99]);
+    expect($histogram['count'])->toBe(64)->and($histogram['bars'])->toHaveCount(64)
+        ->and($histogram['bars'][7][8])->toBe(99.0)
+        ->and($histogram['bars'][63][64])->toBe(99.0);
+    $large = Histogram::presentation(array_fill(0, 1024, 50));
+    expect($large['count'])->toBe(128)->and($large['bars'])->toHaveCount(128)
+        ->and($large['bars'][127][128])->toBe(50.0);
+});
+
+it('maps the price range schema options to the same fluent configuration', function () {
+    $field = (new PriceRangeFieldConfigurator)
+        ->configurePriceRangeField(PriceRangeField::make('budget'), [
+            'min' => 1.25, 'max' => 10.25, 'step' => .25, 'integer' => false,
+            'decimal_places' => 2, 'rounding' => 'full', 'locale' => 'pl',
+            'read_only' => true, 'focus_outline' => false, 'show_inputs' => false,
+        ]);
+    expect($field->getMin())->toBe(1.25)->and($field->getDecimalPlaces())->toBe(2)
+        ->and($field->getLocale())->toBe('pl')->and($field->getRounding())->toBe('full')
+        ->and($field->isReadOnly())->toBeTrue()->and($field->shouldShowFocusOutline())->toBeFalse()
+        ->and($field->shouldShowInputs())->toBeFalse();
 });

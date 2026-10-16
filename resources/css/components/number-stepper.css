@@ -41,20 +41,65 @@
         transform 0.15s ease;
 }
 
-.fff-number-stepper__button:hover:not(:disabled) {
+.fff-number-stepper__button:hover:not(:disabled):not([aria-disabled="true"]) {
     @apply bg-gray-50;
     box-shadow:
         0 1px 2px rgb(0 0 0 / 0.08),
         0 2px 4px rgb(0 0 0 / 0.06);
 }
 
-.fff-number-stepper__button:active:not(:disabled) {
+.fff-number-stepper__button:active:not(:disabled):not([aria-disabled="true"]) {
     transform: scale(0.96);
 }
 
-.fff-number-stepper__button:disabled {
+.fff-number-stepper__button:disabled,
+.fff-number-stepper__button[aria-disabled="true"] {
     opacity: 0.4;
     cursor: not-allowed;
+}
+
+.fff-number-stepper__button[aria-disabled="true"]:not(:disabled) {
+    cursor: pointer;
+}
+
+.fff-number-stepper__value-display:focus-visible {
+    outline: 2px solid var(--primary-500, #6366f1);
+    outline-offset: 4px;
+    border-radius: 8px;
+}
+
+.fff-number-stepper__button {
+    touch-action: manipulation;
+}
+
+.fff-number-stepper__live-value {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.fff-number-stepper__live-value.is-ready {
+    opacity: 1;
+    visibility: inherit;
+}
+
+.fff-number-stepper__dynamic-suffix,
+.fff-number-stepper__suffix-char {
+    display: inline-flex;
+    line-height: 1;
+}
+
+.fff-number-stepper__dynamic-flow {
+    display: inline-block;
+    line-height: 1;
+}
+
+.fff-number-stepper__suffix-char {
+    overflow: hidden;
+    white-space: pre;
 }
 
 .fff-number-stepper--sm .fff-number-stepper__button {
@@ -130,7 +175,7 @@
 
 .fff-number-stepper__ssr-value {
     display: inline-flex;
-    align-items: baseline;
+    align-items: center;
     gap: 0;
     line-height: 1;
     font-variant-numeric: tabular-nums;
@@ -138,7 +183,7 @@
     color: inherit;
     white-space: nowrap;
     opacity: 1;
-    visibility: visible;
+    visibility: inherit;
 }
 
 .fff-number-stepper__ssr-value.is-replaced {
@@ -169,7 +214,7 @@
 
 .fff-number-stepper__null-label.is-ready {
     opacity: 1;
-    visibility: visible;
+    visibility: inherit;
     pointer-events: auto;
 }
 
@@ -186,13 +231,8 @@
 
 .fff-number-stepper__flow.is-ready {
     opacity: 1;
-    visibility: visible;
+    visibility: inherit;
     pointer-events: auto;
-}
-
-.fff-number-stepper__flow::part(suffix) {
-    @apply font-medium text-gray-500;
-    font-size: 0.8125em;
 }
 
 .dark .fff-number-stepper {
@@ -207,7 +247,7 @@
         inset 0 0 0 1px rgb(255 255 255 / 0.07);
 }
 
-.dark .fff-number-stepper__button:hover:not(:disabled) {
+.dark .fff-number-stepper__button:hover:not(:disabled):not([aria-disabled="true"]) {
     background-color: rgb(82 82 91);
     color: rgb(244 244 245);
     box-shadow:
@@ -227,17 +267,13 @@
     @apply text-gray-400;
 }
 
-.dark .fff-number-stepper__flow::part(suffix) {
-    @apply text-gray-400;
-}
-
 .fff-number-stepper--primary .fff-number-stepper__button {
     @apply text-white;
     background-color: var(--primary-600, rgb(79 70 229));
     box-shadow: none;
 }
 
-.fff-number-stepper--primary .fff-number-stepper__button:hover:not(:disabled) {
+.fff-number-stepper--primary .fff-number-stepper__button:hover:not(:disabled):not([aria-disabled="true"]) {
     background-color: var(--primary-700, rgb(67 56 202));
 }
 
@@ -247,7 +283,7 @@
     box-shadow: none;
 }
 
-.fff-number-stepper--secondary .fff-number-stepper__button:hover:not(:disabled) {
+.fff-number-stepper--secondary .fff-number-stepper__button:hover:not(:disabled):not([aria-disabled="true"]) {
     background-color: color-mix(in srgb, var(--primary-500, #6366f1) 24%, white);
 }
 
@@ -256,7 +292,7 @@
     box-shadow: none;
 }
 
-.fff-number-stepper--tertiary .fff-number-stepper__button:hover:not(:disabled) {
+.fff-number-stepper--tertiary .fff-number-stepper__button:hover:not(:disabled):not([aria-disabled="true"]) {
     @apply bg-gray-300;
 }
 
@@ -265,7 +301,7 @@
     box-shadow: none;
 }
 
-.fff-number-stepper--outline .fff-number-stepper__button:hover:not(:disabled) {
+.fff-number-stepper--outline .fff-number-stepper__button:hover:not(:disabled):not([aria-disabled="true"]) {
     @apply bg-gray-50;
 }
 
@@ -273,7 +309,7 @@
     background-color: var(--primary-500, rgb(99 102 241));
 }
 
-.dark .fff-number-stepper--primary .fff-number-stepper__button:hover:not(:disabled) {
+.dark .fff-number-stepper--primary .fff-number-stepper__button:hover:not(:disabled):not([aria-disabled="true"]) {
     background-color: var(--primary-400, rgb(129 140 248));
 }
 
@@ -283,7 +319,7 @@
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-400, #818cf8) 22%, transparent);
 }
 
-.dark .fff-number-stepper--secondary .fff-number-stepper__button:hover:not(:disabled) {
+.dark .fff-number-stepper--secondary .fff-number-stepper__button:hover:not(:disabled):not([aria-disabled="true"]) {
     background-color: color-mix(in srgb, var(--primary-500, #6366f1) 32%, rgb(39 39 42));
 }
 
@@ -293,7 +329,7 @@
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
 }
 
-.dark .fff-number-stepper--tertiary .fff-number-stepper__button:hover:not(:disabled) {
+.dark .fff-number-stepper--tertiary .fff-number-stepper__button:hover:not(:disabled):not([aria-disabled="true"]) {
     background-color: rgb(82 82 91);
     color: rgb(244 244 245);
 }
@@ -305,7 +341,7 @@
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.05);
 }
 
-.dark .fff-number-stepper--outline .fff-number-stepper__button:hover:not(:disabled) {
+.dark .fff-number-stepper--outline .fff-number-stepper__button:hover:not(:disabled):not([aria-disabled="true"]) {
     border-color: rgb(255 255 255 / 0.14);
     background-color: rgb(82 82 91);
     color: rgb(244 244 245);

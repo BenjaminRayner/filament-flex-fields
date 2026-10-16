@@ -43,7 +43,7 @@ it('dehydrates matrix state arrays', function (): void {
         ->and($field->dehydrateItems(null))->toBe([]);
 });
 
-it('caches normalized rows after first resolution', function (): void {
+it('reevaluates reactive rows instead of retaining stale closures', function (): void {
     $evaluations = 0;
 
     $field = FlexMatrixTable::make('specs')
@@ -58,5 +58,5 @@ it('caches normalized rows after first resolution', function (): void {
     $field->getNormalizedRows();
     $field->getNormalizedRows();
 
-    expect($evaluations)->toBe(1);
+    expect($evaluations)->toBe(2);
 });

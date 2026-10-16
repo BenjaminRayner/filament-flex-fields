@@ -191,23 +191,23 @@ class DateTimeFieldValue
         }
 
         return match ($mode) {
-            DateTimeFieldMode::Date => 'm/d/Y',
+            DateTimeFieldMode::Date => 'M j, Y',
             DateTimeFieldMode::Month => 'm/Y',
             DateTimeFieldMode::Year => 'Y',
             DateTimeFieldMode::Time, DateTimeFieldMode::Duration, DateTimeFieldMode::TimeRange => $hourCycle === 12
                 ? ($showSeconds ? 'g:i:s A' : 'g:i A')
                 : ($showSeconds ? 'H:i:s' : 'H:i'),
             DateTimeFieldMode::DateTime => match ($granularity) {
-                DateTimeGranularity::Day => 'm/d/Y',
-                DateTimeGranularity::Hour => $hourCycle === 12 ? 'm/d/Y g:i A' : 'm/d/Y H:i',
-                DateTimeGranularity::Minute => $hourCycle === 12 ? 'm/d/Y g:i A' : 'm/d/Y H:i',
-                DateTimeGranularity::Second => $hourCycle === 12 ? 'm/d/Y g:i:s A' : 'm/d/Y H:i:s',
+                DateTimeGranularity::Day => 'M j, Y',
+                DateTimeGranularity::Hour => $hourCycle === 12 ? 'M j, Y g:i A' : 'M j, Y H:i',
+                DateTimeGranularity::Minute => $hourCycle === 12 ? 'M j, Y g:i A' : 'M j, Y H:i',
+                DateTimeGranularity::Second => $hourCycle === 12 ? 'M j, Y g:i:s A' : 'M j, Y H:i:s',
             },
             DateTimeFieldMode::DateRange => match ($granularity) {
-                DateTimeGranularity::Day => 'm/d/Y',
-                DateTimeGranularity::Hour => $hourCycle === 12 ? 'm/d/Y g:i A' : 'm/d/Y H:i',
-                DateTimeGranularity::Minute => $hourCycle === 12 ? 'm/d/Y g:i A' : 'm/d/Y H:i',
-                DateTimeGranularity::Second => $hourCycle === 12 ? 'm/d/Y g:i:s A' : 'm/d/Y H:i:s',
+                DateTimeGranularity::Day => 'M j, Y',
+                DateTimeGranularity::Hour => $hourCycle === 12 ? 'M j, Y g:i A' : 'M j, Y H:i',
+                DateTimeGranularity::Minute => $hourCycle === 12 ? 'M j, Y g:i A' : 'M j, Y H:i',
+                DateTimeGranularity::Second => $hourCycle === 12 ? 'M j, Y g:i:s A' : 'M j, Y H:i:s',
             },
         };
     }

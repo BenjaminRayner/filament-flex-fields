@@ -5,87 +5,46 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TimezoneField;
-use Filament\Schemas\Components\Component;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Bjanczak\FilamentFlexFields\Support\Playground\DateTime\DateTimePlayground;
+use Bjanczak\FilamentFlexFields\Support\Playground\DateTime\ExampleGroup;
+use Bjanczak\FilamentFlexFields\Support\Playground\DateTime\ValidationExample;
 
-class TimezoneFieldPlayground
+final class TimezoneFieldPlayground extends DateTimePlayground
 {
-    /**
-     * @return array<string, mixed>
-     */
-    public function defaultState(): array
+    protected function slug(): string
     {
-        return [
-            'timezone__basic' => 'Europe/Warsaw',
-            'timezone__empty' => null,
-            'timezone__limited' => 'America/New_York',
-            'timezone__no_utc' => 'Europe/Warsaw',
-            'timezone__browser' => null,
-            'timezone__sm' => 'Europe/Berlin',
-            'timezone__soft' => 'Europe/Warsaw',
-            'timezone__lg' => 'Asia/Tokyo',
-            'timezone__disabled' => 'Europe/London',
-        ];
+        return 'timezone-field';
     }
 
-    /**
-     * @return list<Component>
-     */
-    public function components(): array
+    /** @return list<ExampleGroup> */
+    protected function groups(): array
     {
         return [
-            Section::make('Timezone field')
-                ->description('Searchable IANA timezone picker with Gravity UI clock icon prefix.')
-                ->extraAttributes(['class' => 'fff-playground-section'])
-                ->schema([
-                    TimezoneField::make('timezone__basic')
-                        ->label('Timezone')
-                        ->defaultTimezone('Europe/Warsaw')
-                        ->helperText('Stores IANA timezone identifier (e.g. Europe/Warsaw).')
-                        ->required()
-                        ->columnSpanFull(),
-                    Grid::make(['default' => 1, 'lg' => 2])
-                        ->extraAttributes(['class' => 'fff-playground-variants'])
-                        ->schema([
-                            TimezoneField::make('timezone__empty')
-                                ->label('Empty')
-                                ->helperText('No default — shows placeholder until selected.'),
-                            TimezoneField::make('timezone__limited')
-                                ->label('Limited timezones')
-                                ->timezones(['Europe/Warsaw', 'Europe/Berlin', 'America/New_York', 'UTC'])
-                                ->defaultTimezone('UTC'),
-                            TimezoneField::make('timezone__no_utc')
-                                ->label('Without UTC')
-                                ->includeUtc(false)
-                                ->helperText('Hides canonical UTC from the default IANA list.'),
-                            TimezoneField::make('timezone__browser')
-                                ->label('Browser timezone')
-                                ->browserTimezoneDefault()
-                                ->browserTimezoneSortFirst()
-                                ->helperText('Defaults from Intl browser timezone when empty.'),
-                        ]),
-                    Grid::make(['default' => 1, 'sm' => 2, 'lg' => 4])
-                        ->extraAttributes(['class' => 'fff-playground-variants'])
-                        ->schema([
-                            TimezoneField::make('timezone__sm')
-                                ->label('Small')
-                                ->size('sm')
-                                ->defaultTimezone('Europe/Berlin'),
-                            TimezoneField::make('timezone__soft')
-                                ->label('Soft')
-                                ->variant('soft')
-                                ->defaultTimezone('Europe/Warsaw'),
-                            TimezoneField::make('timezone__lg')
-                                ->label('Large')
-                                ->size('lg')
-                                ->defaultTimezone('Asia/Tokyo'),
-                            TimezoneField::make('timezone__disabled')
-                                ->label('Disabled')
-                                ->defaultTimezone('Europe/London')
-                                ->disabled(),
-                        ]),
-                ]),
+            new ExampleGroup('Search and browser defaults', 'Timezone values are IANA identifiers. Search by region/city or let the browser choose an initial timezone for an empty field.', [
+                TimezoneField::make('timezone__basic')->label('Search all timezones')->defaultTimezone('Europe/Warsaw')->default('Europe/Warsaw')->helperText('Stores Europe/Warsaw; offsets are shown in the menu.'),
+                TimezoneField::make('timezone__empty')->label('Optional timezone')->helperText('Empty until a timezone is selected.'),
+                TimezoneField::make('timezone__browser')->label('Browser timezone')->browserTimezoneDefault()->browserTimezoneSortFirst()->helperText('The browser timezone is preferred only while empty.'),
+            ], columns: 3),
+            new ExampleGroup('Restricted and excluded timezones', 'Use a whitelist, exclude individual identifiers or hide UTC from the catalog.', [
+                TimezoneField::make('timezone__limited')->label('Approved timezones')->timezones(['Europe/Warsaw', 'Europe/Berlin', 'America/New_York', 'UTC'])->default('America/New_York')->helperText('Only these four identifiers are offered.'),
+                TimezoneField::make('timezone__excluded')->label('Exclude selected timezones')->exceptTimezones(['America/New_York', 'Asia/Tokyo'])->default('Europe/Warsaw')->helperText('New York and Tokyo are removed.'),
+                TimezoneField::make('timezone__no_utc')->label('Without UTC')->includeUtc(false)->default('Europe/Warsaw')->helperText('Canonical UTC is omitted.'),
+            ], columns: 3),
+            new ExampleGroup('Labels and sizes', 'Hide offsets, localize labels or use a larger input. The dropdown remains the shared FLEX Select.', [
+                TimezoneField::make('timezone__no_offset')->label('Without offset label')->showOffset(false)->default('Europe/Warsaw'),
+                TimezoneField::make('timezone__localized')->label('Polski')->locale('pl')->default('Europe/Warsaw'),
+                TimezoneField::make('timezone__lg')->label('Large timezone input')->size('lg')->default('Asia/Tokyo'),
+            ], columns: 3),
+            new ExampleGroup('Validation: required and whitelist', 'These checks reject empty and unsupported values independently from the other examples.', [
+                new ValidationExample(TimezoneField::make('timezone__required')->label('Required timezone')->required()->validationMessages(['required' => 'Choose a timezone.']), invalid: null, valid: 'Europe/Warsaw', description: 'Empty value is rejected.'),
+                new ValidationExample(TimezoneField::make('timezone__validation_list')->label('Restricted timezone validation')->timezones(['Europe/Warsaw', 'UTC'])->in(['Europe/Warsaw', 'UTC'])->default('Europe/Warsaw'), invalid: 'Asia/Tokyo', valid: 'Europe/Warsaw', description: 'Asia/Tokyo is outside this explicit server whitelist.'),
+                new ValidationExample(TimezoneField::make('timezone__validation_identifier')->label('IANA identifier validation')->rules(['timezone'])->default('Europe/Warsaw'), invalid: 'Mars/Olympus', valid: 'Europe/Warsaw', description: 'A made-up timezone identifier is rejected.'),
+            ], columns: 3),
+            new ExampleGroup('Variants and locked values', 'Compare a secondary input, a read-only timezone and a disabled timezone.', [
+                TimezoneField::make('timezone__secondary')->label('Small · secondary')->size('sm')->variant('secondary')->default('Europe/Warsaw'),
+                TimezoneField::make('timezone__read_only')->label('Read-only timezone')->readOnly()->default('Europe/London'),
+                TimezoneField::make('timezone__disabled')->label('Disabled timezone')->disabled()->default('Europe/London'),
+            ], columns: 3),
         ];
     }
 }

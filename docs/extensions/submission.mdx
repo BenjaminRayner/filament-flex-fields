@@ -1,0 +1,64 @@
+---
+title: "Validate and save family values"
+description: "Submit through family rules and an explicit application write policy."
+---
+
+Use `FamilySchemaSubmission` for an API, import or job that writes values belonging
+to a registered family. It resolves the same configuration layers and calls the
+same adapter rules as the form. `isRequired` is applied in both paths. Your adapter
+must provide a nonempty value-rule list for this server-side save boundary; an
+empty rule list is rejected. Use `nullable` explicitly for optional nullable values.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyRenderContext;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaSubmission;
+use Illuminate\Support\Arr;
+
+// $definitions and $context come from your trusted server-side schema.
+// The payload uses the same statePathPrefix as the form.
+$prepared = app(FamilySchemaSubmission::class)->prepare(
+    values: ['attributes' => $request->input('attributes', [])],
+    definitions: $definitions,
+    context: $context,
+    authorizeWrite: fn (
+        FamilySchemaDefinition $field,
+        FamilyRenderContext $context,
+    ): bool => $fieldPolicy->canEdit($actor, $customer, $field->slug),
+);
+
+foreach ($definitions as $field) {
+    $path = $context->statePath($field->slug);
+
+    if (Arr::has($prepared, $path)) {
+        $customer->setFlexFieldValue(
+            $field->slug,
+            data_get($prepared, $path),
+        );
+    }
+}
+
+$customer->save();
+```
+
+Resolve the actor, customer and tenant in your application's policy and query the
+customer within that tenant. `authorizeWrite` is required and must return a boolean.
+The adapter's `authorize()` check also runs. A denied submitted field throws;
+an omitted denied field remains omitted. Inactive, disabled and readonly definitions
+cannot accept submitted values. A hidden field still requires the write policy;
+visibility does not grant permission. A migrated configuration is checked by the
+policy before and after normalization.
+
+Unknown field paths, duplicate definitions, old value versions and invalid values
+reject the whole preparation. Structured values still need rules such as
+`array:text` or a custom typed value rule to reject unknown keys inside the value.
+Rules referring to other fields use the actual state paths, for example
+`same:attributes.confirmation`. The method returns only prepared fields and never
+persists a record. Merge only those fields into existing data so omitted fields
+and temporarily unavailable extensions are preserved. Encryption, record locking
+and database transactions remain explicit application storage concerns.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

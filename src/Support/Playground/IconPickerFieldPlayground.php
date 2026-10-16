@@ -18,20 +18,23 @@ class IconPickerFieldPlayground
     {
         return [
             'icon_picker__empty' => null,
-            'icon_picker__heroicon' => 'heroicon-o-star',
-            'icon_picker__gravity' => 'gravityui-star',
-            'icon_picker__multi_set' => 'heroicon-o-star',
-            'icon_picker__grid' => 'heroicon-o-bolt',
-            'icon_picker__whitelist' => 'heroicon-o-heart',
-            'icon_picker__sm' => 'heroicon-o-star',
-            'icon_picker__md' => 'heroicon-o-bolt',
-            'icon_picker__lg' => 'heroicon-o-heart',
-            'icon_picker__flat' => 'heroicon-o-star',
-            'icon_picker__soft' => 'heroicon-o-bolt',
-            'icon_picker__faded' => 'heroicon-o-heart',
-            'icon_picker__underlined' => 'heroicon-o-star',
-            'icon_picker__secondary' => 'heroicon-o-bolt',
-            'icon_picker__not_clearable' => 'heroicon-o-star',
+            'icon_picker__heroicon' => 'hugeicons-star',
+            'icon_picker__gravity' => 'hugeicons-star',
+            'icon_picker__multi_set' => 'hugeicons-star',
+            'icon_picker__grid' => 'hugeicons-flash',
+            'icon_picker__list' => 'hugeicons-star',
+            'icon_picker__label_grid' => 'hugeicons-favourite',
+            'icon_picker__preload' => 'hugeicons-flash',
+            'icon_picker__whitelist' => 'hugeicons-favourite',
+            'icon_picker__sm' => 'hugeicons-star',
+            'icon_picker__md' => 'hugeicons-flash',
+            'icon_picker__lg' => 'hugeicons-favourite',
+            'icon_picker__flat' => 'hugeicons-star',
+            'icon_picker__soft' => 'hugeicons-flash',
+            'icon_picker__faded' => 'hugeicons-favourite',
+            'icon_picker__underlined' => 'hugeicons-star',
+            'icon_picker__secondary' => 'hugeicons-flash',
+            'icon_picker__not_clearable' => 'hugeicons-star',
         ];
     }
 
@@ -47,23 +50,23 @@ class IconPickerFieldPlayground
                 ->schema([
                     IconPickerField::make('icon_picker__empty')
                         ->label('Empty (no selection)')
-                        ->sets(['heroicons'])
+                        ->sets(['hugeicons'])
                         ->helperText('Starts blank — open the panel to load the default catalog. Also useful to verify clear → reopen.')
                         ->columnSpanFull(),
                     IconPickerField::make('icon_picker__heroicon')
-                        ->label('Heroicons only')
-                        ->sets(['heroicons'])
-                        ->helperText('Limits the catalog to the heroicons set.')
+                        ->label('Hugeicons · search')
+                        ->sets(['hugeicons'])
+                        ->helperText('Limits the catalog to the Hugeicons set.')
                         ->columnSpanFull(),
                     IconPickerField::make('icon_picker__gravity')
-                        ->label('Gravity icons only')
-                        ->sets(['gravity-icons'])
-                        ->helperText('Limits the catalog to the gravity-icons set.')
+                        ->label('Hugeicons · filtered catalog')
+                        ->sets(['hugeicons'])
+                        ->helperText('Limits the catalog to the hugeicons set.')
                         ->columnSpanFull(),
                     IconPickerField::make('icon_picker__multi_set')
                         ->label('Multiple sets (set filter pills)')
-                        ->sets(['heroicons', 'gravity-icons'])
-                        ->helperText('Open the dropdown — All sets, Heroicon, and Gravityui pills appear above the search field.')
+                        ->sets(['hugeicons'])
+                        ->helperText('Open the dropdown — All sets, Hugeicons filter pills appear above the search field.')
                         ->columnSpanFull(),
                     Grid::make(['default' => 1, 'lg' => 2])
                         ->extraAttributes(['class' => 'fff-playground-variants'])
@@ -72,18 +75,36 @@ class IconPickerFieldPlayground
                                 ->label('Icon grid')
                                 ->searchResultsLayout('icons')
                                 ->gridColumns(8)
-                                ->sets(['heroicons'])
+                                ->sets(['hugeicons'])
                                 ->helperText('Dropdown with icon-only grid layout.'),
+                            IconPickerField::make('icon_picker__list')
+                                ->label('Virtual list · pagination')
+                                ->list()
+                                ->sets(['hugeicons'])
+                                ->perPage(32)
+                                ->helperText('List layout shares keyboard and active identity with the grid; SVG batches load on demand.'),
+                            IconPickerField::make('icon_picker__label_grid')
+                                ->label('Label grid · pagination')
+                                ->grid()
+                                ->gridColumns(4)
+                                ->sets(['hugeicons'])
+                                ->perPage(24)
+                                ->closeOnSelect(false),
+                            IconPickerField::make('icon_picker__preload')
+                                ->label('Preloaded icon catalog')
+                                ->preload()
+                                ->sets(['hugeicons'])
+                                ->perPage(32),
                             IconPickerField::make('icon_picker__whitelist')
                                 ->label('Whitelisted icons')
-                                ->sets(['heroicons'])
+                                ->sets(['hugeicons'])
                                 ->icons([
-                                    'heroicon-o-heart',
-                                    'heroicon-o-star',
-                                    'heroicon-o-bolt',
-                                    'heroicon-o-fire',
+                                    'hugeicons-favourite',
+                                    'hugeicons-star',
+                                    'hugeicons-flash',
+                                    'hugeicons-fire',
                                 ])
-                                ->excludeIcons(['heroicon-o-fire'])
+                                ->excludeIcons(['hugeicons-fire'])
                                 ->gridColumns(4),
                         ]),
                     Grid::make(['default' => 1, 'sm' => 3])
@@ -91,14 +112,14 @@ class IconPickerFieldPlayground
                         ->schema([
                             IconPickerField::make('icon_picker__sm')
                                 ->label('Small')
-                                ->sets(['heroicons'])
+                                ->sets(['hugeicons'])
                                 ->size('sm'),
                             IconPickerField::make('icon_picker__md')
                                 ->label('Medium')
-                                ->sets(['heroicons']),
+                                ->sets(['hugeicons']),
                             IconPickerField::make('icon_picker__lg')
                                 ->label('Large')
-                                ->sets(['heroicons'])
+                                ->sets(['hugeicons'])
                                 ->size('lg'),
                         ]),
                     Grid::make(['default' => 1, 'sm' => 2, 'lg' => 4])
@@ -106,19 +127,19 @@ class IconPickerFieldPlayground
                         ->schema([
                             IconPickerField::make('icon_picker__flat')
                                 ->label('Flat')
-                                ->sets(['heroicons'])
+                                ->sets(['hugeicons'])
                                 ->variant('flat'),
                             IconPickerField::make('icon_picker__soft')
                                 ->label('Soft')
-                                ->sets(['heroicons'])
+                                ->sets(['hugeicons'])
                                 ->variant('soft'),
                             IconPickerField::make('icon_picker__faded')
                                 ->label('Faded')
-                                ->sets(['heroicons'])
+                                ->sets(['hugeicons'])
                                 ->variant('faded'),
                             IconPickerField::make('icon_picker__underlined')
                                 ->label('Underlined')
-                                ->sets(['heroicons'])
+                                ->sets(['hugeicons'])
                                 ->variant('underlined'),
                         ]),
                     Grid::make(['default' => 1, 'sm' => 2])
@@ -126,11 +147,11 @@ class IconPickerFieldPlayground
                         ->schema([
                             IconPickerField::make('icon_picker__secondary')
                                 ->label('Secondary')
-                                ->sets(['heroicons'])
+                                ->sets(['hugeicons'])
                                 ->variant('secondary'),
                             IconPickerField::make('icon_picker__not_clearable')
                                 ->label('Not clearable')
-                                ->sets(['heroicons'])
+                                ->sets(['hugeicons'])
                                 ->clearable(false),
                         ]),
                 ]),

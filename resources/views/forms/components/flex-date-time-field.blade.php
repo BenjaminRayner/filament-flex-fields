@@ -1,7 +1,7 @@
 @php
     use Bjanczak\FilamentFlexFields\Enums\DateTimeFieldMode;
     use Bjanczak\FilamentFlexFields\Support\DateTime\DateTimeSegmentHydrator;
-    use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+    use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 
     $statePath = $getStatePath();
     $isDisabled = $isDisabled();
@@ -9,6 +9,7 @@
     $wrapperClasses = $getWrapperClasses();
     $alpine = $field->getAlpineConfiguration();
     $initialDisplay = $alpine['initialDisplay'];
+    $triggerDisplay = is_array($initialDisplay) ? ($initialDisplay['combined'] ?? '') : $initialDisplay;
     $hasError = filled($statePath) && $errors->has($statePath);
     $livewireKey = $getLivewireKey();
     $isRange = in_array($field->getMode()->value, ['dateRange', 'timeRange'], true);
@@ -48,8 +49,8 @@
     <div
         wire:ignore
         wire:key="{{ $livewireKey }}.{{ substr(md5(serialize([$isDisabled, $isReadOnly, $getSize(), $showCalendar, $field->getMode()->value])), 0, 64) }}"
-        x-load
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('flex-date-time-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+        x-fff-load
+        x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('flex-date-time-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
         x-data="flexDateTimeFieldFormComponent({
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
             statePath: @js($statePath),
@@ -62,7 +63,6 @@
                 {{ $key }}: @js($value),
             @endforeach
         })"
-        x-init="init()"
         x-on:click.outside="if ($refs.calendarMenu?.contains($event.target)) { return }; closeCalendar()"
         x-on:keydown.escape.window="closeCalendar()"
         @class([
@@ -89,15 +89,26 @@
         role="group"
         aria-label="{{ $getLabel() }}"
     >
-        <div
+        <x-filament-flex-fields::text-input.shell
             @class([
                 'fff-date-time-field__shell fff-flex-text-input__shell',
                 'is-invalid' => $hasError,
                 'is-segment-invalid' => false,
             ])
             x-bind:class="{ 'is-segment-invalid': segmentInvalid || config.isInvalid }"
-            x-ref="fieldShell"
+            :actions-framed="false" x-ref="fieldShell"
+            :prefix-icon="$showCalendarButton ? FlexIcon::Calendar : null"
         >
+            @if ($showCalendarButton && ($isRange || $isDateTime))
+                <x-filament::input.wrapper :disabled="$isDisabled" :valid="! $hasError" class="fff-flex-text-input__wrapper">
+                    <x-filament-flex-fields::text-input.control :value="$triggerDisplay"
+                        :id="$getId()" :disabled="$isDisabled" :readonly="true"
+                        :aria-label="$getLabel()" :placeholder="$field->getPlaceholder()"
+                        x-bind:value="displayText" x-on:click="toggleCalendar()"
+                        x-on:keydown.arrow-down.prevent="toggleCalendar()" aria-haspopup="dialog"
+                        x-bind:aria-expanded="calendarOpen" />
+                </x-filament::input.wrapper>
+            @else
             <div class="fff-date-time-field__input-row">
                 <div class="fff-date-time-field__segments" role="presentation">
                     @if ($isRange)
@@ -181,11 +192,13 @@
                     @endif
                 </div>
 
+            </div>
+            @endif
                 @if ($showCalendarButton)
-                    <div class="fff-date-time-field__suffix">
+                    <x-slot:actions><span class="fff-flex-text-input__action-item fff-date-time-field__suffix">
                         <button
                             type="button"
-                            class="fff-date-time-field__calendar-button"
+                            class="fff-flex-text-input__action-btn"
                             x-ref="calendarTrigger"
                             x-on:click.stop="toggleCalendar()"
                             x-bind:aria-expanded="calendarOpen ? 'true' : 'false'"
@@ -194,14 +207,13 @@
                             @disabled($isDisabled || $isReadOnly)
                         >
                             <x-filament::icon
-                                :icon="GravityIcon::Calendar"
-                                class="fff-date-time-field__calendar-icon"
+                                :icon="FlexIcon::ChevronDown"
+                                class="fff-flex-text-input__action-icon fff-flex-text-input__disclosure-icon"
                             />
                         </button>
-                    </div>
+                    </span></x-slot:actions>
                 @endif
-            </div>
-        </div>
+        </x-filament-flex-fields::text-input.shell>
 
         <p
             class="fff-date-time-field__segment-error"
@@ -216,12 +228,12 @@
                     <div
                         @class([
                             'fff-date-time-field__calendar',
+                            'fff-teleported-menu',
                             'fff-date-time-field__calendar--'.$getSize(),
                         ])
                         x-ref="calendarMenu"
                         x-show="calendarOpen"
                         x-cloak
-                        x-transition.opacity.duration.150ms
                         x-bind:class="{ 'is-positioned': calendarReady }"
                         x-bind:dir="calendarDirection"
                         x-on:click.stop
@@ -241,7 +253,7 @@
                             >
                                 <span class="fff-date-time-field__year-trigger-heading" x-text="calendarHeaderLabel"></span>
                                 <x-filament::icon
-                                    :icon="GravityIcon::ChevronRight"
+                                    :icon="FlexIcon::ChevronRight"
                                     class="fff-date-time-field__year-trigger-indicator"
                                     x-bind:class="{ 'is-open': yearPickerOpen || calendarViewMode === 'years' }"
                                 />
@@ -249,13 +261,13 @@
                             <div class="fff-date-time-field__calendar-nav" x-show="showsCalendarNavigation">
                                 <button type="button" class="fff-date-time-field__nav-button" x-on:click="previousMonth()" x-bind:aria-label="calendarViewMode === 'days' ? 'Previous month' : (calendarViewMode === 'months' ? 'Previous year' : 'Previous years')">
                                     <x-filament::icon
-                                        :icon="GravityIcon::ChevronLeft"
+                                        :icon="FlexIcon::ChevronLeft"
                                         class="fff-date-time-field__nav-icon"
                                     />
                                 </button>
                                 <button type="button" class="fff-date-time-field__nav-button" x-on:click="nextMonth()" x-bind:aria-label="calendarViewMode === 'days' ? 'Next month' : (calendarViewMode === 'months' ? 'Next year' : 'Next years')">
                                     <x-filament::icon
-                                        :icon="GravityIcon::ChevronRight"
+                                        :icon="FlexIcon::ChevronRight"
                                         class="fff-date-time-field__nav-icon"
                                     />
                                 </button>

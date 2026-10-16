@@ -13,6 +13,7 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexRichEditor;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextareaField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexVerificationCode;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FontSelect;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\IconPickerField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\PhoneField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SlugField;
@@ -24,6 +25,7 @@ use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\CreditCardFiel
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\FlexTextareaFieldConfigurator;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\FlexTextInputFieldConfigurator;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\FlexVerificationCodeFieldConfigurator;
+use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\FontSelectFieldConfigurator;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\IconPickerFieldConfigurator;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\PhoneFieldConfigurator;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\SlugFieldConfigurator;
@@ -42,6 +44,7 @@ final class TextFieldTypeHandler extends AbstractFieldTypeHandler
         private readonly PhoneFieldConfigurator $phone = new PhoneFieldConfigurator,
         private readonly CountryFieldConfigurator $country = new CountryFieldConfigurator,
         private readonly TimezoneFieldConfigurator $timezone = new TimezoneFieldConfigurator,
+        private readonly FontSelectFieldConfigurator $font = new FontSelectFieldConfigurator,
         private readonly SlugFieldConfigurator $slug = new SlugFieldConfigurator,
         private readonly AddressAutocompleteFieldConfigurator $addressAutocomplete = new AddressAutocompleteFieldConfigurator,
         private readonly FlexVerificationCodeFieldConfigurator $verificationCode = new FlexVerificationCodeFieldConfigurator,
@@ -63,6 +66,7 @@ final class TextFieldTypeHandler extends AbstractFieldTypeHandler
             FieldType::Phone,
             FieldType::Country,
             FieldType::Timezone,
+            FieldType::FontSelect,
             FieldType::Password,
             FieldType::Slug,
             FieldType::Search,
@@ -89,6 +93,7 @@ final class TextFieldTypeHandler extends AbstractFieldTypeHandler
             FieldType::Phone => $this->phone->configure(PhoneField::make($statePath), $config),
             FieldType::Country => $this->country->configure(CountryField::make($statePath), $config),
             FieldType::Timezone => $this->timezone->configure(TimezoneField::make($statePath), $config),
+            FieldType::FontSelect => $this->font->configure(FontSelect::make($statePath), $config),
             FieldType::Password => TextInput::make($statePath)->password()->revealable(),
             FieldType::Slug => filled($config['title_slug'] ?? null)
                 ? TitleSlugField::make(
@@ -101,7 +106,7 @@ final class TextFieldTypeHandler extends AbstractFieldTypeHandler
                     requiredTitleLocales: $config['required_title_locales'] ?? null,
                 )
                 : $this->slug->configure(SlugField::make($statePath), $config),
-            FieldType::Search => TextInput::make($statePath)->prefixIcon('heroicon-o-magnifying-glass'),
+            FieldType::Search => TextInput::make($statePath)->prefixIcon('hugeicons-search-01'),
             FieldType::AddressAutocomplete => $this->addressAutocomplete->configure(AddressAutocompleteField::make($statePath), $config),
             FieldType::VerificationCode => $this->verificationCode->configure(FlexVerificationCode::make($statePath), $config),
             FieldType::IconPicker => $this->iconPicker->configure(IconPickerField::make($statePath), $config),

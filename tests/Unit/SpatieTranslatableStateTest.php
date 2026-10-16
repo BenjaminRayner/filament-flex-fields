@@ -13,10 +13,10 @@ it('keeps tiptap document arrays when dehydrating for spatie', function (): void
     ];
 
     expect(SpatieTranslatableState::dehydrate($doc))->toBe($doc)
-        ->and(SpatieTranslatableState::dehydrate([]))->toBeNull()
-        ->and(SpatieTranslatableState::dehydrate('  '))->toBeNull()
+        ->and(SpatieTranslatableState::dehydrate([]))->toBe([])
+        ->and(SpatieTranslatableState::dehydrate('  '))->toBe('  ')
         ->and(SpatieTranslatableState::dehydrate('<p>Hi</p>'))->toBe('<p>Hi</p>')
-        ->and(SpatieTranslatableState::dehydrate(123))->toBeNull();
+        ->and(SpatieTranslatableState::dehydrate(123))->toBe(123);
 });
 
 it('hydrates tiptap arrays and json-encoded tiptap strings', function (): void {
@@ -31,5 +31,5 @@ it('hydrates tiptap arrays and json-encoded tiptap strings', function (): void {
         ->and(SpatieTranslatableState::hydrate(json_encode($doc)))->toBe($doc)
         ->and(SpatieTranslatableState::hydrate('<p>Legacy HTML</p>'))->toBe('<p>Legacy HTML</p>')
         ->and(SpatieTranslatableState::hydrate(null))->toBeNull()
-        ->and(SpatieTranslatableState::hydrate(''))->toBeNull();
+        ->and(SpatieTranslatableState::hydrate(''))->toBe('');
 });

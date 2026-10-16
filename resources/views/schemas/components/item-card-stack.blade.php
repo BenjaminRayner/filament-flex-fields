@@ -3,6 +3,7 @@
 @endphp
 
 @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'item-card',
+        'assetSchemaComponent' => $schemaComponent,
         'livewireKey' => $getLivewireKey(),
     ])
 

@@ -66,9 +66,12 @@ test('alpine load gate falls back to managed asset links when injector is absent
 
     const listeners = new Map()
     const link = {
+        parentNode: {},
+        isConnected: true,
         rel: 'stylesheet',
         href: normalizeAssetUrl('/css/flex-fields-select-field.css', 'https://panel.test/admin'),
         sheet: null,
+        dataset: { fffStylesheet: 'select-field' },
         addEventListener(type, listener) {
             listeners.set(type, listener)
         },

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexSlider;
+use Filament\Forms\Components\Slider\Enums\Behavior;
 use Filament\Forms\Components\Slider\Enums\PipsMode;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
@@ -20,6 +21,19 @@ class FlexSliderPlayground
     {
         return [
             'flex_slider__step_demo' => 50,
+            'flex_slider__elastic_pill' => 64,
+            'flex_slider__elastic_circle' => 64,
+            'flex_slider__speed_pill' => 1,
+            'flex_slider__speed_circle' => 1,
+            'flex_slider__circle_range' => [45, 55],
+            'flex_slider__circle_fixed' => [25, 75],
+            'flex_slider__elastic_rtl' => 64,
+            'flex_slider__elastic_disabled' => 64,
+            'flex_slider__button_pill' => 64,
+            'flex_slider__button_circle' => 64,
+            'flex_slider__button_only' => 64,
+            'flex_slider__button_end' => 30,
+            'flex_slider__button_disabled' => 64,
             'flex_slider__sm' => 0,
             'flex_slider__md' => 50,
             'flex_slider__lg' => 100,
@@ -43,7 +57,7 @@ class FlexSliderPlayground
     public function section(): Section
     {
         return Section::make('Flex Slider')
-            ->description('Pill rail + accent fill + capsule thumb + optional in-track step dots. Full Filament Slider API.')
+            ->description('Compare pill and circle handles, elastic motion, rolling numbers, magnetic marks and validated ranges.')
             ->extraAttributes(['class' => 'fff-playground-section'])
             ->schema([
                 Section::make('Pill thumb & step dots')
@@ -59,6 +73,75 @@ class FlexSliderPlayground
                             ->fillTrack()
                             ->tooltips(RawJs::make('`$${$value}`'))
                             ->default(50),
+                    ]),
+                Section::make('Elastic · two handle styles')
+                    ->description('The same icons, magnetic marks and elastic motion with a pill inside the rail or a circle outside it.')
+                    ->compact()
+                    ->schema([
+                        Grid::make(['default' => 1, 'sm' => 2])->schema([
+                            $this->single('flex_slider__elastic_pill', 'Volume · pill')
+                                ->fillColor('#8B5CF6')
+                                ->default(64)->valuePlacement('header')->suffix('%')->elastic()->tooltips()->haptics()
+                                ->startIcon('hugeicons-volume-low')->endIcon('hugeicons-volume-high')
+                                ->marks([0, ['value' => 50, 'label' => '50%'], 100]),
+                            $this->single('flex_slider__elastic_circle', 'Volume · circle')
+                                ->color('success')
+                                ->default(64)->valuePlacement('header')->suffix('%')->thumbStyle('circle')->elastic()->tooltips()->haptics()
+                                ->startIcon('hugeicons-volume-low')->endIcon('hugeicons-volume-high')
+                                ->marks([0, ['value' => 50, 'label' => '50%'], 100]),
+                            $this->single('flex_slider__speed_pill', 'Playback · pill')
+                                ->color('info')
+                                ->range(0.5, 2)->step(0.1)->default(1)->valuePlacement('header')->suffix('×')->elastic()->tooltips()
+                                ->marks([['value' => 0.5, 'label' => '0.5×'], ['value' => 1, 'label' => '1×'], ['value' => 1.5, 'label' => '1.5×'], ['value' => 2, 'label' => '2×']]),
+                            $this->single('flex_slider__speed_circle', 'Playback · circle')
+                                ->fillColor('#F43F5E')
+                                ->range(0.5, 2)->step(0.1)->default(1)->valuePlacement('header')->suffix('×')->thumbStyle('circle')->elastic()->tooltips()
+                                ->marks([['value' => 0.5, 'label' => '0.5×'], ['value' => 1, 'label' => '1×'], ['value' => 1.5, 'label' => '1.5×'], ['value' => 2, 'label' => '2×']]),
+                            $this->single('flex_slider__circle_range', 'Circle · two handles')
+                                ->fillColor('#14B8A6')
+                                ->default([45, 55])->rangeHandles()->thumbStyle('circle')
+                                ->fillTrack([false, true, false])->valuePlacement('header')->suffix('%')
+                                ->elastic()->tooltips()->marks([0, ['value' => 50, 'label' => '50%'], 100]),
+                            $this->single('flex_slider__circle_fixed', 'Circle · fixed interval')
+                                ->default([25, 75])->rangeHandles()->thumbStyle('circle')
+                                ->fillTrack([false, true, false])->valuePlacement('header')->suffix('%')
+                                ->elastic()->tooltips()->behavior([Behavior::Tap, Behavior::Drag, Behavior::Fixed]),
+                            $this->single('flex_slider__elastic_rtl', 'Elastic · RTL')
+                                ->default(64)->rtl()->thumbStyle('circle')->elastic()->tooltips()->suffix('%'),
+                            $this->single('flex_slider__elastic_disabled', 'Elastic · disabled')
+                                ->default(64)->thumbStyle('circle')->elastic()->tooltips()->disabled(),
+                        ]),
+                    ]),
+                Section::make('Icon buttons')
+                    ->description('Ordinary side icons stay decorative. Add a separate circular button to switch to a chosen value and restore the previous value.')
+                    ->compact()
+                    ->schema([
+                        Grid::make(['default' => 1, 'sm' => 2])->schema([
+                            $this->single('flex_slider__button_pill', 'Volume button · pill')
+                                ->default(64)->suffix('%')->valuePlacement('header')->elastic()->tooltips()
+                                ->iconButton('hugeicons-volume-high')->iconButtonActiveIcon('hugeicons-volume-off')
+                                ->iconButtonLabel('Mute')->iconButtonActiveLabel('Restore volume')
+                                ->endIcon('hugeicons-volume-high'),
+                            $this->single('flex_slider__button_circle', 'Volume button · circle')
+                                ->default(64)->suffix('%')->valuePlacement('header')->thumbStyle('circle')->elastic()->tooltips()
+                                ->iconButton('hugeicons-volume-high')->iconButtonActiveIcon('hugeicons-volume-off')
+                                ->iconButtonLabel('Mute')->iconButtonActiveLabel('Restore volume')
+                                ->endIcon('hugeicons-volume-high'),
+                            $this->single('flex_slider__button_end', 'Brightness preset · end button')
+                                ->default(30)->suffix('%')->valuePlacement('header')->thumbStyle('circle')->elastic()->tooltips()
+                                ->startIcon('hugeicons-sun-03')->iconButton('hugeicons-sun-03')
+                                ->iconButtonValue(100)->iconButtonPosition('end')
+                                ->iconButtonLabel('Maximum brightness')->iconButtonActiveLabel('Restore brightness'),
+                            $this->single('flex_slider__button_disabled', 'Volume button · disabled')
+                                ->default(64)->suffix('%')->valuePlacement('header')->thumbStyle('circle')->disabled()
+                                ->iconButton('hugeicons-volume-high')->iconButtonActiveIcon('hugeicons-volume-off')
+                                ->iconButtonLabel('Mute')->iconButtonActiveLabel('Restore volume'),
+                            $this->single('flex_slider__button_only', 'Single button · circle')
+                                ->fillColor('#0EA5E9')
+                                ->default(64)->suffix('%')->valuePlacement('header')->thumbStyle('circle')->elastic()->tooltips()
+                                ->iconButton('hugeicons-volume-high')->iconButtonActiveIcon('hugeicons-volume-off')
+                                ->iconButtonLabel('Mute')->iconButtonActiveLabel('Restore volume'),
+                        ]),
                     ]),
                 Grid::make(['default' => 1, 'sm' => 2, 'lg' => 3])
                     ->extraAttributes(['class' => 'fff-playground-variants'])

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\UserColumn;
+use Bjanczak\FilamentFlexFields\Support\Playground\Contracts\PlaygroundWithComponents;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
 use Illuminate\Database\Eloquent\Model;
 
-class UserColumnPlayground
+class UserColumnPlayground implements PlaygroundWithComponents
 {
     /**
      * @return array<string, mixed>

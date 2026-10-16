@@ -1,6 +1,7 @@
 ---
 title: "IconColumn"
 description: Read-only table column for displaying blade-icons with optional labels, colors, and sizes.
+icon: "diamond"
 ---
 
 [← Back to Table of Contents](/docs/index)
@@ -15,7 +16,7 @@ Read-only **table column** for displaying blade-icons values stored by [IconPick
 | **Context** | Filament tables (`$table->columns([...])`) |
 | **State type** | `string\|null` — full icon name (e.g. `heroicon-o-star`) |
 | **Parent** | `Filament\Tables\Columns\TextColumn` |
-| **Playground** | `icon-column` slug in Flex Fields playground |
+| **Playground** | `icon-picker-field` → **Demo → Table column** |
 
 > **Import alias:** Filament ships its own `IconColumn`. When you need both, alias this class:
 > `use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\IconColumn as FlexIconColumn;`
@@ -86,7 +87,7 @@ IconColumn::make('debug_icon')
 
 ### Playground
 
-`/admin/flex-fields-playground/icon-column`
+`/admin/flex-fields/icon-picker-field?variant=table-column`
 
 See [Playground](/docs/index#playground) for setup.
 

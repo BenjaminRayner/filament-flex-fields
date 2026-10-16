@@ -1,11 +1,118 @@
 ---
 title: "AudioField"
 description: Compact audio player with waveform visualization, play/pause control, optional loop, and optional client-side Whisper speech-to-text.
+icon: "music"
+"canonical": "https://flex-fields.bjanczak.com/docs/audiofield"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/audio-field.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "AudioField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/audio-field-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/audio-field-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/audio-field.webp"
+"twitter:image:alt": "AudioField in the FLEX Fields playground"
 ---
 
-![AudioField](/art/sc-12.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/audiofield#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/audiofield",
+      "name": "AudioField",
+      "description": "Compact audio player with waveform visualization, play/pause control, optional loop, and optional client-side Whisper speech-to-text.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/audiofield#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/audiofield#article",
+      "url": "https://flex-fields.bjanczak.com/docs/audiofield",
+      "headline": "AudioField",
+      "description": "Compact audio player with waveform visualization, play/pause control, optional loop, and optional client-side Whisper speech-to-text.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/audiofield#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/audio-field-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/audio-field-motion.mp4#video",
+      "name": "AudioField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of AudioField in the FLEX Fields playground for Filament. Compact audio player with waveform visualization, play/pause control, optional loop, and optional client-side Whisper speech-to-text.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/audio-field.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT7.833S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/audio-field-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/audiofield#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
 
-[← Back to Table of Contents](/docs/index)
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/audio-field-motion.mp4"
+  poster="/art/previews/audio-field.webp"
+  width="1920"
+  height="1080"
+  aria-label="AudioField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/audio-field-motion.mp4">Watch the AudioField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 ### Summary
 
@@ -58,7 +165,7 @@ See [Speech-to-text (Whisper)](#speech-to-text-whisper) for model, language, and
 ### State & validation
 
 #### Stored value
-State is a string representing the audio URL.
+State is an HTTP(S) or root-relative audio URL string. URLs containing credentials, control characters or unsafe schemes are rejected. This field plays a URL; it does not upload or store the audio file.
 
 ```php
 $record->preview_url; // 'https://example.com/audio.mp3'
@@ -71,14 +178,14 @@ Ensures the state is a valid media URL string.
 
 ### Configuration API
 
-All methods accept `Closure` unless noted.
+Methods accept closures as well as the displayed values, unless noted.
 
 | Method | Type | Default | Description |
 |--------|------|---------|-------------|
-| `src(string $src)` | Setup | `null` | Fixed audio URL (overrides state) |
+| `src(string\|Closure\|null $src)` | Setup | `null` | Fixed audio URL (overrides state) |
 | `fullWidth(bool $condition)` | Setup | `false` | Stretch player to container width |
 | `loop(bool $condition)` | Setup | `false` | Loop playback |
-| `waveform(array $waveform)` | Setup | default | Custom peak heights `8`–`100` |
+| `waveform(array $waveform)` | Setup | default | List of up to 2048 finite numeric peaks, clamped to `8`–`100` |
 | `playIcon(string $icon)` | Setup | config | Custom play icon |
 | `pauseIcon(string $icon)` | Setup | config | Custom pause icon |
 | `size(string $size)` | Setup | `'md'` | `sm`, `md`, `lg` |
@@ -89,7 +196,7 @@ All methods accept `Closure` unless noted.
 
 ### Speech-to-text (Whisper)
 
-Enable optional **client-side** speech-to-text on any `AudioField` that has a playable audio URL. Transcription runs entirely in the user's browser via `@xenova/transformers` — no server API key, no upload of audio to your backend for STT.
+Enable optional **client-side** speech-to-text on any `AudioField` that has a playable audio URL. The Quantized switch selects `q8` weights; disabling it selects `fp32`. Inference uses the WASM backend and does not require WebGPU or cross-origin isolation. Transcription runs entirely in the user's browser via `@huggingface/transformers` — no server API key, no upload of audio to your backend for STT.
 
 ```php
 AudioField::make('voice_message')
@@ -107,7 +214,7 @@ If the runtime is missing, the audio player still works. The Transcribe UI is so
 
 #### Installing the Whisper runtime
 
-The browser ONNX / WASM runtime (**~40 MB**) is **not** included in the Composer package and is **not** published by `php artisan filament:assets`. Only apps that use `->transcription()` need it.
+The browser ONNX / WASM runtime (**~15 MB**) is **not** included in the Composer package and is **not** published by `php artisan filament:assets`. Only apps that use `->transcription()` need it.
 
 > **Important:** `filament:assets` syncs Flex Fields CSS/JS and small static media (beeps, NPS emoji, etc.). It never installs Whisper. Use the commands below.
 
@@ -119,10 +226,10 @@ php artisan fff:whisper:install
 
 What this does:
 
-1. Downloads the pinned `@xenova/transformers` dist files (currently **2.17.2**) from the jsDelivr npm CDN.
+1. Downloads the pinned `@huggingface/transformers` **4.3.1** browser bundle and its matching ONNX WASM/loader from the jsDelivr npm CDN.
 2. Verifies each file with **SHA-256** against the package manifest (`WhisperRuntimeManifest`).
-3. Writes them to `public/filament-flex-fields-assets/whisper/`.
-4. Writes `public/filament-flex-fields-assets/whisper/.installed.json` (version + hashes + timestamp).
+3. Writes them to `public/filament-flex-fields-assets/whisper/4.3.1/`.
+4. Writes `public/filament-flex-fields-assets/whisper/4.3.1/.installed.json` (version + hashes + timestamp).
 5. Does **not** install source maps (`.map` files are excluded on purpose).
 
 After a successful install, hard-refresh the admin panel and use `->transcription()` as usual.
@@ -157,7 +264,7 @@ Re-fetches all files even when the current install already verifies. Use after a
 
 | Command | Purpose |
 |---------|---------|
-| `php artisan fff:whisper:install` | Download + SHA-256 verify + write `public/.../whisper/` |
+| `php artisan fff:whisper:install` | Download + SHA-256 verify + write `public/.../whisper/4.3.1/` |
 | `php artisan fff:whisper:install --force` | Same, always re-download |
 | `php artisan fff:whisper:install --check` | Verify only (CI); exit `1` if missing/corrupt |
 | `php artisan fff:whisper:status` | Human-readable installed vs expected |
@@ -166,28 +273,29 @@ Re-fetches all files even when the current install already verifies. Use after a
 
 | Path | Role |
 |------|------|
-| `public/filament-flex-fields-assets/whisper/transformers.min.js` | Transformers runtime module |
-| `public/filament-flex-fields-assets/whisper/ort-wasm*.wasm` | ONNX Runtime WASM variants (simd / threaded) |
-| `public/filament-flex-fields-assets/whisper/.installed.json` | Lockfile written by install |
+| `public/filament-flex-fields-assets/whisper/4.3.1/transformers.min.js` | Transformers runtime module |
+| `public/filament-flex-fields-assets/whisper/4.3.1/ort-wasm-simd-threaded.wasm` | ONNX Runtime CPU/WASM binary |
+| `public/filament-flex-fields-assets/whisper/4.3.1/ort-wasm-simd-threaded.mjs` | Matching ONNX module loader |
+| `public/filament-flex-fields-assets/whisper/4.3.1/.installed.json` | Lockfile written by install |
 
-URLs are resolved at runtime via `FlexFieldAssets::whisperRuntimeModuleSrc()` and `whisperRuntimeWasmBaseSrc()` (cache-busted with `?v=`).
+The field resolves the installed runtime URLs automatically. Each runtime version has its own directory so cached modules and already-open pages cannot mix different runtime versions. The manifest also pins the matching `onnxruntime-web` release; its `.mjs` loader and `.wasm` file are installed together.
 
 ##### Deploy notes
 
-- Run `fff:whisper:install` on each environment that needs transcription (or copy the verified `public/filament-flex-fields-assets/whisper/` directory as a build artifact).
+- Run `fff:whisper:install` on each environment that needs transcription (or copy the verified `public/filament-flex-fields-assets/whisper/4.3.1/` directory as a build artifact).
 - Commit the whisper directory only if your deploy strategy requires it; many teams install during CI/CD instead.
 - Do **not** expect `composer install` or `filament:assets` alone to restore Whisper after an upgrade.
 - Upgrading from an older Flex Fields release that **bundled** Whisper in Composer: remove any stale vendor/public copies from the old layout, then run `fff:whisper:install` once.
 
 ##### Network requirements for install
 
-The install command needs outbound HTTPS to the jsDelivr npm CDN (`cdn.jsdelivr.net/npm/@xenova/transformers@…`). Air-gapped hosts must vendor the verified files into `public/filament-flex-fields-assets/whisper/` by another channel, then confirm with `fff:whisper:install --check`.
+The install command needs outbound HTTPS to the jsDelivr npm CDN (`cdn.jsdelivr.net/npm/@huggingface/transformers@…`). Air-gapped hosts must vendor the verified files into `public/filament-flex-fields-assets/whisper/4.3.1/` by another channel, then confirm with `fff:whisper:install --check`. Install access must allow both the pinned `@huggingface/transformers` and `onnxruntime-web` npm packages.
 
 Model **weights** (Hugging Face) are still downloaded in the **browser** on first Transcribe — that is separate from this artisan install.
 
 #### Transcript is not field state
 
-The transcript appears in `.fff-audio-field__transcript` for the current page session. It is **not** saved to the Eloquent attribute / form state. To persist text, bind a separate field (for example `Textarea`) or use server-side transcription on [VoiceNoteRecorderField](/docs/voicenoterecorderfield) via [Media Ingress](/docs/media-capture-os).
+The transcript appears in `.fff-audio-field__transcript` for the current page session. It is **not** saved to the Eloquent attribute / form state. To persist text, bind a separate field (for example `Textarea`) or use server-side transcription on [VoiceNoteRecorderField](/docs/voicenoterecorderfield) via [Media OS](/docs/media-capture-os).
 
 #### How it works
 
@@ -214,7 +322,7 @@ Progress during the first model load shows the downloading file and percentage (
 
 #### Configuration API (transcription)
 
-All methods accept `Closure` unless noted.
+Methods accept closures as well as the displayed values, unless noted.
 
 | Method | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -330,7 +438,7 @@ AudioField::make('foreign_clip')
 | Symptom | Likely cause | What to try |
 |---------|--------------|-------------|
 | Install CTA / Transcribe UI missing though `->transcription()` is set | Whisper runtime not installed on this host | `php artisan fff:whisper:install`, then `fff:whisper:status`, hard refresh |
-| `fff:whisper:install --check` exits `1` | Missing files or SHA-256 mismatch | `fff:whisper:install --force`; confirm deploy includes `public/.../whisper/` |
+| `fff:whisper:install --check` exits `1` | Missing files or SHA-256 mismatch | `fff:whisper:install --force`; confirm deploy includes `public/.../whisper/4.3.1/` |
 | SHA-256 mismatch during install | Truncated download or CDN/proxy tampering | Retry `--force`; allowlist `cdn.jsdelivr.net`; check disk space |
 | "Whisper runtime assets are not configured" | Runtime URLs empty / not installed | `fff:whisper:install` (not `filament:assets` alone) |
 | "Could not fetch the audio file" | CORS or 403 on audio URL | Same-origin URL, signed URL with CORS, or proxy |
@@ -365,7 +473,7 @@ AudioField::make('demo')
 
 ### Playground
 
-`/admin/flex-fields-playground/audio-field`
+`/admin/flex-fields/audio-field`
 
 Two sections:
 
@@ -406,3 +514,14 @@ See [Playground](/docs/index#playground) for setup.
 | `fff-audio-field__stt-status` | Loading / error status line |
 | `fff-audio-field__transcript` | Transcript output container |
 | `fff-audio-field__transcript-text` | Transcript text (`<pre>`) |
+
+
+## Keyboard, layout and resource use
+
+Focus the waveform and use Left/Right to seek by five seconds, Home for the beginning and End for the end. Seeking follows RTL direction. The play button supports normal button keyboard activation. Read-only and disabled fields block interaction.
+
+The compact player keeps its existing appearance in all three sizes. Waveform bar count adapts to the available width. Provide `waveform()` when you already have peaks to avoid fetching audio for analysis. Without custom peaks, the initial display uses a deterministic waveform; real analysis is lazy and never delays playback. Automatic analysis skips tracks whose known duration exceeds ten minutes and limits downloads to 32 MB.
+
+Only playing audio runs a progress animation. Removing the field stops playback and cancels owned requests, gestures, observers and timers. Inactive tabs and modals use the FLEX activation lifecycle; merely scrolling the field out of view does not stop it.
+
+Whisper is optional. Changing the source or removing the field cancels its pending fetch and discards obsolete results. An already running native model inference may continue internally; it cannot update a disposed field. Model weights remain subject to browser caching and memory limits. For long recordings or centralized processing, use a server transcription provider with Voice Note Recorder instead.

@@ -1,4 +1,4 @@
-<style>
+<style @if (($deliveryNonce = app(\Bjanczak\FilamentFlexFields\Support\Assets\Delivery\AssetDeliveryContext::class)->nonce()) !== null) nonce="{{ $deliveryNonce }}" @endif>
     /* Loaded after Filament / tippy theme so glass tooltips win the cascade. */
     .tippy-box[data-theme~='light'] {
         --fff-tooltip-bg: #ffffffa3;

@@ -1,0 +1,8 @@
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
+    <div class="fff-{{PREFIX}}-field fff-composite-field" {{ $getExtraAttributeBag() }}>
+        <x-filament-flex-fields::assets :component="$getAssetComponent()" :capabilities="$getAssetCapabilities()" :consumer="$getLivewireKey()" :schema-component="$field" />
+        <div x-fff-load x-fff-load-src="{{ \Bjanczak\FilamentFlexFields\Support\FlexFieldAssets::alpineEntrySrc('{{PREFIX}}-field') }}" x-data="{{FACTORY}}()">
+            <x-filament-flex-fields::schema :component="$field" />
+        </div>
+    </div>
+</x-dynamic-component>

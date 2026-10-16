@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'navigation_plural' => 'Feldgruppen',
+    'model_singular' => 'Feldgruppe',
+    'group' => 'Gruppe',
+    'sections' => 'Abschnitte',
+    'sections_description' => 'Optionale Layoutabschnitte zum Gruppieren von Formularfeldern.',
+    'section_id' => 'Abschnitts-ID',
+    'fields_schema' => 'Feldschema',
+    'fields_description' => 'Felddefinitionen für Formulare, Tabellen und Infolisten.',
+    'fields' => 'Felder',
+    'section' => 'Abschnitt',
+    'required' => 'Erforderlich',
+    'encrypted' => 'Gespeicherte Daten verschlüsseln',
+    'help_text' => 'Hilfetext',
+    'tenant_id' => 'Mandanten-ID',
+    'tenant' => 'Mandant',
+    'tenant_help' => 'Optionaler Mandantenschlüssel. Für eine globale Gruppe leer lassen.',
+    'name' => 'Name',
+    'slug' => 'Slug',
+    'order' => 'Reihenfolge',
+    'label' => 'Beschriftung',
+    'type' => 'Typ',
+    'sort' => 'Sortierreihenfolge',
+    'description' => 'Beschreibung',
+    'placeholder' => 'Platzhalter',
+    'width' => 'Breite',
+    'updated_at' => 'Aktualisiert am',
+    'section_type_section' => 'Abschnitt',
+    'section_type_fieldset' => 'Feldgruppe',
+    'section_type_headless' => 'Ohne Container',
+];

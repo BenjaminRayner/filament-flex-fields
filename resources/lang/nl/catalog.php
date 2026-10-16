@@ -1,0 +1,387 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'field_variant' => 'Veld',
+    'display_variant' => 'Weergave',
+    'column_variant' => 'Tabelkolom',
+    'recording' => [
+        'title' => 'Opnameweergave',
+        'choose_hint' => 'Klik op een voorbeeld om er een voorbeeld van te bekijken. Houd Shift ingedrukt en klik om maximaal drie te selecteren.',
+        'preview' => 'Selectie bekijken',
+        'cancel' => 'Annuleren',
+        'close' => 'Opnameweergave sluiten',
+        'zoom' => 'Zoomen',
+        'vertical' => 'Verticale positie',
+        'helpers' => 'Hulptekst weergeven',
+        'width' => 'Componentbreedte',
+        'shortcuts' => '16:9 · Alt+H verbergt besturingselementen · Escape / Alt+R sluit af',
+    ],
+    'developer_tools' => 'Ontwikkelaarstools',
+    'developer_tools_description' => 'Test hoe gedeelde assets worden geladen en vrijgegeven in echte Filament-formulieren, tabellen en geneste dialoogvensters.',
+    'included' => 'Inbegrepen',
+    'dark_mode' => 'Donkere modus',
+    'light_mode' => 'Lichte modus',
+    'sponsors' => 'Sponsoren',
+    'top_sponsors' => 'Topsponsors',
+    'become_sponsor' => 'Word sponsor op GitHub',
+    'sponsors_scroll' => 'Blader door sponsors met de pijltjestoetsen of veeg',
+    'previous_sponsors' => 'Eerdere sponsors',
+    'next_sponsors' => 'Meer sponsoren',
+    'sponsor_ranks' => [
+        'bronze' => 'Brons',
+        'silver' => 'Zilver',
+        'gold' => 'Goud',
+    ],
+    'form_state' => 'Formulierstatus',
+    'form_state_hint' => 'Een momentopname van de huidige demowaarden.',
+    'close' => 'Sluiten',
+    'demo_reset' => 'Demo opnieuw instellen',
+    'loading_examples' => 'Codevoorbeelden laden…',
+    'no_examples' => 'Er zijn nog geen codevoorbeelden gepubliceerd voor dit onderdeel.',
+    'example_files' => 'Voorbeeldbestanden',
+    'copy_code' => 'Kopiëren',
+    'code_copied' => 'Gekopieerd',
+    'copy_failed' => 'Kopiëren mislukt',
+    'example_unavailable' => 'Dit voorbeeldbestand is momenteel niet beschikbaar.',
+    'example_hint' => 'Klaar om aan uw eigen formulier aan te passen.',
+    'live_demo' => 'Livevoorbeeld',
+    'demo_actions' => 'Demo-acties',
+    'pause_banners' => 'Automatische dia\'s pauzeren',
+    'resume_banners' => 'Automatische dia\'s hervatten',
+    'footer_tagline' => 'Doordacht gebouwd. Klaar om te componeren.',
+    'footer_project' => 'Project op GitHub',
+    'loading_banner' => 'Uitgelichte inhoud laden…',
+    'loading_promotions' => 'Uitgelichte banners bijwerken…',
+    'banner_slide' => 'Toon banner :number',
+    'banner_slides' => 'Kies banner',
+    'information' => 'Informatie',
+    'developer' => 'Ontwikkelaar',
+    'category' => 'Categorie',
+    'version' => 'Versie',
+    'website' => 'Website',
+    'privacy_policy' => 'Privacybeleid',
+    'terms_of_service' => 'Servicevoorwaarden',
+    'install_short' => 'Installeren',
+    'breadcrumb' => 'Broodkruimelnavigatie',
+    'validate' => 'Valideren',
+    'dump_json' => 'JSON dumpen',
+    'reset_defaults' => 'Standaardwaarden opnieuw instellen',
+    'count' => ':count componenten en uitbreidingen',
+    'search' => 'Componenten zoeken…',
+    'collection' => 'Blader door de collectie',
+    'all' => 'Alles',
+    'installed' => 'Geïnstalleerd',
+    'community' => 'Gemeenschap',
+    'component_type' => 'Componenttype',
+    'component_types' => [
+        'all' => 'Alle typen',
+        'field' => 'Formuliervelden',
+        'column' => 'Tabelkolommen',
+        'display' => 'Inhoud en lay-outs',
+        'entry' => 'Infolijstgegevens',
+        'action' => 'Acties',
+    ],
+    'results' => 'Resultaten',
+    'categories' => 'Categorieën',
+    'all_categories' => 'Alle categorieën',
+    'popular' => 'Populair',
+    'noteworthy' => 'Nieuw en opmerkelijk',
+    'all_components' => 'Ontdek FLEX',
+    'empty' => 'Er komen geen componenten overeen met uw zoekopdracht.',
+    'clear_filters' => 'Filters wissen',
+    'install_named' => 'Installeer :name',
+    'explore_named' => 'Ontdek :name',
+    'official' => 'Officieel FLEX-onderdeel',
+    'carousel' => 'carrousel',
+    'promotion' => 'Uitgelicht',
+    'previous_banner' => 'Vorige banner',
+    'next_banner' => 'Volgende banner',
+    'verified' => 'Officieel FLEX-onderdeel',
+    'install' => 'Plugin installeren',
+    'github' => 'Bekijk op GitHub',
+    'demo' => 'Demo',
+    'code_example' => 'Codevoorbeeld',
+    'extension_notice' => 'Dit is een aanbevolen externe plug-in. Installatie en documentatie worden door de auteur op GitHub geleverd.',
+    'component_notice' => 'Dit onderdeel is geregistreerd in FLEX en beschikbaar voor gebruik. De auteur heeft geen interactieve demo gegeven.',
+    'previous' => 'Vorige banner',
+    'next' => 'Volgende banner',
+    'navigation_group' => 'Instellingen en hulpmiddelen',
+    'category_labels' => [
+        'buttons' => 'Acties',
+        'collections' => 'Collecties',
+        'colors' => 'Kleuren',
+        'controls' => 'Bedieningselementen',
+        'data-display' => 'Gegevensweergave',
+        'date-and-time' => 'Datum en tijd',
+        'guides' => 'Gidsen',
+        'location' => 'Locatie',
+        'media' => 'Media',
+        'navigation' => 'Navigatie',
+        'pickers' => 'Keuzevelden',
+        'text-input' => 'Tekstinvoer',
+    ],
+    'components' => [
+        'font-select' => [
+            'label' => 'Lettertype selecteren',
+            'description' => 'Zoek lettertypen met live previews, categoriefilters en gevirtualiseerd oneindig scrollen.',
+        ],
+        'address-autocomplete' => [
+            'label' => 'Adres automatisch aanvullen',
+            'description' => 'Vind adressen met gedeelde zoekopdracht, gestructureerde resultaten en configureerbare geocodering.',
+        ],
+        'admin-columns' => [
+            'label' => 'Beheerderskolommen',
+            'description' => 'Tabelpresentaties voor statussen, voortgang, pictogrammen en andere compacte gegevens.',
+        ],
+        'audio-field' => [
+            'label' => 'Audiospeler',
+            'description' => 'Compacte audiospeler met golfvormvisualisatie, afspeel-/pauzebediening, optionele lus en optionele client-side Whisper-spraak-naar-tekst.',
+        ],
+        'barcode-scanner-field' => [
+            'label' => 'Barcodescanner',
+            'description' => 'Ontdek de barcodescanner met configureerbaar gedrag, stijl en live voorbeelden.',
+        ],
+        'bubble-choice' => [
+            'label' => 'Bubble-keuze',
+            'description' => 'Multi-selectie van bellen met middenvergroting, randverkleining bij pan en optionele geschulpte selectie.',
+        ],
+        'calculator-field' => [
+            'label' => 'Rekenmachineveld',
+            'description' => 'Numerieke invoer met een gedeeld rekenmachinepaneel in iOS-stijl, sessiegeheugen per veld en volledige numerieke beperkingen.',
+        ],
+        'choice-cards' => [
+            'label' => 'Keuzekaarten',
+            'description' => 'Presenteer selecteerbare kaarten met pictogrammen, labels, beschrijvingen en aangevinkte statussen.',
+        ],
+        'choice-checkbox-cards' => [
+            'label' => 'Keuzecheckbox-kaarten',
+            'description' => 'Meerkeuzekaarten met behulp van de gedeelde geanimeerde selectie-indicator.',
+        ],
+        'color-swatch' => [
+            'label' => 'Kleurstaal',
+            'description' => 'Vooraf ingestelde kleurkiezer: horizontale staalpillen met optionele sectiekop en tooltips.',
+        ],
+        'country-field' => [
+            'label' => 'Landveld',
+            'description' => 'Zoek landen en gebieden met lokale vlaggen; een landcode van twee letters opslaan.',
+        ],
+        'country-map-field' => [
+            'label' => 'Landkaart',
+            'description' => 'Kies landen op een interactieve wereldkaart met regioselectie en zoeken.',
+        ],
+        'cover-card' => [
+            'label' => 'Omslagkaart',
+            'description' => 'Presenteer een omslagafbeelding, titel en beschrijving op een statische kaart.',
+        ],
+        'credit-card' => [
+            'label' => 'Creditcard',
+            'description' => 'Creditcardinvoer met live merkdetectie, interactieve preview en Luhn-validatie op de server.',
+        ],
+        'currency-field' => [
+            'label' => 'Valutaveld',
+            'description' => 'Valuta-invoer in Revolut-stijl met locale-bewuste opmaak, cijferanimaties, optionele valutakiezer en opslag van kleine eenheden.',
+        ],
+        'date-time-fields' => [
+            'label' => 'Datum- en tijdvelden',
+            'description' => 'Datum-, tijd- en bereikselectie met een gedeeld kalenderoppervlak en toetsenbordondersteuning.',
+        ],
+        'dual-listbox' => [
+            'label' => 'Dubbele keuzelijst',
+            'description' => 'Selectiehulpmiddel met twee vensters, met zoeken, opnieuw ordenen en virtueel scrollen.',
+        ],
+        'field-intelligence' => [
+            'label' => 'Berekende formules',
+            'description' => 'Gevalideerde berekeningen, afhankelijkheidsbewuste formules en door de server berekende formulierwaarden.',
+        ],
+        'file-upload' => [
+            'label' => 'Bestand uploaden',
+            'description' => 'Upload bestanden en afbeeldingen met voorbeelden, beperkingen en mediaconfiguratie.',
+        ],
+        'flex-checklist' => [
+            'label' => 'Flexchecklist',
+            'description' => 'Toegankelijke enkele of meerdere keuzes met configureerbare lijstpresentaties.',
+        ],
+        'flex-color-picker' => [
+            'label' => 'Flex-kleurkiezer',
+            'description' => 'Kies kleuren met een HSV-gebied, kanaalschuifregelaars, formaten en stalen.',
+        ],
+        'flex-matrix-table' => [
+            'label' => 'Flex-matrixtabel',
+            'description' => 'Bewerk gestructureerde keuzes in rijen en kolommen met gedeelde formulierbesturingselementen.',
+        ],
+        'flex-radiolist' => [
+            'label' => 'Flex-radiolijst',
+            'description' => 'Verbeterde radiolijst met pictogrammen, beschrijvingen en aangepaste afmetingen.',
+        ],
+        'flex-rich-editor' => [
+            'label' => 'Flex Rich-editor',
+            'description' => 'Uitgebreide documentbewerking, opmaak, media en uitbreidbare inhoudsblokken.',
+        ],
+        'flex-slider' => [
+            'label' => 'Flex-schuifregelaar',
+            'description' => 'Pil- en cirkelvormige sliders met elastische beweging, rollende cijfers, magnetische markeringen en gevalideerde bereiken.',
+        ],
+        'flex-text-input' => [
+            'label' => 'Flex-tekstinvoer',
+            'description' => 'Veelzijdige tekstinvoer met gedeelde stijlen, validatie, formaten en visuele varianten.',
+        ],
+        'flex-textarea' => [
+            'label' => 'Flex-tekstgebied',
+            'description' => 'Slim automatisch aanpassen van tekstgebied met tekentellers, spraakdictatie en emoji-ondersteuning.',
+        ],
+        'hold-confirm' => [
+            'label' => 'Ingedrukt houden om te bevestigen',
+            'description' => 'Bevestig opzettelijke acties met vasthouden, inline vragen, aftellen, servervoortgang en optioneel ongedaan maken.',
+        ],
+        'icon-column' => [
+            'label' => 'PictogramKolom',
+            'description' => 'Alleen-lezen tabelkolom voor Blade-pictogrammen met optionele labels, kleuren en afmetingen.',
+        ],
+        'icon-picker-field' => [
+            'label' => 'Pictogramkiezer',
+            'description' => 'Blader door pictogrammen met zoek-, lijst- of rasterlay-outs, virtuele weergave en paginering.',
+        ],
+        'image-choice-cards' => [
+            'label' => 'Afbeeldingkeuzekaarten',
+            'description' => 'Selecteer visuele opties met afbeeldingskaarten, bijschriften en consistente selectiestatussen.',
+        ],
+        'item-card-group' => [
+            'label' => 'Artikelkaartgroep',
+            'description' => 'Groepeer inhoud en acties in configureerbare kaartlay-outs.',
+        ],
+        'link-preview-field' => [
+            'label' => 'Linkvoorbeeld',
+            'description' => 'Ontdek linkvoorbeeld met configureerbaar gedrag, stijl en live voorbeelden.',
+        ],
+        'map-picker' => [
+            'label' => 'Kaartkiezer',
+            'description' => 'Zoek naar adressen en kies een locatie met gestructureerde coördinaten.',
+        ],
+        'matrix-choice' => [
+            'label' => 'Matrixkeuze',
+            'description' => 'Ontdek de matrixkeuze met configureerbaar gedrag, stijl en live voorbeelden.',
+        ],
+        'nps-field' => [
+            'label' => 'NPS-veld',
+            'description' => 'NPS-, CSAT- en Likert-schaalinvoer met drie visuele varianten.',
+        ],
+        'number-stepper' => [
+            'label' => 'Nummerstapper',
+            'description' => 'Pilvormige numerieke besturing met − / + knoppen en een geanimeerd NumberFlow-display.',
+        ],
+        'phone-field' => [
+            'label' => 'Telefoonveld',
+            'description' => 'Internationale telefoonnummers met doorzoekbare landcodes en validatie.',
+        ],
+        'price-range' => [
+            'label' => 'Prijsklasse',
+            'description' => 'Prijsbereikschuifregelaar met dubbele handgreep, histogramachtergrond, min/max numerieke invoer en valutavoorvoegsel.',
+        ],
+        'progress-bar' => [
+            'label' => 'Voortgangsbalk',
+            'description' => 'Presenteer voortgang, doelen en mijlpalen met configureerbare visuele statussen.',
+        ],
+        'progress-circle' => [
+            'label' => 'Voortgangscirkel',
+            'description' => 'Circulaire voortgangsdisplays met labels, kleuren en maten.',
+        ],
+        'rating-column' => [
+            'label' => 'Beoordelingskolom',
+            'description' => 'Toon beoordelingen in tabellen met configureerbare symbolen en numerieke waarden.',
+        ],
+        'rating' => [
+            'label' => 'Beoordeling',
+            'description' => 'Leg beoordelingen vast met aangepaste symbolen, precisie, labels en formaten.',
+        ],
+        'schedule-field' => [
+            'label' => 'Veld Planning',
+            'description' => 'Wekelijkse beschikbaarheid, tijdsbereiken, pauzes en tijdzonebewuste configuratie.',
+        ],
+        'segment-control' => [
+            'label' => 'Segmentcontrole',
+            'description' => 'IOS-stijl gesegmenteerde bediening met enkele selectie, met schuifindicatoren, pictogrammen en geanimeerde labeluitbreiding.',
+        ],
+        'segment-tabs' => [
+            'label' => 'Segmenttabbladen',
+            'description' => 'Stel formuliersecties samen met geanimeerde tabbladen, geneste schema\'s en permanente selectie.',
+        ],
+        'select-field' => [
+            'label' => 'Selectieveld',
+            'description' => 'Rijke selectie met zoeken, gegroepeerde opties, virtuele lijsten en paginering op afstand.',
+        ],
+        'signature-field' => [
+            'label' => 'Handtekening',
+            'description' => 'Ontdek de handtekening met configureerbaar gedrag, stijl en live voorbeelden.',
+        ],
+        'slug-field' => [
+            'label' => 'Slugveld',
+            'description' => 'Ontdek het slugveld met instelbaar gedrag, vormgeving en live voorbeelden.',
+        ],
+        'social-links-field' => [
+            'label' => 'Sociale links',
+            'description' => 'Bouw een reeks sociale links met platformpictogrammen en URL-validatie.',
+        ],
+        'switch' => [
+            'label' => 'Schakelaar',
+            'description' => 'Booleaanse schakelaar met rij- en kaartindelingen, badges en rimpeleffecten.',
+        ],
+        'tags-field' => [
+            'label' => 'Veld Tags',
+            'description' => 'Zoek, kies en maak tags met compacte chips en een gedeelde vervolgkeuzelijst.',
+        ],
+        'timezone-field' => [
+            'label' => 'Tijdzoneveld',
+            'description' => 'Zoek wereldtijdzones met lokale verschuivingen en browserstandaarden.',
+        ],
+        'todo-list-field' => [
+            'label' => 'Takenlijst',
+            'description' => 'Interactieve takenlijsten met voltooiing, sortering en instelbare feedback.',
+        ],
+        'track-slider' => [
+            'label' => 'Trackschuifregelaar',
+            'description' => 'Minimalistische track-gebaseerde bereikschuifregelaar met optionele live-waarde-uitvoer.',
+        ],
+        'traffic-split' => [
+            'label' => 'Verkeerssplitsing',
+            'description' => 'Interactieve, op percentages gebaseerde gewichtsverdeler voor A/B-testen en verkeerstoewijzing.',
+        ],
+        'translatable-fields' => [
+            'label' => 'Vertaalbare velden',
+            'description' => 'Bouw gelokaliseerde velden en schakel tussen taalspecifieke formulierstatussen.',
+        ],
+        'user-column' => [
+            'label' => 'Gebruikerskolom',
+            'description' => 'Presenteer gebruikers, avatars en aanvullende identiteitsinformatie in tabelkolommen.',
+        ],
+        'user-select' => [
+            'label' => 'Gebruiker selecteren',
+            'description' => 'Kies mensen met avatars, namen, secundaire details en meervoudige selectie.',
+        ],
+        'verification-code' => [
+            'label' => 'Verificatiecode',
+            'description' => 'OTP-invoer met gegroepeerde cijfervakken, plakken en optionele bediening voor accountverificatie.',
+        ],
+        'video-field' => [
+            'label' => 'Videoveld',
+            'description' => 'Aangepaste videospeler met optionele YouTube-insluiting, bedieningselementen voor overslaan, PiP, volledig scherm en compacte bedieningsindeling.',
+        ],
+        'voice-note-recorder-field' => [
+            'label' => 'Spraaknotitierecorder',
+            'description' => 'Spraakrecorder in de browser met realtimeweergave, geïntegreerd afspelen en opslag via Filament.',
+        ],
+    ],
+    'promotions' => [
+        'discover-flex' => [
+            'title' => 'Kleine details. Betere ervaringen.',
+            'description' => 'Ontdek FLEX-componenten, probeer de demo\'s en vind de juiste bouwstenen voor uw volgende idee.',
+            'action' => 'Maak kennis met FLEX',
+        ],
+        'compose-with-flex' => [
+            'title' => 'Uw volgende idee begint hier.',
+            'description' => 'Bouw met gedeelde componenten, verken hun configuratie en maak ze uw eigen.',
+            'action' => 'Ontdek het project',
+        ],
+    ],
+];

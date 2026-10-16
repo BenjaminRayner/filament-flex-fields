@@ -5,9 +5,11 @@ declare(strict_types=1);
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CellSlider;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TrackSlider;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\TrackSliderFieldConfigurator;
 use Bjanczak\FilamentFlexFields\Support\Playground\TrackSliderPlayground;
+use Bjanczak\FilamentFlexFields\Support\TrackSlider\TrackSliderValue;
+use Bjanczak\FilamentFlexFields\Tests\Support\TestableNumberStepperForm;
+use Livewire\Livewire;
 
 it('exposes track slider configuration via fluent api', function () {
     $field = TrackSlider::make('spacing')
@@ -94,7 +96,7 @@ it('registers track slider playground variants', function () {
 });
 
 it('merges track slider default state into playground builder', function () {
-    $state = app(FlexFieldsPlaygroundBuilder::class)->defaultState();
+    $state = app(TrackSliderPlayground::class)->defaultState();
 
     expect($state)->toHaveKey('track_slider__spacing');
 });
@@ -109,4 +111,57 @@ it('sets track label on all track slider playground helpers', function () {
 
     expect($decimalField->getTrackLabel())->toBe('Spacing')
         ->and($integerField->getTrackLabel())->toBe('Volume');
+});
+
+it('renders initial numeric values before javascript and retains independent field state', function () {
+    $form = TestableNumberStepperForm::class;
+    $form::$formSchema = [
+        TrackSlider::make('minimum')->default(0),
+        TrackSlider::make('maximum')->default(100),
+        TrackSlider::make('decimal')->min(0)->max(1)->step(0.01)->integer(false)->decimalPlaces(2)->default(0.47),
+    ];
+
+    try {
+        Livewire::test($form, ['data' => ['minimum' => 0, 'maximum' => 100, 'decimal' => 0.47]])
+            ->assertSeeHtml('aria-valuenow="0"')
+            ->assertSeeHtml('aria-valuenow="100"')
+            ->assertSeeHtml('aria-valuetext="0.47"')
+            ->assertSeeHtml('--fff-track-slider-position: 47%;')
+            ->assertSeeHtml('trackSliderFormComponent')
+            ->set('data.minimum', 21)
+            ->assertSet('data.maximum', 100)
+            ->call('save')
+            ->assertHasNoErrors();
+    } finally {
+        $form::$formSchema = [];
+    }
+});
+
+it('validates submitted numeric types and limits on the server', function (mixed $value) {
+    $form = TestableNumberStepperForm::class;
+    $form::$formSchema = [TrackSlider::make('amount')->min(0)->max(100)->required()];
+
+    try {
+        Livewire::test($form)->set('data.amount', $value)->call('save')->assertHasErrors(['data.amount']);
+    } finally {
+        $form::$formSchema = [];
+    }
+})->with([[-1], [101], [0.5], ['not a number'], [['invalid' => 50]], [true], [false], ['1e999']]);
+
+it('rejects invalid track configurations before rendering or saving', function (float $min, float $max, float $step, ?int $precision) {
+    TrackSliderValue::assertConfiguration($min, $max, $step, $precision);
+})->with([
+    [10.0, 0.0, 1.0, null],
+    [0.0, 100.0, 0.0, null],
+    [0.0, INF, 1.0, null],
+    [0.0, 100.0, 1.0, 21],
+])->throws(InvalidArgumentException::class);
+
+it('keeps presentation normalization separate from saved validation', function () {
+    expect(TrackSliderValue::normalize(150, 0, 100, true, null))->toBe(100)
+        ->and(TrackSliderValue::normalize('invalid', 0, 100, true, null))->toBe(0)
+        ->and(TrackSliderValue::normalize(-0.5, -5, 5, true, null))->toBe(0)
+        ->and(TrackSliderValue::percentage(100, 0, 100))->toBe(100.0)
+        ->and(TrackSliderValue::percentage(5, 5, 5))->toBe(0.0)
+        ->and(TrackSliderValue::format(0.47, false, 2, 'x'))->toBe('0.47x');
 });

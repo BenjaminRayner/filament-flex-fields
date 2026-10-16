@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'navigation_plural' => 'Gruppi di campi',
+    'model_singular' => 'Gruppo di campi',
+    'group' => 'Gruppo',
+    'sections' => 'Sezioni',
+    'sections_description' => 'Sezioni di layout facoltative per raggruppare i campi del modulo.',
+    'section_id' => 'ID sezione',
+    'fields_schema' => 'Schema dei campi',
+    'fields_description' => 'Definizioni dei campi utilizzate in moduli, tabelle ed elenchi di dettagli.',
+    'fields' => 'Campi',
+    'section' => 'Sezione',
+    'required' => 'Obbligatorio',
+    'encrypted' => 'Cifra i dati memorizzati',
+    'help_text' => 'Testo di aiuto',
+    'tenant_id' => 'ID del tenant',
+    'tenant' => 'Tenant',
+    'tenant_help' => 'Chiave del tenant facoltativa. Lascia vuoto per un gruppo globale.',
+    'name' => 'Nome',
+    'slug' => 'Slug',
+    'order' => 'Ordine',
+    'label' => 'Etichetta',
+    'type' => 'Tipo',
+    'sort' => 'Ordinamento',
+    'description' => 'Descrizione',
+    'placeholder' => 'Testo segnaposto',
+    'width' => 'Larghezza',
+    'updated_at' => 'Aggiornato il',
+    'section_type_section' => 'Sezione',
+    'section_type_fieldset' => 'Gruppo di campi',
+    'section_type_headless' => 'Senza contenitore',
+];

@@ -1,9 +1,14 @@
         <template x-teleport="body">
             <div
                 x-ref="headlessMenu"
+                @if ($panelStyle ?? null) style="{{ $panelStyle }}" @endif
                 id="{{ $headlessMenuDomId }}"
+                @if ($dynamicId ?? false) x-bind:id="menuDomId" @endif
                 data-fff-select-menu-owner="{{ $headlessComponentKey }}"
-                x-show="comboboxOpen"
+                x-show.important="comboboxOpen"
+                x-bind:style="{ ...(menuHeight > 0 ? { '--fff-select-menu-height': menuHeight + 'px' } : {}), ...(menuMaxHeight > 0 ? { '--fff-select-menu-max-height': menuMaxHeight + 'px' } : {}) }"
+                x-bind:aria-hidden="comboboxOpen ? 'false' : 'true'"
+                x-bind:inert="!comboboxOpen"
                 x-cloak
                 x-on:click.stop
                 x-on:keydown="onHeadlessMenuKeydown($event)"
@@ -18,8 +23,13 @@
                     'fff-select-dropdown-panel--overlay-scroll',
                     // Filament theme defaults to max-w-[14rem]! — kill it so matchTriggerWidth can work.
                     'fi-width-none',
+                    ...($panelClasses ?? []),
                     'fff-select-dropdown-panel--layout-' . ($isUserSelectField ? 'list' : ($useRichListDropdownLayout ? 'list' : ($isGridLayout ? 'grid' : 'plain'))),
                     'fff-select-dropdown-panel--user-select' => $isUserSelectField,
+                    'fff-select-dropdown-panel--country' => $field instanceof \Bjanczak\FilamentFlexFields\Filament\Forms\Components\CountryField,
+                    'fff-select-dropdown-panel--country-'.($field?->getSize() ?? 'md') => $field instanceof \Bjanczak\FilamentFlexFields\Filament\Forms\Components\CountryField,
+                    'fff-select-dropdown-panel--no-selection-indicator' => ! ($field?->showsSelectionIndicator() ?? true),
+                    'fff-select-dropdown-panel--description-trailing' => $field?->getOptionDescriptionPosition() === 'trailing',
                     'fi-select-input-ctn-option-labels-not-wrapped' => ! $canOptionLabelsWrap,
                 ])
                 x-bind:aria-label="{{ json_encode($fieldLabel ?? $statePath) }}"
@@ -32,6 +42,7 @@
                             x-cloak
                         @endif
                     >
+                        <div class="fff-select-search-control">
                         <input
                             type="search"
                             class="fi-input fi-select-input-search-input"
@@ -43,11 +54,11 @@
                             dir="auto"
                             x-model="comboboxQuery"
                             x-ref="headlessSearchInput"
-                            x-on:keydown.down.prevent="comboboxMoveHighlight(1)"
-                            x-on:keydown.up.prevent="comboboxMoveHighlight(-1)"
-                            x-on:keydown.enter.prevent="comboboxSelectHighlighted()"
-                            x-on:keydown.escape.stop="comboboxCloseMenu()"
-                            x-bind:placeholder="@js($getSearchPrompt())"
+                            role="combobox"
+                            x-bind:aria-expanded="comboboxOpen ? 'true' : 'false'"
+                            x-bind:aria-activedescendant="headlessActiveDescendant()"
+                            x-on:keydown="onHeadlessControlKeydown($event)"
+                            x-bind:placeholder="searchPrompt"
                         />
                         <button
                             type="button"
@@ -59,9 +70,11 @@
                         >
                             {!! $headlessSearchClearIconHtml !!}
                         </button>
+                        </div>
                     </div>
                 @endif
 
+                {{ $toolbar ?? '' }}
                 <div class="fff-select-dropdown-scroller">
                 <div
                     @class([
@@ -69,14 +82,30 @@
                         'fi-dropdown-list' => $isGridLayout,
                     ])
                     id="{{ $headlessListboxId }}"
+                    @if ($dynamicId ?? false) x-bind:id="menuDomId + '-listbox'" @endif
                     role="listbox"
+                    x-bind:aria-multiselectable="multiple ? 'true' : null"
                     x-ref="headlessOptionsList"
+                    x-bind:data-fff-virtualized="comboboxOpen && shouldVirtualizeDropdown() ? 'true' : null"
                     x-on:scroll.passive="onHeadlessOptionsScroll($event)"
                     x-bind:aria-label="{{ json_encode($fieldLabel ?? $statePath) }}"
                 >
+                @if ($field instanceof \Bjanczak\FilamentFlexFields\Filament\Forms\Components\CountryMapField)
+                    <div class="fff-country-map__leading-options" data-fff-select-leading-content>
+                        @include('filament-flex-fields::forms.components.partials.location.country-groups')
+                        <div class="fi-dropdown-header">{{ __('filament-flex-fields::location.countries') }}</div>
+                    </div>
+                @endif
+                    @include('filament-flex-fields::forms.components.partials.picker-request-error', [
+                        'errorExpression' => 'searchError || optionsError',
+                        'retryHandler' => 'retryHeadlessRequest()',
+                        'busyExpression' => 'searchPending || optionsLoading || loadingMore || requestRetryRemaining > 0',
+                        'cooldownExpression' => 'requestRetryRemaining',
+                    ])
                     @include('filament-flex-fields::forms.components.partials.select-field.option-list')
 
                     @include('filament-flex-fields::forms.components.partials.select-field.empty-create')
+                </div>
                     <div
                         class="fff-select-dropdown-scrollbar"
                         data-visible="false"
@@ -85,6 +114,5 @@
                     >
                         <div class="fff-select-dropdown-scrollbar__thumb"></div>
                     </div>
-                </div>
             </div>
         </template>

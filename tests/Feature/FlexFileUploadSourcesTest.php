@@ -90,7 +90,7 @@ it('does not render upload source tabs when optional sources are disabled', func
     $html = Livewire::test(TestableTranslatableForm::class)->html(false);
 
     expect($html)
-        ->not->toContain('fff-flex-file-upload__source-tabs')
+        ->not->toContain('role="tablist"')
         ->not->toContain('fff-flex-file-upload--source-tabs');
 
     expect(substr_count($html, '<div'))
@@ -116,20 +116,28 @@ it('renders upload source tabs and panels when optional sources are enabled', fu
     $html = Livewire::test(TestableTranslatableForm::class)->html(false);
 
     expect($html)
-        ->toContain('fff-flex-file-upload__source-tabs')
+        ->toContain('role="tablist"')
         ->not->toContain('fff-segment-track--ghost')
-        ->toContain('fff-flex-file-upload__source-panel--url')
-        ->toContain('fff-flex-file-upload__url-dropzone')
-        ->toContain('fff-flex-file-upload__source-dropzone')
-        ->toContain('fff-flex-file-upload__source-panel--webcam')
-        ->toContain('fff-flex-file-upload__webcam-placeholder')
-        ->toContain('fff-flex-file-upload-webcam-modal')
+        ->toContain('data-fff-upload-header="url"')
+        ->toContain('fff-flex-file-upload__url-controls')
+        ->toContain('data-fff-upload-header="file"')
+        ->toContain('data-fff-upload-header="camera"')
+        ->toContain('fff-flex-file-upload__camera-art-body')
+        ->toContain('fff-flex-text-input__shell')
+        ->toContain('fff-flex-text-input__input')
+        ->toContain('fff-flex-text-input__wrapper')
+        ->toContain('has-focus-outline')
+        ->toContain('class="fff-camera"')
+        ->toContain('x-ref="webcamDialog"')
+        ->not->toContain('fff-flex-file-upload-webcam-modal')
         ->toContain('openWebcamModal()')
         ->toContain('confirmWebcamPhoto()')
         ->toContain('retakeWebcamPhoto()')
         ->toContain('webcamRemove')
-        ->toContain('onWebcamModalOpened')
-        ->toContain('fff-flex-file-upload__webcam-dock--solo')
+        ->not->toContain('onWebcamModalOpened')
+        ->toContain('fff-camera__shutter')
+        ->toContain('webcamMirrored')
+        ->toContain('webcamGrid')
         ->toContain('fff-segment-track')
         ->toContain('callSchemaComponentMethod');
 
@@ -137,19 +145,34 @@ it('renders upload source tabs and panels when optional sources are enabled', fu
         ->toBe(substr_count($html, '</div>'));
 });
 
+beforeEach(function () {
+    $this->app->instance(SafeRemoteUrlValidator::class, new class extends SafeRemoteUrlValidator
+    {
+        public function approvedAddresses(string $url): array
+        {
+            $host = parse_url($url, PHP_URL_HOST);
+            if ($this->isValidHttpUrl($url) && in_array($host, ['cdn.example.com', 'atlantahumane.org'], true)) {
+                return ['93.184.216.34'];
+            }
+
+            return parent::approvedAddresses($url);
+        }
+    });
+});
+
 it('blocks unsafe remote urls during import', function () {
     $validator = app(SafeRemoteUrlValidator::class);
 
     expect($validator->isAllowedHttpUrl('http://127.0.0.1/image.jpg'))->toBeFalse()
-        ->and($validator->isAllowedHttpUrl('https://example.com/image.jpg'))->toBeTrue();
+        ->and($validator->isAllowedHttpUrl('https://93.184.216.34/image.jpg'))->toBeTrue();
 });
 
 it('prepares a remote image for the filepond pipeline without persisting to the field disk', function () {
     Storage::fake('local');
 
     $this->mock(SafeRemoteUrlValidator::class)
-        ->shouldReceive('isAllowedHttpUrl')
-        ->andReturn(true);
+        ->shouldReceive('approvedAddresses')->andReturn(['93.184.216.34'])
+        ->getMock()->shouldReceive('isAllowedHttpUrl')->andReturn(true);
 
     Http::fake([
         'https://cdn.example.com/*' => Http::response(
@@ -191,8 +214,8 @@ it('exposes a fetchable preview url for staged url imports', function () {
     Storage::fake('local');
 
     $this->mock(SafeRemoteUrlValidator::class)
-        ->shouldReceive('isAllowedHttpUrl')
-        ->andReturn(true);
+        ->shouldReceive('approvedAddresses')->andReturn(['93.184.216.34'])
+        ->getMock()->shouldReceive('isAllowedHttpUrl')->andReturn(true);
 
     Http::fake([
         'https://cdn.example.com/*' => Http::response(
@@ -233,8 +256,8 @@ it('processes alternate source uploads through the flex upload pipeline on form 
     Storage::fake('local');
 
     $this->mock(SafeRemoteUrlValidator::class)
-        ->shouldReceive('isAllowedHttpUrl')
-        ->andReturn(true);
+        ->shouldReceive('approvedAddresses')->andReturn(['93.184.216.34'])
+        ->getMock()->shouldReceive('isAllowedHttpUrl')->andReturn(true);
 
     Http::fake([
         'https://cdn.example.com/*' => Http::response(
@@ -374,8 +397,8 @@ it('rejects url import through livewire when url upload is disabled', function (
 
 it('rejects remote imports that exceed configured mime restrictions', function () {
     $this->mock(SafeRemoteUrlValidator::class)
-        ->shouldReceive('isAllowedHttpUrl')
-        ->andReturn(true);
+        ->shouldReceive('approvedAddresses')->andReturn(['93.184.216.34'])
+        ->getMock()->shouldReceive('isAllowedHttpUrl')->andReturn(true);
 
     Http::fake([
         'https://cdn.example.com/*' => Http::response('%PDF-1.4', 200, ['Content-Type' => 'application/pdf']),
@@ -444,8 +467,8 @@ it('commits staged url imports into livewire state for filepond sync', function 
     Storage::fake('local');
 
     $this->mock(SafeRemoteUrlValidator::class)
-        ->shouldReceive('isAllowedHttpUrl')
-        ->andReturn(true);
+        ->shouldReceive('approvedAddresses')->andReturn(['93.184.216.34'])
+        ->getMock()->shouldReceive('isAllowedHttpUrl')->andReturn(true);
 
     Http::fake([
         'https://cdn.example.com/*' => Http::response(
@@ -486,8 +509,8 @@ it('exposes commit alternate source staging through livewire schema methods', fu
     Storage::fake('local');
 
     $this->mock(SafeRemoteUrlValidator::class)
-        ->shouldReceive('isAllowedHttpUrl')
-        ->andReturn(true);
+        ->shouldReceive('approvedAddresses')->andReturn(['93.184.216.34'])
+        ->getMock()->shouldReceive('isAllowedHttpUrl')->andReturn(true);
 
     Http::fake([
         'https://cdn.example.com/*' => Http::response(

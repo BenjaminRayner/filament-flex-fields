@@ -1,0 +1,142 @@
+/* Video.js default video layout: one desktop bar, separate mobile control groups. */
+.fff-video-field.is-controls-compact {
+    --fff-video-field-glass-saturate: saturate(1.1);
+    --fff-video-field-compact-control-size: 2.25rem;
+    --fff-video-field-compact-icon-size: 1.125rem;
+    --fff-video-field-compact-font-size: 0.8125rem;
+}
+.fff-video-field--sm.is-controls-compact {
+    --fff-video-field-compact-control-size: 2rem;
+    --fff-video-field-compact-icon-size: 1rem;
+    --fff-video-field-compact-font-size: 0.6875rem;
+}
+.fff-video-field--lg.is-controls-compact {
+    --fff-video-field-compact-control-size: 2.625rem;
+    --fff-video-field-compact-icon-size: 1.3125rem;
+    --fff-video-field-compact-font-size: 0.875rem;
+}
+.fff-video-field.is-controls-compact .fff-video-field__scrim {
+    background: linear-gradient(to top in oklab, rgb(0 0 0 / .4), rgb(0 0 0 / .2), rgb(0 0 0 / .5));
+    transition: opacity 100ms cubic-bezier(0, 0, .2, 1);
+}
+.fff-video-field.is-controls-compact .fff-video-field__ui {
+    opacity: 1; pointer-events: none; transition: none;
+}
+.fff-video-field__dock--compact {
+    display: contents; transform: none; opacity: 1;
+}
+.fff-video-field__dock--compact::before,
+.fff-video-field__dock--compact::after { display: none; }
+.fff-video-field__toolbar--compact {
+    display: contents; color: white; transform: none; opacity: 1;
+    font: var(--fff-video-field-compact-font-size)/1.5 ui-sans-serif, system-ui, sans-serif;
+    text-shadow: 0 1px 0 rgb(0 0 0 / .15);
+}
+.fff-video-field__compact-primary,
+.fff-video-field__toolbar-end--compact {
+    position: absolute; z-index: 30; display: flex; align-items: center;
+    padding: 2px; border-radius: 99px; pointer-events: auto;
+    background: var(--fff-video-field-glass-bg);
+    box-shadow: var(--fff-video-field-glass-shadow);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
+    backdrop-filter: blur(16px) saturate(1.1);
+    transition: opacity 50ms cubic-bezier(0, 0, .2, 1), filter 50ms cubic-bezier(0, 0, .2, 1), scale 50ms cubic-bezier(0, 0, .2, 1), translate 50ms cubic-bezier(0, 0, .2, 1);
+}
+.fff-video-field__compact-primary { inset-inline: 8px; bottom: 8px; transform-origin: bottom; }
+.fff-video-field__toolbar-end--compact { top: 8px; inset-inline-end: 8px; gap: 1px; transform-origin: top; }
+.fff-video-field__compact-primary::after,
+.fff-video-field__toolbar-end--compact::after,
+.fff-video-field__toolbar--compact::after {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    border-radius: inherit; box-shadow: var(--fff-video-field-glass-inset);
+}
+.fff-video-field__toolbar-start--compact { display: flex; align-items: center; gap: 0; flex: 0 0 auto; }
+.fff-video-field__toolbar--compact .fff-video-field__volume { margin-inline-start: 1px; }
+.fff-video-field__toolbar--compact .fff-video-field__glass-btn {
+    width: var(--fff-video-field-compact-control-size); height: var(--fff-video-field-compact-control-size);
+    min-height: 0; padding: 0; flex-shrink: 0; background: transparent; color: inherit;
+    box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+    transform: none; scale: 1; border-radius: 99px;
+    transition: background-color 150ms cubic-bezier(0, 0, .2, 1), color 150ms cubic-bezier(0, 0, .2, 1), scale 150ms cubic-bezier(0, 0, .2, 1);
+}
+.fff-video-field__toolbar--compact .fff-video-field__glass-btn::after { display: none; }
+.fff-video-field__toolbar--compact .fff-video-field__glass-btn:is(:hover, :focus-visible, [aria-expanded='true']) { background: rgb(255 255 255 / .1); }
+.fff-video-field__toolbar--compact .fff-video-field__glass-btn:active { scale: .97; }
+.fff-video-field__toolbar--compact .fff-video-field__glass-btn svg {
+    width: var(--fff-video-field-compact-icon-size); height: var(--fff-video-field-compact-icon-size);
+    filter: drop-shadow(0 1px 0 rgb(0 0 0 / .15));
+}
+.fff-video-field__time-controls--compact {
+    display: flex; flex: 1; min-width: 0; align-items: center; direction: ltr;
+    gap: 10px; padding-inline: 8px; container-type: inline-size; container-name: video-time;
+}
+.fff-video-field__toolbar--compact .fff-video-field__time-current,
+.fff-video-field__toolbar--compact .fff-video-field__time-remaining {
+    color: inherit; font: inherit; font-variant-numeric: tabular-nums; line-height: inherit;
+    flex-shrink: 0; min-width: 0; margin: 0; padding: 0; white-space: nowrap;
+}
+.fff-video-field__toolbar--compact .fff-video-field__time-remaining {
+    cursor: pointer; background: transparent; border: 0; border-radius: 2px;
+}
+.fff-video-field__toolbar--compact :is(.fff-video-field__time-remaining,.fff-video-field__glass-btn):focus-visible {
+    outline: 2px solid white; outline-offset: 2px;
+}
+.fff-video-field__progress-block--compact { min-width: 72px; flex: 1; width: auto; margin: 0; transform: none; opacity: 1; transition: none; }
+.fff-video-field__toolbar--compact .fff-video-field__progress-wrap {
+    min-height: 32px; --fff-video-slider-track-h: 4px; --fff-video-slider-thumb-size: 12px;
+}
+.fff-video-field.is-controls-compact .fff-video-field__ui:not(.is-panel-visible) .fff-video-field__compact-primary,
+.fff-video-field.is-controls-compact .fff-video-field__ui:not(.is-panel-visible) .fff-video-field__toolbar-end--compact {
+    opacity: 0; scale: .95; translate: 0 4px; pointer-events: none; transition-duration: 100ms;
+}
+.fff-video-field.is-controls-compact .fff-video-field__ui:not(.is-panel-visible) .fff-video-field__toolbar-end--compact { translate: 0 -4px; }
+@media (pointer: fine) {
+    .fff-video-field.is-controls-compact .fff-video-field__ui:not(.is-panel-visible) .fff-video-field__compact-primary,
+    .fff-video-field.is-controls-compact .fff-video-field__ui:not(.is-panel-visible) .fff-video-field__toolbar-end--compact { filter: blur(8px); }
+}
+@container video-field (width >= 32rem) {
+    .fff-video-field__toolbar--compact {
+        display: flex; align-items: center; position: absolute; inset-inline: 8px; bottom: 8px;
+        width: auto; max-width: none; padding: 4px; gap: 0; border-radius: 99px; pointer-events: auto;
+        background: var(--fff-video-field-glass-bg); box-shadow: var(--fff-video-field-glass-shadow);
+        -webkit-backdrop-filter: blur(16px) saturate(1.1); backdrop-filter: blur(16px) saturate(1.1);
+        transition: opacity 50ms cubic-bezier(0, 0, .2, 1), filter 50ms cubic-bezier(0, 0, .2, 1), scale 50ms cubic-bezier(0, 0, .2, 1), translate 50ms cubic-bezier(0, 0, .2, 1);
+    }
+    .fff-video-field__compact-primary { display: contents; }
+    .fff-video-field__toolbar-end--compact {
+        position: static; padding: 0; background: transparent; box-shadow: none;
+        -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
+    .fff-video-field__toolbar-end--compact::after { display: none; }
+    .fff-video-field__time-controls--compact { padding-inline: 12px; }
+    .fff-video-field__toolbar--compact .fff-video-field__settings { margin-inline-start: 1px; }
+    .fff-video-field.is-controls-compact .fff-video-field__ui:not(.is-panel-visible) .fff-video-field__toolbar--compact {
+        opacity: 0; scale: .95; translate: 0 4px; pointer-events: none; transition-duration: 100ms;
+    }
+    .fff-video-field.is-controls-compact .fff-video-field__ui:not(.is-panel-visible) .fff-video-field__toolbar-end--compact { opacity: 1; scale: 1; translate: 0; filter: none; }
+}
+@container video-field (width >= 42rem) {
+    .fff-video-field__toolbar--compact { inset-inline: 12px; bottom: 12px; }
+}
+@container video-time (width < 16rem) {
+    .fff-video-field__time-current, .fff-video-field__time-remaining { display: none; }
+}
+@media (pointer: fine) {
+    @container video-field (width >= 32rem) {
+        .fff-video-field.is-controls-compact .fff-video-field__ui:not(.is-panel-visible) .fff-video-field__toolbar--compact { filter: blur(8px); }
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .fff-video-field__toolbar--compact,
+    .fff-video-field__compact-primary,
+    .fff-video-field__toolbar-end--compact,
+    .fff-video-field__toolbar--compact .fff-video-field__glass-btn,
+    .fff-video-field__toolbar--compact .fff-video-field__progress-track,
+    .fff-video-field__toolbar--compact .fff-video-field__progress-thumb { transition: none; }
+}
+.fff-video-field.is-controls-compact .fff-video-field__player.is-hydrated .fff-video-field__ui .fff-video-field__dock--compact {
+    opacity: 1; transform: none; transition: none;
+}
+.fff-video-field.is-controls-compact .fff-video-field__player.is-hydrated .fff-video-field__ui .fff-video-field__toolbar--compact {
+    transform: none; transition-delay: 0ms;
+}

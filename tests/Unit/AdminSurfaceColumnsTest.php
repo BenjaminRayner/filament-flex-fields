@@ -7,10 +7,8 @@ use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\MapPinColumn;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\ProgressColumn;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\SignaturePreviewColumn;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\StatusChipColumn;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldStylesheetQueue;
 use Bjanczak\FilamentFlexFields\Support\MapPinColumnRenderCache;
-use Bjanczak\FilamentFlexFields\Support\Playground\AdminColumnsPlayground;
+use Bjanczak\FilamentFlexFields\Support\Playground\SignaturePreviewColumnPlayground;
 use Bjanczak\FilamentFlexFields\Support\ProgressColumnRenderCache;
 use Bjanczak\FilamentFlexFields\Support\SignaturePreviewColumnRenderCache;
 use Bjanczak\FilamentFlexFields\Support\StatusChipColumnRenderCache;
@@ -81,20 +79,20 @@ it('instantiates signature preview column with svg and empty placeholder', funct
         ->toContain('is-empty');
 });
 
-it('renders admin columns playground demo rows with a visible signature preview', function () {
+it('renders relocated signature column examples with a visible signature preview', function () {
     SignaturePreviewColumnRenderCache::flush();
 
-    $playground = app(AdminColumnsPlayground::class);
+    $playground = app(SignaturePreviewColumnPlayground::class);
     $rows = (new ReflectionClass($playground))
-        ->getMethod('demoRows')
+        ->getMethod('signatureRows')
         ->invoke($playground);
 
     expect($rows)->toHaveCount(2)
-        ->and($rows[0]['signature'])->toContain('fff-signature-preview-column')
-        ->and($rows[0]['signature'])->toContain('stroke="#18181b"')
-        ->and($rows[0]['signature'])->not->toContain('is-empty')
-        ->and($rows[1]['signature'])->toContain('fff-signature-preview-column__empty')
-        ->and($rows[1]['signature'])->toContain('is-empty');
+        ->and($rows[0]['preview'])->toContain('fff-signature-preview-column')
+        ->and($rows[0]['preview'])->toContain('fill="#18181b"', 'fill-rule="evenodd"')
+        ->and($rows[0]['preview'])->not->toContain('is-empty')
+        ->and($rows[1]['preview'])->toContain('fff-signature-preview-column__empty')
+        ->and($rows[1]['preview'])->toContain('is-empty');
 });
 
 it('instantiates map pin column with label and coordinates tooltip', function () {
@@ -113,19 +111,6 @@ it('instantiates map pin column with label and coordinates tooltip', function ()
         ->toContain('fff-map-pin-column--sm')
         ->toContain('Gdansk, Poland')
         ->toContain('title="54.352,18.646"');
-});
-
-it('registers lazy css bundles for admin surface columns', function () {
-    foreach ([
-        'progress-column',
-        'status-chip-column',
-        'signature-preview-column',
-        'map-pin-column',
-    ] as $component) {
-        expect(FlexFieldAssets::hasLazyStylesheet($component))->toBeTrue()
-            ->and(FlexFieldAssets::stylesheetsFor($component))->toBe([$component])
-            ->and(FlexFieldStylesheetQueue::enqueueFor($component))->toBe([$component]);
-    }
 });
 
 it('caches admin surface column renders within the same request', function () {

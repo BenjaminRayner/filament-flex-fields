@@ -1,0 +1,1 @@
+<span class="fff-{{PREFIX}}-value">{{ $getDisplayValue() }}</span>

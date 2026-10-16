@@ -8,6 +8,8 @@ class CountryRegistry
 {
     public const POOL_ISO = 'iso';
 
+    public const POOL_EXTENDED = 'country-extended';
+
     public const POOL_PHONE = 'phone';
 
     /**
@@ -62,6 +64,7 @@ class CountryRegistry
 
         return match ($pool) {
             self::POOL_ISO => self::isoPoolMetadata($locale),
+            self::POOL_EXTENDED => self::isoPoolMetadata($locale, Countries::ADDITIONAL_REGION_CODES),
             self::POOL_PHONE => self::phonePoolMetadata($locale),
             default => [],
         };
@@ -74,8 +77,15 @@ class CountryRegistry
     {
         $names = [];
 
-        foreach (self::poolMetadata($pool, $locale) as $code => $country) {
-            $names[$code] = $country['n'];
+        $codes = match ($pool) {
+            self::POOL_ISO => Countries::allCodes(),
+            self::POOL_EXTENDED => [...Countries::allCodes(), ...Countries::ADDITIONAL_REGION_CODES],
+            self::POOL_PHONE => PhoneCountries::allSupportedCodes(),
+            default => [],
+        };
+
+        foreach ($codes as $code) {
+            $names[$code] = Countries::name($code, $locale);
         }
 
         return $names;
@@ -112,13 +122,14 @@ class CountryRegistry
     }
 
     /**
+     * @param  list<string>  $additional
      * @return array<string, array{c: string, n: string, d: string, f: string}>
      */
-    protected static function isoPoolMetadata(string $locale): array
+    protected static function isoPoolMetadata(string $locale, array $additional = []): array
     {
         $map = [];
 
-        foreach (Countries::metadata(locale: $locale) as $country) {
+        foreach (Countries::metadata(locale: $locale, additional: $additional) as $country) {
             $map[$country['code']] = self::compact($country);
         }
 

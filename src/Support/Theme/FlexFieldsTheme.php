@@ -17,7 +17,7 @@ class FlexFieldsTheme
     protected Density $density;
 
     /**
-     * @var array<string, mixed>
+     * @var array<string, string|int|float>
      */
     protected array $theme = [];
 
@@ -51,7 +51,7 @@ class FlexFieldsTheme
      */
     public function setTheme(array $theme): static
     {
-        $this->theme = $theme;
+        $this->theme = ThemeTokenMap::validate($theme);
 
         return $this;
     }
@@ -61,9 +61,15 @@ class FlexFieldsTheme
      */
     public function mergeTheme(array $theme): static
     {
-        $this->theme = array_replace($this->theme, $theme);
+        $this->theme = ThemeTokenMap::validate(array_replace($this->theme, $theme));
 
         return $this;
+    }
+
+    /** @param array<string, mixed> $tokens */
+    public function mergePackageTheme(AppearanceNamespace $appearance, array $tokens): static
+    {
+        return $this->mergeTheme($appearance->tokens($tokens));
     }
 
     /**
@@ -90,10 +96,6 @@ class FlexFieldsTheme
         $variables = [];
 
         foreach ($this->theme as $key => $value) {
-            if (! is_string($value) && ! is_int($value) && ! is_float($value)) {
-                continue;
-            }
-
             $variableName = $this->resolveThemeVariableName((string) $key);
 
             if ($variableName === null) {
@@ -108,23 +110,6 @@ class FlexFieldsTheme
 
     protected function resolveThemeVariableName(string $key): ?string
     {
-        if (str_starts_with($key, '--fff-')) {
-            return $key;
-        }
-
-        if (str_starts_with($key, 'fff_')) {
-            return '--'.$key;
-        }
-
-        return match ($key) {
-            'primary', 'primary_color' => '--fff-field-focus-border',
-            'radius', 'field_radius' => '--fff-global-radius',
-            'menu_radius' => '--fff-global-menu-radius',
-            'field_bg' => '--fff-field-bg',
-            'field_border' => '--fff-field-border',
-            'field_focus_ring' => '--fff-field-focus-ring',
-            'field_focus_ring_width' => '--fff-field-focus-ring-width',
-            default => null,
-        };
+        return ThemeTokenMap::variable($key);
     }
 }

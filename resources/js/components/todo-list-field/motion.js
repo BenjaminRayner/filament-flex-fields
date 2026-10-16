@@ -1,18 +1,23 @@
+import {
+    animateNativeTodoStrike,
+    cancelNativeTodoMotion,
+    strikeProgress,
+} from './motion-native.js'
+
 /**
  * Checkbox spark + title strike motion (tick draw is CSS :checked + dashoffset).
  * 13.5 → 4.5 (delay 0.2, duration 0.2) then clearProps — no CSS transition reverse.
  */
 
-function cancelRowMotion(rowEl) {
-    if (! rowEl) {
+export function cancelRowMotion(rowEl) {
+    if (!rowEl) {
         return
     }
 
-    if (typeof rowEl.getAnimations === 'function') {
-        for (const animation of rowEl.getAnimations()) {
-            animation.cancel()
-        }
-    }
+    cancelNativeTodoMotion(rowEl)
+
+    // Only timers and RAFs below belong to this motion owner. Enumerating CSS
+    // animations forces style resolution and cancels unrelated row transitions.
 
     if (rowEl._fffStrikeRaf) {
         cancelAnimationFrame(rowEl._fffStrikeRaf)
@@ -44,6 +49,10 @@ function tweenLinesOffset(rowEl, fromPx, toPx, durationMs, onDone) {
     const start = performance.now()
 
     const step = (now) => {
+        if (rowEl.isConnected === false) {
+            cancelRowMotion(rowEl)
+            return
+        }
         const t = Math.min(1, (now - start) / durationMs)
         const value = fromPx + (toPx - fromPx) * t
         rowEl.style.setProperty('--checkbox-lines-offset', `${value}px`)
@@ -60,8 +69,11 @@ function tweenLinesOffset(rowEl, fromPx, toPx, durationMs, onDone) {
     rowEl._fffLinesTweenRaf = requestAnimationFrame(step)
 }
 
-export function animateCheckOn(rowEl, { reducedMotion = false, onStrikeComplete = null } = {}) {
-    if (! rowEl) {
+export function animateCheckOn(
+    rowEl,
+    { reducedMotion = false, onStrikeComplete = null } = {},
+) {
+    if (!rowEl) {
         return
     }
 
@@ -80,8 +92,20 @@ export function animateCheckOn(rowEl, { reducedMotion = false, onStrikeComplete 
     rowEl.style.setProperty('--text-x', '0px')
     clearLinesOffset(rowEl)
 
+    if (
+        animateNativeTodoStrike(rowEl, {
+            on: true,
+            onComplete: onStrikeComplete,
+        })
+    )
+        return
+
     // Delay 0.2 → tween to 4.5px over 0.2 → clear (instant hide).
     rowEl._fffLinesTimer = window.setTimeout(() => {
+        if (rowEl.isConnected === false) {
+            cancelRowMotion(rowEl)
+            return
+        }
         tweenLinesOffset(rowEl, 13.5, 4.5, 200, () => {
             clearLinesOffset(rowEl)
         })
@@ -92,6 +116,10 @@ export function animateCheckOn(rowEl, { reducedMotion = false, onStrikeComplete 
     const duration = 300
 
     const step = (now) => {
+        if (rowEl.isConnected === false) {
+            cancelRowMotion(rowEl)
+            return
+        }
         const t = Math.min(1, (now - start) / duration)
 
         // Same keyframe shape as demo: scale to 1 + nudge, then settle x
@@ -118,11 +146,15 @@ export function animateCheckOn(rowEl, { reducedMotion = false, onStrikeComplete 
     rowEl._fffStrikeRaf = requestAnimationFrame(step)
 }
 
-export function animateCheckOff(rowEl, { reducedMotion = false, onComplete = null } = {}) {
-    if (! rowEl) {
+export function animateCheckOff(
+    rowEl,
+    { reducedMotion = false, onComplete = null } = {},
+) {
+    if (!rowEl) {
         return
     }
 
+    const nativeProgress = strikeProgress(rowEl)
     cancelRowMotion(rowEl)
     clearLinesOffset(rowEl)
 
@@ -134,15 +166,32 @@ export function animateCheckOff(rowEl, { reducedMotion = false, onComplete = nul
         return
     }
 
-    const startScale = Number.parseFloat(rowEl.style.getPropertyValue('--text-line-scale'))
-        || Number.parseFloat(getComputedStyle(rowEl).getPropertyValue('--text-line-scale'))
-        || 1
+    const previousScale = Number.parseFloat(
+        rowEl.style.getPropertyValue('--text-line-scale'),
+    )
+    const startScale =
+        nativeProgress ?? (Number.isFinite(previousScale) ? previousScale : 1)
+    if (
+        animateNativeTodoStrike(rowEl, {
+            on: false,
+            from: startScale,
+            onComplete,
+        })
+    )
+        return
     const start = performance.now()
     const duration = 250
 
     const step = (now) => {
+        if (rowEl.isConnected === false) {
+            cancelRowMotion(rowEl)
+            return
+        }
         const t = Math.min(1, (now - start) / duration)
-        rowEl.style.setProperty('--text-line-scale', String(startScale * (1 - t)))
+        rowEl.style.setProperty(
+            '--text-line-scale',
+            String(startScale * (1 - t)),
+        )
         rowEl.style.setProperty('--text-x', '0px')
 
         if (t < 1) {

@@ -18,8 +18,11 @@
         x-bind:data-muted="muted || volume === 0 ? '' : null"
         x-bind:data-volume-level="volumeLevel"
     >
-        <span x-show="! muted && volume > 0" aria-hidden="true">
+        <span x-show="volumeLevel === 'high'" aria-hidden="true">
             {{ \Filament\Support\generate_icon_html($field->getVolumeIcon(), size: $iconSize) }}
+        </span>
+        <span x-show="volumeLevel === 'low'" style="display: none" aria-hidden="true">
+            {{ \Filament\Support\generate_icon_html($field->getVolumeLowIcon(), size: $iconSize) }}
         </span>
         <span x-show="muted || volume === 0" style="display: none" aria-hidden="true">
             {{ \Filament\Support\generate_icon_html($field->getMuteIcon(), size: $iconSize) }}
@@ -39,6 +42,8 @@
             class="fff-video-field__volume-slider"
             x-ref="volumeSlider"
             role="slider"
+    tabindex="0"
+    aria-label="{{ __('filament-flex-fields::default.video.volume') }}"
             x-bind:aria-valuemin="0"
             x-bind:aria-valuemax="100"
             x-bind:aria-valuenow="Math.round(volume * 100)"
@@ -49,6 +54,8 @@
             x-on:pointerdown="onVolumePointerDown($event)"
             x-on:pointermove="onVolumePointerMove($event)"
             x-on:pointerup="onVolumePointerUp($event)"
+    x-on:pointercancel="onVolumePointerCancel($event)"
+    x-on:keydown="onSliderKeydown($event, true)"
             x-on:pointerleave="onVolumePointerLeave()"
             x-on:lostpointercapture="onVolumeLostPointerCapture($event)"
             x-on:wheel.prevent="onVolumeWheel($event)"

@@ -1,115 +1,27 @@
+/* Tags owns only shell composition/chip layout; Select owns every menu surface. */
 .fff-tags-field {
     --fff-tags-field-meta: rgb(113 113 122);
-    --fff-tags-field-tags-gap: 0.625rem;
-
-    @apply flex w-full flex-col;
-    gap: 0.5rem;
-}
-
-.fff-tags-field-input-mount {
-    position: relative;
-    width: 100%;
-    min-height: var(--fff-flex-text-input-h, var(--fff-track-h-md));
-}
-
-.fff-tags-field-input-mount:has(.fff-tags-field__input-live.is-hydrated) .fff-tags-field-input-ssr {
-    display: none;
-}
-
-.fff-tags-field-input-mount .fff-tags-field__input-live:not(.is-hydrated) {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.fff-tags-field-input-mount .fff-tags-field__input-live.is-hydrated {
-    position: relative;
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.fff-tags-field-input-ssr {
-    width: 100%;
-}
-
-.fff-tags-field__input-live,
-.fff-tags-field__shell {
-    width: 100%;
-}
-
-.fff-tags-field.is-hydrated .fff-tags-field__tags-ssr,
-.fff-tags-field.is-hydrated .fff-tags-field__meta-ssr {
-    display: none;
-}
-
-.fff-tags-field:not(.is-hydrated) .fff-tags-field__tags:not(.fff-tags-field__tags-ssr) {
-    display: none;
-}
-
-.fff-tags-field:not(.is-hydrated) .fff-tags-field__meta:not(.fff-tags-field__meta-ssr) {
-    display: none;
-}
-
-.dark .fff-tags-field {
-    --fff-tags-field-meta: rgb(161 161 170);
-}
-
-.fff-tags-field--sm {
-    --fff-tags-field-tags-gap: 0.5rem;
-}
-
-.fff-tags-field--lg {
-    --fff-tags-field-tags-gap: 0.75rem;
-}
-
-.fff-tags-field.fi-color-danger {
-    --fff-tags-field-accent: var(--danger-500, rgb(239 68 68));
-}
-
-.fff-tags-field.fi-color-success {
-    --fff-tags-field-accent: var(--success-500, rgb(34 197 94));
-}
-
-.fff-tags-field.fi-color-warning {
-    --fff-tags-field-accent: var(--warning-500, rgb(245 158 11));
-}
-
-.fff-tags-field.fi-color-info {
-    --fff-tags-field-accent: var(--info-500, rgb(59 130 246));
-}
-
-.fff-tags-field__tags {
+    --fff-tags-field-tags-gap: .625rem;
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: var(--fff-tags-field-tags-gap);
-    padding-top: 0.125rem;
+    flex-direction: column;
+    width: 100%;
+    gap: .5rem;
 }
-
-.fff-tags-field__tags[hidden] {
-    display: none !important;
-}
-
-.fff-tags-field__meta {
-    font-size: 0.75rem;
-    color: var(--fff-tags-field-meta);
-}
-
-.fff-tags-field.is-disabled .fff-tags-field__tag-remove {
-    pointer-events: none;
-    opacity: 0.55;
-}
-
-.fff-tags-field.fff-flex-text-input--secondary {
-    --fff-tags-field-tag-bg: var(--fff-field-secondary-bg);
-}
-
-.fff-tags-field.fff-flex-text-input--soft .fff-tags-field__tag {
-    border-color: color-mix(in srgb, var(--fff-tags-field-accent) 22%, var(--fff-field-soft-border));
-}
-
-.fff-tags-field.fff-flex-text-input--flat .fff-tags-field__tag {
-    box-shadow: none;
-}
+.dark .fff-tags-field { --fff-tags-field-meta: rgb(161 161 170); }
+.fff-tags-field--sm { --fff-tags-field-tags-gap: .5rem; }
+.fff-tags-field--lg { --fff-tags-field-tags-gap: .75rem; }
+.fff-tags-field__chip-mount { display: grid; }
+.fff-tags-field__chip-mount > .fff-tags-field__tags { grid-area: 1 / 1; }
+.fff-tags-field__tags { display: flex; flex-wrap: wrap; gap: .5rem; }
+.fff-tags-field__tags:not(:empty) { padding-block-start: var(--fff-tags-field-tags-gap); }
+.fff-tags-field:not(.is-hydrated) .fff-tags-field__tags-live { visibility: hidden; pointer-events: none; }
+.fff-tags-field.is-hydrated .fff-tags-field__tags-ssr { display: none; }
+.fff-tags-field__meta { font-size: .75rem; color: var(--fff-tags-field-meta); }
+.fff-tags-field.is-disabled .fff-tags-field__tag-remove { pointer-events: none; opacity: .55; }
+.fff-tags-field.fi-color-danger { --fff-tags-field-accent: var(--danger-500, rgb(239 68 68)); }
+.fff-tags-field.fi-color-success { --fff-tags-field-accent: var(--success-500, rgb(34 197 94)); }
+.fff-tags-field.fi-color-warning { --fff-tags-field-accent: var(--warning-500, rgb(245 158 11)); }
+.fff-tags-field.fi-color-info { --fff-tags-field-accent: var(--info-500, rgb(59 130 246)); }
+.fff-tags-field.fff-flex-text-input--secondary { --fff-tags-field-tag-bg: var(--fff-field-secondary-bg); }
+.fff-tags-field.fff-flex-text-input--soft .fff-tags-field__tag { border-color: color-mix(in srgb, var(--fff-tags-field-accent) 22%, var(--fff-field-soft-border)); }
+.fff-tags-field.fff-flex-text-input--flat .fff-tags-field__tag { box-shadow: none; }

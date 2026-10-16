@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Schema;
 
 use Bjanczak\FilamentFlexFields\Enums\FieldType;
-use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldOptionStorage;
 use Closure;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Repeater;
@@ -21,7 +20,7 @@ final class FieldOptionsBuilder
     public static function make(string $name = 'field_options'): Repeater
     {
         return Repeater::make($name)
-            ->label(__('filament-flex-fields::default.schema.field_options'))
+            ->label(fn () => __('filament-flex-fields::default.schema.field_options'))
             ->table([
                 TableColumn::make('label')
                     ->hiddenHeaderLabel(),
@@ -30,7 +29,7 @@ final class FieldOptionsBuilder
             ])
             ->schema([
                 TextInput::make('label')
-                    ->label(__('filament-flex-fields::default.schema.field_option_label'))
+                    ->label(fn () => __('filament-flex-fields::default.schema.field_option_label'))
                     ->required()
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
@@ -69,7 +68,7 @@ final class FieldOptionsBuilder
                         },
                     ]),
                 TextInput::make('value')
-                    ->label(__('filament-flex-fields::default.schema.field_option_value'))
+                    ->label(fn () => __('filament-flex-fields::default.schema.field_option_value'))
                     ->alphaDash()
                     ->required()
                     ->rules([
@@ -97,23 +96,23 @@ final class FieldOptionsBuilder
                         },
                     ]),
                 TextInput::make('description')
-                    ->label(__('filament-flex-fields::default.schema.field_option_description'))
+                    ->label(fn () => __('filament-flex-fields::default.schema.field_option_description'))
                     ->maxLength(500)
                     ->visible(fn (Get $get): bool => self::selectedType($get)?->supportsRichFieldOptions() ?? false),
                 TextInput::make('icon')
-                    ->label(__('filament-flex-fields::default.schema.field_option_icon'))
-                    ->placeholder('heroicon-o-check')
+                    ->label(fn () => __('filament-flex-fields::default.schema.field_option_icon'))
+                    ->placeholder('hugeicons-tick-02')
                     ->visible(fn (Get $get): bool => self::selectedType($get)?->supportsRichFieldOptions() ?? false),
                 TextInput::make('image')
-                    ->label(__('filament-flex-fields::default.schema.field_option_image'))
+                    ->label(fn () => __('filament-flex-fields::default.schema.field_option_image'))
                     ->url()
                     ->visible(fn (Get $get): bool => self::selectedType($get) === FieldType::ImageChoiceCards),
                 TextInput::make('alt')
-                    ->label(__('filament-flex-fields::default.schema.field_option_alt'))
+                    ->label(fn () => __('filament-flex-fields::default.schema.field_option_alt'))
                     ->maxLength(255)
                     ->visible(fn (Get $get): bool => self::selectedType($get) === FieldType::ImageChoiceCards),
                 ColorPicker::make('color')
-                    ->label(__('filament-flex-fields::default.schema.field_option_color'))
+                    ->label(fn () => __('filament-flex-fields::default.schema.field_option_color'))
                     ->hexColor()
                     ->visible(fn (Get $get): bool => in_array(self::selectedType($get), [
                         FieldType::Select,
@@ -126,11 +125,11 @@ final class FieldOptionsBuilder
                         FieldType::FlexRadiolist,
                     ], true)),
                 Toggle::make('disabled')
-                    ->label(__('filament-flex-fields::default.schema.field_option_disabled'))
+                    ->label(fn () => __('filament-flex-fields::default.schema.field_option_disabled'))
                     ->inline(false),
             ])
             ->defaultItems(1)
-            ->addActionLabel(__('filament-flex-fields::default.schema.field_options_add'))
+            ->addActionLabel(fn () => __('filament-flex-fields::default.schema.field_options_add'))
             ->reorderable()
             ->collapsible()
             ->columnSpanFull()

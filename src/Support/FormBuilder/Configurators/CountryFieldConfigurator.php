@@ -6,6 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CountryField;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Contracts\FieldConfigurator;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\IdentifierList;
 use Filament\Schemas\Components\Component;
 
 final class CountryFieldConfigurator implements FieldConfigurator
@@ -26,6 +27,10 @@ final class CountryFieldConfigurator implements FieldConfigurator
 
         if (array_key_exists('countries', $config) && is_array($config['countries'])) {
             $field->countries($config['countries']);
+        }
+
+        if (isset($config['additional_regions']) && is_array($config['additional_regions'])) {
+            $field->additionalRegions(IdentifierList::normalize($config['additional_regions'], uppercase: true));
         }
 
         if (array_key_exists('except_countries', $config) && is_array($config['except_countries'])) {

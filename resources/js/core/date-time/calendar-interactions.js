@@ -49,7 +49,7 @@ export function createCalendarInteractionsBehavior() {
         },
 
         closeCalendar() {
-            this.calendarOpen = false
+            this.closeTeleportedMenu()
             this.hoveredDate = null
             this.yearPickerOpen = false
             this.calendarViewMode = this.resolveCalendarViewMode()
@@ -399,17 +399,7 @@ export function createCalendarInteractionsBehavior() {
         },
 
         scheduleCalendarPosition() {
-            this.calendarReady = false
-
-            this.$nextTick(() => {
-                requestAnimationFrame(() => {
-                    this.updateCalendarPosition()
-
-                    requestAnimationFrame(() => {
-                        this.updateCalendarPosition()
-                    })
-                })
-            })
+            if (this.calendarOpen) this.scheduleMenuPosition()
         },
 
         isYearGridScrollEvent(event) {
@@ -417,54 +407,7 @@ export function createCalendarInteractionsBehavior() {
         },
 
         updateCalendarPosition() {
-            const trigger = this.$refs.calendarTrigger || this.$refs.fieldShell
-            const menu = this.$refs.calendarMenu
-
-            if (! trigger || ! menu) {
-                return
-            }
-
-            this.applyCalendarTheme(menu)
-
-            const rect = trigger.getBoundingClientRect()
-            const gap = 6
-            const viewportPadding = 16
-            const menuWidth = Math.min(Math.max(rect.width, 320), window.innerWidth - (viewportPadding * 2))
-            const isRtl = this.calendarDirection === 'rtl'
-
-            let top = rect.bottom + gap
-            let left = isRtl ? rect.right - menuWidth : rect.left
-
-            menu.style.position = 'fixed'
-            menu.style.width = `${Math.round(menuWidth)}px`
-            menu.style.zIndex = '200'
-            menu.style.top = `${Math.round(top)}px`
-            menu.style.left = `${Math.round(left)}px`
-            menu.style.right = 'auto'
-
-            const menuRect = menu.getBoundingClientRect()
-
-            if (menuRect.bottom > window.innerHeight - viewportPadding) {
-                const aboveTop = rect.top - menuRect.height - gap
-
-                if (aboveTop >= viewportPadding) {
-                    top = aboveTop
-                }
-            }
-
-            if (left + menuRect.width > window.innerWidth - viewportPadding) {
-                left = window.innerWidth - menuRect.width - viewportPadding
-            }
-
-            if (left < viewportPadding) {
-                left = viewportPadding
-            }
-
-            menu.style.top = `${Math.round(top)}px`
-            menu.style.left = `${Math.round(left)}px`
-            this.updateYearPickerOverlay()
-            this.syncStandaloneYearGridHeight()
-            this.calendarReady = true
+            if (this.calendarOpen) this.updateMenuPosition()
         },
 
         scheduleScrollActiveYearIntoView() {
@@ -629,36 +572,6 @@ export function createCalendarInteractionsBehavior() {
             menu.style.backgroundColor = isDark ? 'rgb(39 39 42)' : 'rgb(255 255 255)'
         },
 
-        bindCalendarListeners() {
-            if (this.menuScrollHandler) {
-                return
-            }
 
-            this.menuScrollHandler = (event) => {
-                if (this.isYearGridScrollEvent(event)) {
-                    return
-                }
-
-                this.updateCalendarPosition()
-            }
-            this.menuResizeHandler = () => this.updateCalendarPosition()
-
-            window.addEventListener('scroll', this.menuScrollHandler, true)
-            window.addEventListener('resize', this.menuResizeHandler)
-        },
-
-        unbindCalendarListeners() {
-            this.unbindYearGridWheelListeners()
-
-            if (! this.menuScrollHandler) {
-                return
-            }
-
-            window.removeEventListener('scroll', this.menuScrollHandler, true)
-            window.removeEventListener('resize', this.menuResizeHandler)
-
-            this.menuScrollHandler = null
-            this.menuResizeHandler = null
-        },
     }
 }

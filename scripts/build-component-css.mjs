@@ -1,91 +1,127 @@
-import { execSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
+import { availableParallelism } from 'node:os';
+import { promisify } from 'node:util';
+import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
 import { collectCssMetrics, fileSizeMetrics, writeBundleMetrics } from './bundle-metrics.mjs';
+import { withComponentOutputLock } from './assets/component-output-lock.mjs';
+import { pruneStylesheetOutput } from './assets/prune-stylesheet-output.mjs';
+import { createCoreCssFoundation } from './assets/css-core-foundation.mjs';
 
 const packageRoot = path.resolve(import.meta.dirname, '..');
-const entriesRoot = path.join(packageRoot, 'resources/css/entries');
-const distRoot = path.join(packageRoot, 'resources/dist/css');
-const foundationOutput = path.join(distRoot, 'utilities-foundation.css');
-const coreOutput = path.join(distRoot, 'core.css');
-const foundationBuildEntry = path.join(entriesRoot, '.foundation.build.css');
-
-fs.mkdirSync(distRoot, { recursive: true });
-
-fs.writeFileSync(
-    foundationBuildEntry,
-    '@import "../utilities-baseline.css";\n@import "../base.css";\n',
-);
-
-execSync(`npx @tailwindcss/cli -i "${foundationBuildEntry}" -o "${foundationOutput}" --minify`, {
-    cwd: packageRoot,
-    stdio: 'inherit',
-});
-
-fs.unlinkSync(foundationBuildEntry);
-
-function buildScopedEntrySource(entrySource) {
-    const scopedLines = entrySource
-        .split('\n')
-        .filter((line) => {
-            const trimmed = line.trim();
-
-            return ! trimmed.includes('utilities-baseline.css')
-                && ! /^@import\s+["']\.\.\/base\.css["'];?\s*$/.test(trimmed);
-        });
-
-    return [
-        '@reference "../utilities-baseline.css";',
-        '@reference "../base.css";',
-        '',
-        scopedLines.join('\n').trim(),
-        '',
-    ].join('\n');
+const runCompiler = promisify(execFile);
+const cliManifestPath = fileURLToPath(import.meta.resolve('@tailwindcss/cli/package.json'));
+const cliManifest = JSON.parse(fs.readFileSync(cliManifestPath, 'utf8'));
+const cliPath = path.resolve(path.dirname(cliManifestPath), cliManifest.bin.tailwindcss);
+const configuredWorkers = process.env.FFF_CSS_BUILD_WORKERS;
+if (configuredWorkers !== undefined && !/^[1-8]$/.test(configuredWorkers)) {
+    throw new Error('FFF_CSS_BUILD_WORKERS must be an integer from 1 to 8.');
 }
+const parallelism = configuredWorkers === undefined ? Math.min(4, availableParallelism()) : Number(configuredWorkers);
+await withComponentOutputLock(packageRoot, async lease => {
+    const entriesRoot = path.join(packageRoot, 'resources/css/entries');
+    const distRoot = path.join(packageRoot, 'resources/dist/css');
+    const coreOutput = path.join(distRoot, 'core.css');
 
-const entries = fs.readdirSync(entriesRoot).filter((file) => (
-    file.endsWith('.css') && ! file.startsWith('.scoped-build.') && file !== '.foundation.build.css'
-));
+    fs.mkdirSync(distRoot, { recursive: true });
+    const foundation = createCoreCssFoundation(fs.readFileSync(coreOutput));
+    let sharedDeclarations = 0, sharedProperties = 0;
 
-for (const entry of entries) {
-    const name = entry.replace(/\.css$/, '');
-    const input = path.join(entriesRoot, entry);
-    const scopedInput = path.join(entriesRoot, `.scoped-build.${entry}`);
-    const output = path.join(distRoot, `${name}.css`);
+    function buildScopedEntrySource(entrySource) {
+        const scopedLines = entrySource
+            .split('\n')
+            .filter((line) => {
+                const trimmed = line.trim();
 
-    fs.writeFileSync(scopedInput, buildScopedEntrySource(fs.readFileSync(input, 'utf8')));
+                return ! trimmed.includes('utilities-baseline.css')
+                    && ! /^@import\s+["']\.\.\/base\.css["'];?\s*$/.test(trimmed);
+            });
 
-    try {
-        execSync(`npx @tailwindcss/cli -i "${scopedInput}" -o "${output}" --minify`, {
-            cwd: packageRoot,
-            stdio: 'pipe',
-        });
-    } catch (error) {
-        const stderr = error.stderr?.toString?.() ?? '';
-        const stdout = error.stdout?.toString?.() ?? '';
+        return [
+            '@reference "../utilities-baseline.css";',
+            '@reference "../base.css";',
+            '',
+            scopedLines.join('\n').trim(),
+            '',
+        ].join('\n');
+    }
 
-        throw new Error(`Failed to build ${entry}:\n${stderr || stdout || error.message}`);
-    } finally {
-        if (fs.existsSync(scopedInput)) {
-            fs.unlinkSync(scopedInput);
+    const entries = fs.readdirSync(entriesRoot).filter((file) => (
+        file.endsWith('.css') && ! file.startsWith('.scoped-build.') && file !== '.foundation.build.css'
+    )).sort();
+
+    const requested = process.argv.slice(2);
+    for (const name of requested) {
+        if (!entries.includes(`${name}.css`)) throw new Error(`Unknown component stylesheet: ${name}`);
+    }
+    const selectedEntries = requested.length ? entries.filter(entry => requested.includes(entry.slice(0, -4))) : entries;
+    async function buildEntry(entry) {
+        const name = entry.replace(/\.css$/, '');
+        const input = path.join(entriesRoot, entry);
+        const scopedInput = path.join(entriesRoot, `.scoped-build.${entry}`);
+        const output = path.join(distRoot, `${name}.css`);
+
+        fs.writeFileSync(scopedInput, buildScopedEntrySource(fs.readFileSync(input, 'utf8')));
+
+        try {
+            await runCompiler(process.execPath, [cliPath, '-i', scopedInput, '-o', output, '--minify'], {
+                cwd: packageRoot,
+                timeout: 60000,
+                maxBuffer: 1024 * 1024,
+            });
+            const pruned = foundation.prune(fs.readFileSync(output), `${name}.css`);
+            fs.writeFileSync(output, pruned.code);
+            sharedDeclarations += pruned.removedDeclarations;
+            sharedProperties += pruned.removedProperties;
+        } catch (error) {
+            const stderr = error.stderr?.toString?.() ?? '';
+            const stdout = error.stdout?.toString?.() ?? '';
+
+            throw new Error(`Failed to build ${entry}:\n${stderr || stdout || error.message}`);
+        } finally {
+            if (fs.existsSync(scopedInput)) {
+                fs.unlinkSync(scopedInput);
+            }
         }
     }
-}
 
-const cssMetrics = collectCssMetrics(distRoot);
+    // Hold the output lease until every running child has completed its cleanup.
+    // A failure stops new work; it never leaves unawaited compilers writing later.
+    let cursor = 0, failure;
+    const workers = Array.from({ length: Math.min(parallelism, selectedEntries.length) }, async () => {
+        while (!failure && cursor < selectedEntries.length) {
+            const entry = selectedEntries[cursor++];
+            try { await buildEntry(entry); }
+            catch (error) { failure ??= error; }
+        }
+    });
+    const results = await Promise.allSettled(workers);
+    for (const result of results) {
+        if (result.status === 'rejected') failure ??= result.reason;
+    }
+    if (failure) throw failure;
 
-if (fs.existsSync(foundationOutput)) {
-    cssMetrics['utilities-foundation.css'] = fileSizeMetrics(foundationOutput);
-}
+    if (!requested.length) {
+        const cleanup = pruneStylesheetOutput(packageRoot, selectedEntries, lease);
+        console.log(`Removed ${cleanup.removed.length} obsolete generated CSS outputs.`);
+    }
 
-if (fs.existsSync(coreOutput)) {
-    cssMetrics['core.css'] = fileSizeMetrics(coreOutput);
-}
+    // Reject optimized output that would silently lose blur in standard browsers.
+    await import('./assets/audit-css-browser-compatibility.mjs');
 
-if (fs.existsSync(path.join(distRoot, 'playground.css'))) {
-    cssMetrics['playground.css'] = fileSizeMetrics(path.join(distRoot, 'playground.css'));
-}
+    const cssMetrics = collectCssMetrics(distRoot);
 
-writeBundleMetrics(packageRoot, { css: cssMetrics });
+    if (fs.existsSync(coreOutput)) {
+        cssMetrics['core.css'] = fileSizeMetrics(coreOutput);
+    }
 
-console.log(`Built ${entries.length} scoped component CSS bundles (foundation: utilities-foundation.css).`);
+    if (fs.existsSync(path.join(distRoot, 'playground.css'))) {
+        cssMetrics['playground.css'] = fileSizeMetrics(path.join(distRoot, 'playground.css'));
+    }
+
+    writeBundleMetrics(packageRoot, { css: cssMetrics });
+
+    console.log(`Built ${selectedEntries.length} scoped component CSS bundles with ${Math.min(parallelism, selectedEntries.length)} compiler workers.`);
+    console.log(`Core owns ${sharedDeclarations} shared Tailwind initializers and ${sharedProperties} matching property registrations removed from component output.`);
+});

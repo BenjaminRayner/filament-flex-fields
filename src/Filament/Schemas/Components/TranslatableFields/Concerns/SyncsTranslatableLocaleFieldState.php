@@ -4,53 +4,64 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\Concerns;
 
-use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\TranslatableTab;
 use Bjanczak\FilamentFlexFields\Support\Translatable\TranslatableHydrator;
 use Filament\Forms\Components\Field;
-use Illuminate\Support\Str;
+use Filament\Schemas\Schema;
 
 trait SyncsTranslatableLocaleFieldState
 {
-    public function fillStateWithNull(): void
+    /**
+     * @param  array<string, mixed>|null  $hydratedDefaultState
+     * @param  array<string, true>  $appliedStateCastPaths
+     */
+    public function hydrateState(?array &$hydratedDefaultState, bool $shouldCallHydrationHooks = true, bool $shouldApplyStateCasts = true, array &$appliedStateCastPaths = []): void
     {
-        parent::fillStateWithNull();
-
-        $this->syncLocaleFieldStatesFromParent();
+        if ($schema = $this->getChildSchema()) {
+            $this->syncLocaleFieldStates($schema, fromRecord: $hydratedDefaultState === null);
+        }
+        parent::hydrateState($hydratedDefaultState, $shouldCallHydrationHooks, $shouldApplyStateCasts, $appliedStateCastPaths);
     }
 
-    protected function syncLocaleFieldStatesFromParent(): void
+    /** @param array<string> $statePaths */
+    public function hydrateStatePartially(array $statePaths, bool $shouldCallHydrationHooks = true): void
     {
-        foreach (parent::getChildSchema()?->getComponents() ?? [] as $tab) {
-            if (! $tab instanceof TranslatableTab) {
-                continue;
-            }
-
-            $locale = $tab->getLocale();
-
-            foreach ($tab->getChildSchema()?->getComponents() ?? [] as $field) {
+        if ($schema = $this->getChildSchema()) {
+            $prepared = [];
+            foreach ($schema->getFlatComponents(withHidden: true) as $field) {
                 if (! $field instanceof Field) {
                     continue;
                 }
-
-                $resolved = TranslatableHydrator::resolveRenderedState($field);
-
-                if (filled($resolved)) {
-                    if (blank($field->getState())) {
-                        $field->state($resolved);
+                foreach ($statePaths as $path) {
+                    $fieldPath = $field->getStatePath();
+                    if (is_string($fieldPath) && ($fieldPath === $path || str_starts_with($fieldPath, $path.'.'))) {
+                        TranslatableHydrator::prepareField($field, true, $prepared);
+                        break;
                     }
-
-                    continue;
                 }
+            }
+        }
+        parent::hydrateStatePartially($statePaths, $shouldCallHydrationHooks);
+    }
 
-                $relativeStatePath = $field->getStatePath(isAbsolute: false);
-
-                if (! is_string($relativeStatePath) || ! str_ends_with($relativeStatePath, ".{$locale}")) {
-                    continue;
+    /** @param array<string, mixed> $state */
+    public function dehydrateState(array &$state, bool $isDehydrated = true): void
+    {
+        parent::dehydrateState($state, $isDehydrated);
+        if ($schema = $this->getChildSchema()) {
+            foreach ($schema->getFlatComponents(withHidden: true) as $field) {
+                if ($field instanceof Field) {
+                    TranslatableHydrator::dehydrateNestedAttribute($field, $state);
                 }
+            }
+        }
+    }
 
-                $storageAttribute = Str::beforeLast($relativeStatePath, ".{$locale}");
-
-                TranslatableHydrator::hydrateFromFormState($field, $storageAttribute, $locale);
+    protected function syncLocaleFieldStates(Schema $schema, bool $fromRecord = false): void
+    {
+        $preparedPaths = [];
+        foreach ($schema->getFlatComponents(withHidden: true) as $field) {
+            if ($field instanceof Field) {
+                TranslatableHydrator::prepareField($field, $fromRecord, $preparedPaths);
             }
         }
     }

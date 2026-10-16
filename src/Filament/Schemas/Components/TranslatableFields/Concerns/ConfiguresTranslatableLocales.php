@@ -46,6 +46,6 @@ trait ConfiguresTranslatableLocales
      */
     public function getLocales(): array
     {
-        return TranslatableLocales::resolve($this->translatableLocales, $this->translatableLocaleLabels);
+        return TranslatableLocales::resolve($this->evaluate($this->translatableLocales), $this->evaluate($this->translatableLocaleLabels));
     }
 }

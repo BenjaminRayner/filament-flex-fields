@@ -12,109 +12,61 @@ namespace Bjanczak\FilamentFlexFields;
 
 use Bjanczak\FilamentFlexFields\Assets\FlexFieldsAlpineComponent;
 use Bjanczak\FilamentFlexFields\Assets\FlexFieldsCss;
-use Bjanczak\FilamentFlexFields\Console\BuildIconManifestCommand;
-use Bjanczak\FilamentFlexFields\Console\ExportAssetRegistryCommand;
-use Bjanczak\FilamentFlexFields\Console\InstallWhisperRuntimeCommand;
-use Bjanczak\FilamentFlexFields\Console\MakeFlexFieldSchemaMigrationCommand;
-use Bjanczak\FilamentFlexFields\Console\PruneCaptureMediaCommand;
-use Bjanczak\FilamentFlexFields\Console\UpgradeToV3Command;
-use Bjanczak\FilamentFlexFields\Console\WhisperRuntimeStatusCommand;
+use Bjanczak\FilamentFlexFields\Filament\Livewire\CodeExamples;
+use Bjanczak\FilamentFlexFields\Filament\Livewire\ScheduleDisplayExamples;
 use Bjanczak\FilamentFlexFields\Models\FlexFieldGroup;
 use Bjanczak\FilamentFlexFields\Policies\FlexFieldGroupPolicy;
-use Bjanczak\FilamentFlexFields\Support\CalculatorPanelMount;
-use Bjanczak\FilamentFlexFields\Support\CountryRegistryQueue;
-use Bjanczak\FilamentFlexFields\Support\CurrencyRegistryQueue;
-use Bjanczak\FilamentFlexFields\Support\Enterprise\SiemBridge;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldAlpineQueue;
+use Bjanczak\FilamentFlexFields\Support\Assets\InitialSchemaLayout;
+use Bjanczak\FilamentFlexFields\Support\Assets\Rendering\LivewirePlanProjection;
+use Bjanczak\FilamentFlexFields\Support\Bootstrap\AssetRegistration;
+use Bjanczak\FilamentFlexFields\Support\Bootstrap\ConfigurationDefaults;
+use Bjanczak\FilamentFlexFields\Support\Bootstrap\ConsoleIntegration;
+use Bjanczak\FilamentFlexFields\Support\Bootstrap\IconRegistration;
+use Bjanczak\FilamentFlexFields\Support\Bootstrap\RenderHookRegistration;
+use Bjanczak\FilamentFlexFields\Support\Bootstrap\ServiceBindings;
+use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Lifecycle\UploadModelSaved;
+use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Lifecycle\UploadRecordSaved;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldSchemaRegistry;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsConfig;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldStylesheetQueue;
-use Bjanczak\FilamentFlexFields\Support\FormBuilder\FieldComponentFactory;
-use Bjanczak\FilamentFlexFields\Support\FormBuilder\Registry\FieldTypeHandlerRegistry;
-use Bjanczak\FilamentFlexFields\Support\Geocoding\GeocodingOs;
-use Bjanczak\FilamentFlexFields\Support\HtmlSanitizer;
-use Bjanczak\FilamentFlexFields\Support\Icons\IconCatalogResolver;
-use Bjanczak\FilamentFlexFields\Support\Icons\IconSvgCache;
-use Bjanczak\FilamentFlexFields\Support\Media\CaptureRetentionSchedule;
-use Bjanczak\FilamentFlexFields\Support\Media\MediaCaptureOs;
-use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaIngress;
-use Bjanczak\FilamentFlexFields\Support\RichEditorGravityIcons;
-use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldGroupRegistrySync;
-use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldGroupValidator;
-use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldInfolistBuilder;
-use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldSchemaResolver;
-use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldStudio;
-use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldTableBuilder;
-use Bjanczak\FilamentFlexFields\Support\Theme\FlexFieldsTheme;
-use Bjanczak\FilamentFlexFields\Support\TimezoneRegistryQueue;
+use Bjanczak\FilamentFlexFields\Support\RichEditorFlexIcons;
 use Bjanczak\FilamentFlexFields\Support\Translatable\RegistersTranslatableFieldMacros;
-use Bjanczak\FilamentFlexFields\Support\Upgrade\V3AutoUpgrade;
-use Bjanczak\FilamentFlexFields\Support\UserSelectQueryCache;
+use Filament\Resources\Events\RecordSaved;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
-use Filament\Support\Facades\FilamentView;
-use Filament\View\PanelsRenderHook;
-use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class FilamentFlexFieldsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/filament-flex-fields.php', 'filament-flex-fields');
+        if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
+            $repository = $this->app->make(Repository::class);
+            $overrides = $repository->get('filament-flex-fields', []);
+            if (! is_array($overrides)) {
+                throw new \InvalidArgumentException('FLEX configuration must be an array.');
+            }
+            $repository->set('filament-flex-fields', ConfigurationDefaults::merge(
+                require __DIR__.'/../config/filament-flex-fields.php', $overrides,
+            ));
+        }
 
-        $this->app->singleton(FlexFieldSchemaRegistry::class, function (): FlexFieldSchemaRegistry {
-            $registry = new FlexFieldSchemaRegistry;
+        // Panel providers may resolve translated navigation during their register phase.
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'filament-flex-fields');
 
-            $registry->registerFromConfig(config('filament-flex-fields.schemas', []));
+        ServiceBindings::register($this->app);
 
-            return $registry;
-        });
+        IconRegistration::register($this->app);
 
-        $this->app->singleton(FlexFieldGroupRegistrySync::class);
-        $this->app->singleton(FlexFieldEntityDiscovery::class);
-        $this->app->singleton(FlexFieldEntityRegistry::class);
-        $this->app->singleton(FlexFieldSchemaResolver::class);
-        $this->app->singleton(FlexFieldFilterBuilder::class);
-        $this->app->singleton(FlexFieldGroupValidator::class);
-        $this->app->singleton(FlexFieldTableBuilder::class);
-        $this->app->singleton(FlexFieldInfolistBuilder::class);
-        $this->app->singleton(FlexFieldStudio::class);
-
-        $this->app->singleton(FieldTypeHandlerRegistry::class);
-        $this->app->singleton(FieldComponentFactory::class);
-        $this->app->singleton(FlexFieldFormBuilder::class);
-        $this->app->singleton(HtmlSanitizer::class);
-        $this->app->singleton(FlexFieldsPlaygroundBuilder::class);
-        $this->app->scoped(FlexFieldStylesheetQueue::class);
-        $this->app->scoped(FlexFieldAlpineQueue::class);
-        $this->app->scoped(CountryRegistryQueue::class);
-        $this->app->scoped(TimezoneRegistryQueue::class);
-        $this->app->scoped(CurrencyRegistryQueue::class);
-        $this->app->scoped(CalculatorPanelMount::class);
-        $this->app->scoped(UserSelectQueryCache::class);
-        $this->app->singleton(IconCatalogResolver::class);
-        $this->app->singleton(IconSvgCache::class);
-        $this->app->singleton(MediaIngress::class);
-        $this->app->singleton(FlexFieldsTheme::class, function (): FlexFieldsTheme {
-            $theme = new FlexFieldsTheme;
-
-            $theme
-                ->setDensity(FlexFieldsConfig::getDensity())
-                ->mergeTheme(FlexFieldsConfig::getTheme());
-
-            return $theme;
-        });
     }
 
     public function boot(): void
     {
-        RichEditorGravityIcons::register();
+        RichEditorFlexIcons::register();
 
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
@@ -133,12 +85,11 @@ class FilamentFlexFieldsServiceProvider extends ServiceProvider
         Gate::policy(FlexFieldGroup::class, FlexFieldGroupPolicy::class);
 
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'filament-flex-fields');
+        Livewire::component('flex-code-examples', CodeExamples::class);
+        Livewire::component('flex-schedule-display-examples', ScheduleDisplayExamples::class);
 
-        $langPath = __DIR__.'/../resources/lang';
-
-        if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, 'filament-flex-fields');
-        }
+        InitialSchemaLayout::register();
+        LivewirePlanProjection::register();
 
         FilamentAsset::register([
             ...$this->registeredStylesheets(),
@@ -147,238 +98,44 @@ class FilamentFlexFieldsServiceProvider extends ServiceProvider
             ...$this->registeredAlpineChunkComponents(),
         ], package: FilamentFlexFieldsPlugin::PACKAGE_NAME);
 
-        $this->publishStalePackageAssets();
+        ConsoleIntegration::register($this->app, fn () => $this->publishStalePackageAssets());
 
-        V3AutoUpgrade::ensure();
-
-        MediaCaptureOs::bootFromConfig();
-
-        GeocodingOs::bootFromConfig();
-
-        SiemBridge::boot();
-
-        if (FlexFieldsConfig::isPlaygroundEnabled()) {
-            FilamentView::registerRenderHook(
-                PanelsRenderHook::HEAD_END,
-                fn (): string => Blade::render('filament-flex-fields::partials.playground-theme'),
-            );
+        if (! $this->app->runningInConsole()
+            && $this->app->environment('local', 'testing')
+            && config('filament-flex-fields.assets.publish_on_boot', false)) {
+            $this->app->booted(fn () => $this->publishStalePackageAssets());
         }
 
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::HEAD_END,
-            fn (): string => view('filament-flex-fields::partials.critical-stylesheet-preloads')->render(),
-        );
-
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::STYLES_AFTER,
-            fn (): string => view('filament-flex-fields::partials.queued-stylesheets')->render(),
-        );
-
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::BODY_END,
-            fn (): string => view('filament-flex-fields::partials.queued-stylesheets')->render(),
-        );
-
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::BODY_END,
-            fn (): string => CalculatorPanelMount::renderOnce(),
-        );
-
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::STYLES_AFTER,
-            fn (): string => view('filament-flex-fields::partials.tooltip-overrides')->render(),
-        );
-
-        if (FlexFieldsConfig::isPlaygroundEnabled()) {
-            FilamentView::registerRenderHook(
-                PanelsRenderHook::STYLES_BEFORE,
-                fn (): string => request()->is('*flex-fields-playground*')
-                    ? view('filament-flex-fields::partials.playground-page-stylesheets')->render()
-                    : '',
-            );
-
-            FilamentView::registerRenderHook(
-                PanelsRenderHook::SCRIPTS_AFTER,
-                fn (): string => view('filament-flex-fields::partials.playground-assets')->render(),
-            );
-        }
-
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::SCRIPTS_AFTER,
-            fn (): string => view('filament-flex-fields::partials.tooltip-glass-script')->render(),
-        );
-
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::SCRIPTS_AFTER,
-            fn (): string => view('filament-flex-fields::partials.flex-field-asset-injector')->render(),
-        );
-
-        if (FlexFieldsConfig::isPlaygroundEnabled()) {
-            FilamentView::registerRenderHook(
-                PanelsRenderHook::SCRIPTS_AFTER,
-                fn (): string => request()->is('*flex-fields-playground*')
-                    ? view('filament-flex-fields::partials.playground-skeleton-demo-script')->render()
-                    : '',
-            );
-        }
+        RenderHookRegistration::register();
 
         RegistersTranslatableFieldMacros::boot();
+        $this->app->make(Dispatcher::class)->listen(RecordSaved::class, UploadRecordSaved::class);
+        $this->app->make(Dispatcher::class)->listen('eloquent.saved: *', UploadModelSaved::class);
 
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                BuildIconManifestCommand::class,
-                ExportAssetRegistryCommand::class,
-                InstallWhisperRuntimeCommand::class,
-                WhisperRuntimeStatusCommand::class,
-                PruneCaptureMediaCommand::class,
-                UpgradeToV3Command::class,
-                MakeFlexFieldSchemaMigrationCommand::class,
-            ]);
-        }
-
-        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
-
-        $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
-            CaptureRetentionSchedule::register($schedule);
-        });
-
-        $this->app->booted(function (): void {
-            try {
-                app(FlexFieldGroupRegistrySync::class)->syncAllFromDatabase();
-            } catch (\Throwable $e) {
-                report($e);
-            }
-        });
     }
 
-    /**
-     * @return list<FlexFieldsCss>
-     */
+    /** @return list<FlexFieldsCss> */
     protected function registeredStylesheets(): array
     {
-        $distPath = __DIR__.'/../resources/dist/css';
-
-        $assets = [
-            FlexFieldsCss::make(FlexFieldAssets::CORE_STYLESHEET_ID, $distPath.'/core.css'),
-        ];
-
-        if (FlexFieldsConfig::isPlaygroundEnabled()) {
-            $assets[] = FlexFieldsCss::make(FlexFieldAssets::PLAYGROUND_STYLESHEET_ID, $distPath.'/playground.css')->loadedOnRequest();
-
-            foreach (glob($distPath.'/playground-*.css') ?: [] as $bundlePath) {
-                $slug = str_replace('playground-', '', basename($bundlePath, '.css'));
-
-                $assets[] = FlexFieldsCss::make(
-                    FlexFieldAssets::playgroundBundleStylesheetId($slug),
-                    $bundlePath,
-                )->loadedOnRequest();
-            }
-        }
-
-        foreach (FlexFieldAssets::LAZY_COMPONENT_STYLESHEETS as $component) {
-            $assets[] = FlexFieldsCss::make(
-                FlexFieldAssets::stylesheetId($component),
-                $distPath.'/'.$component.'.css',
-            )->loadedOnRequest();
-        }
-
-        return $assets;
+        return (new AssetRegistration)->stylesheets();
     }
 
-    /**
-     * @return list<Js>
-     */
+    /** @return list<Js> */
     protected function registeredScripts(): array
     {
-        $scripts = [
-            // loadedOnRequest: URL is available via FilamentAsset::getScriptSrc(),
-            // but tags are rendered once from render hooks (avoids double boot).
-            Js::make(
-                FlexFieldAssets::FFF_LOAD_BOOTSTRAP_SCRIPT_ID,
-                __DIR__.'/../resources/dist/core/flex-fff-load-bootstrap.js',
-            )->loadedOnRequest(),
-            Js::make(
-                FlexFieldAssets::ASSET_INJECTOR_SCRIPT_ID,
-                __DIR__.'/../resources/dist/core/flex-field-asset-injector.js',
-            )->loadedOnRequest(),
-            Js::make(
-                FlexFieldAssets::ASSET_INSPECTOR_SCRIPT_ID,
-                __DIR__.'/../resources/dist/core/flex-field-asset-inspector.js',
-            )->loadedOnRequest(),
-            Js::make(
-                FlexFieldAssets::FLEX_RICH_EDITOR_PASTE_EXTENSION_SCRIPT_ID,
-                __DIR__.'/../resources/dist/support/flex-rich-editor-paste-extension.js',
-            )->loadedOnRequest(),
-            Js::make(
-                FlexFieldAssets::FLEX_RICH_EDITOR_BLOCK_IMAGE_EXTENSION_SCRIPT_ID,
-                __DIR__.'/../resources/dist/support/flex-rich-editor-block-image-extension.js',
-            )->loadedOnRequest(),
-            Js::make(
-                FlexFieldAssets::FLEX_RICH_EDITOR_YOUTUBE_EXTENSION_SCRIPT_ID,
-                __DIR__.'/../resources/dist/support/flex-rich-editor-youtube-extension.js',
-            )->loadedOnRequest(),
-            Js::make(
-                FlexFieldAssets::SEGMENT_OVERFLOW_SSR_SCRIPT_ID,
-                __DIR__.'/../resources/dist/core/segment-overflow-ssr.js',
-            )->loadedOnRequest(),
-            Js::make(
-                FlexFieldAssets::TIMEZONE_BROWSER_SSR_BOOT_SCRIPT_ID,
-                __DIR__.'/../resources/dist/core/timezone-browser-ssr-boot.js',
-            )->loadedOnRequest(),
-        ];
-
-        if (FlexFieldsConfig::isPlaygroundEnabled()) {
-            $scripts[] = Js::make(
-                FlexFieldAssets::PLAYGROUND_SKELETON_DEMO_SCRIPT_ID,
-                __DIR__.'/../resources/dist/playground/skeleton-demo.js',
-            )->loadedOnRequest();
-        }
-
-        return $scripts;
+        return (new AssetRegistration)->scripts();
     }
 
-    /**
-     * @return list<FlexFieldsAlpineComponent>
-     */
+    /** @return list<FlexFieldsAlpineComponent> */
     protected function registeredAlpineComponents(): array
     {
-        $distPath = __DIR__.'/../resources/dist/components';
-        $assets = [];
-
-        foreach (FlexFieldAssets::alpineEntryNames() as $entry) {
-            $path = $distPath.'/'.$entry.'.js';
-
-            if (! is_file($path)) {
-                continue;
-            }
-
-            $assets[] = FlexFieldsAlpineComponent::make($entry, $path);
-        }
-
-        return $assets;
+        return (new AssetRegistration)->alpineComponents();
     }
 
-    /**
-     * @return list<FlexFieldsAlpineComponent>
-     */
+    /** @return list<FlexFieldsAlpineComponent> */
     protected function registeredAlpineChunkComponents(): array
     {
-        $distPath = __DIR__.'/../resources/dist/components';
-        $assets = [];
-
-        foreach (FlexFieldAssets::alpineSharedChunkNames() as $chunk) {
-            $path = $distPath.'/'.$chunk;
-
-            if (! is_file($path)) {
-                continue;
-            }
-
-            $id = str_replace('.js', '', $chunk);
-
-            $assets[] = FlexFieldsAlpineComponent::make($id, $path)->loadedOnRequest();
-        }
-
-        return $assets;
+        return (new AssetRegistration)->alpineChunks();
     }
 
     protected function publishStalePackageAssets(): void

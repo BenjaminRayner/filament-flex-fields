@@ -32,6 +32,7 @@ class SocialLinksFieldPlayground
                 ['platform' => 'youtube', 'url' => 'https://youtube.com/@laravelphp'],
             ],
             'social_links__empty' => [],
+            'social_links__readonly' => [['platform' => 'website', 'url' => 'https://example.com']],
         ];
     }
 
@@ -42,7 +43,7 @@ class SocialLinksFieldPlayground
     {
         return [
             Section::make('Social links field')
-                ->description('Add platforms from a picker — one row per platform with URL validation, reordering, and custom platforms.')
+                ->description('Add platforms with FLEX Select — one row per platform with URL validation, reordering, and custom platforms.')
                 ->schema([
                     SocialLinksField::make('social_links__default')
                         ->label('Broker profile links')
@@ -69,14 +70,22 @@ class SocialLinksFieldPlayground
                         ->variant('secondary'),
 
                     SocialLinksField::make('social_links__custom')
-                        ->label('Custom Mastodon platform')
-                        ->platforms(['mastodon', SocialPlatform::Website])
+                        ->label('Custom platforms only')
+                        ->platforms(['mastodon', 'customer_portal'])
                         ->customPlatforms([
                             [
                                 'value' => 'mastodon',
                                 'label' => 'Mastodon',
                                 'placeholder' => 'https://mastodon.social/@username',
                                 'hosts' => ['mastodon.social', 'mastodon.online'],
+                                'icon' => 'hugeicons-mastodon',
+                            ],
+                            [
+                                'value' => 'customer_portal',
+                                'label' => 'Customer portal',
+                                'placeholder' => 'https://portal.example.com/profile/name',
+                                'hosts' => ['portal.example.com'],
+                                'icon' => 'hugeicons-user-account',
                             ],
                         ]),
 
@@ -94,6 +103,10 @@ class SocialLinksFieldPlayground
                         ->label('Start from scratch')
                         ->variant('soft')
                         ->size('sm'),
+                    SocialLinksField::make('social_links__readonly')
+                        ->label('Read-only · large')
+                        ->size('lg')
+                        ->readOnly(),
                 ]),
         ];
     }

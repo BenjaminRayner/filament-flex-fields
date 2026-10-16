@@ -25,7 +25,8 @@ it('exposes flex time segments field configuration api', function () {
         ->and($field->getLocale())->toBe('pl_PL')
         ->and($field->getStorageFormat())->toBe('H:i')
         ->and($field->getAlpineConfiguration()['hourCycle'])->toBe(12)
-        ->and($field->getAlpineConfiguration()['minValue'])->toBe('09:00');
+        ->and($field->getAlpineConfiguration()['minValue'])->toBe('09:00:00')
+        ->and($field->getAlpineConfiguration()['maxValue'])->toBe('18:00:00');
 });
 
 it('normalizes flex time segments state to HH:MM', function () {
@@ -41,17 +42,4 @@ it('normalizes flex time segments state to HH:MM', function () {
 it('registers flex time segments assets for lazy loading', function () {
     expect(FlexFieldAssets::hasLazyStylesheet('flex-time-segments'))->toBeTrue()
         ->and(FlexFieldAssets::STYLESHEET_DEPENDENCIES['flex-time-segments'])->toBe(['flex-text-input', 'teleported-menu']);
-});
-
-it('renders flex time segments field view with entangled alpine bindings', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-time-segments-field.blade.php');
-    $partial = file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/flex-time-segments.blade.php');
-
-    expect($blade)
-        ->toContain('flex-time-segments-field')
-        ->toContain('load-stylesheet')
-        ->toContain('flex-time-segments')
-        ->toContain('$entangle')
-        ->and($partial)->toContain('flexTimeSegmentsComponent')
-        ->and($partial)->toContain('x-load-src');
 });

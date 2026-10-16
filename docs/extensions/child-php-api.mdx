@@ -1,0 +1,78 @@
+---
+title: "Configure children with the PHP API"
+description: "Use relationships, callbacks and full fluent child configuration in trusted PHP."
+---
+
+`configure` receives the real child renderer and its `ChildRenderContext`. It can
+use the component's public methods, closures, rules, relations and application
+services. Return the same field from a fluent chain, or return nothing. Returning
+a replacement field is rejected. The callback is created for the current render;
+it is not serialized or stored in the registry.
+
+For a relation, keep query and authorization decisions in PHP:
+
+```php
+use Illuminate\Database\Eloquent\Builder;
+
+$author = $children->render(
+    'author',
+    'main',
+    ['searchable' => true, 'required' => true],
+    configure: fn (SelectField $select) => $select
+        ->relationship(
+            'author',
+            'name',
+            modifyQueryUsing: fn (Builder $query) => $query
+                ->where('tenant_id', $tenant->getKey())
+                ->where('active', true),
+        ),
+);
+```
+
+Attach the model class for create or the actual record for edit to the parent
+schema. Native relationship hydration, selection validation and relationship
+callbacks remain available. The application still owns its transaction, endpoint
+authorization and model save. In particular, an independently nested BelongsTo
+selection does not become a top-level foreign-key attribute just because it is
+inside a composite field. With a custom save flow, validate first, attach the
+saved record for create, call `saveRelationships()` and save any existing model
+whose association has changed. Keep those operations in the application's
+authorized transaction. Do not pass a relation name or query callback from
+untrusted JSON.
+
+For actual cursor pagination, supply a provider and a selected-value resolver:
+
+```php
+$results = $children->render(
+    'results',
+    'main',
+    [
+        'searchable' => true,
+        'paginatedSearchResults' => true,
+        'virtualizeThreshold' => 100,
+        'virtualRowHeight' => 36,
+        'virtualWindowSize' => 30,
+    ],
+    configure: function (SelectField $select) use ($repository, $tenant): void {
+        $select
+            ->getSearchResultsPageUsing(
+                fn (string $search, ?string $cursor, int $pageSize) =>
+                    $repository->page($tenant, $search, $cursor, $pageSize),
+            )
+            ->getOptionLabelUsing(
+                fn ($value) => $repository->allowedLabel($tenant, $value),
+            );
+    },
+);
+```
+
+The example repository is application code. Its `page()` returns `items` containing
+`value`/`label`, an opaque `cursor`, and `hasMore`; `allowedLabel()` returns `null`
+for an inaccessible selection. Setting `paginatedSearchResults` alone does not
+create a database pagination query. Virtualization controls presentation; it does
+not authorize values or replace a scoped query.
+
+## Continue reading
+
+[Reusable child contracts](/docs/extensions/child-contracts) · [Validation](/docs/extensions/validation)
+

@@ -83,11 +83,11 @@ it('renders hold confirm wrapper view with alpine form component name', function
     expect($html)
         ->toContain('fff-hold-confirm-action-host')
         ->toContain('holdConfirmActionFormComponent(')
-        ->toContain('duration: 2000')
-        ->toContain('fff-hold-complete')
+        ->toContain('data-variant="hold"')
         ->toContain('mountAction')
         ->toContain('delete')
-        ->not->toContain('partials.load-stylesheet');
+        ->not->toContain('partials.load-stylesheet', 'rel="modulepreload"', 'x-init=')
+        ->and($action->getConfirmationConfiguration()['duration'])->toBe(2000);
 });
 
 it('includes mount action expression in hold confirm complete handler', function () {

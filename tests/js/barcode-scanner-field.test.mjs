@@ -6,17 +6,14 @@ import {
     detectBarcodeFormat,
     isBarcodeChecksumValid,
     matchesBarcodeFormat,
-    prepareScanBeepAudio,
-    usesTransientScanBeep,
     validateBarcodeValue,
     validateModulo10Checksum,
-} from '../../resources/js/support/barcode-validation.js'
+} from '../../resources/js/barcode/validation.js'
 
 import {
     clampScanInterval,
-    isMobileCameraDevice,
     mapEngineFormatToSlug,
-} from '../../resources/js/support/barcode-scanner-engine.js'
+} from '../../resources/js/barcode/decoder/formats.js'
 
 describe('barcode-scanner-engine helpers', () => {
     it('clamps scan interval between 50 and 2000 ms', () => {
@@ -31,21 +28,10 @@ describe('barcode-scanner-engine helpers', () => {
         assert.equal(mapEngineFormatToSlug(null), null)
     })
 
-    it('detects mobile camera devices from user agent', () => {
-        assert.equal(isMobileCameraDevice(), false)
-    })
+
 })
 
 describe('barcode-validation helpers', () => {
-    it('prepares scan beep audio without throwing when APIs are unavailable', async () => {
-        await prepareScanBeepAudio(null)
-        await prepareScanBeepAudio('https://example.test/beep.mp3')
-    })
-
-    it('uses transient scan beep on mobile user agents', () => {
-        assert.equal(usesTransientScanBeep(), false)
-    })
-
     it('matches known barcode formats', () => {
         assert.equal(matchesBarcodeFormat('5901234123457', BARCODE_FORMATS.ean_13), true)
         assert.equal(matchesBarcodeFormat('ABC-123', BARCODE_FORMATS.code_39), true)

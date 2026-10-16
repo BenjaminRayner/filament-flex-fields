@@ -26,18 +26,18 @@ final class MatrixFieldAdminSchema
     public static function components(): array
     {
         return [
-            Fieldset::make(__('filament-flex-fields::default.schema.settings.matrix_choice'))
+            Fieldset::make(fn () => __('filament-flex-fields::default.schema.settings.matrix_choice'))
                 ->columns(3)
                 ->schema([
                     Select::make(self::settingsPath('mode'))
-                        ->label(__('filament-flex-fields::default.schema.settings.mode'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.mode'))
                         ->options([
                             'radio' => 'Single choice',
                             'checkbox' => 'Multiple choice',
                         ])
                         ->native(false),
                     Select::make(self::settingsPath('color'))
-                        ->label(__('filament-flex-fields::default.schema.settings.color'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.color'))
                         ->options([
                             'primary' => 'Primary',
                             'success' => 'Success',

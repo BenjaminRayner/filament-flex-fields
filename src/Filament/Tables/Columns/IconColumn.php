@@ -6,7 +6,6 @@ namespace Bjanczak\FilamentFlexFields\Filament\Tables\Columns;
 
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\Concerns\EmitsFlexFieldTableColumnAssets;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldStylesheetQueue;
 use Bjanczak\FilamentFlexFields\Support\IconColumnRenderCache;
 use Bjanczak\FilamentFlexFields\Support\Icons\IconCatalogResolver;
 use Bjanczak\FilamentFlexFields\Support\Icons\IconSvgCache;
@@ -15,6 +14,7 @@ use Filament\Support\Enums\IconSize;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\HtmlString;
 
 class IconColumn extends TextColumn
 {
@@ -37,11 +37,9 @@ class IconColumn extends TextColumn
     {
         parent::setUp();
 
-        FlexFieldStylesheetQueue::enqueueFor('icon-column');
-
         $this->html();
 
-        $this->formatStateUsing(fn (mixed $state, IconColumn $column): string => $column->formatIconDisplay($state));
+        $this->formatStateUsing(fn (mixed $state, IconColumn $column): Htmlable => new HtmlString($column->formatIconDisplay($state)));
     }
 
     public function iconSize(string|ControlSize|Closure $size): static

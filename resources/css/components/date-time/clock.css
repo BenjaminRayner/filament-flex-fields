@@ -1,0 +1,36 @@
+.fff-dt-clock { display:grid; gap:8px; padding-block-start:12px; margin-block-start:12px; border-top:1px solid oklch(95% 0 0); }
+.fff-dt-clock__row { display:flex; align-items:center; gap:10px; min-width:0; }
+.fff-dt-clock__label { flex:1; font-size:14px; white-space:nowrap; color:var(--fff-dt-muted); }
+.fff-dt-clock__zone { justify-self:end; font-size:13px; white-space:nowrap; color:var(--fff-dt-muted); }
+.fff-dt-clock__row > .fff-flex-text-input { width:160px; flex:none; }
+.fff-dt-clock__trigger { height:100%; width:100%; border:0; background:transparent; text-align:start; white-space:nowrap; color:inherit; cursor:pointer; padding-inline:0; font:inherit; font-size:14px; font-variant-numeric:tabular-nums; }
+.fff-dt-clock__seconds { border:0; border-radius:12px; background:var(--fff-dt-hover); color:var(--fff-dt-ink); padding:8px; font-variant-numeric:tabular-nums; cursor:pointer; }
+.fff-dt-time-menu { padding:5px; }
+.fff-dt-time-menu__scroll { position:relative; max-height:238px; overflow-y:auto; overscroll-behavior:contain; }
+.fff-dt-time-menu__option { display:flex; width:100%; min-height:36px; align-items:center; justify-content:space-between; border:0; border-radius:21px; padding:0 12px; background:transparent; color:var(--fff-dt-ink); font:inherit; font-variant-numeric:tabular-nums; cursor:pointer; transition:background-color 80ms; }
+.fff-dt-time-menu__option:focus-visible, .fff-dt-time-menu__option:hover:not(:disabled) { background:var(--fff-dt-hover); outline:none; }
+.fff-dt-time-menu__option[aria-selected="true"] { color:var(--primary-600,#2563eb); font-weight:500; }
+.fff-dt-time-menu__option[aria-selected="true"]::after { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+.fff-dt-time-menu__option:disabled { opacity:.4; cursor:default; }
+.fff-dt-time-menu__empty { padding:12px; margin:0; font-size:13px; color:var(--fff-dt-ink); opacity:.7; }
+.fff-dt-range > .fff-dt-clock { flex:none; grid-template-columns:repeat(2,minmax(0,1fr)) auto; align-items:center; padding:12px 4px 2px; gap:16px; }
+.fff-dt-range > .fff-dt-clock .fff-dt-clock__row > .fff-flex-text-input { width:136px; flex:1; min-width:0; }
+.fff-dt-range.is-compact > .fff-dt-clock { grid-template-columns:repeat(2,minmax(0,1fr)) auto; gap:8px; padding-inline:2px; }
+.fff-dt-range.is-compact .fff-dt-clock__row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px; }
+.fff-dt-range.is-compact .fff-dt-clock__label { grid-column:1 / -1; }
+.fff-dt-range.is-compact .fff-dt-clock__row > .fff-flex-text-input { width:100%; }
+.fff-dt-range.is-compact .fff-dt-clock__row:not(:has(.fff-dt-clock__seconds)) { grid-template-columns:minmax(0,1fr); }
+.fff-dt-range.is-compact .fff-dt-clock__zone { align-self:end; padding-block-end:6px; }
+.fff-dt-clock:not(:has([data-clock-row="1"])) { grid-template-columns:minmax(0,1fr) auto; align-items:center; }
+@media (max-width:360px) { .fff-dt-clock__row > .fff-flex-text-input { width:140px; } }
+
+.fff-dt-time-menu { --fff-dt-ink:var(--fff-phone-field-menu-text,#18181b); --fff-dt-hover:var(--fff-select-menu-hover,#f4f4f5); border-radius:26px; font-size:14px; color:var(--fff-dt-ink); }
+
+.fff-dt-range.is-compact .fff-dt-clock__zone { max-width:42px; overflow:hidden; text-overflow:ellipsis; }
+.fff-dt-range.is-compact > .fff-dt-clock:has(.fff-dt-clock__seconds) { grid-template-columns:minmax(0,1fr); }
+.fff-dt-range.is-compact > .fff-dt-clock:has(.fff-dt-clock__seconds):has(.fff-dt-clock__zone) { grid-template-columns:minmax(0,1fr) auto; }
+.fff-dt-range.is-compact .fff-dt-clock__row:has(.fff-dt-clock__seconds) { grid-column:1; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; }
+.fff-dt-range.is-compact .fff-dt-clock__row:has(.fff-dt-clock__seconds) > .fff-dt-clock__label { grid-column:auto; }
+.fff-dt-range.is-compact .fff-dt-clock:has(.fff-dt-clock__seconds) > .fff-dt-clock__zone { grid-column:2; grid-row:1 / 3; align-self:center; padding:0; }
+@media (max-width:360px) { .fff-dt-range.is-compact .fff-dt-clock__row .fff-flex-text-input__leading-icon { display:none; } }
+@media (max-width:360px) { .fff-dt-range.is-compact > .fff-dt-clock { column-gap:4px; } }

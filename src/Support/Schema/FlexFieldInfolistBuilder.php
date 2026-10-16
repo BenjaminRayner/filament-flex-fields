@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Schema;
 
 use Bjanczak\FilamentFlexFields\Data\FlexFieldDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyRenderContext;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaRenderer;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsConfig;
 use Filament\Infolists\Components\Entry;
 use Filament\Infolists\Components\IconEntry;
@@ -13,10 +17,10 @@ use Filament\Infolists\Components\TextEntry;
 final class FlexFieldInfolistBuilder
 {
     /**
-     * @param  iterable<FlexFieldDefinition>  $definitions
+     * @param  iterable<FlexFieldDefinition|FamilySchemaDefinition>  $definitions
      * @return list<Entry>
      */
-    public function build(iterable $definitions, string $valuesColumn = ''): array
+    public function build(iterable $definitions, string $valuesColumn = '', ?FamilyRenderContext $familyContext = null): array
     {
         $column = $valuesColumn !== '' ? $valuesColumn : FlexFieldsConfig::getValuesColumn();
         $entries = [];
@@ -26,18 +30,27 @@ final class FlexFieldInfolistBuilder
                 continue;
             }
 
-            if (($definition->config['visible_in_view'] ?? true) === false) {
+            if (($definition->config['visible_in_view'] ?? true) === false || ($definition instanceof FamilySchemaDefinition && ! $definition->isVisible)) {
                 continue;
             }
 
-            $entries[] = $this->makeEntry($definition, $column);
+            $entries[] = $this->makeEntry($definition, $column, $familyContext);
         }
 
         return $entries;
     }
 
-    public function makeEntry(FlexFieldDefinition $definition, string $valuesColumn): Entry
+    public function makeEntry(FlexFieldDefinition|FamilySchemaDefinition $definition, string $valuesColumn, ?FamilyRenderContext $familyContext = null): Entry
     {
+        if ($definition instanceof FamilySchemaDefinition) {
+            $entry = app(FamilySchemaRenderer::class)->make(ComponentKind::Entry, $definition,
+                $familyContext ?? new FamilyRenderContext('infolist:'.$valuesColumn, $valuesColumn));
+            if (! $entry instanceof Entry) {
+                throw new \LogicException('Family entry renderer returned a form surface.');
+            }
+
+            return $entry;
+        }
         $statePath = "{$valuesColumn}.{$definition->slug}";
 
         if (in_array($definition->type->value, ['toggle', 'switch_field'], true)) {

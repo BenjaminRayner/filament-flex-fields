@@ -1,8 +1,5 @@
 import {
-    buildHeadlessDropdownRows,
-    flattenHeadlessDropdownRowOptions,
     flattenHeadlessOptions,
-    headlessOptionValue,
 } from './headless-select-options.js'
 
 export function createHeadlessComboboxEmptyUiMixin() {
@@ -11,6 +8,8 @@ export function createHeadlessComboboxEmptyUiMixin() {
             if (this.isUserSelectField) {
                 return null
             }
+
+            if (this.searchError || this.optionsError) return 'error'
 
             const query = String(this.comboboxQuery ?? '').trim()
             const minLen = Number(this.minSearchLength ?? 0)
@@ -74,26 +73,8 @@ export function createHeadlessComboboxEmptyUiMixin() {
          * Options remaining in the dropdown after selected-item filtering.
          */
         countVisibleDropdownOptions() {
-            if (this.smartSuggestEnabled && this._engine && ! this.hasDynamicSearchResults) {
-                const flat = typeof this.getEngineOptions === 'function'
-                    ? this.getEngineOptions()
-                    : []
-
-                if (! this.multiple || this.keepSelectedOptionsInDropdown) {
-                    return flat.length
-                }
-
-                return flat.filter((option) => ! this.isOptionSelected(headlessOptionValue(option))).length
-            }
-
-            const rows = buildHeadlessDropdownRows(this.comboboxFilteredOptionTree(), {
-                multiple: this.multiple,
-                keepSelectedOptionsInDropdown: this.keepSelectedOptionsInDropdown,
-                isOptionSelected: (value) => this.isOptionSelected(value),
-                withSeparators: false,
-            })
-
-            return flattenHeadlessDropdownRowOptions(rows).length
+            this.rebuildVirtualFlatRows()
+            return this._virtualRowPositions?.size ?? 0
         },
 
         /**
@@ -105,7 +86,7 @@ export function createHeadlessComboboxEmptyUiMixin() {
                 return false
             }
 
-            const sourceCount = flattenHeadlessOptions(this.options ?? []).length
+            const sourceCount = this.flatOptions?.length ?? flattenHeadlessOptions(this.options ?? []).length
 
             if (sourceCount === 0) {
                 return false

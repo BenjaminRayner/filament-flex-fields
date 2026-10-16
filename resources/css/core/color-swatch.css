@@ -1,127 +1,84 @@
-/* Color swatch — SaaS-style preset pills */
+/* Color Swatch owns its sizes, contrast and selection states. */
 .fff-color-swatch {
     --fff-color-swatch-pill-size: 1.75rem;
-    --fff-color-swatch-pill-gap: 0.625rem;
+    --fff-color-swatch-pill-gap: .625rem;
     --fff-color-swatch-header-text: rgb(24 24 27);
     --fff-color-swatch-header-icon: rgb(113 113 122);
     --fff-color-swatch-header-icon-size: 1rem;
-    --fff-color-swatch-header-label-size: 0.875rem;
-    --fff-color-swatch-stack-gap: 0.75rem;
+    --fff-color-swatch-header-label-size: .875rem;
+    --fff-color-swatch-stack-gap: .75rem;
     --fff-color-swatch-ring-gap: rgb(255 255 255);
-    --fff-color-swatch-light-border: rgb(228 228 231);
+    --fff-color-swatch-selection: rgb(39 39 42);
+    --fff-color-swatch-edge: rgb(0 0 0 / .2);
     display: grid;
     gap: var(--fff-color-swatch-stack-gap);
 }
-
 .fff-color-swatch--sm {
     --fff-color-swatch-pill-size: 1.25rem;
-    --fff-color-swatch-pill-gap: 0.5rem;
-    --fff-color-swatch-header-icon-size: 0.875rem;
-    --fff-color-swatch-header-label-size: 0.8125rem;
-    --fff-color-swatch-stack-gap: 0.5rem;
+    --fff-color-swatch-pill-gap: .5rem;
+    --fff-color-swatch-header-icon-size: .875rem;
+    --fff-color-swatch-header-label-size: .8125rem;
+    --fff-color-swatch-stack-gap: .5rem;
 }
-
-.fff-color-swatch--md {
-    --fff-color-swatch-pill-size: 1.75rem;
-    --fff-color-swatch-pill-gap: 0.625rem;
-    --fff-color-swatch-header-icon-size: 1rem;
-    --fff-color-swatch-header-label-size: 0.875rem;
-    --fff-color-swatch-stack-gap: 0.75rem;
-}
-
 .fff-color-swatch--lg {
     --fff-color-swatch-pill-size: 2.25rem;
-    --fff-color-swatch-pill-gap: 0.75rem;
+    --fff-color-swatch-pill-gap: .75rem;
     --fff-color-swatch-header-icon-size: 1.125rem;
     --fff-color-swatch-header-label-size: 1rem;
-    --fff-color-swatch-stack-gap: 0.875rem;
+    --fff-color-swatch-stack-gap: .875rem;
 }
-
 .fff-color-swatch__header {
-    @apply inline-flex w-full items-center gap-2 border-0 bg-transparent p-0 text-left;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
     color: var(--fff-color-swatch-header-text);
+    text-align: start;
 }
-
-.fff-color-swatch__header-icon {
-    @apply inline-flex shrink-0 items-center justify-center;
-    color: var(--fff-color-swatch-header-icon);
-}
-
-.fff-color-swatch__header-icon .fi-icon,
-.fff-color-swatch__header-icon svg {
-    width: var(--fff-color-swatch-header-icon-size);
-    height: var(--fff-color-swatch-header-icon-size);
-}
-
-.fff-color-swatch__header-label {
-    @apply font-medium;
-    font-size: var(--fff-color-swatch-header-label-size);
-}
-
-.fff-color-swatch__pills {
-    @apply flex flex-wrap items-center;
-    gap: var(--fff-color-swatch-pill-gap);
-}
-
+.fff-color-swatch__header-icon { display: inline-flex; flex-shrink: 0; color: var(--fff-color-swatch-header-icon); }
+.fff-color-swatch__header-icon svg { width: var(--fff-color-swatch-header-icon-size); height: var(--fff-color-swatch-header-icon-size); }
+.fff-color-swatch__header-label { font-size: var(--fff-color-swatch-header-label-size); font-weight: 500; }
+.fff-color-swatch__pills { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fff-color-swatch-pill-gap); padding: 4px; margin: -4px; }
 .fff-color-swatch__pill {
+    position: relative;
+    flex: 0 0 auto;
     width: var(--fff-color-swatch-pill-size);
     height: var(--fff-color-swatch-pill-size);
+    padding: 0;
     border-radius: 9999px;
-    border: 1px solid transparent;
-    background-color: var(--fff-color-swatch-pill);
-    box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 0.35),
-        0 1px 2px rgb(0 0 0 / 0.08);
+    border: 1px solid var(--fff-color-swatch-edge);
+    background: var(--fff-color-swatch-pill);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / .2);
     cursor: pointer;
-    transition:
-        box-shadow 0.15s ease,
-        transform 0.15s ease;
+    transition: transform 150ms ease;
 }
-
-.fff-color-swatch__pill--light {
-    border-color: var(--fff-color-swatch-light-border);
+.fff-color-swatch__pill::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border: 2px solid var(--fff-color-swatch-selection);
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms ease;
 }
-
-.fff-color-swatch__pill:hover:not(:disabled) {
-    transform: scale(1.05);
-}
-
-.fff-color-swatch__pill.is-selected {
-    box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 0.35),
-        0 0 0 2px var(--fff-color-swatch-ring-gap),
-        0 0 0 4px var(--fff-color-swatch-pill);
-}
-
-.fff-color-swatch__pill:focus-visible {
-    @apply outline-none;
-    box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 0.35),
-        0 0 0 2px var(--fff-color-swatch-ring-gap),
-        0 0 0 4px var(--fff-color-swatch-pill),
-        0 0 0 6px color-mix(in srgb, var(--fff-color-swatch-pill) 35%, transparent);
-}
-
-.fff-color-swatch.is-disabled {
-    @apply pointer-events-none opacity-60;
-}
-
+.fff-color-swatch__pill.is-selected::after { opacity: 1; }
+@media(hover: hover) { .fff-color-swatch__pill:hover:not(:disabled) { transform: scale(1.05); } }
+.fff-color-swatch__pill:focus-visible { outline: 2px solid var(--primary-500, #6366f1); outline-offset: 6px; }
+.fff-color-swatch.is-disabled { opacity: .6; }
+.fff-color-swatch__pill:disabled { cursor: not-allowed; }
 .dark .fff-color-swatch {
     --fff-color-swatch-header-text: rgb(244 244 245);
     --fff-color-swatch-header-icon: rgb(161 161 170);
     --fff-color-swatch-ring-gap: rgb(24 24 27);
-    --fff-color-swatch-light-border: rgb(82 82 91);
+    --fff-color-swatch-selection: rgb(228 228 231);
+    --fff-color-swatch-edge: rgb(255 255 255 / .28);
+}
+@media(prefers-reduced-motion: reduce) {
+    .fff-color-swatch__pill, .fff-color-swatch__pill::after { transition: none; }
+}
+@media(forced-colors: active) {
+    .fff-color-swatch__pill { forced-color-adjust: none; }
+    .fff-color-swatch__pill::after { border-color: Highlight; }
 }
 
-.dark .fff-color-swatch__pill {
-    box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 0.12),
-        0 1px 2px rgb(0 0 0 / 0.28);
-}
-
-.dark .fff-color-swatch__pill.is-selected {
-    box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 0.12),
-        0 0 0 2px var(--fff-color-swatch-ring-gap),
-        0 0 0 4px var(--fff-color-swatch-pill);
-}
+.tippy-box[data-theme~='fff-color-swatch'] { --fff-tooltip-padding: .25rem .5rem; }

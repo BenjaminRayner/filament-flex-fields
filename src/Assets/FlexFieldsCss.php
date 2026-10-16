@@ -4,33 +4,19 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Assets;
 
+use Bjanczak\FilamentFlexFields\Assets\Concerns\ResolvesAssetContentVersion;
+use Bjanczak\FilamentFlexFields\Assets\Concerns\ResolvesImmutableAssetRelease;
 use Filament\Support\Assets\Css;
-use Throwable;
 
 class FlexFieldsCss extends Css
 {
-    /**
-     * @var array<string, string>
-     */
-    protected static array $versionCache = [];
+    use ResolvesAssetContentVersion;
+    use ResolvesImmutableAssetRelease;
 
-    public function getVersion(): string
+    public function getHref(): string
     {
-        $cacheKey = implode('|', array_filter([$this->getPublicPath(), $this->getPath()]));
+        $path = $this->immutablePublicPath();
 
-        if (isset(self::$versionCache[$cacheKey])) {
-            return self::$versionCache[$cacheKey];
-        }
-
-        try {
-            foreach ([$this->getPublicPath(), $this->getPath()] as $path) {
-                if (is_string($path) && file_exists($path)) {
-                    return self::$versionCache[$cacheKey] = (string) filemtime($path);
-                }
-            }
-        } catch (Throwable) {
-        }
-
-        return self::$versionCache[$cacheKey] = parent::getVersion();
+        return $path === null ? parent::getHref() : asset($path);
     }
 }

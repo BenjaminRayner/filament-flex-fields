@@ -4,96 +4,51 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Media;
 
-use Bjanczak\FilamentFlexFields\Support\FileUpload\ScopedDirectoryResolver;
+use Bjanczak\FilamentFlexFields\Support\Media\Storage\MediaDestinations;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 
+/** @deprecated Host registration aliases; MediaDestinations owns path and disk policy. */
 final class MediaCaptureTenantDiskResolver
 {
-    /** @var (callable(array<string, mixed>): string|null)|null */
-    private static $diskResolver = null;
-
-    /** @var (callable(array<string, mixed>): string|null)|null */
-    private static $directoryPrefixResolver = null;
-
-    /**
-     * @param  (callable(array<string, mixed> $context): string|null)|null  $resolver
-     */
+    /** @param (callable(array<string, mixed>): string|null)|null $resolver */
     public static function registerDiskResolver(?callable $resolver): void
     {
-        self::$diskResolver = $resolver;
+        RequestState::configure(MediaCaptureTenantState::class, static function (MediaCaptureTenantState $state) use ($resolver): void {
+            $state->diskResolver = $resolver === null ? null : Closure::fromCallable($resolver);
+        });
     }
 
-    /**
-     * @param  (callable(array<string, mixed> $context): string|null)|null  $resolver
-     */
+    /** @param (callable(array<string, mixed>): string|null)|null $resolver */
     public static function registerDirectoryPrefixResolver(?callable $resolver): void
     {
-        self::$directoryPrefixResolver = $resolver;
+        RequestState::configure(MediaCaptureTenantState::class, static function (MediaCaptureTenantState $state) use ($resolver): void {
+            $state->directoryPrefixResolver = $resolver === null ? null : Closure::fromCallable($resolver);
+        });
     }
 
-    /**
-     * @param  array<string, mixed>  $context
-     */
+    /** @param array<string, mixed> $context */
     public static function resolveDisk(?string $fallback = null, array $context = []): string
     {
-        $fallback ??= (string) config('filament-flex-fields.media_capture.disk', config('filesystems.default'));
-
-        if (self::$diskResolver !== null) {
-            $resolved = (self::$diskResolver)($context);
-
-            if (is_string($resolved) && filled($resolved)) {
-                return $resolved;
-            }
-        }
-
-        $tenantDisk = config('filament-flex-fields.media_capture.tenant.disk');
-
-        if (is_string($tenantDisk) && filled($tenantDisk)) {
-            return $tenantDisk;
-        }
-
-        return $fallback;
+        return app(MediaDestinations::class)->tenantDisk($fallback, $context);
     }
 
-    public static function resolveDirectory(
-        string $prefix = 'uploads',
-        ?Model $record = null,
-        int|string|null $userId = null,
-        array $context = [],
-    ): string {
-        $tenantPrefix = null;
-
-        if (self::$directoryPrefixResolver !== null) {
-            $tenantPrefix = (self::$directoryPrefixResolver)(array_merge($context, [
-                'prefix' => $prefix,
-                'record' => $record,
-                'user_id' => $userId,
-            ]));
-        }
-
-        if (! is_string($tenantPrefix) || $tenantPrefix === '') {
-            $tenantPrefix = config('filament-flex-fields.media_capture.tenant.directory_prefix');
-        }
-
-        if (is_string($tenantPrefix) && filled($tenantPrefix)) {
-            $prefix = trim($tenantPrefix.'/'.trim($prefix, '/'), '/');
-        }
-
-        return ScopedDirectoryResolver::resolve($prefix, $record, $userId);
+    /** @param array<string, mixed> $context */
+    public static function resolveDirectory(string $prefix = 'uploads', ?Model $record = null, int|string|null $userId = null, array $context = []): string
+    {
+        return app(MediaDestinations::class)->directory($prefix, $record, $userId, $context);
     }
 
     public static function shouldApplyDirectoryPrefix(): bool
     {
-        if (self::$directoryPrefixResolver !== null) {
-            return true;
-        }
-
-        return filled(config('filament-flex-fields.media_capture.tenant.directory_prefix'));
+        return app(MediaDestinations::class)->hasDirectoryPrefix();
     }
 
     public static function reset(): void
     {
-        self::$diskResolver = null;
-        self::$directoryPrefixResolver = null;
+        $state = RequestState::resolve(MediaCaptureTenantState::class);
+        $state->diskResolver = null;
+        $state->directoryPrefixResolver = null;
     }
 }

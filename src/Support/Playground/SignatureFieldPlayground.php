@@ -13,17 +13,6 @@ use Filament\Schemas\Components\Section;
 
 class SignatureFieldPlayground implements PlaygroundWithPersistence
 {
-    private static function readonlyPreviewSignature(): string
-    {
-        $path = dirname(__DIR__, 3).'/resources/fixtures/signature-readonly-preview.svg';
-
-        if (! is_readable($path)) {
-            throw new \RuntimeException("Missing signature readonly fixture at [{$path}].");
-        }
-
-        return trim((string) file_get_contents($path));
-    }
-
     /**
      * @return array<string, mixed>
      */
@@ -34,8 +23,8 @@ class SignatureFieldPlayground implements PlaygroundWithPersistence
             'signature__enterprise' => null,
             'signature__enterprise_legal' => null,
             'signature__validation' => null,
-            'signature__webp' => null,
-            'signature__readonly' => self::readonlyPreviewSignature(),
+            'signature__webp' => SignaturePlaygroundFixture::replaySvg(),
+            'signature__readonly' => SignaturePlaygroundFixture::svg(),
         ];
     }
 
@@ -78,7 +67,8 @@ class SignatureFieldPlayground implements PlaygroundWithPersistence
                         ->schema([
                             SignatureField::make('signature__webp')
                                 ->label('Download as WebP')
-                                ->helperText('Same pad with downloadable WebP export.')
+                                ->helperText('Preloaded signature with document preview and downloadable WebP export.')
+                                ->pdfPreview()
                                 ->downloadable(SignatureField::DOWNLOAD_WEBP)
                                 ->webpQuality(0.88),
                             SignatureField::make('signature__readonly')

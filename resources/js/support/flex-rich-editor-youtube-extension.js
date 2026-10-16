@@ -1,7 +1,7 @@
 import Youtube from '@tiptap/extension-youtube'
 
 export default function flexRichEditorYoutubeExtension() {
-    const config = window.__flexRichEditorYoutubeConfig ?? {}
+    const config = JSON.parse(new URL(import.meta.url).searchParams.get('fff-options') || '{}')
 
     return Youtube.configure({
         inline: false,

@@ -22,7 +22,10 @@ class DualListboxPlayground
             'dual_listbox__flat' => ['tailwind'],
             'dual_listbox__sm' => ['draft'],
             'dual_listbox__lg' => ['published'],
-            'dual_listbox__disabled' => ['read'],
+            'dual_listbox__disabled' => ['draft'],
+            'dual_listbox__large_list' => ['item-3', 'item-21'],
+            'dual_listbox__limited' => ['draft'],
+            'dual_listbox__readonly' => ['published'],
             'dual_listbox__locked' => ['users.view', 'posts.edit'],
         ];
     }
@@ -85,7 +88,7 @@ class DualListboxPlayground
 
         return [
             Section::make('Dual Listbox')
-                ->description('SaaS-style transfer list with search, reorder and compact panels.')
+                ->description('Search, mark and transfer multiple items. Reorder with touch, mouse or keyboard.')
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     DualListboxField::make('dual_listbox__permissions')
@@ -128,11 +131,32 @@ class DualListboxPlayground
                                 ->options($statusOptions),
                             DualListboxField::make('dual_listbox__locked')
                                 ->label('Locked options')
-                                ->helperText('Grayed rows cannot move between panes. View users stays granted but can still be reordered; Delete users cannot be added.')
+                                ->helperText('Locked rows cannot move between panes in the interface. View users can still be reordered; Delete users cannot be added.')
                                 ->options($permissionOptions)
                                 ->disabledOptions(['users.view', 'users.delete'])
                                 ->default(['users.view', 'posts.edit']),
                         ]),
+                    DualListboxField::make('dual_listbox__large_list')
+                        ->label('1,000 options · virtual scrolling')
+                        ->options(array_combine(
+                            array_map(fn (int $index): string => 'item-'.$index, range(1, 1000)),
+                            array_map(fn (int $index): string => 'Catalog item '.$index, range(1, 1000)),
+                        ))
+                        ->virtualThreshold(100)
+                        ->helperText('Only the visible rows and a small buffer are rendered. Search both panes and use End to reach the last row.')
+                        ->columnSpanFull(),
+                    Grid::make(['default' => 1, 'lg' => 2])->schema([
+                        DualListboxField::make('dual_listbox__limited')
+                            ->label('Choose one to three')
+                            ->options($statusOptions)
+                            ->required()
+                            ->minItems(1)
+                            ->maxItems(3),
+                        DualListboxField::make('dual_listbox__readonly')
+                            ->label('Read only')
+                            ->options($statusOptions)
+                            ->readOnly(),
+                    ]),
                 ]),
         ];
     }

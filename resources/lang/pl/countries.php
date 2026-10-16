@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'AC' => 'Wyspa Wniebowstąpienia',
     'AD' => 'Andora',

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\NpsField;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -163,15 +163,15 @@ class NpsFieldPlayground
                             ->required(),
 
                         NpsField::make('nps_emojis_gravity')
-                            ->label('Custom Gravity icons')
+                            ->label('Custom Hugeicons')
                             ->options($emojiOptions)
                             ->variant('emojis')
                             ->icons([
-                                0 => GravityIcon::CircleXmark,
-                                1 => GravityIcon::Hand,
-                                2 => GravityIcon::FaceSmile,
-                                3 => GravityIcon::Heart,
-                                4 => GravityIcon::Star,
+                                0 => FlexIcon::CircleXmark,
+                                1 => FlexIcon::Hand,
+                                2 => FlexIcon::FaceSmile,
+                                3 => FlexIcon::Heart,
+                                4 => FlexIcon::Star,
                             ]),
 
                         Grid::make(['default' => 1, 'sm' => 2])

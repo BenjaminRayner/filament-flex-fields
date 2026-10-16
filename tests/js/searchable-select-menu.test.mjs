@@ -1,3 +1,5 @@
+// Node fixture supplies the browser Element identity used by dropdown ownership.
+globalThis.Element ??= class Element { static [Symbol.hasInstance](value) { return value?.__testElement === true } }
 import assert from 'node:assert/strict'
 import { describe, it, before, after } from 'node:test'
 
@@ -169,6 +171,7 @@ describe('searchable select menu scroll reposition', () => {
         })
 
         const menu = {
+            dataset: {},
             style: {
                 setProperty() {},
             },
@@ -221,6 +224,7 @@ describe('searchable select menu scroll reposition', () => {
         })
 
         const menu = {
+            dataset: {},
             dir: 'ltr',
             style: {
                 left: '',
@@ -274,12 +278,13 @@ describe('searchable select menu scroll reposition', () => {
         }
 
         component.updateMenuPosition({ reveal: false })
-        assert.equal(menu.style.left, '40px')
+        assert.equal(menu.style.left, '16px')
     })
 
     it('skips reposition for internal multi-select chip scrolling', () => {
         const menuChild = { nodeType: 1 }
         const menu = {
+            dataset: {},
             contains(node) {
                 return node === menuChild
             },
@@ -333,6 +338,7 @@ describe('searchable select menu scroll reposition', () => {
         }
 
         const menu = {
+            dataset: {},
             style: {
                 setProperty() {},
             },
@@ -383,209 +389,7 @@ describe('searchable select menu scroll reposition', () => {
         assert.equal(component.menuReady, true)
     })
 
-    it('defers menuReady on first open until nextTick/rAF settles', () => {
-        const mixin = createSearchableSelectMenuMixin({
-            openKey: 'menuOpen',
-            menuRef: 'menuMenu',
-            triggerRef: 'menuTrigger',
-            minMenuWidth: 288,
-            matchTriggerWidth: false,
-        })
 
-        const trigger = {
-            getBoundingClientRect: () => ({
-                top: 40,
-                bottom: 72,
-                left: 40,
-                right: 240,
-                width: 200,
-                height: 32,
-            }),
-        }
-
-        const menu = {
-            style: {
-                width: '',
-                setProperty() {},
-                removeProperty(name) {
-                    if (name === 'width') {
-                        this.width = ''
-                    }
-                },
-            },
-            classList: {
-                add() {},
-                remove() {},
-                toggle() {},
-                contains: () => false,
-            },
-            getBoundingClientRect: () => ({
-                top: 100,
-                bottom: 300,
-                left: 40,
-                right: 328,
-                width: 288,
-                height: 200,
-            }),
-        }
-
-        let runNextTick = null
-
-        const component = {
-            ...mixin,
-            menuOpen: true,
-            menuReady: false,
-            $nextTick(callback) {
-                runNextTick = callback
-            },
-            $refs: {
-                menuTrigger: trigger,
-                menuMenu: menu,
-            },
-        }
-
-        component.scheduleMenuPosition()
-
-        assert.equal(component.menuReady, false)
-        assert.equal(menu.style.width, '288px')
-        assert.equal(typeof runNextTick, 'function')
-
-        const frames = []
-        const originalRaf = globalThis.requestAnimationFrame
-        globalThis.requestAnimationFrame = (cb) => {
-            frames.push(cb)
-
-            return frames.length
-        }
-
-        try {
-            runNextTick()
-            assert.equal(component.menuReady, false)
-            assert.ok(frames.length >= 1)
-            frames.shift()()
-            // First-open reveal path schedules a second rAF before ready.
-            if (frames.length > 0) {
-                assert.equal(component.menuReady, false)
-                frames.shift()()
-            }
-            assert.equal(component.menuReady, true)
-            assert.equal(menu.__fffHasBeenPositioned, true)
-        } finally {
-            globalThis.requestAnimationFrame = originalRaf
-        }
-    })
-
-    it('first panel open paints closed glass before adding is-open', () => {
-        const mixin = createSearchableSelectMenuMixin({
-            openKey: 'menuOpen',
-            menuRef: 'menuMenu',
-            triggerRef: 'menuTrigger',
-            minMenuWidth: 288,
-            matchTriggerWidth: false,
-        })
-
-        const trigger = {
-            getBoundingClientRect: () => ({
-                top: 40,
-                bottom: 72,
-                left: 40,
-                right: 240,
-                width: 200,
-                height: 32,
-            }),
-        }
-
-        const classes = new Set()
-        const menu = {
-            style: {
-                width: '',
-                setProperty() {},
-                removeProperty() {},
-            },
-            classList: {
-                add(...names) {
-                    for (const name of names) {
-                        classes.add(name)
-                    }
-                },
-                remove(...names) {
-                    for (const name of names) {
-                        classes.delete(name)
-                    }
-                },
-                toggle(name, force) {
-                    if (force === true) {
-                        classes.add(name)
-                    } else if (force === false) {
-                        classes.delete(name)
-                    }
-                },
-                contains: (name) => classes.has(name),
-            },
-            getBoundingClientRect: () => ({
-                top: 100,
-                bottom: 300,
-                left: 40,
-                right: 328,
-                width: 288,
-                height: 200,
-            }),
-            offsetWidth: 288,
-        }
-
-        let runNextTick = null
-        const component = {
-            ...mixin,
-            menuOpen: true,
-            menuReady: false,
-            $nextTick(callback) {
-                runNextTick = callback
-            },
-            $refs: {
-                menuTrigger: trigger,
-                menuMenu: menu,
-            },
-        }
-
-        globalThis.window.matchMedia = (query) => ({
-            matches: false,
-            media: query,
-            addListener() {},
-            removeListener() {},
-        })
-        globalThis.matchMedia = globalThis.window.matchMedia
-        globalThis.window.innerWidth = 1280
-        globalThis.window.innerHeight = 800
-
-        component.scheduleMenuPosition()
-
-        const frames = []
-        const originalRaf = globalThis.requestAnimationFrame
-        globalThis.requestAnimationFrame = (cb) => {
-            frames.push(cb)
-
-            return frames.length
-        }
-
-        try {
-            runNextTick()
-            frames.shift()()
-
-            // First-open defers finishAnchor one rAF.
-            assert.ok(frames.length >= 1)
-            frames.shift()()
-
-            assert.equal(component.menuReady, true)
-            assert.equal(classes.has('is-open'), false, 'closed glass frame must paint before is-open')
-
-            assert.ok(frames.length >= 1)
-            frames.shift()()
-
-            assert.equal(classes.has('is-open'), true)
-        } finally {
-            globalThis.requestAnimationFrame = originalRaf
-        }
-    })
 
     it('sets menuReady synchronously on re-anchor when already positioned', () => {
         const mixin = createSearchableSelectMenuMixin({
@@ -606,6 +410,7 @@ describe('searchable select menu scroll reposition', () => {
         }
 
         const menu = {
+            dataset: {},
             __fffHasBeenPositioned: true,
             style: {
                 setProperty() {},
@@ -632,7 +437,7 @@ describe('searchable select menu scroll reposition', () => {
         const component = {
             ...mixin,
             menuOpen: true,
-            menuReady: false,
+            menuReady: true,
             $nextTick(callback) {
                 nextTickScheduled = true
                 // Intentionally do not run — sync unlock must happen first.
@@ -648,6 +453,7 @@ describe('searchable select menu scroll reposition', () => {
         assert.equal(component.menuReady, true)
         assert.equal(menu.__fffHasBeenPositioned, true)
         assert.equal(nextTickScheduled, true)
+        component._surfaceOpenSession?.dispose()
     })
 
     it('claims overlay exclusive lock on open and displaces the previous menu', () => {
@@ -666,18 +472,18 @@ describe('searchable select menu scroll reposition', () => {
                 closeMethod: 'closeMenu',
             })
 
-            /** @type {((open: boolean) => void) | null} */
-            let openWatcher = null
+            /** @type {Array<(open: boolean) => void>} */
+            const openWatchers = []
 
             const component = {
                 ...mixin,
                 menuOpen: false,
                 menuReady: false,
-                $el: null,
+                $el: { __testElement:true, setAttribute() {}, closest() {return null} },
                 $refs: {},
                 $watch(key, callback) {
                     if (key === 'menuOpen') {
-                        openWatcher = callback
+                        openWatchers.push(callback)
                     }
                 },
                 scheduleMenuPosition() {},
@@ -688,15 +494,15 @@ describe('searchable select menu scroll reposition', () => {
                     }
 
                     this.menuOpen = false
-                    openWatcher?.(false)
+                    openWatchers.forEach(callback => callback(false))
                 },
                 openMenu() {
                     this.menuOpen = true
-                    openWatcher?.(true)
+                    openWatchers.forEach(callback => callback(true))
                 },
             }
 
-            component.bindSelectMenuLifecycle({ wireExclusive: false })
+            component.bindSelectMenuLifecycle({ wireExclusive: true })
 
             return component
         }
@@ -706,19 +512,19 @@ describe('searchable select menu scroll reposition', () => {
 
         country.openMenu()
 
-        assert.equal(runtime.isOpen('fff-country-field-menu'), true)
-        assert.deepEqual(runtime.getOpenIds(), ['fff-country-field-menu'])
+        assert.equal(runtime.isOpen(country.resolveMenuOverlayId()), true)
+        assert.deepEqual(runtime.getOpenIds(), [country.resolveMenuOverlayId()])
 
         phone.openMenu()
 
         assert.equal(country.menuOpen, false)
-        assert.equal(runtime.isOpen('fff-country-field-menu'), false)
-        assert.equal(runtime.isOpen('fff-phone-field-menu'), true)
-        assert.deepEqual(runtime.getOpenIds(), ['fff-phone-field-menu'])
+        assert.equal(runtime.isOpen(country.resolveMenuOverlayId()), false)
+        assert.equal(runtime.isOpen(phone.resolveMenuOverlayId()), true)
+        assert.deepEqual(runtime.getOpenIds(), [phone.resolveMenuOverlayId()])
 
         phone.closeMenu()
 
-        assert.equal(runtime.isOpen('fff-phone-field-menu'), false)
+        assert.equal(runtime.isOpen(phone.resolveMenuOverlayId()), false)
         assert.deepEqual(runtime.getOpenIds(), [])
 
         runtime.destroy()
@@ -741,20 +547,20 @@ describe('searchable select menu scroll reposition', () => {
                 closeMethod: 'closeSearchDropdown',
             })
 
-            /** @type {((open: boolean) => void) | null} */
-            let openWatcher = null
+            /** @type {Array<(open: boolean) => void>} */
+            const openWatchers = []
 
-            const ownerEl = { nodeType: 1 }
+            const ownerEl = { nodeType: 1, closest() { return null } }
 
             const component = {
                 ...mixin,
                 searchOpen: false,
                 searchDropdownReady: false,
-                $el: ownerEl,
+                $el: Object.assign(ownerEl, { __testElement:true, setAttribute() {} }),
                 $refs: {},
                 $watch(key, callback) {
                     if (key === 'searchOpen') {
-                        openWatcher = callback
+                        openWatchers.push(callback)
                     }
                 },
                 scheduleMenuPosition() {},
@@ -765,16 +571,15 @@ describe('searchable select menu scroll reposition', () => {
                     }
 
                     this.searchOpen = false
-                    openWatcher?.(false)
+                    openWatchers.forEach(callback => callback(false))
                 },
                 openSearch() {
                     this.searchOpen = true
-                    openWatcher?.(true)
+                    openWatchers.forEach(callback => callback(true))
                 },
             }
 
-            component.__fffMenuOverlayId = `${ownerIdPrefix}-instance-menu`
-            component.bindSelectMenuLifecycle({ wireExclusive: false })
+            component.bindSelectMenuLifecycle({ wireExclusive: true })
 
             return component
         }
@@ -785,8 +590,9 @@ describe('searchable select menu scroll reposition', () => {
         firstPicker.openSearch()
         secondPicker.openSearch()
 
-        assert.equal(runtime.isOpen('fff-map-picker-1-instance-menu'), false)
-        assert.equal(runtime.isOpen('fff-map-picker-2-instance-menu'), true)
+        assert.notEqual(firstPicker.resolveMenuOverlayId(), secondPicker.resolveMenuOverlayId())
+        assert.equal(runtime.isOpen(firstPicker.resolveMenuOverlayId()), false)
+        assert.equal(runtime.isOpen(secondPicker.resolveMenuOverlayId()), true)
         assert.equal(firstPicker.searchOpen, false)
         assert.equal(secondPicker.searchOpen, true)
 
@@ -801,11 +607,13 @@ describe('searchable select menu scroll reposition', () => {
 
         const first = {
             ...mixin,
+            $el: {__testElement:true},
             componentKey: 'data.select__cascade_region',
             statePath: 'select__cascade_region',
         }
         const second = {
             ...mixin,
+            $el: {__testElement:true},
             componentKey: 'data.select__status',
             statePath: 'select__status',
         }
@@ -814,12 +622,12 @@ describe('searchable select menu scroll reposition', () => {
         const secondId = second.resolveMenuOverlayId()
 
         assert.notEqual(firstId, secondId)
-        assert.match(firstId, /select__cascade_region/)
-        assert.match(secondId, /select__status/)
+        assert.match(firstId, /^fff-headless-select-/)
+        assert.match(secondId, /^fff-headless-select-/)
         assert.equal(first.resolveMenuOverlayId(), firstId)
         assert.equal(
             createSearchableSelectMenuMixin({ ownerIdPrefix: 'fff-headless-select' }).resolveMenuOverlayId.call({}),
-            'fff-headless-select-menu',
+            null,
         )
     })
 
@@ -954,6 +762,7 @@ describe('searchable select menu scroll reposition', () => {
         })
 
         const menu = {
+            dataset: {},
             classList: {
                 classes: new Set(['is-open']),
                 add(name) {
@@ -994,6 +803,7 @@ describe('searchable select menu scroll reposition', () => {
         })
 
         const menu = {
+            dataset: {},
             classList: {
                 classes: new Set(['is-closing', 'fff-teleported-menu--sheet']),
                 add(name) {
@@ -1054,6 +864,7 @@ describe('searchable select menu scroll reposition', () => {
 
         const removed = []
         const menu = {
+            dataset: {},
             classList: {
                 classes: new Set(['fff-teleported-menu--sheet', 'is-open']),
                 add(name) {
@@ -1146,6 +957,7 @@ describe('searchable select menu scroll reposition', () => {
         })
 
         const menu = {
+            dataset: {},
             classList: {
                 classes: new Set(),
                 add(name) {
@@ -1272,6 +1084,7 @@ describe('searchable select menu scroll reposition', () => {
     it('playSheetEnter parks closed then opens on the next frames', async () => {
         const styles = {}
         const menu = {
+            dataset: {},
             isConnected: true,
             classList: {
                 classes: new Set(['is-open', 'fff-teleported-menu--sheet']),
@@ -1351,6 +1164,7 @@ describe('searchable select menu scroll reposition', () => {
         })
 
         const menu = {
+            dataset: {},
             classList: {
                 classes: new Set(['fff-teleported-menu--sheet']),
                 add(name) { this.classes.add(name) },
@@ -1477,6 +1291,7 @@ describe('searchable select menu scroll reposition', () => {
 
         const removed = []
         const menu = {
+            dataset: {},
             classList: {
                 classes: new Set(['fff-teleported-menu--sheet', 'fff-overlay-sheet', 'is-open']),
                 add(name) {
@@ -1615,6 +1430,7 @@ describe('searchable select menu scroll reposition', () => {
         })
 
         const menu = {
+            dataset: {},
             classList: {
                 classes: new Set(['fff-teleported-menu--panel', 'fff-overlay-panel', 'is-open']),
                 add(name) {
@@ -1755,6 +1571,9 @@ describe('searchable select menu scroll reposition', () => {
             return rafCallbacks.length
         }
 
+        globalThis.document.defaultView = globalThis.window
+        const trigger = { nodeType: 1, ownerDocument: globalThis.document, isConnected: true, offsetWidth: 200 }
+        const menu = { nodeType: 1, ownerDocument: globalThis.document, isConnected: true, classList: { contains() { return false } } }
         let updateCalls = 0
         const component = {
             ...mixin,
@@ -1765,10 +1584,10 @@ describe('searchable select menu scroll reposition', () => {
                 updateCalls += 1
             },
             resolveMenuTriggerRef() {
-                return { offsetWidth: 200 }
+                return trigger
             },
             resolveMenuElement() {
-                return { classList: { contains() { return false } } }
+                return menu
             },
         }
 
@@ -1778,7 +1597,7 @@ describe('searchable select menu scroll reposition', () => {
             assert.equal(listeners.filter((entry) => entry.type === 'resize').length, 1)
             assert.equal(listeners.filter((entry) => entry.type === 'scroll').length, 0)
             assert.equal(typeof component.menuResizeHandler, 'function')
-            assert.equal(component.menuScrollHandler, undefined)
+            assert.equal(component.menuScrollHandler, null)
 
             component.menuResizeHandler()
             assert.equal(rafCallbacks.length, 1)

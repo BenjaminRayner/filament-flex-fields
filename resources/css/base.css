@@ -82,9 +82,9 @@
     --fff-track-slider-thumb-h-active: 67%;
     --fff-track-slider-thumb-hit: 1.25rem;
     --fff-track-slider-track-hover-mix: 1.5%;
-    --fff-track-slider-shadow: var(--fff-surface-shadow);
-    --fff-track-slider-track-bg: #fff;
-    --fff-track-slider-fill-bg: rgb(243 244 246);
+    --fff-track-slider-shadow: none;
+    --fff-track-slider-track-bg: rgb(244 244 245);
+    --fff-track-slider-fill-bg: rgb(228 228 231);
     --fff-track-slider-secondary-track-bg: rgb(243 244 246);
     --fff-track-slider-secondary-fill-bg: rgb(209 213 219);
 

@@ -1,6 +1,5 @@
 /* Switch — SaaS-style label row with toggle */
-.fff-switch,
-.fff-cell-switch {
+.fff-switch {
     @apply block w-full;
 }
 
@@ -12,14 +11,12 @@
     @apply cursor-pointer appearance-none;
 }
 
-.fff-switch.is-disabled,
-.fff-cell-switch.is-disabled {
+.fff-switch.is-disabled {
     @apply opacity-60 pointer-events-none;
 }
 
-.fff-switch__track,
-.fff-cell-switch__track {
-    @apply relative box-border flex w-full items-center justify-between gap-4 overflow-hidden rounded-2xl bg-white text-left;
+.fff-switch__track {
+    @apply relative box-border flex w-full items-center justify-between gap-4 overflow-hidden rounded-2xl bg-white;
     padding-block: var(--fff-switch-track-p-md);
     padding-inline-end: var(--fff-switch-track-p-md);
     padding-inline-start: var(--fff-switch-track-px-md);
@@ -92,34 +89,29 @@
     box-shadow: var(--fff-surface-shadow);
 }
 
-.fff-switch--sm:not(.fff-switch--layout-card):not(.fff-switch--has-description) .fff-switch__track,
-.fff-cell-switch--sm:not(.fff-switch--layout-card) .fff-cell-switch__track {
+.fff-switch--sm:not(.fff-switch--layout-card):not(.fff-switch--has-description) .fff-switch__track {
     padding-block: var(--fff-switch-track-p-sm);
     padding-inline-end: var(--fff-switch-track-p-sm);
     padding-inline-start: var(--fff-switch-track-px-sm);
 }
 
-.fff-switch--sm.fff-switch--label-end:not(.fff-switch--layout-card):not(.fff-switch--has-description) .fff-switch__track,
-.fff-cell-switch--sm.fff-switch--label-end:not(.fff-switch--layout-card) .fff-cell-switch__track {
+.fff-switch--sm.fff-switch--label-end:not(.fff-switch--layout-card):not(.fff-switch--has-description) .fff-switch__track {
     padding-inline-start: var(--fff-switch-track-p-sm);
     padding-inline-end: var(--fff-switch-track-px-sm);
 }
 
-.fff-switch--lg:not(.fff-switch--layout-card):not(.fff-switch--has-description) .fff-switch__track,
-.fff-cell-switch--lg:not(.fff-switch--layout-card) .fff-cell-switch__track {
+.fff-switch--lg:not(.fff-switch--layout-card):not(.fff-switch--has-description) .fff-switch__track {
     padding-block: var(--fff-switch-track-p-lg);
     padding-inline-end: var(--fff-switch-track-p-lg);
     padding-inline-start: var(--fff-switch-track-px-lg);
 }
 
-.fff-switch--lg.fff-switch--label-end:not(.fff-switch--layout-card):not(.fff-switch--has-description) .fff-switch__track,
-.fff-cell-switch--lg.fff-switch--label-end:not(.fff-switch--layout-card) .fff-cell-switch__track {
+.fff-switch--lg.fff-switch--label-end:not(.fff-switch--layout-card):not(.fff-switch--has-description) .fff-switch__track {
     padding-inline-start: var(--fff-switch-track-p-lg);
     padding-inline-end: var(--fff-switch-track-px-lg);
 }
 
-.fff-switch__content,
-.fff-cell-switch__content {
+.fff-switch__content {
     @apply min-w-0 flex-1;
 }
 
@@ -147,30 +139,27 @@
     @apply bg-red-100 text-red-700;
 }
 
-.fff-switch__label,
-.fff-cell-switch__label {
+.fff-switch__label {
     @apply block font-semibold text-gray-900;
     font-size: var(--fff-text-md);
 }
 
-.fff-switch--sm .fff-switch__label,
-.fff-cell-switch--sm .fff-cell-switch__label {
+.fff-switch--sm .fff-switch__label {
     font-size: var(--fff-text-sm);
 }
 
-.fff-switch--lg .fff-switch__label,
-.fff-cell-switch--lg .fff-cell-switch__label {
+.fff-switch--lg .fff-switch__label {
     font-size: var(--fff-text-lg);
 }
 
-.fff-switch__description,
-.fff-cell-switch__description {
+.fff-switch__description {
     @apply mt-1 block text-gray-500;
     font-size: var(--fff-text-sm);
 }
 
-.fff-switch__control,
-.fff-cell-switch__control {
+.fff-switch__control {
+    --fff-switch-direction: 1;
+    --fff-switch-extra: 0px;
     --fff-switch-pad: 0.125rem;
     --fff-switch-w: 3.5rem;
     --fff-switch-h: 1.5rem;
@@ -187,31 +176,28 @@
 }
 
 .fff-switch__control.fi-color[data-checked='true'],
-.fff-cell-switch__control.fi-color[data-checked='true'],
-.fff-switch__control.fi-color[data-checked='false'],
-.fff-cell-switch__control.fi-color[data-checked='false'] {
+.fff-switch__control.fi-color[data-checked='false'] {
     @apply bg-(--bg) dark:bg-(--dark-bg);
 }
 
-.fff-switch--sm .fff-switch__control,
-.fff-cell-switch--sm .fff-cell-switch__control {
+.fff-switch--sm .fff-switch__control {
     --fff-switch-w: 2.875rem;
     --fff-switch-h: 1.25rem;
 }
 
-.fff-switch--lg .fff-switch__control,
-.fff-cell-switch--lg .fff-cell-switch__control {
+.fff-switch--lg .fff-switch__control {
     --fff-switch-w: 4rem;
     --fff-switch-h: 1.75rem;
 }
 
-.fff-switch__thumb,
-.fff-cell-switch__thumb {
-    @apply relative block shrink-0 rounded-full bg-white transition-transform duration-200 ease-out;
-    width: var(--fff-switch-thumb-w);
+.fff-switch__thumb {
+    @apply relative block shrink-0 rounded-full;
+    width: calc(var(--fff-switch-thumb-w) + var(--fff-switch-extra));
     height: var(--fff-switch-inner-h);
     box-shadow: none;
     transform: translateX(0);
+    transition: transform var(--fff-switch-glide-duration, 300ms) var(--fff-switch-glide-easing, ease-out),
+        width var(--fff-switch-stretch-duration, 260ms) var(--fff-switch-stretch-easing, ease-out);
 }
 
 .fff-switch__thumb-icons {
@@ -226,33 +212,27 @@
     @apply text-gray-400 dark:text-gray-500;
 }
 
-.fff-switch__control[data-checked='false'] .fff-switch__thumb-icon--on,
-.fff-cell-switch__control[data-checked='false'] .fff-cell-switch__thumb-icon--on {
+.fff-switch__control[data-checked='false'] .fff-switch__thumb-icon--on {
     @apply opacity-0 duration-100 ease-out;
 }
 
-.fff-switch__control[data-checked='false'] .fff-switch__thumb-icon--off,
-.fff-cell-switch__control[data-checked='false'] .fff-cell-switch__thumb-icon--off {
+.fff-switch__control[data-checked='false'] .fff-switch__thumb-icon--off {
     @apply opacity-100 duration-200 ease-in;
 }
 
-.fff-switch__control[data-checked='true'] .fff-switch__thumb-icon--on,
-.fff-cell-switch__control[data-checked='true'] .fff-cell-switch__thumb-icon--on {
+.fff-switch__control[data-checked='true'] .fff-switch__thumb-icon--on {
     @apply opacity-100 duration-200 ease-in;
 }
 
-.fff-switch__control[data-checked='true'] .fff-switch__thumb-icon--off,
-.fff-cell-switch__control[data-checked='true'] .fff-cell-switch__thumb-icon--off {
+.fff-switch__control[data-checked='true'] .fff-switch__thumb-icon--off {
     @apply opacity-0 duration-100 ease-out;
 }
 
-.fff-switch__control[data-checked='true'] .fff-switch__thumb,
-.fff-cell-switch__control[data-checked='true'] .fff-cell-switch__thumb {
-    transform: translateX(var(--fff-switch-thumb-travel));
+.fff-switch__control[data-checked='true'] .fff-switch__thumb {
+    transform: translateX(calc(var(--fff-switch-direction) * (var(--fff-switch-thumb-travel) - var(--fff-switch-extra))));
 }
 
-.dark .fff-switch__track,
-.dark .fff-cell-switch__track {
+.dark .fff-switch__track {
     @apply bg-zinc-900;
     border: var(--fff-surface-border-width) solid var(--fff-surface-border);
     box-shadow: var(--fff-surface-shadow) !important;
@@ -279,22 +259,57 @@
     @apply bg-red-500/15 text-red-300;
 }
 
-.dark .fff-switch__label,
-.dark .fff-cell-switch__label {
+.dark .fff-switch__label {
     @apply text-white;
 }
 
-.dark .fff-switch__description,
-.dark .fff-cell-switch__description {
+.dark .fff-switch__description {
     @apply text-gray-400;
 }
 
-.dark .fff-switch__control[data-checked='false']:not(.fi-color),
-.dark .fff-cell-switch__control[data-checked='false']:not(.fi-color) {
+.dark .fff-switch__control[data-checked='false']:not(.fi-color) {
     @apply bg-zinc-600;
 }
 
-.dark .fff-switch__control[data-checked='false'] .fff-switch__thumb,
-.dark .fff-cell-switch__control[data-checked='false'] .fff-cell-switch__thumb {
+.dark .fff-switch__control[data-checked='false'] .fff-switch__thumb-surface {
     @apply bg-zinc-300;
+}
+
+.fff-switch__track {
+    text-align: start;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.fff-switch__track:focus-visible,
+.fff-switch--inline .fff-switch__control:focus-visible {
+    outline: 2px solid var(--primary-500);
+    outline-offset: 3px;
+}
+
+.fff-switch__thumb-surface {
+    @apply absolute inset-0 rounded-full bg-white;
+}
+
+.fff-switch:dir(rtl) .fff-switch__control {
+    --fff-switch-direction: -1;
+}
+
+.fff-switch[data-switch-pressed] .fff-switch__control {
+    --fff-switch-extra: calc(var(--fff-switch-inner-h) * 0.2777778);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fff-switch .fff-switch__control {
+        --fff-switch-extra: 0px;
+    }
+    .fff-switch__control,
+    .fff-switch__thumb,
+    .fff-switch__thumb-icon {
+        transition: none;
+    }
+    .fff-switch__ripple {
+        display: none;
+        animation: none;
+    }
 }

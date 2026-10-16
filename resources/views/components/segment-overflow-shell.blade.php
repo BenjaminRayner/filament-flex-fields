@@ -1,6 +1,6 @@
 @php
     use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
-    use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+    use Bjanczak\FilamentFlexFields\Support\FlexIcon;
     use Filament\Support\Enums\IconSize;
 @endphp
 
@@ -22,11 +22,9 @@
             'fff-segment-scroll-shadow',
             'fff-segment-scroll-shadow--horizontal',
             'fff-segment-scroll-shadow--fade',
-            'fff-segment-scroll-shadow--preparing',
         ])
         data-fff-segment-overflow
         x-ref="scrollShadow"
-        x-on:scroll.passive="updateSegmentScrollShadow()"
         @if (filled($tablistRole))
             role="{{ $tablistRole }}"
         @endif
@@ -49,7 +47,7 @@
         x-on:click="scrollSegmentOverflowBy(-1)"
         aria-label="{{ __('filament-flex-fields::default.segment_control_scroll_previous') }}"
     >
-        {{ \Filament\Support\generate_icon_html(GravityIcon::ChevronLeft, size: IconSize::Small) }}
+        {{ \Filament\Support\generate_icon_html(FlexIcon::ChevronLeft, size: IconSize::Small) }}
     </button>
 
     <button
@@ -60,6 +58,6 @@
         x-on:click="scrollSegmentOverflowBy(1)"
         aria-label="{{ __('filament-flex-fields::default.segment_control_scroll_next') }}"
     >
-        {{ \Filament\Support\generate_icon_html(GravityIcon::ChevronRight, size: IconSize::Small) }}
+        {{ \Filament\Support\generate_icon_html(FlexIcon::ChevronRight, size: IconSize::Small) }}
     </button>
 </div>

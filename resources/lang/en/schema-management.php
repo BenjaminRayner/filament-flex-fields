@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'navigation_plural' => 'Field groups',
+    'model_singular' => 'Field group',
+    'group' => 'Group',
+    'sections' => 'Sections',
+    'sections_description' => 'Optional layout sections for grouping fields in forms.',
+    'section_id' => 'Section ID',
+    'fields_schema' => 'Field schema',
+    'fields_description' => 'Field definitions used by form, table and infolist builders.',
+    'fields' => 'Fields',
+    'section' => 'Section',
+    'required' => 'Required',
+    'encrypted' => 'Encrypt at rest',
+    'help_text' => 'Help text',
+    'tenant_id' => 'Tenant ID',
+    'tenant' => 'Tenant',
+    'tenant_help' => 'Optional tenant key. Leave empty for a global group.',
+    'name' => 'Name',
+    'slug' => 'Slug',
+    'order' => 'Order',
+    'label' => 'Label',
+    'type' => 'Type',
+    'sort' => 'Sort order',
+    'description' => 'Description',
+    'placeholder' => 'Placeholder',
+    'width' => 'Width',
+    'updated_at' => 'Updated at',
+    'section_type_section' => 'Section',
+    'section_type_fieldset' => 'Fieldset',
+    'section_type_headless' => 'Without a container',
+];

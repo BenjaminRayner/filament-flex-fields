@@ -19,8 +19,9 @@
     $initialInputValue = PhoneCountries::formatNationalDisplay($initialNational, $initialCountryCode);
     $initialDialPrefix = PhoneCountries::dialCode($initialCountryCode);
     $livewireKey = $getLivewireKey();
-    \Bjanczak\FilamentFlexFields\Support\CountryRegistryQueue::registerLocale($field->getLocale());
+    $countrySelect = $field->getCountrySelect();
 @endphp
+
 
 <x-dynamic-component
     :component="$getFieldWrapperView()"
@@ -36,15 +37,12 @@
     <div
         wire:ignore
         wire:key="{{ $livewireKey }}.{{ substr(md5(serialize([$isDisabled, $isReadOnly, $getSize()])), 0, 64) }}"
-        x-load
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('phone-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+        x-fff-load
+        x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('phone-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
         x-data="phoneFieldFormComponent({
-            state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
+            phoneState: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
             statePath: @js($statePath),
-            countryPool: @js($field->getCountryPool()),
-            countryFilterKey: @js($field->getCountryFilterKey()),
-            sortPreferredFirst: @js($shouldSortCountriesByBrowserLocale()),
-            preferredCountryCode: @js($shouldSortCountriesByBrowserLocale() ? $getBrowserLocaleCountryCode() : null),
+            countries: @js($field->getCountriesMetadata()),
             selectedCountrySeed: @js($selectedCountry),
             defaultCountry: @js($defaultCountry),
             initialInputValue: @js($initialInputValue),
@@ -56,9 +54,7 @@
             countryLabel: @js(__('filament-flex-fields::default.phone.country')),
             locale: @js($field->getLocale()),
         })"
-        x-init="init()"
-        x-on:click.outside="if ($refs.countryMenu?.contains($event.target)) { return }; closeTeleportedMenuImmediate()"
-        x-on:keydown.escape.window="closeCountryMenu()"
+        x-on:fff-phone-country.stop="selectCountry($event.detail.country)"
         @class([
             'fff-phone-field',
             'fff-flex-text-input',
@@ -73,8 +69,8 @@
         role="group"
         aria-label="{{ $getLabel() }}"
     >
-        {!! \Bjanczak\FilamentFlexFields\Support\CountryRegistryQueue::renderScriptOnce() !!}
-        <div
+
+        <div data-fff-select-anchor
             @class([
                 'fff-phone-field__shell fff-flex-text-input__shell',
                 'is-invalid' => $hasError,
@@ -82,15 +78,26 @@
             x-bind:class="{ 'is-possibly-invalid': possibleInvalid }"
         >
             <div class="fff-phone-field__row fff-flex-text-input__row">
-                <div class="fff-phone-field__country">
+                <div class="fff-phone-field__country"
+                    x-fff-load
+                    x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('select-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+                    x-data="fffHeadlessSelectField({ ...{{ \Illuminate\Support\Js::from($countrySelect->getHeadlessAlpineConfig()) }},
+                        state: phoneState.country,
+                        onChange: values => $dispatch('fff-phone-country', { country: values[0] }),
+                    })"
+                    x-init="$watch('phoneState.country', value => { if (value !== state) { state = value } })"
+                    x-on:click.outside="if (! isEventInsideHeadlessMenu($event)) comboboxCloseMenu({ immediate: true, reason: 'outside' })"
+                >
+                    {{ $countrySelect->getSelectCatalogMarkup() }}
                     <button
                         type="button"
                         class="fff-phone-field__country-trigger"
-                        x-ref="countryTrigger"
-                        x-on:click.stop="toggleCountryMenu()"
-                        x-bind:aria-expanded="countryOpen ? 'true' : 'false'"
+                        x-ref="headlessTrigger" data-fff-open-trigger
+                        x-on:click.stop="onHeadlessTriggerClick($event)"
+                        x-on:keydown="onHeadlessControlKeydown($event, { trigger: true })"
+                        x-bind:aria-expanded="comboboxOpen ? 'true' : 'false'"
                         aria-haspopup="listbox"
-                        x-bind:aria-label="countryLabel"
+                        aria-label="{{ __('filament-flex-fields::default.phone.country') }}"
                         @disabled($isDisabled || $isReadOnly)
                     >
                         <span class="fff-phone-field__flag-wrap" aria-hidden="true">
@@ -98,7 +105,7 @@
                                 class="fff-phone-field__flag is-loaded"
                                 @if ($selectedCountry)
                                     src="{{ $selectedCountry['flag_url'] }}"
-                                    alt="{{ e($selectedCountry['name']) }}"
+                                    alt="{{ $selectedCountry['name'] }}"
                                 @endif
                                 x-bind:src="selectedCountry.flag_url"
                                 x-bind:alt="selectedCountry.name"
@@ -108,108 +115,13 @@
                                 x-on:error="$el.classList.remove('is-loaded')"
                             />
                         </span>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            class="fff-phone-field__country-chevron"
-                            aria-hidden="true"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path d="M18 9.00005C18 9.00005 13.5811 15 12 15C10.4188 15 6 9 6 9" />
-                        </svg>
+                        {{ \Filament\Support\generate_icon_html('hugeicons-arrow-down-01', attributes: new \Illuminate\View\ComponentAttributeBag(['class' => 'fff-phone-field__country-chevron'])) }}
                     </button>
 
-                    <template x-teleport="body">
-                        <div
-                            @class([
-                                'fff-phone-field__country-menu',
-                                'fff-teleported-menu',
-                                'fff-phone-field__country-menu--'.$getSize(),
-                                'fff-teleported-menu--'.$getSize(),
-                            ])
-                            x-ref="countryMenu"
-                            x-show="countryOpen"
-                            x-cloak
-                            x-bind:class="{ 'is-open': countryOpen, 'is-positioned': countryMenuReady }"
-                            x-on:click.stop
-                            x-on:keydown="onCountryMenuKeydown($event)"
-                            role="listbox"
-                            x-bind:aria-label="countryLabel"
-                            x-bind:aria-activedescendant="activeCountryIndex >= 0 ? countryOptionId(activeCountryIndex) : null"
-                        >
-                            @if ($isSearchable())
-                                <div class="fff-phone-field__country-search-wrap fff-teleported-menu__search-wrap">
-                                    <input
-                                        type="search"
-                                        class="fff-phone-field__country-search fff-teleported-menu__search"
-                                        x-model="countrySearch"
-                                        x-ref="countrySearch"
-                                        placeholder="{{ __('filament-flex-fields::default.phone.search_countries') }}"
-                                        x-on:keydown.stop="onCountrySearchKeydown($event)"
-                                    />
-                                </div>
-                            @endif
-
-                            <ul
-                                class="fff-phone-field__country-list"
-                                x-ref="countryListScroll"
-                                x-on:scroll.passive="onVirtualListScroll($event)"
-                                x-on:keydown="onCountryListKeydown($event)"
-                            >
-                                <li
-                                    x-show="usesVirtualList()"
-                                    class="fff-phone-field__country-virtual-spacer"
-                                    x-bind:style="`height: ${virtualSpacerTop()}px`"
-                                    aria-hidden="true"
-                                ></li>
-                                <template x-for="entry in countryListEntries()" :key="entry.item.code">
-                                    <li class="fff-phone-field__country-list-item">
-                                        <button
-                                            type="button"
-                                            class="fff-phone-field__country-option"
-                                            x-bind:id="countryOptionId(entry.index)"
-                                            x-on:click="selectCountry(entry.item.code)"
-                                            x-bind:class="{
-                                                'is-selected': entry.item.code === state.country,
-                                                'is-active': entry.index === activeCountryIndex,
-                                            }"
-                                            role="option"
-                                            x-bind:aria-selected="entry.item.code === state.country ? 'true' : 'false'"
-                                            x-bind:aria-posinset="entry.index + 1"
-                                            x-bind:aria-setsize="filteredCountries().length"
-                                        >
-                                            <span class="fff-phone-field__flag-wrap" aria-hidden="true">
-                                                <img
-                                                    class="fff-phone-field__flag"
-                                                    x-bind:src="entry.item.flag_url"
-                                                    x-bind:alt="entry.item.name"
-                                                    alt=""
-                                                    loading="eager"
-                                                    decoding="async"
-                                                    x-bind:class="{ 'is-loaded': true }"
-                                                    x-init="if ($el.complete) { $el.classList.add('is-loaded') }"
-                                                    x-on:load="$el.classList.add('is-loaded')"
-                                                    x-on:error="$el.classList.remove('is-loaded')"
-                                                />
-                                            </span>
-                                            <span class="fff-phone-field__country-name" x-text="entry.item.name"></span>
-                                            <span class="fff-phone-field__country-dial" x-text="entry.item.dial_code"></span>
-                                        </button>
-                                    </li>
-                                </template>
-                                <li
-                                    x-show="usesVirtualList()"
-                                    class="fff-phone-field__country-virtual-spacer"
-                                    x-bind:style="`height: ${virtualSpacerBottom()}px`"
-                                    aria-hidden="true"
-                                ></li>
-                            </ul>
-                        </div>
-                    </template>
+                    <x-filament-flex-fields::select-menu
+                        :field="$countrySelect"
+                        :panel-classes="['fff-phone-field__country-menu']"
+                    />
                 </div>
 
                 <div class="fff-phone-field__control fff-flex-text-input__control">
@@ -222,6 +134,7 @@
                         @endif
 
                         <input
+                            id="{{ $getId() }}"
                             type="tel"
                             class="fff-phone-field__input fff-flex-text-input__input fi-input"
                             x-ref="phoneInput"

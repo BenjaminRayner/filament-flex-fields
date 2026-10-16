@@ -1,0 +1,124 @@
+---
+title: "Custom dialogs and drawers"
+description: "Prepare, open, suspend and dispose a custom surface with nested owner support."
+---
+
+You can use FLEX components inside a custom dialog without adding Filament modal
+classes or copying the components' templates. Render each child with its ordinary
+asset consumer boundary. Keep the closed container dormant from its first render:
+
+```html
+<div id="customer-dialog" hidden data-fff-asset-active="false">
+    <!-- Render your registered FLEX fields here. -->
+</div>
+```
+
+Register the container from an active host component, rather than from a child
+inside that closed container. Import the public SDK through the [SDK build adapter](/docs/extensions/sdk):
+
+```javascript
+import {
+    createAssetSurface,
+    createResourceScope,
+} from '@bjanczak/flex-fields/sdk/v1';
+
+const effects = createResourceScope();
+const root = document.getElementById('customer-dialog');
+const surface = await createAssetSurface(root, {
+    signal: effects.signal,
+});
+let opening = 0;
+
+async function openDialog() {
+    const request = ++opening;
+    root.setAttribute('aria-busy', 'true');
+
+    try {
+        const ready = await surface.activate();
+
+        if (request === opening && ready && surface.ready) {
+            root.hidden = false;
+            // Apply your dialog's focus and opening animation here.
+        }
+    } catch (error) {
+        // Keep the dialog hidden and offer an explicit retry.
+        if (request === opening) showRetryMessage(error);
+    } finally {
+        if (request === opening) root.removeAttribute('aria-busy');
+    }
+}
+
+function closeDialog() {
+    opening++;
+    root.hidden = true;
+    root.removeAttribute('aria-busy');
+    surface.close();
+}
+
+// Invoke when the host component is destroyed.
+effects.dispose();
+```
+
+`activate()` resolves `true` after the currently active children's CSS and factory
+initialization are ready. Calling it again while opening returns the same pending
+operation. Closing, suspending, disconnecting or disposing that operation resolves
+it `false`; a late response cannot reopen the container. An active preparation
+failure rejects the promise. Calling `activate()` again retries failed active
+factories after their assets are prepared. Always check `surface.ready` before
+revealing the container, including when consuming a previously resolved promise.
+
+The registered container may stay `hidden` while preparing. This does not activate
+closed tabs, collapsed sections or other dormant descendants. An inactive ancestor
+outside the registered container still prevents readiness. Closed containers have
+no asset demand, while suspended parents retain their current asset references.
+
+| Handle member | Behavior |
+| --- | --- |
+| `activate()` | Prepare or resume the surface; returns a promise of current readiness. |
+| `suspend()` | Keep the parent's assets while a child is in front; cancel an unfinished opening. |
+| `close()` | Close this surface and its registered children, releasing their asset references. The handle can be reused. |
+| `dispose()` | Permanently release this registration and its children. Safe to call repeatedly. |
+| `state` | Read `closed`, `active`, `suspended` or `disposed`. |
+| `ready` | Read whether this still-active surface has completed preparation. |
+
+For a child rendered elsewhere in the document, pass the parent's handle explicitly:
+
+```javascript
+const child = await createAssetSurface(childRoot, {
+    parent: surface,
+    signal: effects.signal,
+});
+
+surface.suspend();
+root.hidden = true;
+
+if (await child.activate() && child.ready) {
+    childRoot.hidden = false;
+}
+
+// Return to the parent.
+childRoot.hidden = true;
+child.close();
+
+if (await surface.activate() && surface.ready) {
+    root.hidden = false;
+}
+```
+
+A child cannot activate after its parent closes. Closing the child preserves the
+suspended parent's and underlying page's assets. Disposing the parent invalidates
+its child handles. DOM moves within the document preserve registrations; a
+disconnected root or a replaced page body disposes old registrations.
+
+Register each root once, in its own document. Native Filament modal roots use the
+existing Filament adapter. The document runtime admits up to 256 custom surfaces;
+release registrations with a host signal or `dispose()` when no longer needed.
+Your dialog continues to own its markup, animation, focus management, accessibility,
+scroll locking and retry presentation. Closing a surface releases asset ownership;
+it does not destroy mounted child factories or unload evaluated JavaScript. Remove
+the child's DOM through its framework when it should be unmounted.
+
+## Continue reading
+
+[SDK reference](/docs/extensions/sdk-reference) · [Lifecycle events](/docs/extensions/events)
+

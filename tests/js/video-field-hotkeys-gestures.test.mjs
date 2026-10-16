@@ -1,48 +1,23 @@
-import { describe, expect, it } from 'vitest'
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import { resolveVideoHotkeyAction } from '../../resources/js/video/values.js'
+import { createTapGestureTracker, beginTapGesture, resolveTapGesture, resolveGestureRegion } from '../../resources/js/video/values.js'
+class BrowserElement {constructor(tag) {this.tagName=tag}}
+globalThis.Element=BrowserElement
 
-import { resolveVideoHotkeyAction } from '../../resources/js/core/video-field-hotkeys.js'
-import {
-    createTapGestureTracker,
-    beginTapGesture,
-    resolveTapGesture,
-    resolveGestureRegion,
-} from '../../resources/js/core/video-field-gestures.js'
-
-describe('video-field-hotkeys', () => {
-    it('maps common media keys to actions', () => {
-        expect(resolveVideoHotkeyAction({ key: ' ', altKey: false, ctrlKey: false, metaKey: false, defaultPrevented: false, target: document.body })).toBe('togglePaused')
-        expect(resolveVideoHotkeyAction({ key: 'f', altKey: false, ctrlKey: false, metaKey: false, defaultPrevented: false, target: document.body })).toBe('toggleFullscreen')
-        expect(resolveVideoHotkeyAction({ key: 'ArrowUp', altKey: false, ctrlKey: false, metaKey: false, defaultPrevented: false, target: document.body })).toBe('volumeUp')
-    })
-
-    it('ignores editable targets', () => {
-        const input = document.createElement('input')
-
-        expect(resolveVideoHotkeyAction({ key: ' ', altKey: false, ctrlKey: false, metaKey: false, defaultPrevented: false, target: input })).toBeNull()
-    })
+test('video hotkeys handle media commands but preserve editable fields and modifiers', () => {
+    const event={altKey:false,ctrlKey:false,metaKey:false,defaultPrevented:false,target:new BrowserElement('DIV')}
+    for(const [key,action] of [[' ','togglePaused'],['f','toggleFullscreen'],['ArrowUp','volumeUp']]) assert.equal(resolveVideoHotkeyAction({...event,key}),action)
+    for(const tag of ['INPUT','TEXTAREA','SELECT']) assert.equal(resolveVideoHotkeyAction({...event,key:' ',target:new BrowserElement(tag)}),null)
+    assert.equal(resolveVideoHotkeyAction({...event,key:'f',ctrlKey:true}),null)
 })
-
-describe('video-field-gestures', () => {
-    it('resolves left center right regions', () => {
-        const rect = { left: 0, width: 300 }
-
-        expect(resolveGestureRegion(50, rect)).toBe('left')
-        expect(resolveGestureRegion(150, rect)).toBe('center')
-        expect(resolveGestureRegion(250, rect)).toBe('right')
-    })
-
-    it('detects double tap in the same region', () => {
-        const tracker = createTapGestureTracker()
-        const rect = { left: 0, width: 300 }
-
-        beginTapGesture(tracker, { clientX: 150 })
-        const first = resolveTapGesture(tracker, { clientX: 150 }, rect)
-
-        beginTapGesture(tracker, { clientX: 150 })
-        const second = resolveTapGesture(tracker, { clientX: 150 }, rect)
-
-        expect(first?.isDoubleTap).toBe(false)
-        expect(second?.isDoubleTap).toBe(true)
-        expect(second?.region).toBe('center')
-    })
+test('video gesture regions and same-region double tap remain consistent', () => {
+    const rect={left:0,width:300}, tracker=createTapGestureTracker()
+    assert.deepEqual([50,150,250].map(x => resolveGestureRegion(x,rect)),['left','center','right'])
+    beginTapGesture(tracker,{clientX:150})
+    assert.equal(resolveTapGesture(tracker,{clientX:150},rect).isDoubleTap,false)
+    beginTapGesture(tracker,{clientX:150})
+    assert.equal(resolveTapGesture(tracker,{clientX:150},rect).isDoubleTap,true)
+    beginTapGesture(tracker,{clientX:50})
+    assert.equal(resolveTapGesture(tracker,{clientX:50},rect).isDoubleTap,false)
 })

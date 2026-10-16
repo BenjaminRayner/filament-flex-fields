@@ -17,15 +17,15 @@ class YoutubeAction
     public static function make(): Action
     {
         return Action::make('youtube')
-            ->label(Translations::get('filament-flex-fields::default.rich_editor.youtube.tool'))
-            ->modalHeading(Translations::get('filament-flex-fields::default.rich_editor.youtube.modal.heading'))
+            ->label(fn () => Translations::get('filament-flex-fields::default.rich_editor.youtube.tool'))
+            ->modalHeading(fn () => Translations::get('filament-flex-fields::default.rich_editor.youtube.modal.heading'))
             ->modalWidth(Width::Large)
             ->fillForm(fn (array $arguments): array => [
                 'url' => $arguments['src'] ?? null,
             ])
             ->schema([
                 TextInput::make('url')
-                    ->label(Translations::get('filament-flex-fields::default.rich_editor.youtube.modal.url'))
+                    ->label(fn () => Translations::get('filament-flex-fields::default.rich_editor.youtube.modal.url'))
                     ->inputMode('url')
                     ->placeholder('https://www.youtube.com/watch?v=...')
                     ->required(),

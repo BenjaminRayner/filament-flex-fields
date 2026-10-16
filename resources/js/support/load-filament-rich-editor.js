@@ -22,7 +22,7 @@ export function loadFilamentRichEditorFormComponent(src) {
                 }
 
                 return factory
-            }),
+            }).catch(error => { runtimePromises.delete(src); throw error }),
         )
     }
 

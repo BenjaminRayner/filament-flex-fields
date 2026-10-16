@@ -35,7 +35,7 @@ function createAlpineStub() {
             return `x-${name}`
         },
         skipDuringClone(callback) {
-            return callback()
+            return (...args) => callback(...args)
         },
         destroyTreeCalls: [],
         destroyTree(el) {
@@ -77,6 +77,8 @@ function createElement() {
         },
         closest: () => null,
         dispatchEvent: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
     }
 }
 
@@ -125,6 +127,24 @@ test('x-fff-load loads module then initTree', async () => {
     assert.equal(Alpine.destroyTreeCalls.length, 1)
     assert.equal(Alpine.initTreeCalls.length, 1)
     assert.equal(Alpine.initTreeCalls[0], el)
+})
+
+test('SSR activation handover preserves intent while final removal disposes the owner', async () => {
+    resetFffLoadDirectiveForTests()
+    stubAlpineLoadGate()
+    const Alpine = createAlpineStub(), el = createElement()
+    const events = []
+    let dispose
+    el.dispatchEvent = event => events.push(event.type)
+    el.setAttribute('x-fff-load-src', 'https://cdn.test/select-field.js')
+    Alpine.destroyTree = () => { assert.equal(el._fffReinitializing, true); dispose() }
+    registerFffLoadDirective(Alpine)
+    Alpine.directiveCallback.inline(el)
+    await Alpine.directiveCallback(el, { modifiers: [] }, { cleanup(callback) { dispose = callback } })
+    assert.deepEqual(events, [])
+    assert.equal(el._fffReinitializing, undefined)
+    dispose()
+    assert.deepEqual(events, ['fff-load-dispose'])
 })
 
 test('ensureFffLoadDirectiveRegistered registers directive only once', () => {

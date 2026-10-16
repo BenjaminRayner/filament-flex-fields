@@ -38,12 +38,12 @@ class VoiceNoteRecorderFieldPlayground
                 ->schema([
                     VoiceNoteRecorderField::make('voice_note__basic')
                         ->label('Record Voice Note')
-                        ->helperText('Click microphone to start. Stop to review, then save — file lands on disk like FlexFileUpload. Transcript and waveform metadata appear in voice_note__meta after save.')
+                        ->helperText('Record, pause and listen back. Upload prepares a temporary file; the form save persists it through Media OS. Waveform metadata is kept with the form.')
                         ->directory('voice-notes')
                         ->storeMetadataIn('voice_note__meta')
                         ->storeWaveformIn('voice_note__meta')
                         ->columnSpanFull(),
-                    Grid::make(['default' => 1, 'sm' => 2, 'lg' => 3])
+                    Grid::make(['default' => 1, 'sm' => 2, 'lg' => 2])
                         ->extraAttributes(['class' => 'fff-playground-variants'])
                         ->schema([
                             VoiceNoteRecorderField::make('voice_note__sm')
@@ -60,7 +60,7 @@ class VoiceNoteRecorderFieldPlayground
                                 ->maxDuration(30),
                             VoiceNoteRecorderField::make('voice_note__immediate')
                                 ->label('Immediate upload')
-                                ->helperText('Uploads right after recording. Delete removes the file from storage.')
+                                ->helperText('Uploads to temporary storage after review preparation. Permanent storage follows form save; deletion asks for confirmation.')
                                 ->directory('voice-notes')
                                 ->uploadImmediately(),
                         ]),

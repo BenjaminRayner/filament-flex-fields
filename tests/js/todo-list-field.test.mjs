@@ -4,18 +4,14 @@ import { describe, it } from 'node:test'
 import {
     allTodosComplete,
     applyTodoUndoPatch,
-    buildVirtualOffsets,
     childProgressLabel,
     diffTodoDoneIds,
     filterItems,
-    findVirtualIndexAtOffset,
     handStrikePath,
     mergeTextLineRects,
     paginateItems,
     sortCompletedLast,
-    scrollTopToRevealIndex,
     toggleTodoTree,
-    virtualWindow,
 } from '../../resources/js/components/todo-list-field/helpers.js'
 import {
     getTodoListCelebration,
@@ -36,47 +32,10 @@ describe('todo list helpers', () => {
         assert.equal(filterItems(items, '').length, 2)
     })
 
-    it('paginates and virtualizes', () => {
-        const items = Array.from({ length: 25 }, (_, i) => ({ id: String(i), label: `T${i}` }))
-        const page = paginateItems(items, 2, 10)
-
-        assert.equal(page.page, 2)
-        assert.equal(page.pages, 3)
-        assert.equal(page.items.length, 10)
-        assert.equal(page.items[0].id, '10')
-
-        const windowed = virtualWindow(items, 200, 160, 50)
-        assert.ok(windowed.items.length < items.length)
-        assert.ok(windowed.totalHeight === 25 * 50)
-    })
-
-    it('virtualizes variable row heights', () => {
-        const items = Array.from({ length: 20 }, (_, i) => ({ id: String(i), label: `T${i}` }))
-        const getHeight = (item) => (Number(item.id) % 2 === 0 ? 40 : 80)
-        const offsets = buildVirtualOffsets(items, getHeight)
-
-        assert.equal(offsets[0], 0)
-        assert.equal(offsets[20], 10 * 40 + 10 * 80)
-        assert.equal(findVirtualIndexAtOffset(offsets, 0), 0)
-        assert.equal(findVirtualIndexAtOffset(offsets, 40), 1)
-        assert.equal(findVirtualIndexAtOffset(offsets, 119), 1)
-        assert.equal(findVirtualIndexAtOffset(offsets, 120), 2)
-
-        const windowed = virtualWindow(items, 200, 160, getHeight)
-        assert.ok(windowed.items.length < items.length)
-        assert.equal(windowed.totalHeight, 1200)
-        assert.equal(windowed.offsetY, offsets[windowed.start])
-
-        const reveal = scrollTopToRevealIndex(19, getHeight, 160, items)
-        assert.ok(reveal > 0)
-        assert.ok(reveal <= windowed.totalHeight - 160)
-    })
-
-    it('scrolls virtual lists to reveal a created index', () => {
-        // 20 items × 50px in a 160px viewport → last item needs scroll near bottom
-        assert.equal(scrollTopToRevealIndex(19, 50, 160, 20), 20 * 50 - 160)
-        assert.equal(scrollTopToRevealIndex(0, 50, 160, 20), 0)
-        assert.equal(scrollTopToRevealIndex(2, 50, 160, 20), 0)
+    it('paginates without mutating the full collection', () => {
+        const items=Array.from({length:25},(_,id)=>({id:String(id)}))
+        assert.deepEqual(paginateItems(items,2,10).items.map(item=>item.id),items.slice(10,20).map(item=>item.id))
+        assert.equal(items.length,25)
     })
 
     it('toggles by string/number id interchangeably', () => {

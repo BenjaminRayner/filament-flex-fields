@@ -33,16 +33,16 @@ trait ManagesFlexFieldGroupSchemaActions
                 $this->makePublishSchemaAction(SchemaRegistry::STATE_REVIEW, 'review')->authorize('publish'),
                 $this->makePublishSchemaAction(SchemaRegistry::STATE_LIVE, 'live')->authorize('publish'),
             ])
-                ->label(__('filament-flex-fields::default.schema.publish_group'))
-                ->icon('heroicon-o-arrow-up-tray')
+                ->label(fn () => __('filament-flex-fields::default.schema.publish_group'))
+                ->icon('hugeicons-upload-01')
                 ->button()
                 ->visible($record !== null),
             Action::make('importSchemaJson')
-                ->label(__('filament-flex-fields::default.schema.import_json'))
-                ->icon('heroicon-o-arrow-down-tray')
+                ->label(fn () => __('filament-flex-fields::default.schema.import_json'))
+                ->icon('hugeicons-download-01')
                 ->schema([
                     Textarea::make('json')
-                        ->label(__('filament-flex-fields::default.schema.import_json_payload'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.import_json_payload'))
                         ->required()
                         ->rows(12),
                 ])
@@ -50,8 +50,8 @@ trait ManagesFlexFieldGroupSchemaActions
                     $this->applyImportedSchema($data['json'], $record);
                 }),
             Action::make('exportSchemaJson')
-                ->label(__('filament-flex-fields::default.schema.export_json'))
-                ->icon('heroicon-o-arrow-up-on-square')
+                ->label(fn () => __('filament-flex-fields::default.schema.export_json'))
+                ->icon('hugeicons-upload-01')
                 ->visible($record !== null)
                 ->action(function () use ($record) {
                     $payload = app(SchemaImportExport::class)->export($record->toRegistrySchema());
@@ -66,11 +66,11 @@ trait ManagesFlexFieldGroupSchemaActions
                     );
                 }),
             Action::make('applyBlueprintPack')
-                ->label(__('filament-flex-fields::default.schema.apply_blueprint'))
-                ->icon('heroicon-o-sparkles')
+                ->label(fn () => __('filament-flex-fields::default.schema.apply_blueprint'))
+                ->icon('hugeicons-sparkles')
                 ->schema([
                     Select::make('pack')
-                        ->label(__('filament-flex-fields::default.schema.blueprint_select'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.blueprint_select'))
                         ->options(collect(SchemaBlueprintPacks::names())
                             ->mapWithKeys(fn (string $name): array => [$name => Str::headline($name)])
                             ->all())
@@ -82,7 +82,7 @@ trait ManagesFlexFieldGroupSchemaActions
 
                     if ($pack === null) {
                         Notification::make()
-                            ->title(__('filament-flex-fields::default.schema.blueprint_not_found'))
+                            ->title(fn () => __('filament-flex-fields::default.schema.blueprint_not_found'))
                             ->danger()
                             ->send();
 
@@ -97,10 +97,10 @@ trait ManagesFlexFieldGroupSchemaActions
     protected function makePublishSchemaAction(string $state, string $actionKey): Action
     {
         return Action::make("publishSchema{$actionKey}")
-            ->label(__('filament-flex-fields::default.schema.publish_'.$actionKey))
+            ->label(fn () => __('filament-flex-fields::default.schema.publish_'.$actionKey))
             ->requiresConfirmation()
-            ->modalHeading(__('filament-flex-fields::default.schema.publish_'.$actionKey))
-            ->modalDescription(__('filament-flex-fields::default.schema.publish_'.$actionKey.'_help'))
+            ->modalHeading(fn () => __('filament-flex-fields::default.schema.publish_'.$actionKey))
+            ->modalDescription(fn () => __('filament-flex-fields::default.schema.publish_'.$actionKey.'_help'))
             ->action(function () use ($state): void {
                 /** @var FlexFieldGroup $record */
                 $record = $this->getRecord();
@@ -115,7 +115,7 @@ trait ManagesFlexFieldGroupSchemaActions
                 }
 
                 Notification::make()
-                    ->title(__('filament-flex-fields::default.schema.publish_version_success', ['version' => $version]))
+                    ->title(fn () => __('filament-flex-fields::default.schema.publish_version_success', ['version' => $version]))
                     ->success()
                     ->send();
             });
@@ -141,7 +141,7 @@ trait ManagesFlexFieldGroupSchemaActions
             $this->fillForm($this->prepareFlexFieldGroupFormData($record->fresh()->toArray()));
 
             Notification::make()
-                ->title(__('filament-flex-fields::default.schema.blueprint_applied'))
+                ->title(fn () => __('filament-flex-fields::default.schema.blueprint_applied'))
                 ->success()
                 ->send();
 
@@ -151,7 +151,7 @@ trait ManagesFlexFieldGroupSchemaActions
         $this->form->fill($this->prepareFlexFieldGroupFormData(array_merge($this->form->getState(), $formData)));
 
         Notification::make()
-            ->title(__('filament-flex-fields::default.schema.blueprint_applied'))
+            ->title(fn () => __('filament-flex-fields::default.schema.blueprint_applied'))
             ->success()
             ->send();
     }
@@ -162,7 +162,7 @@ trait ManagesFlexFieldGroupSchemaActions
             $schema = app(SchemaImportExport::class)->import($json);
         } catch (JsonException $exception) {
             Notification::make()
-                ->title(__('filament-flex-fields::default.schema.import_json_failed'))
+                ->title(fn () => __('filament-flex-fields::default.schema.import_json_failed'))
                 ->body($exception->getMessage())
                 ->danger()
                 ->send();
@@ -174,7 +174,7 @@ trait ManagesFlexFieldGroupSchemaActions
 
         if (! $validation['ok']) {
             Notification::make()
-                ->title(__('filament-flex-fields::default.schema.import_json_failed'))
+                ->title(fn () => __('filament-flex-fields::default.schema.import_json_failed'))
                 ->body(implode("\n", $validation['errors']))
                 ->danger()
                 ->send();
@@ -205,7 +205,7 @@ trait ManagesFlexFieldGroupSchemaActions
         }
 
         Notification::make()
-            ->title(__('filament-flex-fields::default.schema.import_json_success'))
+            ->title(fn () => __('filament-flex-fields::default.schema.import_json_success'))
             ->success()
             ->send();
     }

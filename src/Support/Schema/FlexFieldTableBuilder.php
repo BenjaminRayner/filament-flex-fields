@@ -7,6 +7,10 @@ namespace Bjanczak\FilamentFlexFields\Support\Schema;
 use Bjanczak\FilamentFlexFields\Data\FlexFieldDefinition;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\RatingColumn;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\SignaturePreviewColumn;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyRenderContext;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaRenderer;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsConfig;
 use Filament\Tables\Columns\Column;
 use Filament\Tables\Columns\IconColumn;
@@ -15,27 +19,36 @@ use Filament\Tables\Columns\TextColumn;
 final class FlexFieldTableBuilder
 {
     /**
-     * @param  iterable<FlexFieldDefinition>  $definitions
+     * @param  iterable<FlexFieldDefinition|FamilySchemaDefinition>  $definitions
      * @return list<Column>
      */
-    public function build(iterable $definitions, string $valuesColumn = ''): array
+    public function build(iterable $definitions, string $valuesColumn = '', ?FamilyRenderContext $familyContext = null): array
     {
         $column = $valuesColumn !== '' ? $valuesColumn : FlexFieldsConfig::getValuesColumn();
         $columns = [];
 
         foreach ($definitions as $definition) {
-            if (! $definition->isActive) {
+            if (! $definition->isActive || ($definition instanceof FamilySchemaDefinition && ! $definition->isVisible)) {
                 continue;
             }
 
-            $columns[] = $this->makeColumn($definition, $column);
+            $columns[] = $this->makeColumn($definition, $column, $familyContext);
         }
 
         return $columns;
     }
 
-    public function makeColumn(FlexFieldDefinition $definition, string $valuesColumn): Column
+    public function makeColumn(FlexFieldDefinition|FamilySchemaDefinition $definition, string $valuesColumn, ?FamilyRenderContext $familyContext = null): Column
     {
+        if ($definition instanceof FamilySchemaDefinition) {
+            $column = app(FamilySchemaRenderer::class)->make(ComponentKind::Column, $definition,
+                $familyContext ?? new FamilyRenderContext('table:'.$valuesColumn, $valuesColumn));
+            if (! $column instanceof Column) {
+                throw new \LogicException('Family column renderer returned a form surface.');
+            }
+
+            return $column;
+        }
         $statePath = "{$valuesColumn}.{$definition->slug}";
 
         return match ($definition->type->value) {
@@ -100,7 +113,7 @@ final class FlexFieldTableBuilder
         }
 
         if (is_bool($value)) {
-            return $value ? __('Yes') : __('No');
+            return $value ? __('filament-flex-fields::default.boolean.yes') : __('filament-flex-fields::default.boolean.no');
         }
 
         return $value;

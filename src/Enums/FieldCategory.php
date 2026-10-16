@@ -30,12 +30,12 @@ enum FieldCategory: string
     public function icon(): string
     {
         return match ($this) {
-            self::Text => 'heroicon-o-bars-3-bottom-left',
-            self::Number => 'heroicon-o-calculator',
-            self::Choice => 'heroicon-o-list-bullet',
-            self::DateTime => 'heroicon-o-calendar-days',
-            self::Media => 'heroicon-o-photo',
-            self::Advanced => 'heroicon-o-code-bracket-square',
+            self::Text => 'hugeicons-text-align-left',
+            self::Number => 'hugeicons-calculator-01',
+            self::Choice => 'hugeicons-left-to-right-list-bullet',
+            self::DateTime => 'hugeicons-calendar-03',
+            self::Media => 'hugeicons-image-01',
+            self::Advanced => 'hugeicons-code-square',
         };
     }
 }

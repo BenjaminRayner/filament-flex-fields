@@ -1,0 +1,99 @@
+---
+title: "Create a dynamic schema adapter"
+description: "Connect a component family to form, table and infolist schema builders."
+---
+
+Add `FamilySchemaContract` to your existing semantic family registration. Keep
+using `collectComponentFamily()` with its actual field, column and entry surface
+definitions; the adapter does not replace their asset registrations or views.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Contracts\ComponentFamily;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaContract;
+
+$family = new ComponentFamily(
+    package: $package,
+    id: 'acme-name-family',
+    surfaces: [
+        'field' => 'acme-name-field',
+        'column' => 'acme-name-column',
+        'entry' => 'acme-name-entry',
+    ],
+    configurationVersion: 2,
+    valueVersion: 1,
+    schema: new FamilySchemaContract(
+        adapter: NameSchemaAdapter::class,
+        configuration: $configuration,
+        packageDefaults: ['maxLength' => 100],
+    ),
+);
+```
+
+Implement the typed adapter in your package. The example assumes the declared
+field class extends `FlexTextInput`; the column and entry keep their existing
+renderers. Replace the authorization condition with your application's policy.
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyRenderContext;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaAdapter;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaDefinition;
+use Filament\Forms\Components\Field;
+use Filament\Infolists\Components\Entry;
+use Filament\Tables\Columns\Column;
+
+final class NameSchemaAdapter implements FamilySchemaAdapter
+{
+    public function authorize(
+        FamilySchemaDefinition $definition,
+        FamilyRenderContext $context,
+    ): bool {
+        return $context->userKey !== null && $context->tenantId !== null;
+    }
+
+    public function configure(
+        Field|Column|Entry $surface,
+        FamilySchemaDefinition $definition,
+        FamilyRenderContext $context,
+        array $configuration,
+    ): void {
+        if ($surface instanceof FlexTextInput) {
+            $surface->maxLength($configuration['maxLength']);
+        }
+    }
+
+    public function rules(
+        FamilySchemaDefinition $definition,
+        FamilyRenderContext $context,
+        array $configuration,
+    ): array {
+        return ['string', 'max:'.$configuration['maxLength']];
+    }
+
+    public function migrateConfiguration(
+        array $configuration,
+        int $fromVersion,
+        int $toVersion,
+    ): array {
+        if ($fromVersion !== 1 || $toVersion !== 2) {
+            throw new InvalidArgumentException('Unsupported configuration migration.');
+        }
+
+        return ['maxLength' => $configuration['length'] ?? 80];
+    }
+}
+```
+
+Each render builds a fresh adapter. The frozen registry stores its class and
+configuration contract, not a user's values, record or tenant context.
+`authorize()` runs before constructing the surface. `rules()` supplies up to 128
+server-side string rules or `ValidationRule` objects. Required, hidden, disabled
+and readonly restrictions in a definition are added after configuration;
+stricter restrictions set by your adapter are preserved. Readonly/disabled
+fields are excluded from dehydration and validation while excluded. The component does not persist an ORM
+record or authorize your application's save endpoint for you.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

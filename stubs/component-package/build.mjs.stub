@@ -1,0 +1,55 @@
+import { build } from 'esbuild'
+import { mkdir, writeFile, readFile, rename, rm } from 'node:fs/promises'
+import { createHash, randomUUID } from 'node:crypto'
+import path from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+import { spawnSync } from 'node:child_process'
+
+const root = fileURLToPath(new URL('.', import.meta.url))
+// Development and production use the identical SDK/manifest protocol. Only
+// minification differs; every byte change receives its own immutable release.
+const development = process.argv.includes('--development')
+const php = process.env.PHP_BINARY || 'php'
+const locate = process.env.FLEX_FIELDS_ROOT ? null : spawnSync(php, ['-r', "require 'vendor/autoload.php'; echo dirname((new ReflectionClass('Bjanczak\\\\FilamentFlexFields\\\\Support\\\\Components\\\\ComponentDefinition'))->getFileName(), 4);"], { cwd: root, encoding: 'utf8' })
+if (locate && locate.status !== 0) throw Error('Install Composer dependencies first, or set FLEX_FIELDS_ROOT to an installed FLEX package.')
+const flexRoot = path.resolve(process.env.FLEX_FIELDS_ROOT || locate.stdout.trim())
+const { createFlexSdkPlugin } = await import(pathToFileURL(path.join(flexRoot, 'scripts/assets/flex-sdk-plugin.mjs')))
+const staging = path.join(root, 'resources', `.fff-build-${randomUUID()}`)
+const outputRoot = path.join(staging, 'outputs')
+await mkdir(outputRoot, { recursive: true })
+try {
+    const result = await build({ absWorkingDir: root, entryPoints: { field: 'resources/js/field.js', display: 'resources/css/display.css' },
+        outdir: outputRoot, bundle: true, format: 'esm', splitting: true, minify: !development, target: 'es2022', metafile: true, write: false,
+        plugins: [createFlexSdkPlugin()] })
+    for (const file of result.outputFiles) {
+        await mkdir(path.dirname(file.path), { recursive: true })
+        await writeFile(file.path, file.contents, { flag: 'wx' })
+    }
+    const declaration = { format: 1, package: '{{PACKAGE}}', entries: { '{{PREFIX}}-field': 'field.js' }, styles: { '{{PREFIX}}-display': 'display.css' }, helpers: {}, types: {}, resources: {} }
+    const metadata = path.join(staging, 'metafile.json'), declared = path.join(staging, 'declaration.json'), manifestPath = path.join(staging, 'manifest.json')
+    await writeFile(metadata, JSON.stringify(result.metafile), { flag: 'wx' })
+    await writeFile(declared, JSON.stringify(declaration), { flag: 'wx' })
+    const compiled = spawnSync(process.execPath, [path.join(flexRoot, 'scripts/assets/compile-esbuild-package.mjs'), metadata, declared, root, outputRoot, manifestPath],
+        { cwd: root, encoding: 'utf8', maxBuffer: 1024 * 1024, env: { ...process.env, PHP_BINARY: php } })
+    if (compiled.status !== 0) throw Error(compiled.stderr || compiled.error?.message || 'Manifest compilation failed')
+    const json = await readFile(manifestPath, 'utf8'), manifest = JSON.parse(json)
+    const destination = path.join(root, 'resources/dist', manifest.release)
+    await mkdir(path.dirname(destination), { recursive: true })
+    try { await rename(outputRoot, destination) }
+    catch (error) {
+        if (!['EEXIST', 'ENOTEMPTY'].includes(error.code)) throw error
+        for (const artifact of Object.values(manifest.artifacts)) {
+            const content = await readFile(path.join(destination, artifact.path))
+            if (content.length !== artifact.bytes || createHash('sha256').update(content).digest('hex') !== artifact.sha256) {
+                throw Error('Existing release has different bytes; it was not overwritten.')
+            }
+        }
+    }
+    // Artifact generation is complete before replacing the manifest pointer.
+    const pointer = path.join(root, 'resources', `.fff-manifest-${randomUUID()}.json`)
+    try {
+        await writeFile(pointer, json, { flag: 'wx' })
+        await rename(pointer, path.join(root, 'resources/asset-manifest.json'))
+    } finally { await rm(pointer, { force: true }) }
+    console.log(`Built {{PACKAGE}}: ${manifest.release}`)
+} finally { await rm(staging, { recursive: true, force: true }) }

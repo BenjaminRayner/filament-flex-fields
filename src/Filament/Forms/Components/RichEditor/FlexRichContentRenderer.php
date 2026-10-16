@@ -251,7 +251,7 @@ class FlexRichContentRenderer extends RichContentRenderer
 
     protected function attachmentManifestRepository(): RichEditorAttachmentManifestRepository
     {
-        return $this->attachmentManifestRepository ??= new RichEditorAttachmentManifestRepository;
+        return $this->attachmentManifestRepository ??= app(RichEditorAttachmentManifestRepository::class);
     }
 
     /**

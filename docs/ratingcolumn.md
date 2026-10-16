@@ -1,6 +1,7 @@
 ---
 title: "RatingColumn"
 description: Visual star or icon rating display for Filament tables with fractional fill support.
+icon: "chart-no-axes-column"
 ---
 
 [← Back to Table of Contents](/docs/index)
@@ -14,7 +15,7 @@ A table column for displaying numeric ratings as a series of stars or custom ico
 | **Class** | `Bjanczak\FilamentFlexFields\Filament\Tables\Columns\RatingColumn` |
 | **State type** | `float\|int\|null` |
 | **Model cast** | `'rating' => 'float'` |
-| **Playground** | `rating-column` slug in Flex Fields playground |
+| **Playground** | `rating` → **Demo → Table column** |
 | **Default max** | `5` |
 | **Default icon** | `heroicon-s-star` |
 
@@ -43,7 +44,7 @@ RatingColumn::make('satisfaction')
 ### State & formatting
 
 #### Stored value
-The column expects a numeric value (integer or float). Values exceeding the `stars()` count are capped at the maximum.
+The column expects a finite numeric value (integer, float or numeric string). Values exceeding the `stars()` count are capped at the maximum. Empty, negative, nonfinite or malformed values display an empty cell. Column formatting does not validate or write database values.
 
 ```php
 $record->rating; // 4.5
@@ -62,17 +63,34 @@ RatingColumn::make('rating')
 
 ---
 
+### Shared assets and table options
+
+RatingColumn is registered as an independent column through the FLEX component definition API. It shares rating styles and icon markup with RatingField and loads no form JavaScript. Each rendered cell has its own asset boundary, including identical ratings on different records.
+
+Normal TextColumn options remain available: `label()`, `sortable()`, `tooltip()`, `alignment()`, `toggleable()` and relationship paths follow Filament's table API. Configure rating appearance with `ratingColor()`, `ratingIcon()` and `ratingSize()`; these are separate from TextColumn's text-color/icon settings.
+
+```php
+RatingColumn::make('average_rating')
+    ->label('Average rating')
+    ->ratingColor('success')
+    ->ratingSize('sm')
+    ->sortable()
+    ->tooltip('Average customer review score');
+```
+
+Use `criticalStyles()` only for a table visible in the initial page. Hidden tabs and closed modals should keep the normal lazy behavior.
+
 ### Configuration API
 
 All methods accept `Closure` unless noted.
 
 | Method | Type | Default | Description |
 |--------|------|---------|-------------|
-| `stars(int\|Closure $count)` | Setup | `5` | Maximum number of icons to show |
+| `stars(int\|Closure $count)` | Setup | `5` | Maximum number of icons to show, from 1 to 100 |
 | `ratingColor(string\|Closure $color)` | Setup | `'warning'` | Icon fill color |
-| `ratingIcon(string\|Closure $icon)` | Setup | `star` | Filament icon string |
+| `ratingIcon(string\|BackedEnum\|Htmlable\|Closure\|null $icon)` | Setup | `star` | Filament icon string |
 | `showValue(bool\|Closure $cond)` | Setup | `true` | Show numeric value text |
-| `ratingSize(string\|Closure $size)` | Setup | `'md'` | `sm`, `md`, `lg` |
+| `ratingSize(string\|ControlSize\|Closure $size)` | Setup | `'md'` | `sm`, `md`, `lg` |
 
 ---
 
@@ -97,7 +115,7 @@ public static function table(Table $table): Table
 
 ### Playground
 
-`/admin/flex-fields-playground/rating-column`
+`/admin/flex-fields/rating?variant=table-column`
 
 See [Playground](/docs/index#playground) for setup.
 
@@ -118,8 +136,8 @@ See [Playground](/docs/index#playground) for setup.
 | Class | Role |
 |-------|------|
 | `fff-rating-column` | Root wrapper |
-| `fff-rating-column__icons` | Container for all icons |
-| `fff-rating-column__icon-wrapper` | Individual icon container |
-| `fff-rating-column__icon-bg` | Background (empty) icon |
-| `fff-rating-column__icon-fill` | Foreground (filled) icon |
-| `fff-rating-column__value` | Numeric value text |
+| `fff-rating__items` | Container for all icons |
+| `fff-rating__item` | Individual icon container |
+| `fff-rating__icon--empty` | Background (empty) icon |
+| `fff-rating__icon-clip` | Foreground (filled) icon |
+| `fff-rating__value` | Numeric value text |

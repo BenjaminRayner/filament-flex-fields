@@ -13,8 +13,8 @@ final class FieldTypeSettingsBuilder
 {
     public static function section(): Section
     {
-        return Section::make(__('filament-flex-fields::default.schema.field_type_settings'))
-            ->description(__('filament-flex-fields::default.schema.field_type_settings_help'))
+        return Section::make(fn () => __('filament-flex-fields::default.schema.field_type_settings'))
+            ->description(fn () => __('filament-flex-fields::default.schema.field_type_settings_help'))
             ->schema([
                 Group::make(FieldTypeAdminSchemaRegistry::components())
                     ->columnSpanFull(),

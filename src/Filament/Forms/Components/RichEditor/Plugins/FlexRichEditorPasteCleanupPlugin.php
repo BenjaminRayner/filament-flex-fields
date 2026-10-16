@@ -36,12 +36,12 @@ class FlexRichEditorPasteCleanupPlugin implements RichContentPlugin
      */
     public function getTipTapJsExtensions(): array
     {
-        return [
-            FilamentAsset::getScriptSrc(
-                FlexFieldAssets::FLEX_RICH_EDITOR_PASTE_EXTENSION_SCRIPT_ID,
-                FilamentFlexFieldsPlugin::PACKAGE_NAME,
-            ),
-        ];
+        $source = FilamentAsset::getScriptSrc(
+            FlexFieldAssets::FLEX_RICH_EDITOR_PASTE_EXTENSION_SCRIPT_ID,
+            FilamentFlexFieldsPlugin::PACKAGE_NAME,
+        );
+
+        return [$source.(str_contains($source, '?') ? '&' : '?').'fff-mode='.rawurlencode($this->mode)];
     }
 
     /**

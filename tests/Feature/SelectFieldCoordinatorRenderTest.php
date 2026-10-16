@@ -2,7 +2,14 @@
 
 declare(strict_types=1);
 
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CountryField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CurrencyField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FontSelect;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\IconPickerField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\PhoneField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TagsField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TimezoneField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\UserSelect;
 use Bjanczak\FilamentFlexFields\Tests\Support\AlpineJsHtml;
 use Bjanczak\FilamentFlexFields\Tests\Support\TestableTranslatableForm;
@@ -343,4 +350,36 @@ it('headless select blade binds live entangle for wire sync', function (): void 
         ->toContain('company_size')
         ->toContain('entangle(')
         ->not->toContain('fi-select-input-native');
+});
+
+it('connects field labels to real controls across the shared select family before hydration', function (): void {
+    TestableTranslatableForm::$formSchema = [
+        SelectField::make('plain')->label('Plain')->options(['one' => 'One']),
+        SelectField::make('native')->label('Native')->native()->options(['one' => 'One']),
+        SelectField::make('inline')->label('Inline')->searchable()->inlineSearch()->options(['one' => 'One']),
+        SelectField::make('multiple')->label('Multiple')->multiple()->options(['one' => 'One']),
+        UserSelect::make('user')->label('User')->options(['one' => 'One']),
+        CountryField::make('country')->label('Country'),
+        TimezoneField::make('timezone')->label('Timezone'),
+        PhoneField::make('phone')->label('Phone'),
+        CurrencyField::make('currency')->label('Currency'),
+        IconPickerField::make('icon')->label('Icon'),
+        FontSelect::make('font')->label('Font'),
+        TagsField::make('tags')->label('Tags'),
+    ];
+    $html = Livewire::test(TestableTranslatableForm::class)->html(false);
+    $document = new DOMDocument;
+    @$document->loadHTML('<?xml encoding="UTF-8">'.$html);
+    $xpath = new DOMXPath($document);
+    $labels = $xpath->query('//label[@for]');
+    expect($labels->length)->toBeGreaterThanOrEqual(12);
+
+    foreach ($labels as $label) {
+        $id = $label->getAttribute('for');
+        $targets = $xpath->query('//*[@id="'.$id.'"]');
+        expect($targets->length)->toBe(1, "Unique label target: {$id}");
+        $target = $targets->item(0);
+        expect(in_array($target->nodeName, ['button', 'input', 'select', 'textarea'], true))->toBeTrue("Labelable target: {$id}")
+            ->and($target->getAttribute('type'))->not->toBe('hidden');
+    }
 });

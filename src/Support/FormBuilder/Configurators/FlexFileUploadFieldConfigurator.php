@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexFileUpload;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\FlexSpatieMediaLibraryFileUpload;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Contracts\FieldConfigurator;
+use Bjanczak\FilamentFlexFields\Support\Media\Images\Queue\ConversionQueueOptions;
 use Filament\Schemas\Components\Component;
 
 final class FlexFileUploadFieldConfigurator implements FieldConfigurator
@@ -88,6 +89,26 @@ final class FlexFileUploadFieldConfigurator implements FieldConfigurator
             $field->size($config['size']);
         }
 
+        if (array_key_exists('instant_upload', $config)) {
+            $field->instantUpload((bool) $config['instant_upload']);
+        }
+
+        if (array_key_exists('compact_header', $config)) {
+            $field->compactHeader((bool) $config['compact_header']);
+        }
+
+        if (isset($config['upload_layout'])) {
+            $field->uploadLayout((string) $config['upload_layout']);
+        }
+
+        if (isset($config['grid_columns'])) {
+            $field->gridColumns((int) $config['grid_columns']);
+        }
+
+        if (isset($config['avatar_size'])) {
+            $field->avatarSize(is_int($config['avatar_size']) ? $config['avatar_size'] : (string) $config['avatar_size']);
+        }
+
         if (array_key_exists('store_metadata_in', $config) && filled($config['store_metadata_in'])) {
             $field->storeMetadataIn((string) $config['store_metadata_in']);
         }
@@ -100,6 +121,13 @@ final class FlexFileUploadFieldConfigurator implements FieldConfigurator
 
         if (array_key_exists('optimize_images', $config)) {
             $field->optimizeImages((bool) $config['optimize_images']);
+        }
+
+        if (array_key_exists('queue_image_conversions', $config)) {
+            $field->queueImageConversions((bool) $config['queue_image_conversions']);
+        }
+        if (isset($config['image_conversion_queue']) && is_array($config['image_conversion_queue'])) {
+            $field->imageConversionQueue(new ConversionQueueOptions(...$config['image_conversion_queue']));
         }
 
         if (array_key_exists('max_image_width', $config)) {

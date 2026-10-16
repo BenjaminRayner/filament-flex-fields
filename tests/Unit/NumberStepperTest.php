@@ -5,9 +5,10 @@ declare(strict_types=1);
 use Bjanczak\FilamentFlexFields\Concerns\HasFlexFields;
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\NumberStepper;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\NumberStepper\NumericValue;
 use Bjanczak\FilamentFlexFields\Support\Playground\NumberStepperPlayground;
+use Bjanczak\FilamentFlexFields\Support\Playground\SegmentControlPlayground;
 use Bjanczak\FilamentFlexFields\Tests\Support\TestableNumberStepperForm;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
@@ -169,15 +170,16 @@ it('stores and reads flex field values on models', function () {
         ->and($model->getCasts()['flex_field_values'])->toBe('array');
 });
 
-it('merges playground default state from dedicated variant classes', function () {
-    $state = app(FlexFieldsPlaygroundBuilder::class)->defaultState();
+it('provides independent default state for dedicated variant classes', function () {
+    $state = app(NumberStepperPlayground::class)->defaultState();
 
     expect($state)->toHaveKeys([
         'number_stepper__sm',
         'number_stepper__custom_icons',
         'number_stepper__primary',
-        'segment_control__ghost_reference',
     ]);
+    expect(app(SegmentControlPlayground::class)->defaultState())
+        ->toHaveKey('segment_control__ghost_reference');
 });
 
 it('registers hero number stepper playground variants', function () {
@@ -239,13 +241,68 @@ it('normalizes the live debounce delay into milliseconds for the alpine componen
 });
 
 it('debounces the committed value in the alpine component instead of committing on every click', function () {
-    $js = file_get_contents(__DIR__.'/../../resources/js/components/number-stepper.js');
+    $entry = file_get_contents(__DIR__.'/../../resources/js/components/number-stepper.js');
+    $js = file_get_contents(__DIR__.'/../../resources/js/number-stepper/controller.js');
+    $display = file_get_contents(__DIR__.'/../../resources/js/number-stepper/display.js');
 
-    expect($js)
+    expect($entry)->toContain('createStepperRuntime')
+        ->and($js)
         ->toContain('commitDebounced()')
-        ->toContain('clearTimeout(this.commitTimer)')
+        ->toContain('this._stepperScope.timeout(')
         ->toContain('this.$wire.set(this.statePath, this.state, true)')
+        ->and($display)
         ->toContain('lastFlowValue')
         ->toContain('duration: 380')
         ->toContain('Object.is(next, this.lastFlowValue)');
+});
+
+it('uses the selected suffix forms for SSR and runtime without changing static suffixes', function () {
+    $field = NumberStepper::make('seats')->locale('en')->suffixForms(['one' => 'seat', 'other' => 'seats']);
+    expect($field->formatDisplayValue(1))->toBe('1'."\u{00a0}".'seat')
+        ->and($field->formatDisplayValue(2))->toBe('2'."\u{00a0}".'seats')
+        ->and(NumberStepper::make('items')->suffix('items')->formatDisplayValue(1))->toBe('1'."\u{00a0}".'items');
+
+    $localized = NumberStepper::make('seats')->locale('pl')->suffixForms(['one' => 'miejsce', 'few' => 'miejsca', 'many' => 'miejsc', 'other' => 'miejsca']);
+    expect($localized->getSuffixForValue(1))->toBe('miejsce')
+        ->and($localized->getSuffixForValue(2))->toBe('miejsca')
+        ->and($localized->getSuffixForValue(5))->toBe('miejsc');
+});
+
+it('keeps boundary buttons available for feedback while disabling the whole field normally', function () {
+    TestableNumberStepperForm::$formSchema = [NumberStepper::make('count')->minValue(1)->maxValue(5)->default(1)];
+    $html = Livewire::test(TestableNumberStepperForm::class)->html();
+    expect($html)->toContain('aria-disabled="true"', 'role="spinbutton"', 'aria-valuemin="1"', 'aria-valuemax="5"');
+    expect(NumberStepper::make('count')->disabled()->canStepValue(1, 1))->toBeFalse();
+});
+
+it('validates submitted numeric state before casting can hide malformed values', function () {
+    TestableNumberStepperForm::$formSchema = [NumberStepper::make('count')->minValue(1)->maxValue(5)->default(1)];
+    foreach (['bad', ['count' => 2], true, 0, 6, 1.5, '1e999', '9007199254740992'] as $value) {
+        Livewire::test(TestableNumberStepperForm::class)->set('data.count', $value)->call('save')->assertHasErrors(['data.count']);
+    }
+    Livewire::test(TestableNumberStepperForm::class)->set('data.count', '2')->call('save')->assertHasNoErrors();
+});
+
+it('rejects nonfinite in-process numbers instead of silently casting them', function () {
+    expect(NumericValue::parse(INF))->toBeNull()
+        ->and(NumericValue::parse(NAN))->toBeNull();
+});
+
+it('matches browser rounding without overflowing the safe integer display', function () {
+    expect(NumberStepper::make('value')->formatDisplayMain(-1.5))->toBe('-1')
+        ->and(NumberStepper::make('value')->formatDisplayMain(9007199254740991))->toBe('9007199254740991');
+});
+
+it('validates nullable bounds and decimal mode with their final configuration', function () {
+    TestableNumberStepperForm::$formSchema = [NumberStepper::make('count')->minValue(1)->minValue(2)->maxValue(5)->nullable()->integer()->integer(false)];
+    Livewire::test(TestableNumberStepperForm::class)->set('data.count', null)->call('save')->assertHasNoErrors();
+    Livewire::test(TestableNumberStepperForm::class)->set('data.count', 2.5)->call('save')->assertHasNoErrors();
+    Livewire::test(TestableNumberStepperForm::class)->set('data.count', 1)->call('save')->assertHasErrors(['data.count']);
+});
+
+it('rejects malformed numeric configuration before rendering', function () {
+    expect(fn () => NumberStepper::make('count')->step(0)->getNumericPolicy())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => NumberStepper::make('count')->minValue(5)->maxValue(1)->getNumericPolicy())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => NumberStepper::make('count')->decimalPlaces(21)->getDecimalPlaces())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => NumberStepper::make('count')->suffixForms(['one' => 'seat'])->getSuffixForms())->toThrow(InvalidArgumentException::class);
 });

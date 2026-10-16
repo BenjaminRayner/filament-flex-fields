@@ -27,7 +27,7 @@ trait BuildsCommonAdminFields
     {
         return [
             Select::make(self::settingsPath('size'))
-                ->label(__('filament-flex-fields::default.schema.settings.size'))
+                ->label(fn () => __('filament-flex-fields::default.schema.settings.size'))
                 ->options([
                     'xs' => 'XS',
                     'sm' => 'SM',
@@ -37,8 +37,8 @@ trait BuildsCommonAdminFields
                 ])
                 ->native(false),
             Select::make(self::settingsPath('variant'))
-                ->label(__('filament-flex-fields::default.schema.settings.variant'))
-                ->options([
+                ->label(fn () => __('filament-flex-fields::default.schema.settings.variant'))
+                ->options(fn () => [
                     'default' => __('filament-flex-fields::default.schema.settings.variant_default'),
                     'primary' => __('filament-flex-fields::default.schema.settings.variant_primary'),
                     'bordered' => __('filament-flex-fields::default.schema.settings.variant_bordered'),
@@ -54,13 +54,13 @@ trait BuildsCommonAdminFields
     {
         return [
             TextInput::make(self::settingsPath('min'))
-                ->label(__('filament-flex-fields::default.schema.settings.min'))
+                ->label(fn () => __('filament-flex-fields::default.schema.settings.min'))
                 ->numeric(),
             TextInput::make(self::settingsPath('max'))
-                ->label(__('filament-flex-fields::default.schema.settings.max'))
+                ->label(fn () => __('filament-flex-fields::default.schema.settings.max'))
                 ->numeric(),
             TextInput::make(self::settingsPath('step'))
-                ->label(__('filament-flex-fields::default.schema.settings.step'))
+                ->label(fn () => __('filament-flex-fields::default.schema.settings.step'))
                 ->numeric(),
         ];
     }

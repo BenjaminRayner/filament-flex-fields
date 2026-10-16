@@ -51,9 +51,12 @@ export function releaseOverlayExclusive(id) {
  *   exclusive?: boolean,
  *   manageVisibility?: boolean,
  *   onDisplace?: (() => void) | null,
+ *   onAnchorUnavailable?: (() => void) | null,
+ *   onPositioned?: (() => void) | null,
  *   minWidth?: number,
  *   matchTriggerWidth?: boolean,
  *   gap?: number,
+ *   resolveFloatingPosition?: (() => {left: number, top: number} | null) | null,
  * }} options
  */
 export function openOverlayPanel(options) {
@@ -80,6 +83,11 @@ export function updateOverlayPanelPosition(id) {
     runtime?.updatePosition?.(id)
 }
 
+/** Retain the open surface and its exclusive claim when its active field changes. */
+export function retargetOverlayPanel(id, anchor) {
+    return ensureOverlayRuntimeBridge()?.retarget?.(id, anchor) ?? false
+}
+
 /**
  * Sync an open overlay to panel/sheet after a breakpoint flip while open.
  *
@@ -88,8 +96,7 @@ export function updateOverlayPanelPosition(id) {
  */
 export function setOverlayPanelMode(id, mode) {
     const runtime = ensureOverlayRuntimeBridge()
-
-    runtime?.setMode?.(id, mode)
+    return runtime?.setMode?.(id, mode) === true
 }
 
 /**

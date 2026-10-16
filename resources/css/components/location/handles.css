@@ -1,0 +1,15 @@
+.fff-location__point { width: 18px; height: 18px; padding: 0; border: 2px solid #fff; border-radius: 50%; background: var(--fff-location-color, #3b82f6); box-shadow: 0 1px 3px #0002; cursor: pointer; }
+.fff-location__vertex { width: .875rem; height: .875rem; border: 2px solid var(--fff-location-color, #3b82f6); border-radius: 50%; background: #fff; cursor: grab; }
+.fff-location__vertex.is-midpoint { width: .625rem; height: .625rem; opacity: .8; cursor: pointer; }
+/* Editing handles share one footprint; corner shape and cursor describe the operation. */
+.fff-location__vertex.is-radius { cursor: ew-resize; width: 16px; height: 16px; }
+.fff-location__vertex.is-resize, .fff-location__vertex.is-scale { border-radius: 4px; width: 14px; height: 14px; }
+.fff-location__vertex.is-corner-0, .fff-location__vertex.is-corner-2 { cursor: nesw-resize; }
+.fff-location__vertex.is-corner-1, .fff-location__vertex.is-corner-3 { cursor: nwse-resize; }
+.fff-location__vertex.is-dragging, .fff-location__point.is-move.is-dragging { cursor: grabbing; }
+.fff-location__point.is-move { cursor: grab; }
+/* The visible dot remains compact; its pointer target includes an invisible grip halo. */
+.fff-location__vertex::before { content: ''; position: absolute; inset: -9px; border-radius: inherit; }
+.fff-location__vertex.is-midpoint::before { inset: -6px; }
+.fff-location__handle { position: absolute; top: 0; left: 0; z-index: 3; margin: 0; touch-action: none; transition: none; will-change: transform; }
+.fff-location__edit-preview { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }

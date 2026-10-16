@@ -1,0 +1,7 @@
+.fff-address-autocomplete__token-error,
+.fff-address-autocomplete__selection-error {
+    margin-block: .375rem 0;
+    font-size: .8125rem;
+    line-height: 1.25rem;
+    color: var(--fff-field-error-border, #dc2626);
+}

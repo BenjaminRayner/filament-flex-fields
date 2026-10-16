@@ -176,11 +176,11 @@
 .fff-progress-bar__marker--current {
     position: absolute;
     top: 50%;
-    left: var(--fff-progress-bar-marker-position, 0%);
+    inset-inline-start: var(--fff-progress-bar-marker-position, 0%);
     z-index: 1;
     color: var(--fff-progress-bar-accent);
     transform: translate(-50%, -50%);
-    transition: left var(--fff-progress-fill-duration) ease;
+    transition: inset-inline-start var(--fff-progress-fill-duration) ease;
 }
 
 .fff-progress-bar__marker--start,
@@ -224,15 +224,15 @@
 }
 
 .fff-progress-bar__rail-fill {
-    left: 0;
+    inset-inline-start: 0;
     width: var(--fff-progress-bar-fill, 0%);
     background: var(--fff-progress-bar-accent);
     transition: width var(--fff-progress-fill-duration) ease;
 }
 
 .fff-progress-bar__rail-remainder {
-    right: 0;
-    left: var(--fff-progress-bar-fill, 0%);
+    inset-inline-end: 0;
+    inset-inline-start: var(--fff-progress-bar-fill, 0%);
     background: repeating-linear-gradient(
         90deg,
         var(--fff-progress-bar-rail) 0,
@@ -298,7 +298,7 @@
 .fff-progress-bar__segment-dot {
     position: absolute;
     top: 50%;
-    left: var(--fff-progress-bar-segment-dot-position, 0%);
+    inset-inline-start: var(--fff-progress-bar-segment-dot-position, 0%);
     z-index: 1;
     width: calc(var(--fff-progress-bar-rail-h) + 0.25rem);
     height: calc(var(--fff-progress-bar-rail-h) + 0.25rem);
@@ -308,7 +308,7 @@
         0 0 0 2px rgb(255 255 255),
         0 1px 3px rgb(0 0 0 / 0.12);
     transform: translate(-50%, -50%);
-    transition: left var(--fff-progress-fill-duration) ease;
+    transition: inset-inline-start var(--fff-progress-fill-duration) ease;
 }
 
 .dark .fff-progress-bar__segment-dot {
@@ -529,4 +529,46 @@
 
 .fff-progress-bar__pill.is-active {
     background: var(--fff-progress-bar-pill-color, var(--fff-progress-bar-accent));
+}
+
+/* Width-adaptive capsules are painted by CSS from the first frame. */
+.fff-progress-bar__pills--auto {
+    display:block;
+    position:relative;
+    background:var(--fff-progress-bar-rail);
+    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='22' viewBox='0 0 7 22'%3E%3Crect width='4' height='22' rx='2' fill='black'/%3E%3C/svg%3E");
+    mask-size:calc(var(--fff-progress-bar-pill-width) + var(--fff-progress-bar-pill-gap)) 100%;
+    mask-repeat:space no-repeat;
+}
+.fff-progress-bar__auto-pill-fill {
+    display:block;
+    block-size:100%;
+    inline-size:var(--fff-progress-bar-fill,0%);
+    background:linear-gradient(to right,var(--fff-progress-bar-gradient-from),var(--fff-progress-bar-gradient-to));
+    transition:inline-size var(--fff-progress-fill-duration) ease;
+}
+.fff-progress-bar.is-fill-static .fff-progress-bar__auto-pill-fill { transition:none; }
+.fff-progress-bar:dir(rtl) .fff-progress-bar__auto-pill-fill { background:linear-gradient(to left,var(--fff-progress-bar-gradient-from),var(--fff-progress-bar-gradient-to)); }
+.fff-progress-bar.is-indeterminate .fff-progress-bar__auto-pill-fill { inline-size:35%; animation:fff-progress-bar-indeterminate 1.35s ease-in-out infinite; }
+.fff-progress-bar__pills--fixed .fff-progress-bar__pill { flex:1 1 0; min-width:0; }
+@media(prefers-reduced-motion:reduce) {
+    .fff-progress-bar__fill, .fff-progress-bar__auto-pill-fill { animation:none !important; transition:none; }
+}
+
+.fff-progress-bar:dir(rtl) .fff-progress-bar__marker--current,
+.fff-progress-bar:dir(rtl) .fff-progress-bar__segment-dot { transform:translate(50%,-50%); }
+.fff-progress-bar.is-indeterminate .fff-progress-bar__pill { background:var(--fff-progress-bar-accent); animation:fff-progress-pill-pulse 1.35s ease-in-out infinite; }
+@keyframes fff-progress-pill-pulse { 0%,100% { opacity:.25; } 50% { opacity:.8; } }
+@media(prefers-reduced-motion:reduce) { .fff-progress-bar.is-indeterminate .fff-progress-bar__pill { animation:none; opacity:.6; } }
+
+.fff-progress-bar__rail-region { position:relative; display:flex; align-items:center; flex:1 1 auto; min-width:0; min-height:var(--fff-progress-bar-marker-size); }
+.fff-progress-bar__marker--current { inset-inline-start:clamp(calc(var(--fff-progress-bar-marker-size) / 2), var(--fff-progress-bar-marker-position,0%), calc(100% - var(--fff-progress-bar-marker-size) / 2)); }
+.fff-progress-bar__segment-dot { inset-inline-start:clamp(calc((var(--fff-progress-bar-rail-h) + .25rem) / 2), var(--fff-progress-bar-segment-dot-position,0%), calc(100% - (var(--fff-progress-bar-rail-h) + .25rem) / 2)); }
+
+@keyframes fff-progress-bar-indeterminate-rtl { 0% { transform:translateX(120%); } 100% { transform:translateX(-320%); } }
+.fff-progress-bar.is-indeterminate:dir(rtl) .fff-progress-bar__fill,
+.fff-progress-bar.is-indeterminate:dir(rtl) .fff-progress-bar__auto-pill-fill { animation-name:fff-progress-bar-indeterminate-rtl; }
+@media(prefers-reduced-motion:reduce) {
+    .fff-progress-bar__segment-fill, .fff-progress-bar__segment-dot, .fff-progress-bar__rail-fill,
+    .fff-progress-bar__rail-remainder, .fff-progress-bar__marker--current { transition:none; }
 }

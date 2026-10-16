@@ -1,0 +1,54 @@
+---
+title: "Extension recipes"
+description: "Choose a practical architecture for composite fields, display families and optional editors."
+---
+
+Choose the smallest set of surfaces and behaviors that matches your extension.
+These recipes combine the documented APIs; they do not introduce another build
+system or configuration format.
+
+<AccordionGroup>
+  <Accordion title="Composite field with an existing FLEX input">
+    Generate a family, replace the default child schema with actual FLEX fields, and
+    store an object in a JSON attribute. Use child validation and reject unknown keys
+    in your parent value contract. Share parent display CSS across the column and entry.
+    Follow [quickstart](/docs/extensions/quickstart), then
+    [full child PHP configuration](/docs/extensions/child-php-api).
+  </Accordion>
+  <Accordion title="Select with a relationship inside a parent">
+    Declare a Select child slot, render it through `ChildRenderer`, then configure the
+    returned Select with its real `relationship()` and query callbacks in trusted PHP.
+    Preserve the child instance and native model context. Use typed JSON options for
+    portable choices such as size or limits; do not serialize relation closures.
+    Follow [Select composition](/docs/extensions/child-select) and
+    [custom child factories](/docs/extensions/custom-child-factories).
+  </Accordion>
+  <Accordion title="Field plus a lightweight table column and infolist entry">
+    Declare a semantic family with three independent identities. Put common CSS under
+    a primitive display owner and reference it through `stylesFrom`. Add JS only to
+    the field. Call the same escaped value formatter from the two display templates.
+    Follow [family contracts](/docs/extensions/packages-and-families) and
+    [columns and entries](/docs/extensions/columns-and-entries).
+  </Accordion>
+  <Accordion title="Optional editor loaded only when used">
+    Declare an optional capability and a lazy module. Enable it for the rendered
+    instance that actually supports editing. Place controls inside a prepared custom
+    surface and own all listeners and workers with that surface or factory.
+    Follow [asset ownership](/docs/extensions/asset-ownership),
+    [build](/docs/extensions/build) and [custom surfaces](/docs/extensions/surfaces).
+  </Accordion>
+  <Accordion title="Extension selected through saved schemas">
+    Add a `FamilySchemaContract` with typed configuration and a trusted adapter.
+    Use the family builders to render each supported surface. Validate writes through
+    an explicit save policy and persist versioned snapshots for future migrations.
+    Follow [schema adapters](/docs/extensions/schema-adapter),
+    [submission](/docs/extensions/submission) and [migrations](/docs/extensions/migrations).
+  </Accordion>
+  <Accordion title="Shared use in multiple panels or tenants">
+    Register structural metadata once at provider boot. Supply request-local owner,
+    user, tenant, locale and defaults through `FamilyRenderContext`. Give independent
+    rendered instances distinct identities. Keep configuration values and record state
+    outside process-lived registration metadata. See
+    [schema context reference](/docs/extensions/schema-reference).
+  </Accordion>
+</AccordionGroup>

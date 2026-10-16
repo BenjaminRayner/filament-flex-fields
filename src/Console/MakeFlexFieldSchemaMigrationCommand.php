@@ -7,7 +7,9 @@ namespace Bjanczak\FilamentFlexFields\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'make:flex-field-schema-migration')]
 final class MakeFlexFieldSchemaMigrationCommand extends Command
 {
     protected $signature = 'make:flex-field-schema-migration {name : The migration name}';

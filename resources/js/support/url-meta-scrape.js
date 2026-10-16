@@ -1,12 +1,16 @@
+import { createSharedRequestPool } from '../runtime/network/shared-request-pool.js'
+
 const memoryCache = new Map()
 
-const inFlightRequests = new Map()
+const requests = createSharedRequestPool()
+const canonicalUrl = value => {
+    try { const url = new URL(value); url.hash = ''; return url.href } catch { return value }
+}
+const cacheKey = (url, scope) => JSON.stringify([scope, canonicalUrl(url)])
 
 const DEFAULT_MAX_ENTRIES = 64
 
 const DEFAULT_TTL_MS = 300_000
-
-const DEFAULT_FETCH_TIMEOUT_MS = 15_000
 
 export const DEFAULT_IMAGE_PRELOAD_TIMEOUT_MS = 5_000
 
@@ -44,7 +48,7 @@ export function isValidHttpUrl(value) {
     try {
         const url = new URL(value)
 
-        return url.protocol === 'http:' || url.protocol === 'https:'
+        return typeof value === 'string' && value.length <= 2048 && !/[\x00-\x20\x7f\\]/.test(value) && ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password && (!url.port || ['80', '443'].includes(url.port))
     } catch {
         return false
     }
@@ -80,19 +84,22 @@ export function isScrapeCandidate(url, minLength = 10) {
     }
 }
 
-export function readUrlMetaCache(url) {
-    const cached = memoryCache.get(url)
+export function readUrlMetaCache(url, scope = '') {
+    const key = cacheKey(url, scope)
+    const cached = memoryCache.get(key)
 
     if (! cached) {
         return null
     }
 
     if (cached.expiresAt <= Date.now()) {
-        memoryCache.delete(url)
+        memoryCache.delete(key)
 
         return null
     }
 
+    memoryCache.delete(key)
+    memoryCache.set(key, cached)
     return cached.value
 }
 
@@ -101,8 +108,11 @@ export function readUrlMetaCache(url) {
  * @param {UrlMetaPreview} value
  * @param {number} ttlMs
  */
-export function writeUrlMetaCache(url, value, ttlMs = DEFAULT_TTL_MS, maxEntries = DEFAULT_MAX_ENTRIES) {
-    if (memoryCache.size >= maxEntries) {
+export function writeUrlMetaCache(url, value, ttlMs = DEFAULT_TTL_MS, maxEntries = DEFAULT_MAX_ENTRIES, scope = '') {
+    if (maxEntries <= 0 || ttlMs <= 0) return
+    const key = cacheKey(url, scope)
+    memoryCache.delete(key)
+    while (memoryCache.size >= maxEntries) {
         const oldestKey = memoryCache.keys().next().value
 
         if (oldestKey) {
@@ -110,7 +120,7 @@ export function writeUrlMetaCache(url, value, ttlMs = DEFAULT_TTL_MS, maxEntries
         }
     }
 
-    memoryCache.set(url, {
+    memoryCache.set(key, {
         value,
         expiresAt: Date.now() + ttlMs,
     })
@@ -120,18 +130,20 @@ export function writeUrlMetaCache(url, value, ttlMs = DEFAULT_TTL_MS, maxEntries
  * @param {...(AbortSignal|undefined|null)} signals
  */
 export function mergeAbortSignals(...signals) {
+    const active = signals.filter(Boolean)
+    if (typeof AbortSignal.any === 'function') return AbortSignal.any(active)
     const controller = new AbortController()
-
-    for (const signal of signals.filter(Boolean)) {
-        if (signal.aborted) {
-            controller.abort()
-
-            return controller.signal
-        }
-
-        signal.addEventListener('abort', () => controller.abort(), { once: true })
+    const listeners = new Map()
+    const cleanup = () => {
+        for (const [signal, listener] of listeners) signal.removeEventListener('abort', listener)
+        listeners.clear()
     }
-
+    for (const signal of active) {
+        if (signal.aborted) { cleanup(); controller.abort(signal.reason); break }
+        const listener = () => { cleanup(); controller.abort(signal.reason) }
+        listeners.set(signal, listener)
+        signal.addEventListener('abort', listener, { once: true })
+    }
     return controller.signal
 }
 
@@ -142,54 +154,35 @@ export function mergeAbortSignals(...signals) {
  * @returns {Promise<UrlMetaPreview>}
  */
 export async function fetchUrlMeta(scrapeUrl, url, signal) {
-    const cached = readUrlMetaCache(url)
+    if (signal?.aborted) throw signal.reason ?? new DOMException('Request cancelled.', 'AbortError')
+    const cached = readUrlMetaCache(url, scrapeUrl)
+    if (cached) return cached
 
-    if (cached) {
-        return cached
-    }
-
-    if (inFlightRequests.has(url)) {
-        return inFlightRequests.get(url)
-    }
-
-    const request = (async () => {
-        const timeoutSignal = typeof AbortSignal.timeout === 'function'
-            ? AbortSignal.timeout(DEFAULT_FETCH_TIMEOUT_MS)
-            : null
-
-        const response = await fetch(`${scrapeUrl}?url=${encodeURIComponent(url)}`, {
-            headers: {
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            credentials: 'same-origin',
-            signal: mergeAbortSignals(signal, timeoutSignal),
-        })
-
-        if (! response.ok) {
-            throw new Error('url_meta_scrape_failed')
+    const endpoint = new URL(scrapeUrl, globalThis.document?.baseURI ?? globalThis.location?.href)
+    endpoint.searchParams.set('url', canonicalUrl(url))
+    return requests.request(endpoint.href, async (transportSignal) => {
+        if (endpoint.origin !== globalThis.location?.origin) throw new Error('url_meta_endpoint_origin')
+        let response
+        for (let attempt = 0; attempt < 5; attempt++) {
+            response = await fetch(endpoint.href, {
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                signal: transportSignal,
+            })
+            if (response.status !== 503 || attempt === 4 || !response.headers?.get('Retry-After')) break
+            const delay = Math.max(100, Math.min(2000, Number(response.headers.get('Retry-After')) * 1000 || 1000))
+            await waitForRetry(delay, transportSignal)
         }
-
+        if (!response.ok) throw new Error('url_meta_scrape_failed')
         const data = await response.json()
-
         const preview = {
             title: normalizePreviewValue(data.title),
             description: normalizePreviewValue(data.description),
             image: normalizePreviewValue(data.image),
         }
-
-        if (hasPreviewData(preview)) {
-            writeUrlMetaCache(url, preview)
-        }
-
+        if (hasPreviewData(preview)) writeUrlMetaCache(url, preview, DEFAULT_TTL_MS, DEFAULT_MAX_ENTRIES, scrapeUrl)
         return preview
-    })().finally(() => {
-        inFlightRequests.delete(url)
-    })
-
-    inFlightRequests.set(url, request)
-
-    return request
+    }, { signal })
 }
 
 export function normalizePreviewValue(value) {
@@ -275,4 +268,14 @@ export function resolveUrlWithPrefix(value, prefix) {
     }
 
     return `${prefix}${trimmed}`
+}
+
+function waitForRetry(milliseconds, signal) {
+    if (signal.aborted) return Promise.reject(signal.reason ?? new DOMException('Cancelled.', 'AbortError'))
+    return new Promise((resolve, reject) => {
+        const abort = () => { clearTimeout(timer); signal.removeEventListener('abort', abort); reject(signal.reason ?? new DOMException('Cancelled.', 'AbortError')) }
+        const timer = setTimeout(() => { signal.removeEventListener('abort', abort); resolve() }, milliseconds)
+        signal.addEventListener('abort', abort, { once: true })
+        if (signal.aborted) abort()
+    })
 }

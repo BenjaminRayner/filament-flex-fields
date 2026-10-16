@@ -63,6 +63,7 @@ describe('segment-overflow-position', () => {
     it('assigns scrollLeft directly for initial overflow positioning', () => {
         const scrollElement = {
             clientWidth: 200,
+            scrollWidth: 400,
             scrollLeft: 0,
             classList: {
                 removed: [],
@@ -112,6 +113,7 @@ describe('segment-overflow-position', () => {
     it('assigns scrollLeft directly for initial overflow positioning helper', () => {
         const scrollElement = {
             clientWidth: 200,
+            scrollWidth: 400,
             scrollLeft: 0,
             scrollTo() {
                 throw new Error('scrollTo should not run for initial positioning')
@@ -140,6 +142,7 @@ describe('segment-overflow-position', () => {
         const scrollA = {
             dataset: {},
             clientWidth: 200,
+            scrollWidth: 400,
             scrollLeft: 0,
             scrollWidth: 400,
             classList: { removed: [], remove(className) { this.removed.push(className) } },
@@ -151,6 +154,7 @@ describe('segment-overflow-position', () => {
         const scrollB = {
             dataset: {},
             clientWidth: 200,
+            scrollWidth: 400,
             scrollLeft: 0,
             scrollWidth: 400,
             classList: { removed: [], remove(className) { this.removed.push(className) } },

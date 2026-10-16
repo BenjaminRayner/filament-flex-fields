@@ -1,8 +1,9 @@
 @import "../utilities-baseline.css";
 @import "../base.css";
 
-@source "../../src/Filament/Tables/Columns/RatingColumn.php";
-@source "../views/tables/columns/rating-column.blade.php";
+@source "../../../src/Filament/Tables/Columns/RatingColumn.php";
+@source "../../views/tables/columns/rating-column.blade.php";
 
-@import "../core/rating.css";
+@source "../../views/partials/rating/*.blade.php";
+
 @import "../core/tables/rating-column.css";

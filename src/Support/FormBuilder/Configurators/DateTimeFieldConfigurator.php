@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators;
 
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexCivilDateField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexClockField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexDateRangeField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexDateTimeField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexDurationField;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Contracts\FieldConfigurator;
 use Carbon\Carbon;
 use Filament\Schemas\Components\Component;
@@ -13,7 +17,9 @@ final class DateTimeFieldConfigurator implements FieldConfigurator
 {
     public function configure(Component $field, array $config): Component
     {
-        assert($field instanceof FlexDateTimeField);
+        if (! $field instanceof FlexDateTimeField) {
+            throw new \InvalidArgumentException('Date/time configuration requires a FLEX temporal field.');
+        }
 
         return $this->configureDateTimeField($field, $config);
     }
@@ -23,6 +29,19 @@ final class DateTimeFieldConfigurator implements FieldConfigurator
         $field = $field
             ->size($config['size'] ?? config('filament-flex-fields.ui.date_time_size', 'md'))
             ->variant($config['variant'] ?? config('filament-flex-fields.ui.date_time_variant', 'primary'));
+
+        foreach (['highlight_today' => 'highlightToday', 'show_calendar_button' => 'showCalendarButton',
+            'focus_outline' => 'focusOutline', 'is_invalid' => 'isInvalid'] as $key => $method) {
+            if (array_key_exists($key, $config)) {
+                $field->{$method}((bool) $config[$key]);
+            }
+        }
+        foreach (['rounding' => 'rounding', 'calendar_system' => 'calendarSystem',
+            'segment_invalid_message' => 'segmentInvalidMessage'] as $key => $method) {
+            if (array_key_exists($key, $config)) {
+                $field->{$method}($config[$key]);
+            }
+        }
 
         if (array_key_exists('granularity', $config) && filled($config['granularity'])) {
             $field->granularity($config['granularity']);
@@ -96,13 +115,58 @@ final class DateTimeFieldConfigurator implements FieldConfigurator
             $field->rangeSeparator($config['range_separator']);
         }
 
-        if (array_key_exists('first_day_of_week', $config)) {
+        if (array_key_exists('week_starts_on', $config)) {
+            $field->weekStartsOn((int) $config['week_starts_on']);
+        } elseif (array_key_exists('first_day_of_week', $config)) {
             $field->firstDayOfWeek((int) $config['first_day_of_week']);
         }
 
-        if (array_key_exists('unavailable_dates', $config) && is_array($config['unavailable_dates'])) {
+        if ($field instanceof FlexCivilDateField && ! empty($config['unavailable_dates']) && is_array($config['unavailable_dates'])) {
             $dates = array_values($config['unavailable_dates']);
             $field->isDateUnavailable(fn (Carbon $date): bool => in_array($date->format('Y-m-d'), $dates, true));
+        }
+
+        if ($field instanceof FlexCivilDateField || $field instanceof FlexClockField) {
+            if (array_key_exists('allowed_times', $config)) {
+                $field->allowedTimes($config['allowed_times']);
+            }
+            if (array_key_exists('clearable', $config)) {
+                $field->clearable((bool) $config['clearable']);
+            }
+            if (array_key_exists('editable', $config)) {
+                $field->editable((bool) $config['editable']);
+            }
+            foreach (['minute_step' => 'minuteStep', 'second_step' => 'secondStep'] as $key => $method) {
+                if (array_key_exists($key, $config)) {
+                    $field->{$method}((int) $config[$key]);
+                }
+            }
+            if (array_key_exists('default_time', $config)) {
+                $field->defaultTime($config['default_time']);
+            }
+        }
+        if ($field instanceof FlexCivilDateField) {
+            foreach (['inline' => 'inline', 'fixed_weeks' => 'fixedWeeks', 'outside_days' => 'outsideDays'] as $key => $method) {
+                if (array_key_exists($key, $config)) {
+                    $field->{$method}((bool) $config[$key]);
+                }
+            }
+            foreach (['disabled_dates' => 'disabledDates', 'disabled_weekdays' => 'disabledWeekdays'] as $key => $method) {
+                if (array_key_exists($key, $config)) {
+                    $field->{$method}($config[$key]);
+                }
+            }
+        }
+        if ($field instanceof FlexDateRangeField) {
+            if (array_key_exists('calendar_months', $config)) {
+                $field->calendarMonths($config['calendar_months']);
+            }
+            if (array_key_exists('range_presets', $config)) {
+                $field->rangePresets($config['range_presets']);
+            }
+        }
+        if ($field instanceof FlexDurationField && array_key_exists('duration_step', $config)) {
+            $field->durationStep((int) $config['duration_step']);
         }
 
         return $field;

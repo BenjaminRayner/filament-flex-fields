@@ -1,0 +1,94 @@
+---
+title: "Asset manifest reference"
+description: "All manifest roots, artifact kinds, dependency edges and installed asset-package parameters."
+---
+
+Prefer the generated build and compiler. This reference explains their portable
+output so you can extend your package's build without inventing a second protocol.
+Import PHP types from `Bjanczak\FilamentFlexFields\Support\Assets\Manifest`.
+
+## AssetManifest
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `package` | Required | Composer `vendor/package` identity, up to 192 characters. |
+| `artifacts` | Required | Map of artifact identity to `AssetArtifact`, containing 1–4096 outputs. |
+| `entries` | `[]` | Logical module/Alpine entry ID → artifact ID. |
+| `styles` | `[]` | Owned stylesheet ID → stylesheet artifact ID. |
+| `helpers` | `[]` | SSR classic-script helper ID → Script artifact ID. |
+
+The manifest format is `1`. Its release is derived from canonical complete build
+metadata. Portable metadata excludes deployment URLs and installed source roots.
+Paths cannot collide case-insensitively, traverse directories or refer to missing
+outputs. Keep artifact IDs and logical component/root IDs separate.
+
+## AssetArtifact
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `path` | Required | Safe build-output path relative to the installed release root. |
+| `type` | Required | Explicit `ArtifactKind`; the file extension must match. |
+| `sha256` | Required | Lowercase 64-character SHA-256 of the output bytes. |
+| `bytes` | Required | Nonnegative exact file size. |
+| `imports` | `[]` | Static module/CSS dependency artifact IDs in build order. |
+| `dynamicImports` | `[]` | Lazy module dependency IDs; they do not become eager preloads. |
+| `resources` | `[]` | Linked workers, fonts, WASM and other resource outputs. |
+
+| ArtifactKind | Value | Common output |
+| --- | --- | --- |
+| `Module` | `module` | `.js`, `.mjs` ESM |
+| `Stylesheet` | `stylesheet` | `.css` |
+| `Script` | `script` | Classic `.js` SSR helper |
+| `Worker` | `worker` | `.js`, `.mjs` worker |
+| `Wasm` | `wasm` | `.wasm` |
+| `Font` | `font` | `.woff`, `.woff2`, `.ttf`, `.otf` |
+| `Image` | `image` | PNG/JPEG/WebP/AVIF/GIF/SVG |
+| `Audio` | `audio` | MP3/WAV/OGG/M4A/AAC/FLAC |
+| `Video` | `video` | MP4/WebM/MOV |
+| `Data` | `data` | `.json` |
+| `Binary` | `binary` | `.bin`, `.onnx` |
+
+Use type declarations for resources the bundler cannot infer. Do not label a classic
+script as a module or assume a worker is a normal eagerly executed entry.
+
+## AssetPackage
+
+| Parameter | Meaning |
+| --- | --- |
+| `manifest` | Valid typed portable manifest loaded by your provider. |
+| `sourceRoot` | Local installed directory containing every referenced artifact. |
+
+`sourcePath($artifact)` resolves a safe existing installed output.
+`publicDirectory($prefix = '')` describes its immutable publication namespace;
+`moduleIdentity($artifact)` supplies a package-scoped asset identity.
+`sameInstallationAs()` compares package, release and installed root.
+
+## Esbuild declaration
+
+The compiler's declaration contains the following root fields:
+
+| Field | Use |
+| --- | --- |
+| `format` | Declaration format `1`. |
+| `package` | Composer package name. |
+| `entries` | Logical module ID → emitted output path. |
+| `styles` | Owned style ID → emitted CSS path. |
+| `helpers` | SSR helper ID → emitted classic script path. |
+| `types` | Explicit artifact type overrides for outputs such as workers. |
+| `resources` | Explicit output-to-linked-output declarations for opaque dependencies. |
+
+```json
+{
+  "format": 1,
+  "package": "acme/summary",
+  "entries": {"acme-summary-field": "field.js"},
+  "styles": {"acme-summary-display": "display.css"},
+  "helpers": {},
+  "types": {},
+  "resources": {}
+}
+```
+
+This is an input declaration, not the final generated manifest. Follow the
+[complete build example](/docs/extensions/build) for workers and WASM, CLI arguments,
+metafile handling and output validation. Do not hand-edit generated content hashes.

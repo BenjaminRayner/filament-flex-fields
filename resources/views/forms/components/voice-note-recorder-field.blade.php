@@ -1,199 +1,84 @@
 @php
-    use Filament\Support\Enums\IconSize;
-
     $statePath = $getStatePath();
-    $isDisabled = $isDisabled();
-    $isReadOnly = false;
-    $wrapperClasses = $getWrapperClasses();
-    $initialAudioUrl = $field->getInitialAudioUrl();
-    $livewireKey = $getLivewireKey();
+    $disabled = $isDisabled();
+    $initialUrl = $field->getInitialAudioUrl();
+    $settings = [
+        'statePath' => $statePath, 'schemaComponentKey' => $getKey(),
+        'initialAudioUrl' => $initialUrl, 'initialWaveform' => $field->getInitialAudioWaveform(),
+        'maxBytes' => ($field->getMaxSize() ?? 25600) * 1024,
+        'maxDuration' => $field->getMaxDuration(), 'audioBitsPerSecond' => $field->getAudioBitsPerSecond(),
+        'confirmDeletion' => $field->shouldConfirmDeletion(), 'uploadImmediately' => $field->shouldUploadImmediately(),
+        'readOnly' => $disabled, 'waveformMetadataPath' => filled($waveformPath = $field->getStoreWaveformInPath()) ? $field->resolveRelativeStatePath($waveformPath) : null,
+    ];
+    $identity = $settings;
+    unset($identity['initialAudioUrl'], $identity['initialWaveform']);
+    $identity['record'] = $field->getRecord()?->getKey();
+    $labels = [];
+    foreach (['play','pause','capture_unavailable','capture_failed','too_large','uploading_on_submit','delete_confirm','delete_failed','upload_failed'] as $key) {
+        $labels[\Illuminate\Support\Str::camel($key)] = __('filament-flex-fields::default.audio.'.$key);
+    }
+    $labels['permission_denied'] = __('filament-flex-fields::recording.permission_denied');
+    $labels['device_missing'] = __('filament-flex-fields::recording.device_missing');
+    $labels['device_busy'] = __('filament-flex-fields::recording.device_busy');
+    $radius = ['none'=>0,'sm'=>12,'md'=>24,'lg'=>28,'xl'=>32,'full'=>24][$getRounding()] ?? 24;
 @endphp
-
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
-    :attributes="
-        \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
-            ->class($wrapperClasses)
-    "
->
-    <div
-        wire:ignore
-        wire:key="{{ $livewireKey }}.{{ substr(md5(serialize([$isDisabled, $isReadOnly, $getSize()])), 0, 64) }}"
-        @class([
-            'fff-voice-recorder',
-            'fff-voice-recorder--'.$getSize(),
-            'is-disabled' => $isDisabled,
-            'is-read-only' => $isReadOnly,
-        ])
-        role="group"
-        aria-label="{{ $getLabel() }}"
-    >
-        @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'voice-note-recorder-field',
-        'livewireKey' => $getLivewireKey(),
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field"
+    :attributes="\Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())->class($getWrapperClasses())">
+    @include('filament-flex-fields::partials.load-stylesheet', [
+        'component'=>'voice-note-recorder-field', 'livewireKey'=>$getLivewireKey(), 'assetSchemaComponent'=>$field,
     ])
-
-        <div
-            x-load
-            x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('voice-note-recorder-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-            x-data="voiceNoteRecorderFieldFormComponent({
-                state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
-                statePath: @js($statePath),
-                schemaComponentKey: @js($getKey()),
-                initialAudioUrl: @js($initialAudioUrl),
-                maxDuration: @js($getMaxDuration()),
-                uploadImmediately: @js($field->shouldUploadImmediately()),
-                readOnly: @js($isDisabled || $isReadOnly),
-                waveformMetadataPath: @js($field->getStoreWaveformInPath()),
-                labels: {
-                    uploadingOnSubmit: @js(__('filament-flex-fields::default.audio.uploading_on_submit')),
-                    deleteConfirm: @js(__('filament-flex-fields::default.audio.delete_confirm')),
-                    deleteFailed: @js(__('filament-flex-fields::default.audio.delete_failed')),
-                    uploadFailed: @js(__('filament-flex-fields::default.audio.upload_failed')),
-                },
-            })"
-            x-init="init()"
-            x-bind:class="{ 'is-submitting': isUploadingForSubmit }"
-            class="fff-voice-recorder__container"
-        >
-            <!-- Tryb Idle (Brak nagrania) -->
-            <div x-show="mode === 'idle'" class="fff-voice-recorder__idle">
-                <button
-                    type="button"
-                    class="fff-voice-recorder__record-btn"
-                    x-on:click="startRecording()"
-                    x-bind:disabled="readOnly"
-                    title="{{ __('filament-flex-fields::default.audio.record_start') }}"
-                >
-                    <span class="fff-voice-recorder__icon-mic">
-                        {{ \Filament\Support\generate_icon_html($field->getMicrophoneIcon(), size: IconSize::Small) }}
-                    </span>
-                </button>
-                <span class="fff-voice-recorder__label" x-on:click="startRecording()">
-                    {{ __('filament-flex-fields::default.audio.record_label') }}
-                </span>
-            </div>
-
-            <!-- Tryb Recording (Nagrywanie) -->
-            <div x-show="mode === 'recording'" x-cloak class="fff-voice-recorder__recording">
-                <div class="fff-voice-recorder__recording-status">
-                    <span class="fff-voice-recorder__pulse-dot"></span>
-                    <span class="fff-voice-recorder__timer" x-text="formattedDuration">0:00 / 2:00</span>
-                </div>
-
-                <div class="fff-voice-recorder__canvas-wrapper">
-                    <canvas x-ref="canvas" class="fff-voice-recorder__canvas"></canvas>
-                </div>
-
-                <div class="fff-voice-recorder__actions">
-                    <!-- Anuluj -->
-                    <button
-                        type="button"
-                        class="fff-voice-recorder__action-btn fff-voice-recorder__action-btn--cancel"
-                        x-on:click="cancelRecording()"
-                        title="{{ __('filament-flex-fields::default.audio.cancel') }}"
-                    >
-                        {{ \Filament\Support\generate_icon_html($field->getTrashIcon(), size: IconSize::Small) }}
-                    </button>
-                    <!-- Stop i zapisz -->
-                    <button
-                        type="button"
-                        class="fff-voice-recorder__action-btn fff-voice-recorder__action-btn--stop"
-                        x-on:click="stopRecording()"
-                        title="{{ __('filament-flex-fields::default.audio.save') }}"
-                    >
-                        {{ \Filament\Support\generate_icon_html($field->getCheckmarkIcon(), size: IconSize::Small) }}
-                    </button>
-                </div>
-            </div>
-
-            <!-- Tryb Uploading (Wysyłanie) -->
-            <div x-show="mode === 'uploading'" x-cloak class="fff-voice-recorder__uploading">
-                <div class="fff-voice-recorder__spinner-wrapper">
-                    <svg class="fff-voice-recorder__spinner animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </div>
-                <span class="fff-voice-recorder__upload-label">
-                    <span x-show="isUploadingForSubmit" x-cloak>{{ __('filament-flex-fields::default.audio.uploading_on_submit') }}</span>
-                    <span x-show="! isUploadingForSubmit">{{ __('filament-flex-fields::default.audio.uploading') }} <span x-text="uploadProgress + '%'">0%</span></span>
-                </span>
-            </div>
-
-            <!-- Tryb Playback (Odtwarzanie) -->
-            <div x-show="mode === 'playback'" x-cloak class="fff-voice-recorder__playback">
-                <div class="fff-voice-recorder__playback-pill">
-                    <button
-                        type="button"
-                        class="fff-voice-recorder__play-btn"
-                        x-on:click="togglePlay()"
-                    >
-                        <span class="fff-voice-recorder__icon-play" x-show="!playing">
-                            {{ \Filament\Support\generate_icon_html($field->getPlayIcon(), size: IconSize::ExtraSmall) }}
-                        </span>
-                        <span class="fff-voice-recorder__icon-pause" x-show="playing" x-cloak>
-                            {{ \Filament\Support\generate_icon_html($field->getPauseIcon(), size: IconSize::ExtraSmall) }}
-                        </span>
-                    </button>
-
-                    <!-- Waveform zbieżny z audio-field -->
-                    <div
-                        class="fff-voice-recorder__waveform"
-                        x-ref="waveform"
-                        x-on:pointerdown="onWaveformPointerDown($event)"
-                        role="slider"
-                        x-bind:aria-valuenow="Math.round(progressRatio * 100)"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                    >
-                        <!-- Szkielet animacji -->
-                        <div class="fff-voice-recorder__waveform-skeleton" aria-hidden="true" x-show="!waveformReady">
-                            @for ($skeletonIndex = 0; $skeletonIndex < 30; $skeletonIndex++)
-                                <span class="fff-voice-recorder__skeleton-bar" style="--fff-audio-skeleton-i: {{ $skeletonIndex }}"></span>
-                            @endfor
-                            <span class="fff-voice-recorder__waveform-skeleton-shimmer"></span>
-                        </div>
-
-                        <!-- Generowane słupki waveform -->
-                        <template x-for="(peak, index) in displayWaveform" :key="index">
-                            <span
-                                class="fff-voice-recorder__bar"
-                                x-bind:style="'height: ' + peak + '%; --fff-audio-bar-i: ' + index"
-                                x-bind:class="{ 'is-played': barIsPlayed(index) }"
-                            ></span>
-                        </template>
-                    </div>
-
-                    <span class="fff-voice-recorder__time" x-text="timeLabel">0:00</span>
-
-                    <span
-                        class="fff-voice-recorder__bg-upload"
-                        x-show="isBackgroundUploading"
-                        x-cloak
-                        x-text="uploadProgress + '%'"
-                    ></span>
-
-                    <!-- Usuń / Nagraj ponownie -->
-                    <button
-                        type="button"
-                        class="fff-voice-recorder__delete-btn"
-                        x-on:click="deleteRecording()"
-                        x-bind:disabled="readOnly"
-                        title="{{ __('filament-flex-fields::default.audio.delete') }}"
-                    >
-                        {{ \Filament\Support\generate_icon_html($field->getTrashIcon(), size: IconSize::ExtraSmall) }}
-                    </button>
-                </div>
-
-            </div>
-
-            <audio
-                x-ref="audio"
-                class="sr-only"
-                preload="metadata"
-                x-bind:src="audioSrc"
-            ></audio>
+    <div wire:ignore wire:key="{{ $getLivewireKey() }}.{{ hash('sha256',serialize($identity)) }}"
+        class="fff-voice-recorder fff-voice-recorder--{{ $getSize() }}"
+        style="--fff-voice-radius:{{ $radius }}px" role="group" aria-label="{{ $getLabel() }}"
+        x-fff-load x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('voice-note-recorder-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+        x-data="voiceNoteRecorderFieldFormComponent({ ...@js($settings), labels:@js($labels), state:$wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }} })"
+        x-bind:aria-busy="initializing || isBackgroundUploading || isProtectingRecording || isDeleting">
+        <div class="fff-voice-recorder__header">
+            <span class="fff-voice-recorder__eyebrow">{{ __('filament-flex-fields::recording.voice_note') }}</span>
+            <span class="fff-voice-recorder__limit">{{ __('filament-flex-fields::recording.limit', ['seconds'=>$getMaxDuration()]) }}</span>
         </div>
+        <div class="fff-voice-recorder__idle" x-show="mode==='idle'" @if ($initialUrl) style="display:none" @endif>
+            <button type="button" class="fff-voice-recorder__record" x-on:click="startRecording()"
+                x-bind:disabled="readOnly || initializing" @disabled($disabled)
+                aria-label="{{ __('filament-flex-fields::default.audio.record_start') }}">
+                <span x-show="!initializing">{{ \Filament\Support\generate_icon_html($field->getMicrophoneIcon()) }}</span>
+                <x-filament::loading-indicator x-show="initializing" x-cloak />
+            </button>
+            <div class="fff-voice-recorder__intro">
+                <span class="fff-voice-recorder__title">{{ __('filament-flex-fields::recording.start') }}</span>
+                <span class="fff-voice-recorder__hint">{{ __('filament-flex-fields::recording.review_hint') }}</span>
+            </div>
+        </div>
+        <div class="fff-voice-recorder__capture" x-show="mode==='recording' || mode==='paused'" x-cloak>
+            <div class="fff-voice-recorder__status"><span class="fff-voice-recorder__dot" x-bind:class="{ 'is-paused':mode==='paused' }"></span>
+                <span x-text="formattedDuration" class="fff-voice-recorder__time">0:00</span></div>
+            <canvas x-ref="canvas" class="fff-voice-recorder__canvas" aria-hidden="true"></canvas>
+            <div class="fff-voice-recorder__actions">
+                <button type="button" class="fff-voice-recorder__button" x-on:click="toggleRecordingPause()" aria-label="{{ __('filament-flex-fields::recording.pause_resume') }}">
+                    <span x-show="mode==='recording'">{{ \Filament\Support\generate_icon_html($field->getPauseIcon()) }}</span>
+                    <span x-show="mode==='paused'" x-cloak>{{ \Filament\Support\generate_icon_html($field->getPlayIcon()) }}</span>
+                </button>
+                <button type="button" class="fff-voice-recorder__button" x-on:click="cancelRecording()" aria-label="{{ __('filament-flex-fields::default.audio.cancel') }}">{{ \Filament\Support\generate_icon_html($field->getTrashIcon()) }}</button>
+                <button type="button" class="fff-voice-recorder__button fff-voice-recorder__button--primary" x-on:click="stopRecording()" aria-label="{{ __('filament-flex-fields::default.audio.save') }}">{{ \Filament\Support\generate_icon_html($field->getCheckmarkIcon()) }}</button>
+            </div>
+        </div>
+        <div class="fff-voice-recorder__playback fff-audio-field" x-show="mode==='playback'" @if (!$initialUrl) style="display:none" @endif>
+            @include('filament-flex-fields::forms.components.partials.audio.player')
+            <button type="button" class="fff-voice-recorder__button" x-on:click="deleteRecording()"
+                x-bind:disabled="readOnly || isBackgroundUploading || isProtectingRecording || isDeleting" aria-label="{{ __('filament-flex-fields::default.audio.delete') }}">
+                <span x-show="!isDeleting">{{ \Filament\Support\generate_icon_html($field->getTrashIcon()) }}</span>
+                <x-filament::loading-indicator x-show="isDeleting" x-cloak />
+            </button>
+        </div>
+        <div class="fff-voice-recorder__processing" x-show="mode==='processing' || mode==='uploading'" x-cloak>
+            <x-filament::loading-indicator /> <span>{{ __('filament-flex-fields::recording.preparing') }}</span>
+        </div>
+        <div class="fff-voice-recorder__footer" x-show="mode==='playback'" x-cloak>
+            <span class="fff-voice-recorder__hint" x-show="!pendingUpload && !isBackgroundUploading">{{ __('filament-flex-fields::recording.uploaded') }}</span>
+            <span class="fff-voice-recorder__hint" x-show="pendingUpload && !isBackgroundUploading">{{ __('filament-flex-fields::recording.pending') }}</span>
+            <span class="fff-voice-recorder__progress" x-show="isBackgroundUploading" x-text="uploadProgress+'%'" role="status"></span>
+            <button type="button" class="fff-voice-recorder__save" x-show="pendingUpload && !isBackgroundUploading" x-bind:disabled="isProtectingRecording" x-on:click="uploadRecording().catch(()=>{})">{{ __('filament-flex-fields::recording.upload') }}</button>
+        </div>
+        <p class="fff-voice-recorder__error" x-show="error" x-cloak x-text="error" role="alert"></p>
     </div>
 </x-dynamic-component>

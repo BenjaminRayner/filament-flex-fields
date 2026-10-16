@@ -32,12 +32,12 @@ class EditFlexFieldGroup extends EditRecord
             ...$this->flexFieldGroupSchemaActions($record),
             ...$this->flexFieldValueCsvActions($record),
             Action::make('rollbackRegistryVersion')
-                ->label(__('filament-flex-fields::default.schema.rollback_version'))
-                ->icon('heroicon-o-arrow-uturn-left')
+                ->label(fn () => __('filament-flex-fields::default.schema.rollback_version'))
+                ->icon('hugeicons-undo-02')
                 ->authorize('rollback')
                 ->schema([
                     Select::make('version')
-                        ->label(__('filament-flex-fields::default.schema.rollback_version_select'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.rollback_version_select'))
                         ->options(function (): array {
                             return collect(SchemaRegistry::versions($this->getRecord()->registrySchemaId()))
                                 ->mapWithKeys(function (array $version): array {
@@ -63,7 +63,7 @@ class EditFlexFieldGroup extends EditRecord
                     $this->fillForm($record->fresh()->toArray());
 
                     Notification::make()
-                        ->title(__('filament-flex-fields::default.schema.rollback_version_success', [
+                        ->title(fn () => __('filament-flex-fields::default.schema.rollback_version_success', [
                             'version' => $rolled['version'],
                         ]))
                         ->success()

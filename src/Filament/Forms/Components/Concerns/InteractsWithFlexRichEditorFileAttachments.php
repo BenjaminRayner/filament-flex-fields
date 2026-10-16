@@ -14,7 +14,6 @@ use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaPayload;
 use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaStorageDriver;
 use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\Refs\DiskMediaRef;
 use Bjanczak\FilamentFlexFields\Support\RichEditor\RichEditorAttachmentIdResolver;
-use Bjanczak\FilamentFlexFields\Support\RichEditor\RichEditorAttachmentPaths;
 use Bjanczak\FilamentFlexFields\Support\RichEditor\RichEditorAttachmentPruner;
 use Bjanczak\FilamentFlexFields\Support\RichEditor\RichEditorAttachmentVariantGenerator;
 use Bjanczak\FilamentFlexFields\Support\RichEditor\RichEditorImageVariant;
@@ -46,7 +45,10 @@ trait InteractsWithFlexRichEditorFileAttachments
     /**
      * @var array<string, array<string, mixed>|RichEditorImageVariant>|Closure|null
      */
-    protected array|Closure|null $flexRichEditorImageVariants = null;
+    protected array|Closure|null $flexRichEditorImageVariants = [
+        'thumb' => ['max_long_edge' => 250, 'webp' => true],
+        'large' => ['max_long_edge' => 1500, 'webp' => true, 'master' => true],
+    ];
 
     protected bool|Closure $flexRichEditorPruneOrphanedAttachments = true;
 
@@ -254,8 +256,6 @@ trait InteractsWithFlexRichEditorFileAttachments
         $file = $this->prepareRichEditorAttachmentForProviderSave($file);
 
         if (filled($savedFile = $this->defaultSaveUploadedFileAttachment($file))) {
-            $this->queueSpatieVariantConversions($savedFile);
-
             if (is_string($savedFile) && ! $this->usesSpatieRichEditorFileAttachmentProvider()) {
                 $ref = new DiskMediaRef($this->getFileAttachmentsDiskName(), $savedFile);
 
@@ -280,10 +280,19 @@ trait InteractsWithFlexRichEditorFileAttachments
             rescue(fn () => $this->getFileAttachmentsDisk()->setVisibility($path, 'public'), report: false);
         }
 
-        $path = $this->postProcessStoredRichEditorAttachment($path);
+        try {
+            $path = $this->postProcessStoredRichEditorAttachment($path);
+        } catch (\Throwable $error) {
+            // This attachment was created by this operation; a failed conversion
+            // must not leave it behind as an unreferenced permanent upload.
+            (new RichEditorAttachmentPruner)->deleteMastersWithVariants($this->getFileAttachmentsDisk(), [$path]);
+            throw $error;
+        }
         $ref = new DiskMediaRef($this->getFileAttachmentsDiskName(), $path);
 
         if (! FlexMedia::ingress()->assertCleanStored($ref, $context)) {
+            (new RichEditorAttachmentPruner)->deleteMastersWithVariants($this->getFileAttachmentsDisk(), [$path]);
+
             return null;
         }
 
@@ -344,13 +353,6 @@ trait InteractsWithFlexRichEditorFileAttachments
         $originalIds = $this->getOriginalFileAttachmentPaths();
         $removedIds = array_values(array_diff($originalIds, $keptIds));
 
-        if ($this->shouldAggressivelyPruneScopedAttachmentDirectory()) {
-            $removedIds = array_values(array_unique([
-                ...$removedIds,
-                ...$this->resolveUnreferencedAttachmentPathsInDirectory($keptIds),
-            ]));
-        }
-
         if ($removedIds === []) {
             return;
         }
@@ -361,69 +363,9 @@ trait InteractsWithFlexRichEditorFileAttachments
         );
     }
 
-    /**
-     * @param  list<string>  $keptIds
-     * @return list<string>
-     */
-    protected function resolveUnreferencedAttachmentPathsInDirectory(array $keptIds): array
-    {
-        $directory = trim((string) $this->getFileAttachmentsDirectory(), '/');
-
-        if ($directory === '') {
-            return [];
-        }
-
-        $keptPaths = [];
-
-        foreach ($keptIds as $id) {
-            $keptPaths[] = $id;
-            $keptPaths[] = RichEditorAttachmentPaths::manifestPath($id);
-        }
-
-        $files = rescue(fn (): array => $this->getFileAttachmentsDisk()->allFiles($directory), [], report: false);
-        $removed = [];
-
-        foreach ($files as $file) {
-            if (str_ends_with($file, '.flex-variants.json')) {
-                continue;
-            }
-
-            if (str_contains($file, '__')) {
-                $isVariantOfKeptMaster = collect($keptIds)->contains(
-                    fn (string $keptId): bool => str_starts_with($file, (string) Str::of($keptId)->beforeLast('.')),
-                );
-
-                if ($isVariantOfKeptMaster) {
-                    continue;
-                }
-            }
-
-            if (! in_array($file, $keptPaths, true)) {
-                $removed[] = $file;
-            }
-        }
-
-        return array_values(array_unique($removed));
-    }
-
-    protected function shouldAggressivelyPruneScopedAttachmentDirectory(): bool
-    {
-        $directory = (string) $this->getFileAttachmentsDirectory();
-
-        if ($directory === '') {
-            return false;
-        }
-
-        if ($this->getRecord() !== null) {
-            return true;
-        }
-
-        return str_contains($directory, '/drafts/');
-    }
-
     protected function prepareRichEditorAttachmentForProviderSave(TemporaryUploadedFile $file): TemporaryUploadedFile
     {
-        if (! $this->usesRichEditorFileAttachmentProvider() || ! $this->shouldPreProcessRichEditorAttachmentTemp()) {
+        if (! $this->usesRichEditorFileAttachmentProvider() || $this->usesSpatieRichEditorFileAttachmentProvider() || ! $this->shouldPreProcessRichEditorAttachmentTemp()) {
             return $file;
         }
 
@@ -482,34 +424,5 @@ trait InteractsWithFlexRichEditorFileAttachments
             maxImageLongEdge: $this->getFlexRichEditorMaxImageLongEdge(),
             stripExif: $this->shouldStripExifRichEditorAttachments(),
         );
-    }
-
-    protected function queueSpatieVariantConversions(mixed $savedFile): void
-    {
-        if (! $this->usesSpatieRichEditorFileAttachmentProvider()) {
-            return;
-        }
-
-        if ($this->getFlexRichEditorImageVariants() === []) {
-            return;
-        }
-
-        if (! class_exists('Spatie\\MediaLibrary\\MediaCollections\\Models\\Media')) {
-            return;
-        }
-
-        $mediaClass = 'Spatie\\MediaLibrary\\MediaCollections\\Models\\Media';
-
-        $media = is_numeric($savedFile)
-            ? $mediaClass::query()->find($savedFile)
-            : $mediaClass::query()->where('uuid', (string) $savedFile)->first();
-
-        if ($media === null) {
-            return;
-        }
-
-        if (method_exists($media, 'refresh')) {
-            $media->refresh();
-        }
     }
 }

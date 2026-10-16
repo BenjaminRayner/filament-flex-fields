@@ -143,7 +143,7 @@ test('logic: alpine chunks follow the same share / uninstall rules as CSS', asyn
     assert.equal(headHas(head, 'shared-CEWOLNQU'), true)
     assert.equal(headHas(head, 'phone-lib'), false)
     assert.equal(injector.isChunkLoaded(pageChunk), true)
-    assert.equal(injector.isChunkLoaded(modalChunk), false)
+    assert.equal(injector.isChunkLoaded(modalChunk), true) // Prepared ESM survives removal of its preload link.
 })
 
 test('logic: concurrent loadStylesheet calls share one inflight promise and one DOM link', async () => {
@@ -154,8 +154,8 @@ test('logic: concurrent loadStylesheet calls share one inflight promise and one 
     const a = injector.loadStylesheet(href)
     const b = injector.loadStylesheet(href)
     assert.equal(a, b)
-    assert.equal(stylesheetHrefs(head).length, 1)
     await flushAssetLoads(head)
+    assert.equal(stylesheetHrefs(head).length, 1)
     await a
     assert.equal(stylesheetHrefs(head).length, 1)
 })
@@ -1125,7 +1125,7 @@ test('logic: CSS+chunk bundle for modal uninstalls both when page retained neith
     const { document, window, head, body } = createDom()
     const injector = createFlexFieldAssetInjector({ document, window })
     const sheet = css('phone-field')
-    const js = chunk('phone-lib-RPEB4A4Q')
+    const js = chunk('phone-lib-modal-pair')
 
     const modal = createElement('div')
     modal.id = 'pair'
@@ -1177,7 +1177,7 @@ test('logic: ensureAssets boots unprepared segment overflow shells inside modal 
     assert.equal(scrollElement.scrollLeft, 40)
 })
 
-test('logic: shared table-columns consumer-id collapses deps and uninstalls user-display', async () => {
+test('logic: shared logical table key preserves independently owned display and column assets', async () => {
     const { document, window, head, body } = createDom()
     const injector = createFlexFieldAssetInjector({ document, window })
     const display = css('user-display')
@@ -1196,9 +1196,9 @@ test('logic: shared table-columns consumer-id collapses deps and uninstalls user
     await new Promise((resolve) => setTimeout(resolve, 200))
     injector.uninstallUnretainedAssets()
 
-    assert.equal(headHas(head, 'user-display'), false)
+    assert.equal(headHas(head, 'user-display'), true)
     assert.equal(headHas(head, 'user-column'), true)
-    assert.equal(retainedHas(injector, document, display), false)
+    assert.equal(retainedHas(injector, document, display), true)
     assert.equal(retainedHas(injector, document, column), true)
 })
 

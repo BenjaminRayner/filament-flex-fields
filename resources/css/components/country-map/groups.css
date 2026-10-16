@@ -1,0 +1,37 @@
+.fff-country-map__leading-options { display: flow-root; }
+.fff-country-map__groups { display: flex; flex-direction: column; margin-block: .25rem; border-block-end: 1px solid var(--fff-select-menu-border, #e4e4e7); }
+.fff-select-dropdown-panel .fff-country-map__group { width: 100%; padding: 0; margin: 0; text-align: start; }
+.fff-select-dropdown-panel .fff-country-map-option-row {
+    --fff-selection-color: var(--primary-500, rgb(59 130 246));
+    display: grid !important;
+    grid-template-columns: var(--fff-selection-size, 1rem) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .625rem;
+    --fff-select-option-check-gutter: 10px;
+}
+.fff-select-dropdown-panel .fff-country-map-option-row > .fff-country-map__group-label {
+    display: block !important;
+    width: auto !important;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.fff-select-dropdown-panel .fff-country-map-option-row > .fff-country-map__group-count {
+    display: block !important;
+    width: auto !important;
+    color: var(--fff-select-group-label);
+    font-size: .6875rem;
+    font-variant-numeric: tabular-nums;
+}
+.fff-select-dropdown-panel .fff-country-map-option-row > .fff-selection-indicator {
+    display: inline-grid !important;
+    width: var(--fff-selection-size, 1rem);
+    min-width: var(--fff-selection-size, 1rem);
+    max-width: var(--fff-selection-size, 1rem);
+    padding: 0 !important;
+    height: var(--fff-selection-size, 1rem);
+    border-radius: .375rem !important;
+    box-sizing: border-box;
+}
+.fff-country-map__group:focus-visible { outline: 2px solid var(--primary-500); outline-offset: -2px; }

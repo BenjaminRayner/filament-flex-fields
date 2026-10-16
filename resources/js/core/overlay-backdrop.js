@@ -42,7 +42,9 @@ export function createOverlayBackdrop(document, overlayId, options = {}) {
         options.onDismiss?.()
     })
 
-    const body = document.body
+    // A modal portal has its own stacking context. Its backdrop must be a
+    // sibling of the sheet, never a body sibling above the entire modal.
+    const body = options.beforeElement?.parentNode ?? document.body
     const before = options.beforeElement
 
     if (body && before?.parentNode === body && typeof body.insertBefore === 'function') {
@@ -74,7 +76,12 @@ function ensureBackdropBehindPanel(backdrop, panel) {
 
     const parent = panel.parentNode
 
-    if (! parent || backdrop.parentNode !== parent || typeof parent.insertBefore !== 'function') {
+    if (! parent || typeof parent.insertBefore !== 'function') {
+        return
+    }
+
+    if (backdrop.parentNode !== parent) {
+        parent.insertBefore(backdrop, panel)
         return
     }
 

@@ -2,6 +2,8 @@
 
 namespace Filament\Forms\Components;
 
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+
 if (! class_exists('Filament\Forms\Components\SpatieMediaLibraryFileUpload')) {
     class SpatieMediaLibraryFileUpload extends FileUpload
     {
@@ -70,7 +72,7 @@ if (! class_exists('Filament\Forms\Components\SpatieMediaLibraryFileUpload')) {
         /**
          * @return array<string, mixed>
          */
-        public function getCustomProperties(): array
+        public function getCustomProperties(TemporaryUploadedFile $file): array
         {
             return [];
         }
@@ -96,7 +98,7 @@ if (! class_exists('Filament\Forms\Components\SpatieMediaLibraryFileUpload')) {
             return false;
         }
 
-        public function getMediaName(\Livewire\Features\SupportFileUploads\TemporaryUploadedFile $file): ?string
+        public function getMediaName(TemporaryUploadedFile $file): ?string
         {
             return null;
         }

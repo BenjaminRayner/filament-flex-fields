@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Enterprise;
 
 use Bjanczak\FilamentFlexFields\Models\FlexFieldSchemaVersion;
+use Bjanczak\FilamentFlexFields\Support\Enterprise\Schema\DatabaseSchemaVersionStore;
+use Bjanczak\FilamentFlexFields\Support\Enterprise\Schema\SchemaApprovalWorkflow;
+use Bjanczak\FilamentFlexFields\Support\Enterprise\Schema\SchemaMemoryState;
+use Bjanczak\FilamentFlexFields\Support\Enterprise\Schema\SchemaVersionConflict;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
 use Bjanczak\FilamentFlexFields\Support\Schema\SchemaImportExport;
-use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
+use RuntimeException;
 use Throwable;
 
 final class SchemaRegistry
@@ -18,12 +23,16 @@ final class SchemaRegistry
 
     public const string STATE_LIVE = 'live';
 
-    /** @var array<string, list<array{version: int, schema: array<string, mixed>, checksum: string, actor: ?string, state: string, published_at: string}>> */
-    private static array $memoryVersions = [];
+    public const string STATE_APPROVED = 'approved';
 
     private static ?SchemaImportExport $importExport = null;
 
-    private static ?bool $databaseAvailable = null;
+    private static function state(?string $connectionName = null): SchemaMemoryState
+    {
+        $state = RequestState::resolve(SchemaMemoryState::class);
+
+        return $connectionName === null ? $state : ($state->connections[$connectionName] ??= new SchemaMemoryState);
+    }
 
     /**
      * @param  array<string, mixed>  $schema
@@ -34,34 +43,32 @@ final class SchemaRegistry
         ?string $actor = null,
         string $state = self::STATE_DRAFT,
         ?int $flexFieldGroupId = null,
+        ?string $connectionName = null,
+        ?int $expectedVersion = null,
     ): int {
+        self::assertSchemaId($schemaId);
         self::assertApprovalState($state);
+        DatabaseSchemaVersionStore::assertExpectedVersion($expectedVersion);
+        self::importExport()->assertValid($schema);
 
         $checksum = self::checksum($schema);
         $publishedAt = now()->toIso8601String();
 
-        if (self::usesDatabase()) {
-            $version = (int) FlexFieldSchemaVersion::query()
-                ->where('schema_id', $schemaId)
-                ->max('version') + 1;
-
-            FlexFieldSchemaVersion::query()->create([
-                'flex_field_group_id' => $flexFieldGroupId,
-                'schema_id' => $schemaId,
-                'version' => $version,
-                'schema' => $schema,
-                'checksum' => $checksum,
-                'actor' => $actor,
-                'state' => $state,
-                'published_at' => now(),
-            ]);
-
-            return $version;
+        if (self::usesDatabase($connectionName)) {
+            return (new DatabaseSchemaVersionStore($connectionName))->publish($schemaId, $schema, $checksum, $actor, $state, $flexFieldGroupId, $expectedVersion);
         }
 
-        $version = count(self::$memoryVersions[$schemaId] ?? []) + 1;
+        $last = self::state($connectionName)->counters[$schemaId] ?? 0;
+        if ($expectedVersion !== null && $expectedVersion !== $last) {
+            throw new SchemaVersionConflict($expectedVersion, $last);
+        }
+        if ($last >= 4294967295) {
+            throw new RuntimeException('Schema version counter is exhausted.');
+        }
+        $version = $last + 1;
+        self::state($connectionName)->counters[$schemaId] = $version;
 
-        self::$memoryVersions[$schemaId][] = [
+        self::state($connectionName)->versions[$schemaId][] = [
             'version' => $version,
             'schema' => $schema,
             'checksum' => $checksum,
@@ -70,32 +77,42 @@ final class SchemaRegistry
             'published_at' => $publishedAt,
         ];
 
+        self::retireMemoryLiveVersions($schemaId, $version, $state, $connectionName);
+
         return $version;
+    }
+
+    /** Last issued version, including purged history; zero means no publication. */
+    public static function currentVersion(string $schemaId, ?string $connectionName = null): int
+    {
+        self::assertSchemaId($schemaId);
+        if (self::usesDatabase($connectionName)) {
+            return (new DatabaseSchemaVersionStore($connectionName))->currentVersion($schemaId);
+        }
+
+        return self::state($connectionName)->counters[$schemaId] ?? 0;
     }
 
     /**
      * @return list<array{version: int, schema: array<string, mixed>, checksum: string, actor: ?string, state: string, published_at: string}>
      */
-    public static function versions(string $schemaId): array
+    public static function versions(string $schemaId, ?string $connectionName = null): array
     {
-        if (self::usesDatabase()) {
-            return FlexFieldSchemaVersion::query()
-                ->where('schema_id', $schemaId)
-                ->orderBy('version')
-                ->get()
-                ->map(fn (FlexFieldSchemaVersion $row): array => $row->toRegistryRecord())
-                ->all();
+        self::assertSchemaId($schemaId);
+
+        if (self::usesDatabase($connectionName)) {
+            return (new DatabaseSchemaVersionStore($connectionName))->versions($schemaId);
         }
 
-        return self::$memoryVersions[$schemaId] ?? [];
+        return self::state($connectionName)->versions[$schemaId] ?? [];
     }
 
     /**
      * @return array{version: int, schema: array<string, mixed>, checksum: string, actor: ?string, state: string, published_at: string}
      */
-    public static function rollback(string $schemaId, int $version, ?int $flexFieldGroupId = null): array
+    public static function rollback(string $schemaId, int $version, ?int $flexFieldGroupId = null, ?string $actor = null, ?string $connectionName = null, ?int $expectedVersion = null): array
     {
-        $record = self::findVersion($schemaId, $version);
+        $record = self::findVersion($schemaId, $version, $connectionName);
 
         if ($record === null) {
             throw new InvalidArgumentException("Schema [{$schemaId}] has no version [{$version}].");
@@ -104,38 +121,37 @@ final class SchemaRegistry
         $newVersion = self::publish(
             $schemaId,
             $record['schema'],
-            $record['actor'],
+            $actor,
             self::STATE_LIVE,
             $flexFieldGroupId,
+            $connectionName,
+            $expectedVersion,
         );
 
-        return self::findVersion($schemaId, $newVersion) ?? $record;
+        return self::findVersion($schemaId, $newVersion, $connectionName)
+            ?? throw new RuntimeException('Published rollback version could not be read.');
     }
 
-    public static function setApprovalState(string $schemaId, int $version, string $state): void
+    public static function setApprovalState(string $schemaId, int $version, string $state, ?string $connectionName = null): void
     {
+        self::assertSchemaId($schemaId);
         self::assertApprovalState($state);
 
-        if (self::usesDatabase()) {
-            $updated = FlexFieldSchemaVersion::query()
-                ->where('schema_id', $schemaId)
-                ->where('version', $version)
-                ->update(['state' => $state]);
-
-            if ($updated === 0) {
-                throw new InvalidArgumentException("Schema [{$schemaId}] has no version [{$version}].");
-            }
+        if (self::usesDatabase($connectionName)) {
+            (new DatabaseSchemaVersionStore($connectionName))->transition($schemaId, $version, $state);
 
             return;
         }
 
-        $index = self::memoryVersionIndex($schemaId, $version);
+        $index = self::memoryVersionIndex($schemaId, $version, $connectionName);
 
         if ($index === null) {
             throw new InvalidArgumentException("Schema [{$schemaId}] has no version [{$version}].");
         }
 
-        self::$memoryVersions[$schemaId][$index]['state'] = $state;
+        SchemaApprovalWorkflow::assertTransition(self::state($connectionName)->versions[$schemaId][$index]['state'], $state);
+        self::state($connectionName)->versions[$schemaId][$index]['state'] = $state;
+        self::retireMemoryLiveVersions($schemaId, $version, $state, $connectionName);
     }
 
     /**
@@ -148,22 +164,59 @@ final class SchemaRegistry
 
     public static function clear(): void
     {
-        self::$memoryVersions = [];
+        self::state()->versions = [];
+        self::state()->counters = [];
+        self::state()->connections = [];
         self::$importExport = null;
-        self::$databaseAvailable = null;
-
-        if (self::persistenceEnabled() && self::tableExists()) {
-            FlexFieldSchemaVersion::query()->delete();
-        }
+        self::state()->availableTables = [];
     }
 
-    public static function usesDatabase(): bool
+    public static function resetRuntimeCache(): void
+    {
+        self::clear();
+    }
+
+    /** Explicit scoped data deletion; never called by runtime cache reset. */
+    public static function purgeHistory(string $schemaId, ?string $connectionName = null): void
+    {
+        self::assertSchemaId($schemaId);
+
+        if (self::usesDatabase($connectionName)) {
+            (new DatabaseSchemaVersionStore($connectionName))->purge($schemaId);
+        }
+
+        unset(self::state($connectionName)->versions[$schemaId]);
+    }
+
+    private static function retireMemoryLiveVersions(string $id, int $version, string $state, ?string $connectionName): void
+    {
+        if ($state !== self::STATE_LIVE) {
+            return;
+        }
+
+        $versions = self::state($connectionName)->versions[$id] ?? [];
+
+        foreach ($versions as $index => $record) {
+            if ($record['version'] !== $version && $record['state'] === self::STATE_LIVE) {
+                $record['state'] = self::STATE_APPROVED;
+                $versions[$index] = $record;
+            }
+        }
+
+        self::state($connectionName)->versions[$id] = $versions;
+    }
+
+    public static function usesDatabase(?string $connectionName = null): bool
     {
         if (! self::persistenceEnabled()) {
             return false;
         }
 
-        return self::tableExists();
+        if (! self::tableExists($connectionName)) {
+            throw new RuntimeException('Persistent schema registry requires the schema versions and schema heads migrations.');
+        }
+
+        return true;
     }
 
     private static function persistenceEnabled(): bool
@@ -179,25 +232,33 @@ final class SchemaRegistry
         }
     }
 
-    private static function tableExists(): bool
+    private static function tableExists(?string $connectionName): bool
     {
-        if (self::$databaseAvailable !== null) {
-            return self::$databaseAvailable;
+        if (! function_exists('app') || ! app()->bound('db')) {
+            return false;
         }
 
-        try {
-            if (! function_exists('app') || ! app()->bound('db')) {
-                self::$databaseAvailable = false;
+        $connection = (new FlexFieldSchemaVersion)->setConnection($connectionName)->getConnection();
+        $key = json_encode([$connection->getName(), $connection->getDatabaseName()], JSON_THROW_ON_ERROR);
 
-                return false;
-            }
-
-            self::$databaseAvailable = Schema::hasTable('flex_field_schema_versions');
-        } catch (Throwable) {
-            self::$databaseAvailable = false;
+        if (isset(self::state($connectionName)->availableTables[$key])) {
+            return true;
         }
 
-        return self::$databaseAvailable;
+        $schema = $connection->getSchemaBuilder();
+
+        if (! $schema->hasTable('flex_field_schema_versions') || ! $schema->hasTable('flex_field_schema_heads')) {
+            return false;
+        }
+
+        return self::state($connectionName)->availableTables[$key] = true;
+    }
+
+    private static function assertSchemaId(string $id): void
+    {
+        if (! mb_check_encoding($id, 'UTF-8') || trim($id) === '' || mb_strlen($id) > 255 || str_contains($id, "\0")) {
+            throw new InvalidArgumentException('Schema id must contain between 1 and 255 characters and no NUL byte.');
+        }
     }
 
     private static function importExport(): SchemaImportExport
@@ -207,37 +268,30 @@ final class SchemaRegistry
 
     private static function assertApprovalState(string $state): void
     {
-        if (! in_array($state, [self::STATE_DRAFT, self::STATE_REVIEW, self::STATE_LIVE], true)) {
-            throw new InvalidArgumentException("Invalid schema approval state [{$state}].");
-        }
+        SchemaApprovalWorkflow::assertState($state);
     }
 
     /**
      * @return array{version: int, schema: array<string, mixed>, checksum: string, actor: ?string, state: string, published_at: string}|null
      */
-    private static function findVersion(string $schemaId, int $version): ?array
+    private static function findVersion(string $schemaId, int $version, ?string $connectionName = null): ?array
     {
-        if (self::usesDatabase()) {
-            $row = FlexFieldSchemaVersion::query()
-                ->where('schema_id', $schemaId)
-                ->where('version', $version)
-                ->first();
-
-            return $row?->toRegistryRecord();
+        if (self::usesDatabase($connectionName)) {
+            return (new DatabaseSchemaVersionStore($connectionName))->find($schemaId, $version);
         }
 
-        $index = self::memoryVersionIndex($schemaId, $version);
+        $index = self::memoryVersionIndex($schemaId, $version, $connectionName);
 
         if ($index === null) {
             return null;
         }
 
-        return self::$memoryVersions[$schemaId][$index];
+        return self::state($connectionName)->versions[$schemaId][$index];
     }
 
-    private static function memoryVersionIndex(string $schemaId, int $version): ?int
+    private static function memoryVersionIndex(string $schemaId, int $version, ?string $connectionName): ?int
     {
-        foreach (self::$memoryVersions[$schemaId] ?? [] as $index => $record) {
+        foreach (self::state($connectionName)->versions[$schemaId] ?? [] as $index => $record) {
             if ($record['version'] === $version) {
                 return $index;
             }

@@ -1,0 +1,29 @@
+---
+title: "Publish a simple local asset"
+description: "Support the compatibility registration path for components without split resources."
+---
+
+Manifest packages publish complete immutable releases. If you use the earlier
+`register(..., styles: ..., entryPath: ...)` API, publish the assets before rendering
+the page:
+
+```shell
+php artisan filament:assets
+```
+
+Local CSS and JavaScript URLs use the published content digest. Changing a file
+while preserving its size and modification time still changes its version after
+publication. Rendering does not hash source files. Missing publication metadata
+produces a clear error instead of serving a URL with an unreliable version. Use
+an `AssetPackage` manifest when your component includes imports, workers, fonts or
+other resources, or needs complete-release retention and rollback.
+
+The esbuild adapter requires the complete metafile, including input provenance.
+Keep `metafile: true`, use `createFlexSdkPlugin()`, and declare opaque worker resource
+edges in the build declaration. Output-only metadata cannot establish that your
+package reuses the installed SDK implementation.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

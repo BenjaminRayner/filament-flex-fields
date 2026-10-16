@@ -1,4 +1,4 @@
-<script>
+<script @if (($deliveryNonce = app(\Bjanczak\FilamentFlexFields\Support\Assets\Delivery\AssetDeliveryContext::class)->nonce()) !== null) nonce="{{ $deliveryNonce }}" @endif>
     (function () {
         const themes = {
             light: {

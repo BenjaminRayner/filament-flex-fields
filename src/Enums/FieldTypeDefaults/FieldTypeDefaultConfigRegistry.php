@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Enums\FieldTypeDefaults;
 
 use Bjanczak\FilamentFlexFields\Enums\FieldType;
+use Bjanczak\FilamentFlexFields\Support\TextInput\TextInputOptions;
+use Bjanczak\FilamentFlexFields\Support\Translations;
 
 final class FieldTypeDefaultConfigRegistry
 {
@@ -38,7 +40,7 @@ final class FieldTypeDefaultConfigRegistry
                 'currency' => 'PLN',
                 'locale' => 'pl_PL',
                 'size' => 'md',
-                'variant' => 'primary',
+                'variant' => config('filament-flex-fields.ui.currency_variant', 'primary'),
                 'currencies' => null,
                 'min' => null,
                 'max' => null,
@@ -53,7 +55,7 @@ final class FieldTypeDefaultConfigRegistry
                 'step' => 1,
                 'show_output' => true,
                 'suffix' => '%',
-                'variant' => 'default',
+                'variant' => config('filament-flex-fields.ui.slider_variant', 'default'),
                 'size' => 'md',
                 'track_label' => null,
             ],
@@ -65,7 +67,7 @@ final class FieldTypeDefaultConfigRegistry
                 'suffix' => null,
                 'track_label' => null,
                 'size' => 'md',
-                'variant' => 'default',
+                'variant' => config('filament-flex-fields.ui.slider_variant', 'default'),
             ],
             FieldType::FlexSlider => [
                 'min' => 0,
@@ -73,9 +75,27 @@ final class FieldTypeDefaultConfigRegistry
                 'step' => 1,
                 'is_range' => false,
                 'size' => 'md',
-                'variant' => 'default',
+                'variant' => config('filament-flex-fields.ui.slider_variant', 'default'),
                 'show_value' => true,
                 'show_step_dots' => false,
+                'thumb_style' => 'pill',
+                'icon_button' => null,
+                'icon_button_active_icon' => null,
+                'icon_button_value' => null,
+                'icon_button_restore_value' => null,
+                'icon_button_position' => 'start',
+                'icon_button_label' => null,
+                'icon_button_active_label' => null,
+                'tooltips' => false,
+                'value_placement' => 'footer',
+                'elastic' => false,
+                'haptics' => false,
+                'marks' => [],
+                'start_icon' => null,
+                'end_icon' => null,
+                'stretch_limit' => 26,
+                'detent_distance' => 7,
+                'large_step' => null,
                 'hide_thumb_until_interaction' => false,
                 'fill_track' => true,
                 'value_position' => 'end',
@@ -93,7 +113,7 @@ final class FieldTypeDefaultConfigRegistry
                 'step' => 1,
                 'prefix' => '$',
                 'histogram' => [],
-                'variant' => 'primary',
+                'variant' => config('filament-flex-fields.ui.price_range_variant', 'primary'),
                 'size' => 'md',
                 'integer' => false,
                 'decimal_places' => 0,
@@ -102,7 +122,7 @@ final class FieldTypeDefaultConfigRegistry
                 'max_input_label' => '',
             ],
             FieldType::FlexTextarea => [
-                'variant' => 'primary',
+                'variant' => config('filament-flex-fields.ui.flex_textarea_variant', 'primary'),
                 'size' => 'md',
                 'rows' => 3,
                 'character_counter' => false,
@@ -168,8 +188,8 @@ final class FieldTypeDefaultConfigRegistry
                 'loading' => false,
             ],
             FieldType::CreditCard => [
-                'variant' => 'midnight',
-                'input_variant' => 'primary',
+                'variant' => config('filament-flex-fields.ui.credit_card_variant', 'midnight'),
+                'input_variant' => config('filament-flex-fields.ui.credit_card_input_variant', 'primary'),
                 'size' => 'md',
                 'flip_on_cvv_focus' => true,
                 'mark' => '',
@@ -180,8 +200,8 @@ final class FieldTypeDefaultConfigRegistry
             ],
             FieldType::Phone => [
                 'size' => 'md',
-                'variant' => 'primary',
-                'default_country' => 'PL',
+                'variant' => config('filament-flex-fields.ui.phone_variant', 'primary'),
+                'default_country' => config('filament-flex-fields.ui.phone_default_country', 'PL'),
                 'countries' => null,
                 'except_countries' => [],
                 'searchable' => true,
@@ -201,19 +221,21 @@ final class FieldTypeDefaultConfigRegistry
             ],
             FieldType::Country => [
                 'size' => 'md',
-                'variant' => 'primary',
-                'default_country' => 'PL',
+                'variant' => config('filament-flex-fields.ui.country_variant', 'primary'),
+                'default_country' => config('filament-flex-fields.ui.country_default_country', 'PL'),
                 'countries' => null,
                 'except_countries' => [],
+                'additional_regions' => [],
                 'searchable' => true,
                 'browser_locale_default' => false,
                 'browser_locale_sort_first' => false,
                 'show_country_code' => false,
                 'show_dial_code' => false,
             ],
+            FieldType::FontSelect => ['providers' => ['google'], 'fonts' => null, 'except_fonts' => [], 'categories' => [], 'subsets' => [], 'local_fonts' => [], 'category_labels' => [], 'variable_only' => false, 'per_page' => 48, 'preview_weight' => 400, 'preview_style' => 'normal', 'preview_text' => null, 'preview_selected_font' => true, 'sort_fonts' => 'popularity', 'category_tabs' => true, 'size' => 'md', 'variant' => 'bordered'],
             FieldType::Timezone => [
                 'size' => 'md',
-                'variant' => 'primary',
+                'variant' => config('filament-flex-fields.ui.timezone_variant', 'primary'),
                 'default_timezone' => null,
                 'timezones' => null,
                 'except_timezones' => [],
@@ -225,7 +247,7 @@ final class FieldTypeDefaultConfigRegistry
             ],
             FieldType::Schedule => [
                 'size' => 'md',
-                'variant' => 'primary',
+                'variant' => config('filament-flex-fields.ui.schedule_variant', 'primary'),
                 'days' => null,
                 'timezone' => 'UTC',
                 'time_step' => 5,
@@ -246,7 +268,7 @@ final class FieldTypeDefaultConfigRegistry
                 'required_fields' => [],
                 'searchable' => true,
                 'size' => 'md',
-                'variant' => 'primary',
+                'variant' => config('filament-flex-fields.ui.address_autocomplete_variant', 'primary'),
                 'mapbox_token' => null,
                 'placeholder' => null,
             ]),
@@ -266,7 +288,7 @@ final class FieldTypeDefaultConfigRegistry
                 'picture_in_picture' => false,
                 'allow_youtube' => true,
                 'youtube_no_cookie' => true,
-                'auto_hide_controls' => true,
+                'auto_hide_controls' => (bool) config('filament-flex-fields.ui.video_auto_hide_controls', true),
                 'poster' => null,
                 'placeholder' => null,
                 'title' => '',
@@ -281,6 +303,8 @@ final class FieldTypeDefaultConfigRegistry
                 'airplay' => false,
                 'playback_rates' => [],
                 'quality_options' => [],
+                'preview_source' => null,
+                'preview_thumbnails' => [],
                 'compact_controls' => false,
             ],
             FieldType::Audio => [
@@ -297,8 +321,9 @@ final class FieldTypeDefaultConfigRegistry
                 'directory' => 'voice-notes',
             ],
             FieldType::Barcode => [
+                'confirm_scan' => false,
                 'size' => 'md',
-                'variant' => 'primary',
+                'variant' => config('filament-flex-fields.ui.barcode_scanner_variant', 'primary'),
                 'formats' => null,
                 'continuous' => false,
                 'beep_on_scan' => true,
@@ -339,7 +364,7 @@ final class FieldTypeDefaultConfigRegistry
             FieldType::TrafficSplit => [
                 'segment_count' => 3,
                 'size' => 'md',
-                'variant' => 'default',
+                'variant' => config('filament-flex-fields.ui.traffic_split_variant', 'default'),
                 'labels' => [],
                 'locked_segments' => [],
                 'min_weight' => 12,
@@ -352,7 +377,7 @@ final class FieldTypeDefaultConfigRegistry
             FieldType::SegmentControl => [
                 'options' => [],
                 'size' => 'md',
-                'variant' => 'default',
+                'variant' => config('filament-flex-fields.ui.segment_variant', 'default'),
                 'full_width' => false,
                 'separators' => true,
                 'icon_only' => false,
@@ -366,7 +391,7 @@ final class FieldTypeDefaultConfigRegistry
                 'layout' => 'stack',
                 'grid_columns' => 1,
                 'indicator' => 'radio',
-                'variant' => 'default',
+                'variant' => config('filament-flex-fields.ui.choice_cards_variant', 'default'),
                 'size' => 'md',
                 'color' => '',
                 'ripple' => false,
@@ -377,7 +402,7 @@ final class FieldTypeDefaultConfigRegistry
                 'layout' => 'stack',
                 'grid_columns' => 1,
                 'indicator' => 'checkbox',
-                'variant' => 'default',
+                'variant' => config('filament-flex-fields.ui.choice_cards_variant', 'default'),
                 'size' => 'md',
                 'color' => '',
                 'ripple' => false,
@@ -391,7 +416,7 @@ final class FieldTypeDefaultConfigRegistry
                 'multiple' => false,
                 'columns' => 4,
                 'indicator' => null,
-                'variant' => 'default',
+                'variant' => config('filament-flex-fields.ui.choice_cards_variant', 'default'),
                 'size' => 'md',
                 'rounding' => 'lg',
                 'color' => '',
@@ -437,7 +462,7 @@ final class FieldTypeDefaultConfigRegistry
                 'color' => 'primary',
             ],
             FieldType::Toggle => [
-                'variant' => 'default',
+                'variant' => config('filament-flex-fields.ui.switch_variant', 'default'),
                 'layout' => 'row',
                 'size' => 'md',
                 'label_position' => 'start',
@@ -460,7 +485,7 @@ final class FieldTypeDefaultConfigRegistry
                 'multiple' => false,
                 'searchable' => false,
                 'size' => 'md',
-                'variant' => 'bordered',
+                'variant' => config('filament-flex-fields.ui.select_variant', 'bordered'),
                 'clearable' => true,
                 'chip_color' => 'neutral',
                 'disabled' => false,
@@ -492,8 +517,9 @@ final class FieldTypeDefaultConfigRegistry
                 'searchable' => true,
             ],
             FieldType::DualListbox => [
+                'virtual_threshold' => 100,
                 'options' => [],
-                'variant' => 'bordered',
+                'variant' => config('filament-flex-fields.ui.dual_listbox_variant', 'bordered'),
                 'size' => 'md',
                 'searchable' => true,
                 'reorderable' => true,
@@ -510,7 +536,7 @@ final class FieldTypeDefaultConfigRegistry
             ],
             FieldType::BubbleChoice => [
                 'options' => [],
-                'variant' => 'soft',
+                'variant' => config('filament-flex-fields.ui.bubble_choice_variant', 'soft'),
                 'size' => 'md',
                 'arena_height' => '500px',
                 'selected_shape' => 'scallop',
@@ -597,8 +623,8 @@ final class FieldTypeDefaultConfigRegistry
                     ['value' => '9', 'label' => '9'],
                     ['value' => '10', 'label' => '10'],
                 ],
-                'min_label' => 'Not at all likely',
-                'max_label' => 'Extremely likely',
+                'min_label' => Translations::get('filament-flex-fields::default.nps.min'),
+                'max_label' => Translations::get('filament-flex-fields::default.nps.max'),
                 'size' => 'md',
                 'rounding' => '',
                 'disabled_options' => [],
@@ -663,7 +689,7 @@ final class FieldTypeDefaultConfigRegistry
             ],
             FieldType::IconPicker => [
                 'size' => 'md',
-                'variant' => 'bordered',
+                'variant' => config('filament-flex-fields.ui.icon_picker_variant', 'bordered'),
                 'sets' => [],
                 'icons' => [],
                 'exclude_icons' => [],
@@ -688,9 +714,9 @@ final class FieldTypeDefaultConfigRegistry
      */
     private static function flexTextInput(): array
     {
-        return [
-            'variant' => 'primary',
-            'size' => 'md',
+        return array_replace(TextInputOptions::schemaDefaults(), [
+            'variant' => config('filament-flex-fields.ui.flex_text_input_variant', 'primary'),
+            'size' => config('filament-flex-fields.ui.flex_text_input_size', 'md'),
             'speech_dictation' => false,
             'speech_dictation_language' => null,
             'emoji_picker' => false,
@@ -717,7 +743,7 @@ final class FieldTypeDefaultConfigRegistry
             'focus_outline' => true,
             'min_length' => null,
             'max_length' => null,
-        ];
+        ]);
     }
 
     /**
@@ -727,7 +753,7 @@ final class FieldTypeDefaultConfigRegistry
     {
         return [
             'size' => 'md',
-            'variant' => 'primary',
+            'variant' => config('filament-flex-fields.ui.date_time_variant', 'primary'),
             'granularity' => 'day',
             'hour_cycle' => 24,
             'time_picker' => 'segmented',

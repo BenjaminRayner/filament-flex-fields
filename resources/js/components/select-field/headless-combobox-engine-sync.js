@@ -11,6 +11,7 @@ import {
     commitHeadlessSelectionToWire,
 } from './headless-select-state.js'
 import { DEFAULT_VIRTUALIZE_THRESHOLD } from '../../core/combobox-engine.js'
+import { readRawOptionSnapshot } from '../../select/options/option-snapshot.js'
 
 function defaultGetOptionLabel(option) {
     return headlessOptionLabelHtml(option, 'dropdown')
@@ -25,10 +26,6 @@ function defaultGetOptionLabel(option) {
  * @param {{ isGridLayout?: boolean, virtualizeThreshold?: number }} ctx
  */
 export function shouldBypassOptionsLimitForVirtualization(filtered, ctx = {}) {
-    if (ctx.isGridLayout) {
-        return false
-    }
-
     const threshold = ctx.virtualizeThreshold ?? DEFAULT_VIRTUALIZE_THRESHOLD
     const count = flattenHeadlessOptions(filtered).length
 
@@ -37,13 +34,19 @@ export function shouldBypassOptionsLimitForVirtualization(filtered, ctx = {}) {
 
 export function createHeadlessComboboxEngineSyncMixin() {
     return {
+        _optionProjectionRevision: 0,
+        _engineQueryRevision: 0,
+        _headlessOptionProjection: null,
         applyComboboxQueryToEngine() {
+            const before = this._engine?.getSnapshot().query
             this._engine?.setQuery(this.comboboxQuery)
-
-            if (! this.hasDynamicSearchResults) {
-                this._engine?.setOptions(flattenHeadlessOptions(this.options))
+            if (before !== this._engine?.getSnapshot().query) {
+                this._engineQueryRevision++
+                this._displayRowsCache = null
+                this._highlightedDisplayRowKey = null
+                this.invalidateVirtualRowProjection?.()
+                this.virtualScrollTick = (this.virtualScrollTick ?? 0) + 1
             }
-
             this._syncFromEngine()
         },
 
@@ -78,7 +81,7 @@ export function createHeadlessComboboxEngineSyncMixin() {
 
             const snapshot = this._engine.getSnapshot()
 
-            if (this.hasDynamicSearchResults) {
+            if (this.hasDynamicSearchResults && (!this.usesInlineSearchTriggerInput() || this.comboboxOpen)) {
                 this.comboboxQuery = snapshot.query
             }
 
@@ -106,47 +109,43 @@ export function createHeadlessComboboxEngineSyncMixin() {
             }
         },
 
-        comboboxFilteredOptionTree() {
-            const tree = Array.isArray(this.options) ? this.options : []
+        resolveHeadlessOptionProjection() {
+            const source = Array.isArray(this.options) ? readRawOptionSnapshot(this.options) : []
             const query = String(this.comboboxQuery ?? '').trim()
-
-            let filtered = tree
-
-            if (this.searchable && ! this.hasDynamicSearchResults && query !== '') {
-                filtered = filterHeadlessOptionTree(
-                    tree,
-                    query,
-                    (option) => defaultGetOptionLabel(option),
-                    this.searchableOptionFields,
-                )
+            const signature = JSON.stringify([
+                query, this._optionProjectionRevision ?? 0, this.searchable, this.hasDynamicSearchResults,
+                this.isGridLayout, this.virtualizeThreshold, this.optionsLimit, this.searchableOptionFields,
+            ])
+            const cached = this._headlessOptionProjection
+            if (cached?.source === source && cached.signature === signature) return cached
+            let tree = source
+            if (this.searchable && !this.hasDynamicSearchResults && query) {
+                tree = filterHeadlessOptionTree(source, query, (option) => defaultGetOptionLabel(option), this.searchableOptionFields)
             }
-
-            if (shouldBypassOptionsLimitForVirtualization(filtered, {
-                isGridLayout: this.isGridLayout,
-                virtualizeThreshold: this.virtualizeThreshold,
-            })) {
-                return filtered
-            }
-
-            return limitHeadlessOptionTree(filtered, this.optionsLimit)
+            if (!shouldBypassOptionsLimitForVirtualization(tree, {
+                isGridLayout: this.isGridLayout, virtualizeThreshold: this.virtualizeThreshold,
+            })) tree = limitHeadlessOptionTree(tree, this.optionsLimit)
+            const flat = flattenHeadlessOptions(tree)
+            const positions = new Map()
+            flat.forEach((option, index) => positions.set(String(headlessOptionValue(option)), index))
+            this._headlessOptionProjection = Object.freeze({ source, signature, tree, flat, positions })
+            return this._headlessOptionProjection
         },
 
-        getEngineOptions() {
-            return flattenHeadlessOptions(this.comboboxFilteredOptionTree())
-        },
+        comboboxFilteredOptionTree() { return this.resolveHeadlessOptionProjection().tree },
+        getEngineOptions() { return this.resolveHeadlessOptionProjection().flat },
 
         syncEngineOptions() {
-            const next = flattenHeadlessOptions(this.options)
+            const next = flattenHeadlessOptions(readRawOptionSnapshot(this.options))
             const fingerprint = this.fingerprintHeadlessOptions(next)
 
             // Replacing flatOptions on every open re-runs Alpine x-html for the
             // trigger + rows (optionView avatars remount and flash ~1s).
             if (fingerprint === this._engineOptionsFingerprint) {
-                this._engine?.setOptions(next)
-
                 return
             }
 
+            this._optionProjectionRevision = (this._optionProjectionRevision ?? 0) + 1
             this._engineOptionsFingerprint = fingerprint
             this.flatOptions = next
             this._engine?.setOptions(next)
@@ -158,13 +157,8 @@ export function createHeadlessComboboxEngineSyncMixin() {
                 return '0'
             }
 
-            let fingerprint = String(options.length)
-
-            for (const option of options) {
-                fingerprint += `\0${headlessOptionValue(option)}`
-                fingerprint += `\0${option?.triggerLabel ?? ''}`
-                fingerprint += `\0${option?.label ?? ''}`
-            }
+            // The wire transport is JSON data; include disabled, descriptions and rich metadata.
+            const fingerprint = JSON.stringify(readRawOptionSnapshot(options))
 
             return fingerprint
         },
@@ -176,7 +170,7 @@ export function createHeadlessComboboxEngineSyncMixin() {
         headlessOptionFlatIndex(value) {
             const normalized = String(value)
 
-            return this.getEngineOptions().findIndex((option) => headlessOptionValue(option) === normalized)
+            return this.resolveHeadlessOptionProjection().positions.get(normalized) ?? -1
         }
     }
 }

@@ -1,0 +1,44 @@
+.fff-intelligence-overview, .fff-intelligence-results {
+    --fff-intelligence-text: #18181b;
+    --fff-intelligence-muted: #71717a;
+    --fff-intelligence-line: #e4e4e7;
+    --fff-intelligence-surface: #fafafa;
+    color: var(--fff-intelligence-text);
+}
+.dark .fff-intelligence-overview, .dark .fff-intelligence-results {
+    --fff-intelligence-text: #fafafa;
+    --fff-intelligence-muted: #a1a1aa;
+    --fff-intelligence-line: #3f3f46;
+    --fff-intelligence-surface: #27272a;
+}
+.fff-intelligence-overview { display: grid; gap: 24px; padding-block: 8px 16px; }
+.fff-intelligence-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--primary-600, #7c3aed); }
+.fff-intelligence-heading { margin-block: 10px 12px; font-size: clamp(24px, 3vw, 36px); font-weight: 650; line-height: 1.15; letter-spacing: -.035em; }
+.fff-intelligence-description { max-width: 720px; line-height: 1.7; font-size: 14px; color: var(--fff-intelligence-muted); }
+.fff-intelligence-capabilities { display: flex; flex-wrap: wrap; gap: 8px; }
+.fff-intelligence-capabilities > span { border: 1px solid var(--fff-intelligence-line); border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: 500; }
+.fff-intelligence-results { min-width: 0; border: 1px solid var(--fff-intelligence-line); border-radius: 24px; overflow: hidden; }
+.fff-intelligence-status { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 16px 20px; font-size: 12px; font-weight: 600; border-block-end: 1px solid var(--fff-intelligence-line); }
+.fff-intelligence-status-dot { flex: 0 0 7px; width: 7px; height: 7px; background: var(--primary-500, #8b5cf6); border-radius: 50%; }
+.fff-intelligence-status[data-valid="false"] .fff-intelligence-status-dot { background: #ef4444; }
+.fff-intelligence-count { margin-inline-start: auto; color: var(--fff-intelligence-muted); font-weight: 400; }
+.fff-intelligence-output-grid { display: flex; flex-wrap: wrap; gap: 1px; background: var(--fff-intelligence-line); }
+.fff-intelligence-output { flex: 1 1 180px; display: flex; flex-direction: column; min-width: 0; gap: 8px; padding: 20px; background: var(--fff-intelligence-surface); }
+.fff-intelligence-output > span, .fff-intelligence-formula-result > span { font-size: 12px; color: var(--fff-intelligence-muted); }
+.fff-intelligence-output > strong { font-size: 27px; font-weight: 600; letter-spacing: -.04em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.fff-intelligence-output > code { font-size: 11px; line-height: 1.6; color: var(--fff-intelligence-muted); overflow-wrap: anywhere; }
+.fff-intelligence-output > small { font-size: 11px; color: var(--primary-600, #7c3aed); }
+.fff-intelligence-details { padding: 12px 20px; border-block-start: 1px solid var(--fff-intelligence-line); font-size: 12px; }
+.fff-intelligence-details > summary { cursor: pointer; color: var(--fff-intelligence-muted); width: fit-content; }
+.fff-intelligence-details > ol { display: grid; gap: 10px; padding-block-start: 16px; padding-inline-start: 18px; list-style: decimal; }
+.fff-intelligence-details li > span { display: block; margin-block-start: 3px; color: var(--fff-intelligence-muted); }
+.fff-intelligence-errors { padding: 16px 20px; color: #dc2626; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.dark .fff-intelligence-errors { color: #fca5a5; }
+.fff-intelligence-formula-result { display: flex; flex-direction: column; gap: 10px; padding: 20px; }
+.fff-intelligence-formula-result > strong { font-size: 40px; line-height: 1.2; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.fff-intelligence-formula-result > code { font-size: 13px; overflow-wrap: anywhere; }
+.fff-intelligence-meta { display: grid; grid-template-columns: 1fr 1fr; border-block-start: 1px solid var(--fff-intelligence-line); }
+.fff-intelligence-meta > span { display: grid; gap: 8px; padding: 16px 20px; color: var(--fff-intelligence-muted); font-size: 12px; }
+.fff-intelligence-meta strong { color: var(--fff-intelligence-text); font-weight: 500; }
+.fff-intelligence-annotation { padding: 16px 20px; font-size: 12px; overflow-wrap: anywhere; color: var(--fff-intelligence-muted); }
+@media (max-width: 639px) { .fff-intelligence-meta { grid-template-columns: 1fr; } .fff-intelligence-count { margin-inline-start: 15px; } .fff-intelligence-output { padding: 16px; } }

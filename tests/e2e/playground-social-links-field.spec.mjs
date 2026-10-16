@@ -10,7 +10,7 @@ test.describe('Flex Fields playground social links field', () => {
         await page.goto('/social-links-field')
 
         await expect(page.locator('.fff-social-links').first()).toBeVisible()
-        await expect(page.locator('.fff-social-links__add-trigger').first()).toBeVisible()
+        await expect(page.locator('.fff-social-links .fff-select-control__trigger').first()).toBeVisible()
 
         assertClean()
     })
@@ -20,11 +20,11 @@ test.describe('Flex Fields playground social links field', () => {
 
         await page.goto('/social-links-field')
 
-        const addTrigger = page.locator('.fff-social-links__add-trigger').first()
+        const addTrigger = page.locator('.fff-social-links .fff-select-control__trigger').first()
 
         await expect(addTrigger).toBeVisible()
         await expect(addTrigger).toHaveAttribute('aria-haspopup', 'listbox')
-        await expect(page.locator('[role="listbox"]').first()).toHaveCount(0)
+        await expect(page.locator('[role="listbox"]:visible')).toHaveCount(0)
 
         assertClean()
     })

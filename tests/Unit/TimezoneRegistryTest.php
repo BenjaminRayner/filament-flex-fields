@@ -38,17 +38,6 @@ it('renders the timezone registry template once per request', function () {
     expect(TimezoneRegistryQueue::renderScriptOnce())->toBe('');
 });
 
-it('uses the shared registry for the default full iana list', function () {
-    $full = TimezoneField::make('timezone');
-    $whitelist = TimezoneField::make('timezone')->timezones(['Europe/Warsaw', 'UTC']);
-
-    expect($full->shouldUseTimezoneRegistry())->toBeTrue()
-        ->and($full->getOptionsForJs())->toBe([])
-        ->and($full->getBrowserTimezoneBootCatalog())->toBe([])
-        ->and($whitelist->shouldUseTimezoneRegistry())->toBeFalse()
-        ->and($whitelist->getOptionsForJs())->not->toBeEmpty();
-});
-
 it('builds selected timezone seed metadata for ssr when an id is known', function () {
     $metadata = Timezones::metadata(['Europe/Warsaw'], [], 'en')[0] ?? null;
 

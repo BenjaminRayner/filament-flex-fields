@@ -1,6 +1,7 @@
 @import "tailwindcss/theme";
-@import "tailwindcss/utilities";
+@import "tailwindcss/utilities" source(none);
 @import "./base.css";
+@import "./core/tailwind-foundation.css";
 
 /*
  * Match Filament's class-based dark mode strategy. Without this, `dark:*`
@@ -12,6 +13,7 @@
 
 @source "../../src/**/*.php";
 @source "../views/**/*.blade.php";
+@source "../js/**/*.js";
 
 @import "./core/hint-icon.css";
 @import "./core/hint-tooltips.css";

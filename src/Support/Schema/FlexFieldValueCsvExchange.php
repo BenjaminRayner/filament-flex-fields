@@ -6,119 +6,176 @@ namespace Bjanczak\FilamentFlexFields\Support\Schema;
 
 use Bjanczak\FilamentFlexFields\Data\FlexFieldDefinition;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsConfig;
+use Bjanczak\FilamentFlexFields\Support\Values\Csv\CsvValueCodec;
+use Generator;
+use InvalidArgumentException;
+use RuntimeException;
 
+/** CSV transport; typed values preserve null, strings, booleans and nested structures. */
 final class FlexFieldValueCsvExchange
 {
+    private const MAX_IMPORT_BYTES = 16 * 1024 * 1024;
+
+    private const MAX_IMPORT_ROWS = 100000;
+
     /**
      * @param  iterable<FlexFieldDefinition>  $definitions
      * @param  iterable<object>  $records
      */
-    public function export(iterable $definitions, iterable $records, string $valuesColumn = ''): string
+    public function export(iterable $definitions, iterable $records, string $valuesColumn = '', string $profile = 'typed'): string
     {
-        $column = $valuesColumn !== '' ? $valuesColumn : FlexFieldsConfig::getValuesColumn();
-        $headers = ['id', ...collect($definitions)->map(fn (FlexFieldDefinition $definition): string => $definition->slug)->all()];
-        $lines = [implode(',', $headers)];
+        return implode('', iterator_to_array($this->exportRows($definitions, $records, $valuesColumn, $profile), false));
+    }
 
-        foreach ($records as $record) {
-            $row = [(string) (is_object($record) && method_exists($record, 'getKey')
-                ? $record->getKey()
-                : (is_object($record) ? ($record->id ?? '') : ''))];
-
-            foreach ($definitions as $definition) {
-                $value = data_get($record, "{$column}.{$definition->slug}");
-                $row[] = $this->escapeCsv($this->stringifyValue($value, $definition));
-            }
-
-            $lines[] = implode(',', $row);
+    /**
+     * Streaming counterpart: emits one correctly quoted CSV record at a time.
+     *
+     * @param  iterable<FlexFieldDefinition>  $definitions
+     * @param  iterable<object>  $records
+     * @return Generator<int, string>
+     */
+    public function exportRows(iterable $definitions, iterable $records, string $valuesColumn = '', string $profile = 'typed'): Generator
+    {
+        if (! in_array($profile, ['typed', 'legacy', 'spreadsheet'], true)) {
+            throw new InvalidArgumentException('Unknown CSV export profile.');
         }
 
-        return implode("\n", $lines);
+        $definitions = $this->definitionsBySlug($definitions);
+        $column = $valuesColumn !== '' ? $valuesColumn : FlexFieldsConfig::getValuesColumn();
+        $headers = ['id', ...array_map(strval(...), array_keys($definitions))];
+        yield $this->row($profile === 'spreadsheet' ? array_map(CsvValueCodec::spreadsheetSafe(...), $headers) : $headers);
+
+        foreach ($records as $record) {
+            $id = (string) (method_exists($record, 'getKey') ? $record->getKey() : ($record->id ?? ''));
+            $row = [$profile === 'spreadsheet' ? CsvValueCodec::spreadsheetSafe($id) : $id];
+
+            foreach ($definitions as $definition) {
+                $row[] = CsvValueCodec::encode(data_get($record, "{$column}.{$definition->slug}"), $definition, $profile);
+            }
+
+            yield $this->row($row);
+        }
     }
 
     /**
      * @param  iterable<FlexFieldDefinition>  $definitions
      * @return array<string, array<string, mixed>>
      */
-    public function import(string $csv, iterable $definitions): array
+    public function import(string $csv, iterable $definitions, bool $ignoreUnknownColumns = false): array
     {
-        $lines = preg_split('/\R/', trim($csv)) ?: [];
-        $header = str_getcsv(array_shift($lines) ?? '') ?: [];
-        $slugIndex = array_flip(array_slice($header, 1));
+        if (strlen($csv) > self::MAX_IMPORT_BYTES) {
+            throw new InvalidArgumentException('CSV import exceeds 16 MiB.');
+        }
 
-        $definitionsBySlug = collect($definitions)->keyBy(fn (FlexFieldDefinition $definition): string => $definition->slug);
+        $definitions = $this->definitionsBySlug($definitions);
+        $stream = fopen('php://temp/maxmemory:2097152', 'r+b');
 
-        $payload = [];
+        if ($stream === false) {
+            throw new RuntimeException('Unable to allocate CSV parser stream.');
+        }
 
-        foreach ($lines as $line) {
-            if (trim($line) === '') {
-                continue;
+        try {
+            if (fwrite($stream, $csv) !== strlen($csv) || ! rewind($stream)) {
+                throw new RuntimeException('Unable to prepare CSV parser stream.');
             }
 
-            $cells = str_getcsv($line);
-            $recordId = (string) ($cells[0] ?? '');
+            $header = fgetcsv($stream, null, ',', '"', '');
 
-            if ($recordId === '') {
-                continue;
+            if ($header === false) {
+                return [];
             }
 
-            $values = [];
+            $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', (string) ($header[0] ?? ''));
 
-            foreach ($slugIndex as $slug => $headerIndex) {
-                $definition = $definitionsBySlug->get($slug);
+            if ($header[0] !== 'id' || count(array_unique($header)) !== count($header)) {
+                throw new InvalidArgumentException('CSV needs a unique id header and unique field headers.');
+            }
 
-                if ($definition === null) {
+            foreach (array_slice($header, 1) as $slug) {
+                if (! is_string($slug) || (! isset($definitions[$slug]) && ! $ignoreUnknownColumns)) {
+                    throw new InvalidArgumentException('CSV contains an empty or unknown field header.');
+                }
+            }
+
+            $payload = [];
+            $rowNumber = 1;
+
+            while (($cells = fgetcsv($stream, null, ',', '"', '')) !== false) {
+                if ($cells === [null]) {
                     continue;
                 }
 
-                $values[$slug] = $this->castImportedValue($cells[(int) $headerIndex + 1] ?? null, $definition);
+                $rowNumber++;
+
+                if ($rowNumber > self::MAX_IMPORT_ROWS + 1 || count($cells) !== count($header)) {
+                    throw new InvalidArgumentException("Invalid CSV width or row limit at record {$rowNumber}.");
+                }
+
+                $id = (string) ($cells[0] ?? '');
+
+                if ($id === '' || array_key_exists($id, $payload)) {
+                    throw new InvalidArgumentException("Missing or duplicate record id at CSV record {$rowNumber}.");
+                }
+
+                $values = [];
+
+                foreach (array_slice($header, 1, null, true) as $index => $slug) {
+                    if (is_string($slug) && isset($definitions[$slug])) {
+                        $values[$slug] = CsvValueCodec::decode($cells[$index], $definitions[$slug]);
+                    }
+                }
+
+                $payload[$id] = $values;
             }
 
-            $payload[$recordId] = $values;
+            return $payload;
+        } finally {
+            fclose($stream);
         }
-
-        return $payload;
     }
 
-    protected function stringifyValue(mixed $value, FlexFieldDefinition $definition): string
+    /**
+     * @param  iterable<FlexFieldDefinition>  $definitions
+     * @return array<string, FlexFieldDefinition>
+     */
+    private function definitionsBySlug(iterable $definitions): array
     {
-        if ($definition->isEncrypted && is_string($value)) {
-            $value = FlexFieldEncryption::decrypt($value);
+        $indexed = [];
+
+        foreach ($definitions as $definition) {
+            if ($definition->slug === '' || $definition->slug === 'id' || isset($indexed[$definition->slug])) {
+                throw new InvalidArgumentException('CSV field slugs must be unique and cannot be id.');
+            }
+
+            $indexed[$definition->slug] = $definition;
         }
 
-        if (is_array($value)) {
-            return json_encode($value) ?: '';
-        }
-
-        if (is_bool($value)) {
-            return $value ? '1' : '0';
-        }
-
-        return (string) ($value ?? '');
+        return $indexed;
     }
 
-    protected function castImportedValue(?string $value, FlexFieldDefinition $definition): mixed
+    /** @param list<string> $values */
+    private function row(array $values): string
     {
-        if ($value === null || $value === '') {
-            return null;
+        $stream = fopen('php://temp', 'r+b');
+
+        if ($stream === false) {
+            throw new RuntimeException('Unable to allocate CSV writer.');
         }
 
-        if (in_array($definition->type->value, ['toggle', 'switch_field'], true)) {
-            return in_array(strtolower($value), ['1', 'true', 'yes'], true);
+        try {
+            if (fputcsv($stream, $values, ',', '"', '', "\n") === false || ! rewind($stream)) {
+                throw new RuntimeException('Unable to encode CSV record.');
+            }
+
+            $row = stream_get_contents($stream);
+
+            if ($row === false) {
+                throw new RuntimeException('Unable to read encoded CSV record.');
+            }
+
+            return $row;
+        } finally {
+            fclose($stream);
         }
-
-        if ($definition->isEncrypted) {
-            return FlexFieldEncryption::encrypt($value);
-        }
-
-        return $value;
-    }
-
-    protected function escapeCsv(string $value): string
-    {
-        if (str_contains($value, ',') || str_contains($value, '"') || str_contains($value, "\n")) {
-            return '"'.str_replace('"', '""', $value).'"';
-        }
-
-        return $value;
     }
 }

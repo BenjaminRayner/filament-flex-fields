@@ -18,7 +18,7 @@ final class RegistersTranslatableFieldMacros
             ?Closure $modifyFieldsUsing = null,
         ): TranslatableFields {
             /** @var Field $this */
-            $component = TranslatableFields::make($this->getLabel())
+            $component = TranslatableFields::make(fn (TranslatableFields $component): string|\Illuminate\Contracts\Support\Htmlable|null => $this->getClone()->container($component->getContainer())->getLabel())
                 ->schema([$this]);
 
             if ($locales !== null) {

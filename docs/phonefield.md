@@ -1,15 +1,125 @@
 ---
 title: "PhoneField"
+description: "Collect international phone numbers with a searchable country selector, local flags, dial codes, normalization and PHP validation."
+icon: "phone"
+"canonical": "https://flex-fields.bjanczak.com/docs/phonefield"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/phone-field.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "PhoneField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/phone-field-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/phone-field-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/phone-field.webp"
+"twitter:image:alt": "PhoneField in the FLEX Fields playground"
 ---
 
-![PhoneField](/art/phone-field.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/phonefield#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/phonefield",
+      "name": "PhoneField",
+      "description": "Collect international phone numbers with a searchable country selector, local flags, dial codes, normalization and PHP validation.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/phonefield#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/phonefield#article",
+      "url": "https://flex-fields.bjanczak.com/docs/phonefield",
+      "headline": "PhoneField",
+      "description": "Collect international phone numbers with a searchable country selector, local flags, dial codes, normalization and PHP validation.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/phonefield#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/phone-field-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/phone-field-motion.mp4#video",
+      "name": "PhoneField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of PhoneField in the FLEX Fields playground for Filament. Collect international phone numbers with a searchable country selector, local flags, dial codes, normalization and PHP validation.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/phone-field.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT10.917S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/phone-field-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/phonefield#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/phone-field-motion.mp4"
+  poster="/art/previews/phone-field.webp"
+  width="1920"
+  height="1080"
+  aria-label="PhoneField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/phone-field-motion.mp4">Watch the PhoneField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
 
 ### Summary
 
-International phone input with searchable country picker, libphonenumber validation, and structured state (`country`, `national`, `e164`).
+International phone input with searchable country picker, local circle flags, libphonenumber validation, and structured state (`country`, `national`, `e164`).
 
 | | |
 |---|---|
@@ -55,11 +165,16 @@ PhoneField::make('phone')
         : null);
 ```
 
+To store the default composite value, use a JSON column with an Eloquent `array`
+cast. Its `country` key is a code such as `PL` or `DE`, never the country label.
+Country names, flag URLs and dropdown descriptions are not persisted. Saving only
+E.164 is optional, using the dehydration callback above.
+
 ### State format
 
 | Key | Description | Example |
 |-----|-------------|---------|
-| `country` | ISO 3166-1 alpha-2 region code | `PL` |
+| `country` | Uppercase telephone region code (ISO alpha-2, or supported `AC` / `TA` / `XK`) | `PL` |
 | `national` | After a successful `normalizeState()`, libphonenumber **NATIONAL** formatting by default (spaces / punctuation). Opt-in `nationalDigitsOnly()` / `nationalFormat('digits')` stores digits only. The Alpine as-you-type UI keeps digits internally and formats for display. | `512 345 678` or `512345678` |
 | `e164` | E.164 when the number is valid; otherwise may be empty or a provisional dial+digits string | `+48512345678` |
 | `international` / `rfc3966` | Optional — when `includeFormats([...])` is enabled | `+48 512 345 678`, `tel:+48-512-345-678` |
@@ -71,7 +186,7 @@ On hydrate and dehydrate, `normalizeState()` runs automatically. A plain `string
 
 | Behaviour | Detail |
 |-----------|--------|
-| Built-in | Custom rule on normalized array; uses libphonenumber |
+| Built-in | Checks submitted region and number shape before normalization, then validates with libphonenumber |
 | `required()` | `national` must not be empty |
 | `mobileOnly()` | Sugar for `allowTypes([MOBILE])` (also accepts `FIXED_LINE_OR_MOBILE` unless `strictTypes()`) |
 | `fixedLineOnly()` | Sugar for `allowTypes([FIXED_LINE])` |
@@ -95,7 +210,7 @@ Visual style shared with FlexTextInput. Values: `primary` (default), `secondary`
 #### `size(string|ControlSize|Closure $size)`
 
 
-Control height. See [Control size](/docs/shared-concepts). Default: `md`.
+Control height. See [Control size](/docs/configuration). Default: `md`.
 
 ```php
 PhoneField::make('field_name')
@@ -195,7 +310,7 @@ PhoneField::make('field_name')
 #### `locale(string|Closure|null $locale)`
 
 
-Language for country names in the picker (`en` → Poland, `pl` → Polska). Defaults to `app()->getLocale()`.
+Language for country names in the picker (`en` → Poland, `pl` → Polska). Defaults to `app()->getLocale()`. CountryField and PhoneField share the same translation resolver: package overrides first, then PHP ICU regional names, then English fallback. Names are identical on the initial render and in the dropdown.
 
 ```php
 PhoneField::make('phone')->locale('pl');
@@ -343,7 +458,7 @@ Slug: **`phone-field`**
 | Digits / region / enriched | `nationalDigitsOnly()`, `validateForRegion()`, formats + metadata |
 | Allow types | `allowTypes(['VOIP','MOBILE'])` |
 
-`/admin/flex-fields-playground/phone-field` — see [Playground](/docs/index#playground).
+`/admin/flex-fields/phone-field` — see [Playground](/docs/index#playground).
 
 ---
 
@@ -357,3 +472,45 @@ Slug: **`phone-field`**
 | [AddressAutocompleteField](/docs/addressautocompletefield) | Structured address with optional phone |
 
 ---
+
+### Country catalog and local flags
+
+The country picker follows libphonenumber's supported telephone regions, including
+`AC`, `TA` and `XK`. It is intentionally separate from CountryField's default 249-entry
+ISO address catalog: some ISO territories do not have a supported calling-code region.
+The exact telephone list follows the installed libphonenumber metadata version.
+`countries()` and `exceptCountries()` constrain both selection and locale detection.
+
+Both pickers share one `country-flags` asset publication. All supported flags are
+materialized local SVG files, including territories whose upstream files are aliases.
+No external flag CDN is contacted. Publish them through the standard installation steps:
+
+```bash
+php artisan filament:assets
+php artisan fff:assets:publish
+```
+
+See [Installation](/docs/installation) for deployment and asset checks. Country names
+and metadata are cached within the request; no browser-side country-name library or
+full flag preloading is required.
+
+The current installed libphonenumber metadata contains **245 telephone regions**,
+while CountryField defaults to **249 ISO entries**. Telephone regions are not a
+superset of the address catalog. Every supported region has a local flag and a
+calling prefix from libphonenumber, including shared prefixes such as `+1`.
+The prefix displayed by PhoneField follows the selected region.
+
+### Submitted state and server validation
+
+Save through Filament's validated `getState()` result. Validation rejects unknown
+or excluded region codes, country labels, structured country values, non-string
+national numbers, unsupported characters and excessive input. Malformed state
+can be rendered safely without raising a server error, but cannot pass validation.
+`required()` also rejects an empty national number.
+
+The server derives E.164 from `country` and `national`; a forged client-side `e164`
+cannot override it. Unrequested keys such as labels, flag URLs or enrichment are
+removed on dehydration. Enabled `includeFormats()` / `includeMetadata()` values
+are computed on the server and retained; submitted enrichment is never trusted.
+`validateForRegion()` additionally requires the parsed number to be valid for the
+selected region. This remains optional because several regions share calling codes.

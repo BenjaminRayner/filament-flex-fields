@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\UserSelect;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\UserSelect;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionText;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class UserSelectRecordMapper
 {
@@ -44,21 +47,33 @@ class UserSelectRecordMapper
      */
     public function recordToOptionArrayFromShape(string|int $value, array $shape): array
     {
+        $label = OptionText::required($shape['label'] ?? $value, 'label');
+
         return [
-            'label' => (string) ($shape['label'] ?? $value),
-            'description' => filled($shape['description'] ?? null) ? (string) $shape['description'] : null,
-            'image' => filled($shape['image'] ?? null) ? (string) $shape['image'] : null,
+            'label' => $label,
+            'description' => OptionText::optional($shape['description'] ?? null, 'description'),
+            'image' => OptionText::optional($shape['image'] ?? null, 'image'),
             'verified' => (bool) ($shape['verified'] ?? false),
-            'disabled' => (bool) ($shape['disabled'] ?? $this->select->isOptionDisabled($value, (string) ($shape['label'] ?? $value))),
+            'disabled' => (bool) ($shape['disabled'] ?? false)
+                || (bool) ($shape['isDisabled'] ?? false)
+                || $this->select->isOptionDisabled($value, $label),
         ];
     }
 
     public function resolveModelKeyName(): string
     {
+        if ($this->select->hasRelationship() && ($relationship = $this->select->getRelationship()) instanceof Relation) {
+            $qualified = $this->select->getQualifiedRelatedKeyForRelationship($relationship);
+
+            return Str::afterLast($qualified, '.');
+        }
+
         $modelClass = $this->select->getUserModel();
 
         if ($modelClass === null) {
-            return 'id';
+            return $this->select->hasRelationship()
+                ? ($this->select->getRelationship()?->getRelated()->getKeyName() ?? 'id')
+                : 'id';
         }
 
         /** @var Model $model */
@@ -87,10 +102,10 @@ class UserSelectRecordMapper
         $callback = $this->select->getNameResolver();
 
         if ($callback !== null) {
-            return (string) $this->select->evaluate($callback, ['record' => $record]);
+            return OptionText::required($this->select->evaluate($callback, ['record' => $record]), 'user name');
         }
 
-        return (string) data_get($record, $this->select->getNameColumn());
+        return OptionText::required(data_get($record, $this->select->getNameColumn()), 'user name');
     }
 
     public function resolveEmail(Model $record): ?string
@@ -100,7 +115,7 @@ class UserSelectRecordMapper
         if ($callback !== null) {
             $email = $this->select->evaluate($callback, ['record' => $record]);
 
-            return filled($email) ? (string) $email : null;
+            return OptionText::optional($email, 'user email');
         }
 
         $column = $this->select->getEmailColumn();
@@ -111,7 +126,7 @@ class UserSelectRecordMapper
 
         $email = data_get($record, $column);
 
-        return filled($email) ? (string) $email : null;
+        return OptionText::optional($email, 'user email');
     }
 
     public function resolveAvatarUrl(Model $record): ?string
@@ -121,7 +136,7 @@ class UserSelectRecordMapper
         if ($callback !== null) {
             $url = $this->select->evaluate($callback, ['record' => $record]);
 
-            return filled($url) ? (string) $url : null;
+            return OptionText::optional($url, 'user avatar');
         }
 
         $column = $this->select->getAvatarColumn();
@@ -132,7 +147,7 @@ class UserSelectRecordMapper
 
         $url = data_get($record, $column);
 
-        return filled($url) ? (string) $url : null;
+        return OptionText::optional($url, 'user avatar');
     }
 
     public function resolveIsVerified(Model $record): bool

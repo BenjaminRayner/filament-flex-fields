@@ -1,0 +1,26 @@
+/* Font presentation owns no Select layout or input styling. */
+.fff-font-select__categories{display:flex;gap:4px;overflow-x:auto;margin-inline:calc(-1 * var(--fff-select-menu-padding,6px));padding:6px calc(var(--fff-select-menu-padding,6px) + 4px) 8px;scrollbar-width:none;flex-shrink:0}
+.fff-font-select__categories::-webkit-scrollbar{display:none}
+.fff-font-select__menu .fff-font-select__category{flex:none;border:0;border-radius:999px;padding:4px 10px;box-shadow:none;font-size:12px;font-weight:500;line-height:18px;cursor:pointer;transition:background-color .15s,color .15s}
+.fff-font-select__menu .fff-font-select__category:not([aria-pressed=true]){background:var(--color-gray-100);color:var(--color-gray-600)}
+.dark .fff-font-select__menu .fff-font-select__category:not([aria-pressed=true]){background:var(--color-gray-700);color:var(--color-gray-200)}
+.fff-font-select__option{position:relative;display:flex;align-items:center;gap:10px;height:36px;margin-bottom:2px;width:100%;padding:6px 10px;border:0;border-radius:var(--fff-select-option-radius,1rem);text-align:start;color:var(--color-gray-900);background:transparent;cursor:pointer}
+.fff-font-select__option:hover,.fff-font-select__option[aria-selected=true],.fff-font-select__option[data-highlighted=true]{background:var(--fff-select-menu-hover,#ebebec)}
+.dark .fff-font-select__option{color:var(--color-gray-100)}
+.dark .fff-font-select__option:hover,.dark .fff-font-select__option[aria-selected=true],.dark .fff-font-select__option[data-highlighted=true]{background:var(--fff-select-menu-hover,rgb(255 255 255 / .08))}
+.fff-font-select__specimen{position:relative;display:block;width:100%;height:20px;line-height:20px;overflow:hidden;padding-inline-end:22px}
+.fff-font-select__sample{display:block;font-size:14px;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .16s ease}
+.fff-font-select__specimen[data-preview-status=ready] .fff-font-select__sample{opacity:1}
+.fff-font-select__skeleton{position:absolute;inset-inline-start:0;top:4px;width:52%;height:12px;border-radius:5px;background:var(--color-gray-200);transition:opacity .16s ease}
+.fff-font-select__specimen:is([data-preview-status=queued],[data-preview-status=loading]) .fff-font-select__skeleton{animation:fff-font-preview-pulse 1.4s ease-in-out infinite}
+.dark .fff-font-select__skeleton{background:var(--color-gray-600)}
+.fff-font-select__specimen[data-preview-status=ready] .fff-font-select__skeleton,.fff-font-select__specimen[data-preview-status=failed] .fff-font-select__skeleton{opacity:0;animation:none}
+.fff-font-select__fallback{position:absolute;inset-inline-start:0;top:0;opacity:0;font-size:14px}
+.fff-font-select__specimen[data-preview-status=failed] .fff-font-select__fallback{opacity:1}
+.fff-font-select__check{position:absolute;inset-inline-end:10px;top:10px}
+.fff-font-select__check svg{width:16px;height:16px;stroke-width:2}
+.fff-font-select__retry{display:flex;align-items:center;justify-content:center;gap:6px;margin:0 8px 6px;padding:5px 10px;border-radius:999px;background:var(--color-gray-100);color:var(--color-gray-600);font-size:12px}
+.dark .fff-font-select__retry{background:var(--color-gray-700);color:var(--color-gray-200)}
+.fff-font-select__retry svg{width:14px;height:14px}
+@keyframes fff-font-preview-pulse{50%{opacity:.45}}
+@media(prefers-reduced-motion:reduce){.fff-font-select__specimen .fff-font-select__skeleton{animation:none!important}.fff-font-select__sample,.fff-font-select__skeleton,.fff-font-select__category{transition:none}}

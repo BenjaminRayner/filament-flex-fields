@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Data;
 
 use Bjanczak\FilamentFlexFields\Enums\FlexFieldSectionType;
+use Bjanczak\FilamentFlexFields\Support\Schema\Conditions\ConditionRuleParser;
 
 readonly class FlexFieldSection
 {
@@ -34,7 +35,7 @@ readonly class FlexFieldSection
             type: $type instanceof FlexFieldSectionType ? $type : FlexFieldSectionType::from((string) $type),
             sort: (int) ($attributes['sort'] ?? 0),
             description: isset($attributes['description']) && is_string($attributes['description']) ? $attributes['description'] : null,
-            visibleWhen: is_array($attributes['visible_when'] ?? $attributes['visibleWhen'] ?? null) ? ($attributes['visible_when'] ?? $attributes['visibleWhen']) : null,
+            visibleWhen: ConditionRuleParser::parse($attributes['visible_when'] ?? $attributes['visibleWhen'] ?? null),
             isActive: (bool) ($attributes['is_active'] ?? $attributes['isActive'] ?? true),
         );
     }

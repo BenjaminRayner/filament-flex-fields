@@ -1,40 +1,33 @@
 @php
+    $configuration = $field->getClientConfiguration();
     $statePath = $getStatePath();
-    $length = $getLength();
+    $binding = '$entangle('.\Illuminate\Support\Js::from($statePath).')';
     $groups = $getResolvedGroups();
     $separator = $getGroupSeparator();
-    $showSeparators = $shouldShowSeparators();
-    $allowedCharacters = $getAllowedCharacters();
+    $initialState = $field->normalizeState(is_string($getState()) ? $getState() : '');
+    $length = $configuration['length'];
+    $isDisabled = $configuration['disabled'];
     $inputMode = $getInputMode();
-    $color = $getColor();
-    $size = $getSize();
-    $isDisabled = $isDisabled();
     $wrapperClasses = $getWrapperClasses();
-    $initialState = $getState() ?? '';
     $shouldShowLoadingIndicator = $shouldShowLoadingIndicator();
-    $loadingWireTargets = $getLoadingWireTargets();
-    $autoSubmitEnabled = $shouldAutoSubmit();
-    $autoSubmitMethod = $getAutoSubmitMethod();
-    $autoSubmitUsesServerCallback = $shouldAutoSubmitUsingServerCallback();
     $hasError = filled($statePath) && $errors->has($statePath);
-    $globalIndex = 0;
     $heading = $getHeading();
     $description = $getDescription();
     $footer = $getFooter();
     $footerAction = $getFooterAction();
-    $hasLayoutChrome = $hasLayoutChrome();
-    $accessibleLabel = filled($heading) ? $heading : $getLabel();
+    $hasHeader = filled($heading) || filled($description);
+    $hasFooter = filled($footer) || $footerAction !== null;
+    $accessibleLabel = filled($heading) ? trim(strip_tags((string) $heading)) : $getLabel();
+    $identity = [$configuration, $groups, $separator, $wrapperClasses];
+    $globalIndex = 0;
 @endphp
 
 <x-dynamic-component
     :component="$getFieldWrapperView()"
     :field="$field"
 >
-    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'flex-verification-code',
-        'livewireKey' => $getLivewireKey(),
-    ])
-    <div @class(['fff-verification-code-layout' => $hasLayoutChrome])>
-        @if ($hasHeaderContent())
+    <div @class(['fff-verification-code-layout' => $hasHeader || $hasFooter])>
+        @if ($hasHeader)
             <div class="fff-verification-code-layout__header">
                 @if (filled($heading))
                     <div class="fff-verification-code-layout__heading">
@@ -51,34 +44,23 @@
         @endif
 
         <div
-            @class([
-                'fff-verification-code-shell',
-                'fff-verification-code-shell--loading' => $shouldShowLoadingIndicator,
-                'is-invalid' => $hasError,
-            ])
-            @if ($shouldShowLoadingIndicator || filled($autoSubmitMethod))
-                wire:loading.class="is-loading"
-                wire:target="{{ $loadingWireTargets }}"
-            @endif
+            id="{{ $getId() }}"
+            wire:key="{{ $getLivewireKey() }}.{{ hash('xxh128', serialize($identity)) }}"
+            x-fff-load
+            x-fff-load-src="{{ \Bjanczak\FilamentFlexFields\Support\FlexFieldAssets::alpineEntrySrc('flex-verification-code') }}"
+            x-data="flexVerificationCodeFormComponent({ ...@js($configuration), state: $wire.{{ $applyStateBindingModifiers($binding, isOptimisticallyLive: false) }} })"
+            @class(['fff-verification-code-shell', 'fff-verification-code-shell--loading' => $shouldShowLoadingIndicator, 'is-invalid' => $hasError])
+            x-bind:class="{ 'is-loading': autoSubmitPending }"
+            x-bind:aria-busy="autoSubmitPending"
+            role="group"
+            aria-label="{{ $accessibleLabel }}"
+            aria-invalid="{{ $hasError ? 'true' : 'false' }}"
+            wire:loading.class="is-loading"
+            wire:target="{{ $statePath }}"
+            {{ $getExtraAlpineAttributeBag() }}
         >
-            <div
-                wire:ignore
-                x-load
-                x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('flex-verification-code', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-                x-data="flexVerificationCodeFormComponent({
-                    state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
-                    length: @js($length),
-                    allowedCharacters: @js($allowedCharacters),
-                    disabled: @js($isDisabled),
-                    autoSubmitEnabled: @js($autoSubmitEnabled),
-                    autoSubmitMethod: @js($autoSubmitMethod),
-                    autoSubmitUsesServerCallback: @js($autoSubmitUsesServerCallback),
-                })"
-                x-init="init()"
-                @class($wrapperClasses)
-                role="group"
-                aria-label="{{ $accessibleLabel }}"
-            >
+            @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'flex-verification-code', 'livewireKey' => $getLivewireKey()])
+            <div @class($wrapperClasses) wire:ignore dir="ltr">
             @foreach ($groups as $groupIndex => $groupSize)
                 @if ($groupIndex > 0)
                     <span
@@ -92,7 +74,7 @@
                     </span>
                 @endif
 
-                <div class="fff-verification-code__group">
+                <div class="fff-verification-code__group" style="--fff-verification-group-count: {{ $groupSize }}">
                     @for ($offset = 0; $offset < $groupSize; $offset++)
                         @php
                             $index = $globalIndex;
@@ -102,7 +84,10 @@
 
                         <input
                             type="text"
-                            maxlength="1"
+                            maxlength="{{ $length }}"
+                            data-verification-index="{{ $index }}"
+                            autocapitalize="characters"
+                            spellcheck="false"
                             inputmode="{{ $inputMode }}"
                             autocomplete="{{ $index === 0 ? 'one-time-code' : 'off' }}"
                             @class([
@@ -112,13 +97,6 @@
                             aria-label="{{ $getDigitAriaLabel($index) }}"
                             @disabled($isDisabled)
                             value="{{ $initialChar }}"
-                            x-ref="input{{ $index }}"
-                            x-on:input="handleInput({{ $index }}, $event)"
-                            x-on:keydown="handleKeydown({{ $index }}, $event)"
-                            x-on:focus="handleFocus({{ $index }}, $event)"
-                            x-on:paste="handlePaste($event)"
-                            x-bind:class="{ 'is-filled': Boolean(chars[{{ $index }}]) }"
-                            x-bind:disabled="disabled || autoSubmitPending"
                         />
                     @endfor
                 </div>
@@ -128,16 +106,18 @@
         @if ($shouldShowLoadingIndicator)
             <div
                 class="fff-verification-code__loading"
-                wire:loading.delay.class="is-visible"
-                wire:target="{{ $loadingWireTargets }}"
                 aria-hidden="true"
             >
                 <x-filament::loading-indicator class="fff-verification-code__loading-spinner" />
             </div>
         @endif
+            <div class="fff-verification-code__submit-error" x-show="submitFailed" style="display:none" role="alert">
+                <span>{{ __('filament-flex-fields::default.verification_code.submit_failed') }}</span>
+                <button type="button" x-on:click="submit({ retry: true })" x-bind:disabled="autoSubmitPending">{{ __('filament-flex-fields::default.verification_code.retry') }}</button>
+            </div>
         </div>
 
-        @if ($hasFooterContent())
+        @if ($hasFooter)
             <div class="fff-verification-code-layout__footer">
                 @if (filled($footer))
                     <span class="fff-verification-code-layout__footer-text">{{ $footer }}</span>

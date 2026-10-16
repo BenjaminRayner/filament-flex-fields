@@ -10,7 +10,7 @@ export const ICON_PICKER_VIRTUAL_SCROLL_THRESHOLD = ICON_VIRTUALIZE_THRESHOLD
 
 export const ICON_PICKER_LOAD_MORE_SKELETON_ROWS = 2
 
-export const ICON_PICKER_MIN_SKELETON_MS = 480
+export const ICON_PICKER_MIN_SKELETON_MS = 120
 
 export const ICON_PICKER_SKELETON_FADE_MS = 160
 
@@ -215,7 +215,7 @@ export function shouldPrefetchNextPage({
 }
 
 export function buildSearchResultsCacheKey(query, set, page) {
-    return `${query ?? ''}|${set ?? ''}|${page ?? 1}`
+    return JSON.stringify([query ?? '', set ?? '', page ?? 1])
 }
 
 export function createVirtualWindowKey(window, itemCount, scrollTop = 0) {

@@ -1,45 +1,34 @@
 @php
     use Filament\Support\Enums\IconSize;
 
-    $statePath = $getStatePath();
+    $presentation = $field->getTextareaPresentation();
+    $options = $presentation->configuration;
+    $statePath = $options['statePath'];
     $isDisabled = $isDisabled();
     $isReadOnly = $isReadOnly();
     $rows = $getRows();
     $placeholder = $getPlaceholder();
     $wrapperClasses = $getWrapperClasses();
-    $initialHeight = $getInitialHeightRem();
+    $initialHeight = $options['initialHeightRem'];
     $footer = $getFooter();
-    $toolbarActions = array_filter(
-        $getPrefixActions(),
-        fn (\Filament\Actions\Action|\Filament\Actions\ActionGroup $action): bool => $action->isVisible(),
-    );
-    $suffixActions = array_filter(
-        $getSuffixActions(),
-        fn (\Filament\Actions\Action $action): bool => $action->isVisible(),
-    );
-    $toolbarSelects = $getToolbarSelects();
-    $shouldEnableSpeechDictation = $shouldEnableSpeechDictation() && ! $isDisabled && ! $isReadOnly;
-    $shouldEnableEmojiPicker = $shouldEnableEmojiPicker() && ! $isDisabled && ! $isReadOnly;
-    $initialState = \Bjanczak\FilamentFlexFields\Support\Translatable\TranslatableHydrator::resolveRenderedState($field);
-
-    $initialTextareaValue = is_scalar($initialState) ? (string) $initialState : '';
+    $toolbarActions = $presentation->prefix;
+    $suffixActions = $presentation->suffix;
+    $toolbarSelects = $presentation->selects;
+    $shouldEnableSpeechDictation = $options['speechDictation'];
+    $shouldEnableEmojiPicker = $options['emojiPicker'];
+    $initialTextareaValue = $presentation->value;
     $initialCharacterCount = mb_strlen($initialTextareaValue);
-    $initialCharacterLimit = $getCharacterLimit();
-    $initialCounterLabel = $shouldShowCharacterCounter()
-        ? ($initialCharacterLimit
-            ? "{$initialCharacterCount}/{$initialCharacterLimit}"
-            : (string) $initialCharacterCount)
-        : '';
-    $isAutosizeEnabled = $shouldAutosize();
-    $autosizeHeightStyle = $isAutosizeEnabled
-        ? "min-height: {$initialHeight}rem;"
-        : null;
-    $hasToolbar = count($toolbarActions) > 0
-        || count($toolbarSelects) > 0
-        || count($suffixActions) > 0
-        || $shouldShowCharacterCounter()
-        || $shouldEnableSpeechDictation
-        || $shouldEnableEmojiPicker;
+    $initialCharacterLimit = $options['characterLimit'];
+    $initialCounterLabel = $options['showCharacterCounter']
+        ? ($initialCharacterLimit === null ? (string) $initialCharacterCount : "{$initialCharacterCount}/{$initialCharacterLimit}") : '';
+    $isAutosizeEnabled = $options['shouldAutosize'];
+    $autosizeHeightStyle = $isAutosizeEnabled ? "min-height: {$initialHeight}rem;".($options['maxHeight'] === null ? '' : 'max-height: '.$options['maxHeight'].';') : null;
+    $hasToolbar = $presentation->hasToolbar;
+    $clientOptions = $options + [
+        'initialState' => $initialTextareaValue,
+        'emojiInputStylesUrl' => $shouldEnableEmojiPicker ? \Bjanczak\FilamentFlexFields\Support\FlexFieldAssets::stylesheetHref('flex-text-input') : null,
+        'emojiShadowStylesUrl' => $shouldEnableEmojiPicker ? \Bjanczak\FilamentFlexFields\Support\Assets\PublishedResourceUrl::for('emoji-picker', 'shadow-styles', 'shadow.css') : null,
+    ];
 @endphp
 
 <x-dynamic-component
@@ -50,32 +39,12 @@
             ->class($wrapperClasses)
     "
 >
-    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'flex-textarea',
-        'livewireKey' => $getLivewireKey(),
-    ])
     <div
-        x-load
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('flex-textarea', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-        x-data="flexTextareaFormComponent({
-            state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
-            statePath: @js($statePath),
-            initialHeightRem: @js($initialHeight),
-            shouldAutosize: @js($isAutosizeEnabled),
-            animatedAutosize: @js($shouldAnimateAutosize()),
-            maxHeight: @js($getMaxHeight()),
-            characterLimit: @js($getCharacterLimit()),
-            showCharacterCounter: @js($shouldShowCharacterCounter()),
-            speechDictation: @js($shouldEnableSpeechDictation),
-            speechDictationLanguage: @js($getSpeechDictationLanguage()),
-            speechDictationLabel: @js($getSpeechDictationLabel()),
-            speechDictationStopLabel: @js('Stop dictation'),
-            emojiPicker: @js($shouldEnableEmojiPicker),
-            emojiPickerLocale: @js($getEmojiPickerLocale()),
-            emojiPickerLabel: @js($getEmojiPickerLabel()),
-            initialState: @js(filled($initialTextareaValue) ? $initialTextareaValue : null),
-            initialCharacterCount: @js($initialCharacterCount),
-        })"
-        x-init="init()"
+        wire:key="{{ $getLivewireKey() }}.{{ $presentation->identity }}"
+        x-fff-load
+        x-fff-load-src="{{ \Bjanczak\FilamentFlexFields\Support\FlexFieldAssets::alpineEntrySrc('flex-textarea') }}"
+        x-data="flexTextareaFormComponent(@js($clientOptions))"
+        {{ $getExtraAlpineAttributeBag() }}
         @class([
             'fff-flex-textarea',
             'fff-flex-textarea--'.$getSize(),
@@ -95,18 +64,20 @@
         role="group"
         aria-label="{{ $getLabel() }}"
     >
+        @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'flex-textarea', 'livewireKey' => $getLivewireKey(), 'capabilities' => $presentation->capabilities])
+        @if ($isAutosizeEnabled)
+            <div class="fff-flex-textarea__measure-host" data-textarea-measure-host wire:ignore inert aria-hidden="true"></div>
+        @endif
         <div class="fff-flex-textarea__shell">
             <div wire:ignore.self class="fff-flex-textarea__content">
                 <textarea
-                    x-ref="textarea"
-                    x-model="state"
+                    x-ref="input"
+                    wire:ignore.self
                     @class([
                         'fff-flex-textarea__textarea',
-                        'is-animated' => $shouldAnimateAutosize(),
+                        'is-animated' => $options['animatedAutosize'],
+                        'is-autosizing' => $isAutosizeEnabled,
                     ])
-                    @if ($shouldAnimateAutosize())
-                        x-on:input="resize()"
-                    @endif
                     @if ($isGrammarlyDisabled())
                         data-gramm="false"
                         data-gramm_editor="false"
@@ -115,6 +86,7 @@
                     {{
                         $getExtraInputAttributeBag()
                             ->merge([
+                                $applyStateBindingModifiers('wire:model') => $statePath,
                                 'autocomplete' => $getAutocomplete(),
                                 'autofocus' => $isAutofocused(),
                                 'cols' => $getCols(),
@@ -128,7 +100,7 @@
                                 'rows' => $rows,
                                 'style' => $autosizeHeightStyle,
                             ], escape: false)
-                    }}>{{ filled($initialTextareaValue) ? e($initialTextareaValue) : '' }}</textarea>
+                    }}>{{ e($initialTextareaValue) }}</textarea>
             </div>
 
             @if ($hasToolbar)
@@ -164,30 +136,26 @@
                             <span
                                 class="fff-flex-textarea__counter"
                                 x-bind:class="{
-                                    'is-warning': characterLimit && characterCount >= characterLimit * 0.85,
-                                    'is-danger': characterLimit && characterCount >= characterLimit,
+                                    'is-warning': options.characterLimit != null && characterCount >= options.characterLimit * 0.85,
+                                    'is-danger': options.characterLimit != null && characterCount >= options.characterLimit,
                                 }"
                                 x-text="counterLabel"
                             >{{ $initialCounterLabel }}</span>
                         @endif
 
                         @if ($shouldEnableSpeechDictation)
-                            <span
-                                class="fff-flex-textarea__dictation-status"
-                                x-show="dictationStatus"
-                                x-cloak
-                                x-text="dictationStatus"
-                            ></span>
-
                             <button
                                 type="button"
                                 class="fff-flex-textarea__dictation-btn"
-                                x-show="speechSupported"
-                                x-cloak
+                                disabled
+                                aria-label="{{ $options['speechDictationLabel'] }}"
+                                title="{{ $options['speechDictationLabel'] }}"
+                                aria-pressed="false"
+                                x-bind:disabled="!speechSupported"
                                 x-bind:class="{ 'is-listening': isListening }"
                                 x-bind:aria-pressed="isListening ? 'true' : 'false'"
-                                x-bind:title="isListening ? speechDictationStopLabel : speechDictationLabel"
-                                x-bind:aria-label="isListening ? speechDictationStopLabel : speechDictationLabel"
+                                x-bind:title="!speechSupported ? options.messages.unsupported : (isListening ? options.speechDictationStopLabel : options.speechDictationLabel)"
+                                x-bind:aria-label="!speechSupported ? options.messages.unsupported : (isListening ? options.speechDictationStopLabel : options.speechDictationLabel)"
                                 x-on:click="toggleDictation()"
                             >
                                 {{ \Filament\Support\generate_icon_html($getMicrophoneIcon(), size: IconSize::Medium, attributes: new \Illuminate\View\ComponentAttributeBag(['class' => 'fff-flex-textarea__dictation-icon'])) }}
@@ -201,6 +169,12 @@
                 </div>
             @endif
         </div>
+
+        @if ($shouldEnableSpeechDictation)
+            <div class="fff-flex-textarea__speech-feedback" x-show="status" style="display:none">
+                <span class="fff-flex-textarea__dictation-status" role="status" aria-live="polite" x-show="status" x-text="status"></span>
+            </div>
+        @endif
 
         @if (filled($footer))
             <p class="fff-flex-textarea__footer">{{ $footer }}</p>

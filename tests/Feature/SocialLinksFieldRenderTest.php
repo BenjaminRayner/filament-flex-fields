@@ -14,6 +14,7 @@ beforeEach(function (): void {
 it('renders social links field shell and alpine configuration', function (): void {
     TestableSocialLinksForm::$formSchema = [
         SocialLinksField::make('socials')
+            ->reorderable()
             ->required(),
     ];
 
@@ -22,11 +23,14 @@ it('renders social links field shell and alpine configuration', function (): voi
     expect($html)
         ->toContain('fff-social-links')
         ->toContain('socialLinksFieldFormComponent({')
-        ->toContain('onPlatformMenuKeydown')
+        ->toContain('fffHeadlessSelectField({')
         ->toContain('aria-activedescendant')
         ->toContain('fff-social-links__reorder-btn')
         ->toContain('role="listbox"')
-        ->toContain('role="option"');
+        ->toContain('role="option"')
+        ->toContain('data-social-url')
+        ->not->toContain('fff-social-links__ssr-list')
+        ->not->toContain('x-init="init()"');
 });
 
 it('fails server validation when required social links are empty', function (): void {
@@ -111,4 +115,38 @@ it('validates custom platform hosts on the server', function (): void {
         ])
         ->call('save')
         ->assertHasNoErrors();
+});
+
+it('rejects forged payloads before authoritative dehydration', function (mixed $payload): void {
+    TestableSocialLinksForm::$formSchema = [SocialLinksField::make('socials')->maxLinks(1)];
+    $component = Livewire::test(TestableSocialLinksForm::class)->set('data.socials', $payload);
+    expect(fn () => $component->instance()->getSchema('form')->getState())->toThrow(ValidationException::class);
+})->with([
+    'scalar' => ['not a list'],
+    'nested URL' => [[['platform' => 'website', 'url' => ['nested']]]],
+    'extra key' => [[['platform' => 'website', 'url' => 'https://example.com', 'admin' => true]]],
+    'duplicate' => [[['platform' => 'website', 'url' => 'https://a.example'], ['platform' => 'website', 'url' => 'https://b.example']]],
+    'maximum' => [[['platform' => 'website', 'url' => 'https://example.com'], ['platform' => 'x', 'url' => 'https://x.com/a']]],
+    'unknown platform' => [[['platform' => 'evil', 'url' => 'https://example.com']]],
+    'script scheme' => [[['platform' => 'website', 'url' => 'javascript:alert(1)']]],
+    'credentials' => [[['platform' => 'website', 'url' => 'https://trusted.example@evil.example']]],
+    'oversize' => [[['platform' => 'website', 'url' => 'https://example.com/'.str_repeat('x', 4096)]]],
+    'null byte' => [[['platform' => 'website', 'url' => "https://example.com/\0"]]],
+]);
+
+it('keeps duplicates visible to validation with no limit configured', function (): void {
+    TestableSocialLinksForm::$formSchema = [SocialLinksField::make('socials')];
+    $component = Livewire::test(TestableSocialLinksForm::class)->set('data.socials', [
+        ['platform' => 'website', 'url' => 'https://a.example'],
+        ['platform' => 'website', 'url' => 'https://b.example'],
+    ]);
+    expect(fn () => $component->instance()->getSchema('form')->getState())->toThrow(ValidationException::class);
+});
+
+it('allows optional empty state and hydrates legacy maps', function (): void {
+    TestableSocialLinksForm::$formSchema = [SocialLinksField::make('socials')];
+    $component = Livewire::test(TestableSocialLinksForm::class)->set('data.socials', []);
+    expect($component->instance()->getSchema('form')->getState()['socials'])->toBeNull();
+    $component->set('data.socials', ['website' => ' https://example.com ']);
+    expect($component->instance()->getSchema('form')->getState()['socials'])->toBe([['platform' => 'website', 'url' => 'https://example.com']]);
 });

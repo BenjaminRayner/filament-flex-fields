@@ -24,13 +24,13 @@ it('exposes calculator field configuration api', function () {
         ->and($field->getVariant())->toBe('soft')
         ->and($field->getMinValue())->toBe(0)
         ->and($field->getMaxValue())->toBe(9999)
-        ->and($field->getStep())->toBe(0.5)
+        ->and($field->getStep())->toBe(1)
         ->and($field->isInteger())->toBeTrue()
         ->and($field->getDecimalPlaces())->toBe(2)
         ->and($field->getMaxLength())->toBe(8)
         ->and($field->getRoundingMode())->toBe('floor')
         ->and($field->getCalculatorIcon())->toBe(GravityIcon::make('calculator'))
-        ->and($field->getWrapperClasses())->toContain('fff-calculator-field')
+        ->and($field->getWrapperClasses())->toContain('fff-flex-text-input-field')
         ->and($field->getWrapperClasses())->toContain('fff-flex-text-input-field--soft');
 });
 

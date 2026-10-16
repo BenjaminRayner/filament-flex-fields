@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectField;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionIdentityList;
 use Bjanczak\FilamentFlexFields\Support\Translations;
 use Closure;
 
@@ -58,7 +59,7 @@ trait ConfiguresSelectSmartSuggest
     {
         $values = $this->evaluate($this->recentOptionValues);
 
-        return is_array($values) ? array_values($values) : [];
+        return OptionIdentityList::normalize($values);
     }
 
     /**
@@ -78,7 +79,7 @@ trait ConfiguresSelectSmartSuggest
     {
         $values = $this->evaluate($this->suggestedOptionValues);
 
-        return is_array($values) ? array_values($values) : [];
+        return OptionIdentityList::normalize($values);
     }
 
     /**
@@ -115,13 +116,15 @@ trait ConfiguresSelectSmartSuggest
      */
     public function getSmartSuggestConfigForJs(): array
     {
+        $recent = $this->getRecentOptionValues();
+        $suggested = $this->getSuggestedOptionValues();
+        $allowCreate = $this->allowsCreateOption();
+
         return [
-            'enabled' => $this->getRecentOptionValues() !== []
-                || $this->getSuggestedOptionValues() !== []
-                || $this->allowsCreateOption(),
-            'recent' => $this->getRecentOptionValues(),
-            'suggested' => $this->getSuggestedOptionValues(),
-            'allowCreate' => $this->allowsCreateOption(),
+            'enabled' => $recent !== [] || $suggested !== [] || $allowCreate,
+            'recent' => $recent,
+            'suggested' => $suggested,
+            'allowCreate' => $allowCreate,
             'createLabel' => Translations::get('filament-flex-fields::default.select_field.smart_suggest.create'),
             'entityMentions' => $this->hasEntityMentions(),
             'mentionTrigger' => $this->getEntityMentionTrigger(),

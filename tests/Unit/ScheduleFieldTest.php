@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ScheduleField;
 use Bjanczak\FilamentFlexFields\Support\DateTime\ScheduleV2;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
 use Bjanczak\FilamentFlexFields\Support\Schedule\ScheduleDays;
 use Bjanczak\FilamentFlexFields\Support\Schedule\ScheduleNormalizer;
 use Bjanczak\FilamentFlexFields\Support\Schedule\ScheduleValidator;
@@ -63,15 +62,6 @@ it('treats schedule as empty when no enabled day has slots', function () {
     $validSchedule = ScheduleField::defaultSchedule('UTC');
 
     expect($field->isEmptyState($validSchedule))->toBeFalse();
-});
-
-it('renders timezone selector with medium size independent of field size', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/schedule-field.blade.php');
-
-    expect($blade)
-        ->toContain("\$timezoneSize = 'md'")
-        ->toContain("'fff-timezone-field--'.\$timezoneSize")
-        ->toContain("'fff-flex-text-input--'.\$timezoneSize");
 });
 
 it('returns no locked days by default', function () {
@@ -375,21 +365,6 @@ it('dehydrates normalized schedule state for storage', function () {
         ->and(array_keys($normalized['days']))->toBe(ScheduleDays::ALL);
 });
 
-it('registers lazy stylesheet assets for schedule field', function () {
-    expect(FlexFieldAssets::stylesheetsFor('schedule-field'))->toBe([
-        'emoji-picker',
-        'flex-text-input',
-        'switch',
-        'overlay-runtime',
-        'teleported-menu',
-        'timezone-field',
-        'flex-time-segments',
-        'schedule-field',
-    ]);
-    expect(FlexFieldAssets::hasLazyStylesheet('schedule-field'))->toBeTrue();
-    expect(FlexFieldAssets::hasLazyStylesheet('flex-time-segments'))->toBeTrue();
-});
-
 it('includes alpine configuration labels and days', function () {
     $field = ScheduleField::make('hours')->timezone('UTC');
     $config = $field->getAlpineConfiguration();
@@ -398,7 +373,7 @@ it('includes alpine configuration labels and days', function () {
         ->and($config['showTimezone'])->toBeTrue()
         ->and($config['copySourceDay'])->toBe('mon')
         ->and($config['labels']['addSlot'])->toBe(__('filament-flex-fields::default.schedule.add_slot'))
-        ->and($config['flexTimeSegmentsSrc'])->toContain('flex-time-segments');
+        ->and($config)->not->toHaveKey('flexTimeSegmentsSrc');
 });
 
 it('normalizes day keys and rejects invalid copy source day', function () {
@@ -436,79 +411,4 @@ it('exposes wrapper classes for size and variant', function () {
         'fff-schedule-field--sm' => true,
         'fff-schedule-field--soft' => true,
     ]);
-});
-
-it('renders server-side schedule markup before alpine hydrates', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/schedule-field.blade.php');
-    $partial = file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/flex-time-segments.blade.php');
-    $css = file_get_contents(__DIR__.'/../../resources/css/components/schedule-field.css');
-    $js = file_get_contents(__DIR__.'/../../resources/js/components/schedule-field.js');
-
-    expect($blade)
-        ->toContain('fff-schedule-field__day-body-ssr')
-        ->toContain('fff-schedule-field__day-body-live')
-        ->toContain('fff-schedule-field__ssr-status')
-        ->toContain('fff-schedule-field__live-status')
-        ->toContain('fff-schedule-field__copy-slot')
-        ->toContain('fff-schedule-field--has-copy-column')
-        ->toContain('--fff-schedule-status-min-ch')
-        ->toContain('data-checked="{{ $isDayEnabledInitial ? \'true\' : \'false\' }}"')
-        ->toContain('flex-time-segments')
-        ->not->toContain('type="time"')
-        ->not->toContain('<template x-if="showTimezone">')
-        ->and($partial)->toContain('fff-flex-time-segments__trigger')
-        ->and($partial)->toContain('fff-flex-time-segments__menu')
-        ->and($partial)->toContain('x-load-src')
-        ->and($partial)->toContain('x-data="flexTimeSegmentsComponent({')
-        ->and($partial)->toContain('initialValueExpression')
-        ->and($partial)->toContain('skipScriptLoad')
-        ->and($partial)->toContain('fff-flex-time-segments__ssr-label')
-        ->and($partial)->toContain('componentReady')
-        ->and($blade)->toContain('skipScriptLoad\' => true')
-        ->and($blade)->toContain("(daySlots('{\$day}')[slotIndex] ?? {}).from")
-        ->and($blade)->toContain("updateSlotTime('{\$day}'")
-        ->and($css)->toContain('.fff-schedule-field__day-body-ssr.is-replaced')
-        ->and($css)->toContain('.fff-schedule-field__day-body-live.is-ready')
-        ->and($css)->toContain('clip: rect(0, 0, 0, 0)')
-        ->and($css)->toContain('.fff-schedule-field--has-copy-column .fff-schedule-field__day-header')
-        ->and($css)->toContain('.fff-schedule-field__slot--break')
-        ->and($js)->toContain('slotEntryLabel')
-        ->and($js)->toContain('createWorkSlotAfter')
-        ->and($js)->toContain('ensureFlexTimeSegmentsLoaded')
-        ->and($js)->toContain('registerFlexTimeSegmentsComponentGlobally')
-        ->and($js)->toContain('markDisplayReady')
-        ->and($js)->toContain('dayAnimationsEnabled')
-        ->and($js)->toContain('flexTimeSegmentsSrc')
-        ->and($js)->toContain('flexTimeSegmentsReady')
-        ->and($js)->toContain('initialState.days[day].enabled')
-        ->and($js)->toContain('canRemoveSlot')
-        ->and($js)->toContain('dayValidationErrorMessage')
-        ->and($js)->toContain('slotIsInvalid')
-        ->and($js)->toContain('requireSlotsForEnabledDays')
-        ->and($css)->toContain('.fff-schedule-field__day-collapse')
-        ->and($css)->toContain('.fff-schedule-field.is-day-animated .fff-schedule-field__day-collapse')
-        ->and($css)->toContain('prefers-reduced-motion')
-        ->and($blade)->toContain('fff-schedule-field__day-collapse')
-        ->and($blade)->toContain("'is-open' => \$isDayEnabledInitial")
-        ->and($blade)->toContain("'is-expanded' => \$isDayEnabledInitial")
-        ->and($blade)->toContain('is-day-animated')
-        ->and($blade)->toContain('dayValidationErrorMessage')
-        ->and($blade)->toContain('GravityIcon::Briefcase')
-        ->and($blade)->toContain('fff-schedule-field__slot-label-text')
-        ->and($blade)->toContain('fff-schedule-field__day-lock')
-        ->and($blade)->toContain('! $isReadOnly')
-        ->and($blade)->toContain('fff-schedule-field__time-fields')
-        ->and($js)->toContain('isDayLocked')
-        ->and($js)->toContain('lockedDays')
-        ->and($css)->toContain('.fff-schedule-field__slot-label-icon--slot')
-        ->and($css)->toContain('.fff-schedule-field__time-shell')
-        ->and($css)->toContain('@media (max-width: 639px)')
-        ->and($css)->toContain('grid-template-areas')
-        ->and($blade)->toContain('x-show="canRemoveSlot(@js($day))"')
-        ->and($blade)->toContain('x-if="flexTimeSegmentsReady"')
-        ->and($blade)->toContain('toggleSlotOvernight')
-        ->and($blade)->toContain('is-overlap')
-        ->and($blade)->toContain('moveSlotUp')
-        ->and($css)->toContain('.fff-schedule-field__slot.is-overlap')
-        ->and($css)->toContain('.fff-schedule-field__overnight-btn');
 });

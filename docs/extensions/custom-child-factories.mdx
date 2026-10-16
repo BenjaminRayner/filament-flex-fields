@@ -1,0 +1,123 @@
+---
+title: "Custom child factories"
+description: "Create child renderers explicitly when a generic fluent factory is insufficient."
+---
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildSlot;
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationOption;
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationSchema;
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationType;
+
+$childOptions = new ConfigurationSchema([
+    'maxLength' => new ConfigurationOption(
+        ConfigurationType::Integer,
+        default: 80,
+        min: 1,
+        max: 500,
+    ),
+    'locale' => new ConfigurationOption(
+        ConfigurationType::String,
+        default: 'en',
+        choices: ['en', 'pl', 'de'],
+    ),
+]);
+
+$parent = new ComponentDefinition(
+    id: 'acme-contact-field',
+    kind: ComponentKind::Field,
+    children: [
+        'name' => new ChildSlot(
+            name: 'name',
+            component: 'flex-text-input',
+            kind: ComponentKind::Field,
+            renderer: FlexTextInput::class,
+            factory: ContactNameFactory::class,
+            configuration: $childOptions,
+            configurationMap: ['maxLength' => 'maxLength'],
+        ),
+    ],
+);
+```
+
+Register that definition as usual. The child factory configures the declared
+renderer through its public PHP API:
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildFactory;
+use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildRenderContext;
+use Filament\Schemas\Components\Component;
+
+final class ContactNameFactory implements ChildFactory
+{
+    public function make(ChildRenderContext $context): Component
+    {
+        return FlexTextInput::make($context->statePath)
+            ->label(__('Name', locale: $context->configuration['locale']))
+            ->maxLength($context->configuration['maxLength'])
+            ->required();
+    }
+}
+```
+
+Render the children inside your real parent schema. Use the public `schema`
+[child renderer](/docs/extensions/child-select) rather than copying the child Blade template:
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CompositeField;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentRegistry;
+use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildRenderer;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyRenderContext;
+
+$children = new ChildRenderer(
+    registry: app(ComponentRegistry::class),
+    parentComponent: 'acme-contact-field',
+    context: new FamilyRenderContext('contact-card:'.$contact->getKey()),
+    parentConfiguration: ['maxLength' => 120],
+);
+
+$field = CompositeField::make('contact')
+    ->assetComponent('acme-contact-field')
+    ->schema([
+        $children->render('name', 'legal-name', ['locale' => 'en']),
+        $children->render('name', 'display-name', ['locale' => 'pl']),
+    ]);
+```
+
+`configurationMap` maps only named parent options. It never forwards the parent's
+entire configuration. Explicit mapped values take precedence over child instance
+options; absent parent options do not inject `null`. Child paths are relative to
+the parent Filament schema. Their stable keys determine independent state paths,
+native error paths. DOM IDs include the actual native container key as well as
+the stable child key, keeping cloned repeater rows distinct. Use persisted item keys for repeaters, not their
+changing numeric position. Keep one `ChildRenderer` session per parent render;
+a duplicated slot/key is rejected. Recreating a session with the same owner/key
+retains identity across reorder and locale changes.
+
+By default, children have independent state. `shareState: true` explicitly uses
+the parent schema's state path; choose it only for a renderer designed for that
+value shape. Pass `disabled: true` or `readOnly: true` to enforce a parent write
+restriction after the child factory runs. The factory must return the declared
+renderer class; failure releases the key claim so you can retry. Native Filament
+state, validation and accessibility remain owned by the actual child component.
+
+Slots can declare field, display, column, entry or action renderers. The parent
+still needs the appropriate native surface/container. Selected `capabilities`
+are validated against the child's definition and passed to its factory; enable
+the corresponding public child option there. Declaring them does not turn on a
+field feature or replace the child's emitted per-instance asset plan.
+
+Each definition supports up to 128 slots; a composition session supports up to
+256 rendered children. The complete compiled graph permits 4096 child slots and
+4 MiB of child contract metadata. Cycles, missing children, mismatched surface
+kinds, undeclared capabilities and conflicting registered family renderers reject
+before commit. Registration does not load closed surfaces or render their HTML.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

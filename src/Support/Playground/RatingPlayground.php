@@ -45,7 +45,7 @@ class RatingPlayground
     {
         return [
             Section::make('Rating')
-                ->description('SaaS-style rating input with custom icons, colors, sizes, disabled, required, and fractional read-only display. See the RatingColumn section below for read-only table examples.')
+                ->description('Rating input with custom icons, colors, sizes, required validation and fractional read-only display.')
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     RatingField::make('rating__default')
@@ -53,7 +53,7 @@ class RatingPlayground
                         ->helperText('Default stars with hover preview.'),
                     RatingField::make('rating__with_label')
                         ->label('How would you rate this product?')
-                        ->helperText('With label variant from SaaS docs.'),
+                        ->helperText('Custom field label.'),
                     RatingField::make('rating__heart')
                         ->label('Custom icon heart')
                         ->icon(Heroicon::OutlinedHeart)

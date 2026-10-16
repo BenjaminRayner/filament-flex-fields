@@ -1,191 +1,80 @@
-.fff-hold-confirm-action-host {
-    display: inline-grid;
-    vertical-align: middle;
-}
+.fff-hold-confirm-action-host { display: inline-block; max-inline-size: 100%; vertical-align: middle; }
+.fff-confirmation__ui { display: inline-block; max-inline-size: 100%; vertical-align: middle; }
+.fff-confirmation__announcement { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.fff-hold-confirm-action { --fff-hold-progress: 0; position: relative; isolation: isolate; max-inline-size: 100%; grid-template-columns: minmax(0,1fr); overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none; transition: transform 160ms cubic-bezier(.32,.72,0,1); }
+.fff-hold-confirm-action[data-holding="true"] { transform: scale(.97); }
+.fff-action--rounded-none { border-radius: 0 !important; }
+.fff-action--rounded-sm { border-radius: .25rem !important; }
+.fff-action--rounded-md { border-radius: .375rem !important; }
+.fff-action--rounded-lg { border-radius: .5rem !important; }
+.fff-action--rounded-xl { border-radius: .75rem !important; }
+.fff-action--rounded-full { border-radius: var(--fff-global-radius,.75rem) !important; }
+.fff-hold-confirm-action--palette-danger { --fff-hold-confirm-track-bg: rgb(254 226 226); --fff-hold-confirm-track-text: rgb(127 29 29); --fff-hold-confirm-fill-bg: rgb(220 38 38); --fff-hold-confirm-fill-text: #fff; background: var(--fff-hold-confirm-track-bg) !important; color: var(--fff-hold-confirm-track-text) !important; box-shadow: none !important; }
+.dark .fff-hold-confirm-action--palette-danger { --fff-hold-confirm-track-bg: rgb(127 29 29 / .62); --fff-hold-confirm-track-text: rgb(254 226 226); --fff-hold-confirm-fill-bg: rgb(239 68 68); --fff-hold-confirm-fill-text: #fff; }
+.fff-hold-confirm-action__base { display: inline-flex; align-items: center; justify-content: center; gap: inherit; grid-area: 1 / 1; min-inline-size: 0; position: relative; z-index: 1; color: inherit; }
+.fff-hold-confirm-action__overlay { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; gap: inherit; padding: inherit; border-radius: inherit; clip-path: inset(0 100% 0 0); pointer-events: none; color: #fff; background: var(--color-700); }
+.dark .fff-hold-confirm-action__overlay { background: var(--color-400); }
+.fff-hold-confirm-action--palette-danger .fff-hold-confirm-action__overlay { background: var(--fff-hold-confirm-fill-bg); color: var(--fff-hold-confirm-fill-text); }
+.fff-hold-confirm-action__base .fi-icon, .fff-hold-confirm-action__overlay .fi-icon { color: inherit; }
+.fff-hold-confirm-action svg { stroke-width: 2; }
+.item-card__action .fff-hold-confirm-action { min-height: 2rem; font-size: .875rem; line-height: 1.25rem; padding-inline: .75rem; gap: .375rem; }
+.item-card__action .fff-hold-confirm-action .fi-icon { inline-size: .875rem; block-size: .875rem; }
 
-.fff-hold-confirm-action-host > * {
-    grid-area: 1 / 1;
-}
-
-.fff-hold-confirm-action {
-    --fff-hold-progress: 0;
-
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: none;
-    transition: transform 160ms cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.fff-hold-confirm-action[data-holding="true"] {
-    transform: scale(0.97);
-}
-
-.fff-action--rounded-none {
-    border-radius: 0 !important;
-}
-
-.fff-action--rounded-sm {
-    border-radius: 0.25rem !important;
-}
-
-.fff-action--rounded-md {
-    border-radius: 0.375rem !important;
-}
-
-.fff-action--rounded-lg {
-    border-radius: 0.5rem !important;
-}
-
-.fff-action--rounded-xl {
-    border-radius: 0.75rem !important;
-}
-
-.fff-action--rounded-full,
-.fff-hold-confirm-action.fff-action--rounded-full,
-.fff-hold-confirm-action--palette-danger.fff-action--rounded-full {
-    border-radius: var(--fff-global-radius, 0.75rem) !important;
-}
-
-.fff-hold-confirm-action--palette-danger {
-    --fff-hold-confirm-track-bg: rgb(254 226 226);
-    --fff-hold-confirm-track-text: rgb(127 29 29);
-    --fff-hold-confirm-fill-bg: rgb(220 38 38);
-    --fff-hold-confirm-fill-text: #fff;
-
-    background-color: var(--fff-hold-confirm-track-bg) !important;
-    background-image: none !important;
-    color: var(--fff-hold-confirm-track-text) !important;
-    box-shadow: none !important;
-    --tw-shadow: 0 0 #0000;
-    --tw-ring-shadow: 0 0 #0000;
-    --tw-ring-offset-shadow: 0 0 #0000;
-    --tw-ring-color: transparent;
-}
-
-.fff-hold-confirm-action--palette-danger.fi-color.fi-btn:not(label) > .fi-icon,
-.fff-hold-confirm-action--palette-danger.fi-color.fi-ac-btn-action:not(label) > .fi-icon {
-    color: var(--fff-hold-confirm-track-text) !important;
-}
-
-.fff-hold-confirm-action--palette-danger .fff-hold-confirm-action__overlay {
-    background-color: var(--fff-hold-confirm-fill-bg);
-    color: var(--fff-hold-confirm-fill-text);
-}
-
-.fff-hold-confirm-action--palette-danger .fff-hold-confirm-action__base .fi-icon,
-.fff-hold-confirm-action--palette-danger .fff-hold-confirm-action__base svg {
-    color: var(--fff-hold-confirm-track-text);
-}
-
-.fff-hold-confirm-action--palette-danger .fff-hold-confirm-action__overlay .fi-icon,
-.fff-hold-confirm-action--palette-danger .fff-hold-confirm-action__overlay svg {
-    color: var(--fff-hold-confirm-fill-text);
-}
-
-.dark .fff-hold-confirm-action--palette-danger {
-    --fff-hold-confirm-track-bg: rgb(127 29 29 / 0.62);
-    --fff-hold-confirm-track-text: rgb(254 226 226);
-    --fff-hold-confirm-fill-bg: rgb(239 68 68);
-    --fff-hold-confirm-fill-text: #fff;
-    box-shadow: inset 0 0 0 1px rgb(248 113 113 / 0.32) !important;
-}
-
-.fff-hold-confirm-action__base {
-    position: relative;
-    z-index: 1;
-    display: contents;
-    color: inherit;
-}
-
-.fff-hold-confirm-action__overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    display: inline-grid;
-    grid-auto-flow: column;
-    align-items: center;
-    justify-content: center;
-    gap: inherit;
-    padding: inherit;
-    border-radius: inherit;
-    clip-path: inset(0 100% 0 0);
-    pointer-events: none;
-}
-
-.fff-hold-confirm-action.fi-color .fff-hold-confirm-action__overlay {
-    background-color: var(--color-600);
-    color: #fff;
-}
-
-.dark .fff-hold-confirm-action.fi-color .fff-hold-confirm-action__overlay {
-    background-color: var(--color-500);
-    color: #fff;
-}
-
-.fff-hold-confirm-action.fi-color:not(.fi-outlined) .fff-hold-confirm-action__overlay {
-    background-color: var(--color-700);
-}
-
-.dark .fff-hold-confirm-action.fi-color:not(.fi-outlined) .fff-hold-confirm-action__overlay {
-    background-color: var(--color-400);
-}
-
-.fff-hold-confirm-action.fi-btn .fff-hold-confirm-action__overlay .fi-icon,
-.fff-hold-confirm-action.fi-ac-btn-action .fff-hold-confirm-action__overlay .fi-icon,
-.fff-hold-confirm-action.fi-btn .fff-hold-confirm-action__overlay svg,
-.fff-hold-confirm-action.fi-ac-btn-action .fff-hold-confirm-action__overlay svg {
-    color: inherit;
-}
-
-.fff-hold-confirm-action__base .fi-icon,
-.fff-hold-confirm-action__base svg,
-.fff-hold-confirm-action__overlay .fi-icon,
-.fff-hold-confirm-action__overlay svg {
-    color: currentColor;
-    stroke: none;
-}
-
-.item-card__action .fff-hold-confirm-action {
-    --fff-hold-confirm-icon-size: 0.875rem;
-
-    min-height: calc(0.25rem * 8);
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1.25rem;
-    padding-inline: calc(0.25rem * 3);
-    gap: 0.375rem;
-}
-
-.item-card__action .fff-hold-confirm-action .fi-icon,
-.item-card__action .fff-hold-confirm-action .fi-icon svg,
-.item-card__action .fff-hold-confirm-action svg {
-    width: var(--fff-hold-confirm-icon-size) !important;
-    height: var(--fff-hold-confirm-icon-size) !important;
-}
-
-.dark .item-card__action .fff-item-card-action.fi-btn,
-.dark .item-card__action .fff-item-card-action.fi-ac-btn-group {
-    --fff-item-card-action-bg: rgb(39 39 42);
-    --fff-item-card-action-border: rgb(255 255 255 / 0.1);
-    --fff-item-card-action-text: rgb(244 244 245);
-}
-
-.dark .item-card__action .fff-item-card-action.fi-btn:hover:not(.fi-disabled),
-.dark .item-card__action .fff-item-card-action.fi-ac-btn-group:hover:not(.fi-disabled) {
-    background-color: rgb(63 63 70);
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .fff-hold-confirm-action {
-        transition-duration: 0ms !important;
-        transform: none !important;
-    }
-
-    .fff-hold-confirm-action[data-holding="true"] {
-        outline: 2px dashed currentColor;
-        outline-offset: -2px;
-    }
-}
+.fff-hold-confirm-action__feedback { position: relative; grid-area: 1 / 1; min-inline-size: 0; z-index: 3; display: flex; align-items: center; justify-content: center; background: inherit; border-radius: inherit; }
+.fff-hold-confirm-action__feedback[hidden], .fff-hold-confirm-action__feedback [hidden] { display: none; }
+.fff-hold-confirm-action__feedback > span { display: flex; align-items: center; justify-content: center; gap: .5rem; min-inline-size: 0; }
+.fff-hold-confirm-action__feedback > span > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.fff-hold-confirm-action[data-result="pending"] .fff-hold-confirm-action__base,
+.fff-hold-confirm-action[data-result="done"] .fff-hold-confirm-action__base,
+.fff-hold-confirm-action[data-result="error"] .fff-hold-confirm-action__base { visibility: hidden; }
+.fff-hold-confirm-action__feedback .fff-hold-confirm-action__retry { flex: none; overflow: visible; text-decoration: underline; text-underline-offset: .2em; }
+.fff-hold-confirm-action[aria-busy="true"] { cursor: progress; opacity: 1; }
+.fff-confirm-morph { --fff-morph-available: 100%; --fff-confirm-border: rgb(228 228 231); position: relative; display: flex; inline-size: max-content; max-inline-size: 100%; block-size: 36px; overflow: clip; isolation: isolate; border-radius: 9999px; background: #fff; color: rgb(24 24 27); font-size: .875rem; line-height: 20px; box-shadow: 0 1px 2px rgb(0 0 0 / .035); }
+.fff-confirm-morph::after { content: ''; position: absolute; inset: 0; border: 1px solid var(--fff-confirm-border); border-radius: inherit; pointer-events: none; }
+.dark .fff-confirm-morph { --fff-confirm-border: rgb(255 255 255 / .1); background: rgb(39 39 42); color: rgb(244 244 245); }
+.fff-confirm-morph__face { position: relative; display: flex; flex: none; align-items: center; gap: 2px; inline-size: max-content; max-inline-size: var(--fff-morph-available); block-size: 100%; padding-inline: 4px; white-space: nowrap; }
+.fff-confirm-morph__face[data-face="idle"] { padding: 0; }
+.fff-confirm-morph__face[inert] { position: absolute; inset-inline-start: 0; inset-block-start: 0; pointer-events: none; }
+.fff-confirm-morph__face[hidden] { display: none; }
+.fff-confirm-morph__face > [data-part] { display: inline-flex; align-items: center; block-size: 100%; min-inline-size: 0; }
+.fff-confirm-morph__trigger.fi-btn { display: inline-flex; align-items: center; gap: 8px; block-size: 36px; margin: 0; padding: 0 16px 0 14px; border: 0; border-radius: 9999px; background: transparent !important; color: inherit !important; box-shadow: none !important; font-size: inherit; line-height: inherit; font-weight: 500; }
+[dir="rtl"] .fff-confirm-morph__trigger.fi-btn { padding-inline: 14px 16px; }
+.fff-confirm-morph__trigger .fi-icon { inline-size: 16px; block-size: 16px; color: rgb(113 113 122) !important; stroke-width: 2; }
+.dark .fff-confirm-morph__trigger .fi-icon { color: rgb(161 161 170) !important; }
+.fff-confirm-morph__prompt { min-inline-size: 0; max-inline-size: 16rem; overflow: hidden; text-overflow: ellipsis; padding-inline: 12px 8px; font-weight: 500; }
+.fff-confirm-morph__quiet, .fff-confirm-morph__confirm.fi-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; flex: none; block-size: 28px; min-block-size: 28px; padding: 0 12px; border: 0; border-radius: 9999px; font: inherit; font-weight: 500; cursor: pointer; transition: background-color 160ms cubic-bezier(.22,1,.36,1),color 160ms cubic-bezier(.22,1,.36,1); }
+.fff-confirm-morph__quiet { background: transparent; color: rgb(82 82 91); }
+.dark .fff-confirm-morph__quiet { color: rgb(212 212 216); }
+.fff-confirm-morph__face:is([data-face="done"],[data-face="error"]) .fff-confirm-morph__quiet { color: inherit; }
+.fff-confirm-morph__quiet[hidden] { display: none; }
+.fff-confirm-morph__confirm.fi-btn { overflow: clip; box-shadow: none; touch-action: none; user-select: none; }
+.fff-confirm-morph__confirm.fi-btn.fi-color { background: color-mix(in oklab,var(--color-600) 13%,transparent); color: var(--color-600); }
+.dark .fff-confirm-morph__confirm.fi-btn.fi-color { background: color-mix(in oklab,var(--color-400) 18%,transparent); color: var(--color-400); }
+.fff-confirm-morph__fill { position: absolute; inset: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: inherit; clip-path: inset(0 100% 0 0); color: #fff; background: var(--color-600); pointer-events: none; }
+.fff-confirm-morph__answer { display: block; }
+.fff-confirm-morph__status { gap: 8px; padding-inline: 12px 10px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.fff-confirm-morph__status-text { display: inline-flex; align-items: baseline; gap: .25em; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
+.fff-confirm-morph__face[data-face="pending"] .fff-confirm-morph__status { padding-inline: 12px 16px; color: rgb(113 113 122); }
+.fff-confirm-morph__face[data-face="countdown"] .fff-confirm-morph__status { padding-inline-end: 6px; color: rgb(113 113 122); }
+.dark .fff-confirm-morph__face:is([data-face="pending"],[data-face="countdown"]) .fff-confirm-morph__status { color: rgb(161 161 170); }
+.fff-confirm-morph__face[data-face="done"]:not(:has(.fff-confirm-morph__quiet)) .fff-confirm-morph__status { padding-inline-end: 14px; }
+.fff-confirm-morph__status > svg { flex: none; }
+.fff-confirm-morph__spinner, .fff-confirm-morph__alert { inline-size: 16px; block-size: 16px; flex: none; }
+.fff-confirm-morph__alert { color: var(--danger-600,rgb(220 38 38)); stroke-width: 2; }
+.fff-confirm-morph__spinner { animation: fff-confirm-spin .7s linear infinite; }
+@keyframes fff-confirm-spin { to { transform: rotate(360deg); } }
+.fff-confirm-morph__check { inline-size: 18px; block-size: 18px; flex: none; }
+.fff-confirm-morph__check-disc { fill: var(--success-600,rgb(22 163 74)); transform-box: fill-box; transform-origin: center; }
+.fff-confirm-morph__check-tick { stroke: #fff; stroke-dasharray: 1; }
+.fff-confirm-morph__ring { inline-size: 16px; block-size: 16px; flex: none; }
+.fff-confirm-morph__ring-track { stroke: var(--fff-confirm-border); }
+.fff-confirm-morph__ring-fill { stroke: var(--primary-600,rgb(220 38 38)); stroke-dasharray: 1; transform: rotate(-90deg); transform-origin: 8px 8px; }
+.fff-confirm-morph__seconds { display: inline-grid; min-inline-size: 1ch; color: rgb(24 24 27); font-variant-numeric: tabular-nums; }
+.dark .fff-confirm-morph__seconds { color: rgb(244 244 245); }
+.fff-confirm-morph__seconds > span { grid-area: 1 / 1; }
+.fff-confirm-morph:focus, .fff-confirm-morph button:focus { outline: none; }
+.fff-confirm-morph__trigger:focus-visible, .fff-confirm-morph__quiet:focus-visible { background: color-mix(in srgb,currentColor 7%,transparent) !important; }
+.fff-confirm-morph__confirm:focus-visible { background: color-mix(in oklab,var(--color-600) 20%,transparent) !important; }
+.fff-confirm-morph__trigger:disabled { color: rgb(161 161 170) !important; cursor: not-allowed; }
+@media (hover:hover) and (pointer:fine) { .fff-confirm-morph__quiet:hover,.fff-confirm-morph__trigger:hover { background: color-mix(in srgb,currentColor 7%,transparent) !important; } .fff-confirm-morph__confirm.fi-btn.fi-color:hover { background: color-mix(in oklab,var(--color-600) 18%,transparent); } }
+@media (prefers-reduced-motion:reduce) { .fff-hold-confirm-action { transition: none; transform: none !important; } .fff-confirm-morph button { transition: none; } .fff-confirm-morph__spinner { animation-duration: 1.6s; } }

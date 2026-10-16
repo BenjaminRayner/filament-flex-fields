@@ -11,13 +11,7 @@ use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\C
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\Concerns\ProvidesTranslatablePresets;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\Concerns\SyncsTranslatableLocaleFieldState;
 
-/**
- * Locale-aware form layout built on SegmentTabs.
- *
- * Designed as a universal, extensible alternative to third-party translatable tab
- * packages — with explicit extension points (modifiers, localeFieldUsing, storageAttributeUsing)
- * and first-class JSON / Spatie hydration.
- */
+/** Locale composition: shared tab renderer, independently owned child fields. */
 class TranslatableFields extends SegmentTabs
 {
     use BuildsTranslatableTabs;
@@ -30,12 +24,18 @@ class TranslatableFields extends SegmentTabs
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->separators(false);
-        $this->extraAttributes([
-            'class' => 'fff-translatable-fields',
+        $this->extraAttributes(fn (TranslatableFields $component): array => [
+            'class' => 'fff-translatable-fields'.($component->hasBorderedPanels() ? ' fff-translatable-fields--bordered' : ''),
         ]);
+        $this->tabs(fn (): array => $this->buildTranslatableTabs());
+        $this->afterCloned(function (TranslatableFields $clone): void {
+            $clone->clearCachedChildSchemas();
+        });
+    }
 
-        $this->tabs(fn (TranslatableFields $component): array => $component->buildTranslatableTabs());
+    public function getSegmentAssetComponent(): string
+    {
+        return 'translatable-fields';
     }
 }

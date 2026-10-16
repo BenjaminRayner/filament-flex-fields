@@ -23,11 +23,11 @@ final class VisibilityRuleBuilder
         ?callable $modelAttributeOptions = null,
     ): Repeater {
         return Repeater::make($name)
-            ->label(__('filament-flex-fields::default.schema.visibility_rules'))
+            ->label(fn () => __('filament-flex-fields::default.schema.visibility_rules'))
             ->schema([
                 Select::make('source')
-                    ->label(__('filament-flex-fields::default.schema.visibility_source'))
-                    ->options([
+                    ->label(fn () => __('filament-flex-fields::default.schema.visibility_source'))
+                    ->options(fn () => [
                         'flex_field' => __('filament-flex-fields::default.schema.visibility_source_flex_field'),
                         'model' => __('filament-flex-fields::default.schema.visibility_source_model'),
                         'relation' => __('filament-flex-fields::default.schema.visibility_source_relation'),
@@ -37,7 +37,7 @@ final class VisibilityRuleBuilder
                     ->live()
                     ->native(false),
                 Select::make('field')
-                    ->label(__('filament-flex-fields::default.schema.visibility_field'))
+                    ->label(fn () => __('filament-flex-fields::default.schema.visibility_field'))
                     ->options(function (Get $get) use ($flexFieldOptions, $modelAttributeOptions): array {
                         return match ($get('source')) {
                             'model' => is_callable($modelAttributeOptions) ? ($modelAttributeOptions() ?? []) : [],
@@ -49,13 +49,13 @@ final class VisibilityRuleBuilder
                     ->required()
                     ->visible(fn (Get $get): bool => $get('source') !== 'relation'),
                 TextInput::make('field')
-                    ->label(__('filament-flex-fields::default.schema.visibility_relation_path'))
+                    ->label(fn () => __('filament-flex-fields::default.schema.visibility_relation_path'))
                     ->placeholder('owner.email')
                     ->required()
                     ->visible(fn (Get $get): bool => $get('source') === 'relation'),
                 Select::make('operator')
-                    ->label(__('filament-flex-fields::default.schema.visibility_operator'))
-                    ->options(collect(JsonFieldConditions::OPERATORS)
+                    ->label(fn () => __('filament-flex-fields::default.schema.visibility_operator'))
+                    ->options(fn (): array => collect(JsonFieldConditions::OPERATORS)
                         ->mapWithKeys(fn (string $operator): array => [
                             $operator => __('filament-flex-fields::default.schema.visibility_operator_'.$operator),
                         ])
@@ -63,7 +63,7 @@ final class VisibilityRuleBuilder
                     ->required()
                     ->native(false),
                 TextInput::make('value')
-                    ->label(__('filament-flex-fields::default.schema.visibility_value'))
+                    ->label(fn () => __('filament-flex-fields::default.schema.visibility_value'))
                     ->visible(fn (Get $get): bool => ! in_array($get('operator'), ['filled', 'empty'], true)),
             ])
             ->columns(2)

@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Intelligence\Formula;
 
+use Bjanczak\FilamentFlexFields\Support\Intelligence\Values\NumericValue;
+use Closure;
 use InvalidArgumentException;
 
 /**
@@ -20,33 +22,49 @@ use InvalidArgumentException;
 final class FormulaEvaluator
 {
     /**
-     * @param  array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}  $ast
+     * @param  array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}  $ast
      */
-    public static function evaluate(array $ast): float|int
+    public static function evaluate(array $ast, ?Closure $resolveReference = null): float|int
     {
-        return self::normalize(self::evaluateAst($ast));
+        return self::normalize((new self($resolveReference))->visit($ast));
     }
 
-    /**
-     * @param  array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}  $ast
-     */
-    public static function evaluateAst(array $ast): float
+    /** @param array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed} $ast */
+    public static function evaluateAst(array $ast, ?Closure $resolveReference = null): float
     {
-        return match ($ast[0]) {
+        return (new self($resolveReference))->visit($ast);
+    }
+
+    private function __construct(private readonly ?Closure $resolveReference) {}
+
+    /** @param array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed} $ast */
+    private function visit(array $ast): float
+    {
+        return NumericValue::finite(match ($ast[0]) {
             'lit' => (float) $ast[1],
-            'un' => self::evaluateUnary((string) $ast[1], $ast[2]),
-            'bin' => self::evaluateBinary((string) $ast[1], $ast[2], $ast[3]),
-            'call' => self::evaluateCall((string) $ast[1], $ast[2]),
+            'ref' => $this->reference($ast[1] ?? null),
+            'un' => $this->evaluateUnary((string) $ast[1], $ast[2]),
+            'bin' => $this->evaluateBinary((string) $ast[1], $ast[2], $ast[3]),
+            'call' => $this->evaluateCall((string) $ast[1], $ast[2]),
             default => throw new InvalidArgumentException('Unexpected formula AST node.'),
-        };
+        });
+    }
+
+    private function reference(mixed $key): float
+    {
+        if (! is_string($key) || $key === '' || $this->resolveReference === null) {
+            throw new InvalidArgumentException('Invalid formula reference or missing value resolver.');
+        }
+
+        return (float) ($this->resolveReference)($key);
     }
 
     /**
-     * @param  array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}  $child
+     * @param  array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}  $child
      */
-    private static function evaluateUnary(string $operator, array $child): float
+    private function evaluateUnary(string $operator, array $child): float
     {
-        $value = self::evaluateAst($child);
+        $value = $this->visit($child);
 
         return match ($operator) {
             '-' => -$value,
@@ -55,13 +73,13 @@ final class FormulaEvaluator
     }
 
     /**
-     * @param  array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}  $left
-     * @param  array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}  $right
+     * @param  array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}  $left
+     * @param  array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}  $right
      */
-    private static function evaluateBinary(string $operator, array $left, array $right): float
+    private function evaluateBinary(string $operator, array $left, array $right): float
     {
-        $leftValue = self::evaluateAst($left);
-        $rightValue = self::evaluateAst($right);
+        $leftValue = $this->visit($left);
+        $rightValue = $this->visit($right);
 
         return match ($operator) {
             '+' => $leftValue + $rightValue,
@@ -80,16 +98,16 @@ final class FormulaEvaluator
     }
 
     /**
-     * @param  list<array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
+     * @param  list<array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
      */
-    private static function evaluateCall(string $name, array $arguments): float
+    private function evaluateCall(string $name, array $arguments): float
     {
         if (in_array($name, FormulaCatalog::SHORT_CIRCUIT_FUNCTIONS, true)) {
-            return self::evaluateShortCircuit($name, $arguments);
+            return $this->evaluateShortCircuit($name, $arguments);
         }
 
         $values = array_map(
-            static fn (array $argument): float => self::evaluateAst($argument),
+            fn (array $argument): float => $this->visit($argument),
             $arguments,
         );
 
@@ -97,46 +115,46 @@ final class FormulaEvaluator
     }
 
     /**
-     * @param  list<array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
+     * @param  list<array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
      */
-    private static function evaluateShortCircuit(string $name, array $arguments): float
+    private function evaluateShortCircuit(string $name, array $arguments): float
     {
         return match ($name) {
-            'if' => self::evaluateIf($arguments),
-            'and' => self::evaluateAnd($arguments),
-            'or' => self::evaluateOr($arguments),
-            'coalesce', 'nz' => self::evaluateCoalesce($arguments),
+            'if' => $this->evaluateIf($arguments),
+            'and' => $this->evaluateAnd($arguments),
+            'or' => $this->evaluateOr($arguments),
+            'coalesce', 'nz' => $this->evaluateCoalesce($arguments),
             default => throw new InvalidArgumentException("Unknown short-circuit formula function [{$name}]."),
         };
     }
 
     /**
-     * @param  list<array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
+     * @param  list<array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
      */
-    private static function evaluateIf(array $arguments): float
+    private function evaluateIf(array $arguments): float
     {
         if (count($arguments) !== 3) {
             throw new InvalidArgumentException('Function [if] expects exactly 3 arguments: condition, whenTrue, whenFalse.');
         }
 
-        $condition = self::evaluateAst($arguments[0]);
+        $condition = $this->visit($arguments[0]);
 
         return $condition != 0.0
-            ? self::evaluateAst($arguments[1])
-            : self::evaluateAst($arguments[2]);
+            ? $this->visit($arguments[1])
+            : $this->visit($arguments[2]);
     }
 
     /**
-     * @param  list<array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
+     * @param  list<array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
      */
-    private static function evaluateAnd(array $arguments): float
+    private function evaluateAnd(array $arguments): float
     {
         if (count($arguments) < 2) {
             throw new InvalidArgumentException('Function [and] expects at least 2 arguments.');
         }
 
         foreach ($arguments as $argument) {
-            if (self::evaluateAst($argument) == 0.0) {
+            if ($this->visit($argument) == 0.0) {
                 return 0.0;
             }
         }
@@ -145,16 +163,16 @@ final class FormulaEvaluator
     }
 
     /**
-     * @param  list<array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
+     * @param  list<array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
      */
-    private static function evaluateOr(array $arguments): float
+    private function evaluateOr(array $arguments): float
     {
         if (count($arguments) < 2) {
             throw new InvalidArgumentException('Function [or] expects at least 2 arguments.');
         }
 
         foreach ($arguments as $argument) {
-            if (self::evaluateAst($argument) != 0.0) {
+            if ($this->visit($argument) != 0.0) {
                 return 1.0;
             }
         }
@@ -163,9 +181,9 @@ final class FormulaEvaluator
     }
 
     /**
-     * @param  list<array{0: 'lit'|'bin'|'un'|'call', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
+     * @param  list<array{0: 'lit'|'bin'|'un'|'call'|'ref', 1?: mixed, 2?: mixed, 3?: mixed}>  $arguments
      */
-    private static function evaluateCoalesce(array $arguments): float
+    private function evaluateCoalesce(array $arguments): float
     {
         if ($arguments === []) {
             throw new InvalidArgumentException('Function [coalesce] expects at least 1 argument.');
@@ -174,7 +192,7 @@ final class FormulaEvaluator
         $last = 0.0;
 
         foreach ($arguments as $argument) {
-            $last = self::evaluateAst($argument);
+            $last = $this->visit($argument);
 
             if ($last != 0.0) {
                 return $last;
@@ -204,14 +222,6 @@ final class FormulaEvaluator
 
     private static function normalize(float $value): float|int
     {
-        if (! is_finite($value)) {
-            throw new InvalidArgumentException('Formula result must be a finite number.');
-        }
-
-        if (floor($value) === $value && abs($value) <= PHP_INT_MAX) {
-            return (int) $value;
-        }
-
-        return $value;
+        return NumericValue::normalize($value);
     }
 }

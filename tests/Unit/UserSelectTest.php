@@ -4,12 +4,36 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\UserSelect;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
 use Bjanczak\FilamentFlexFields\Support\Playground\UserSelectPlayground;
 use Filament\Schemas\Components\Section;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+final class UserSelectFixtureRecord extends Model
+{
+    protected $table = 'fff_test_select_users';
+
+    protected $guarded = [];
+
+    public $timestamps = false;
+}
+
+beforeEach(function (): void {
+    Schema::create('fff_test_select_users', function (Blueprint $table): void {
+        $table->id();
+        $table->string('name');
+        $table->string('email');
+        $table->timestamp('email_verified_at')->nullable();
+    });
+    UserSelectFixtureRecord::insert([
+        ['id' => 1, 'name' => 'Jane Cooper', 'email' => 'jane@example.com', 'email_verified_at' => '2026-01-01 00:00:00'],
+        ['id' => 2, 'name' => 'Alex Rivera', 'email' => 'alex@example.com', 'email_verified_at' => null],
+        ['id' => 3, 'name' => 'Sam Chen', 'email' => 'sam@example.com', 'email_verified_at' => null],
+    ]);
+    config()->set('auth.providers.users.model', UserSelectFixtureRecord::class);
+});
 
 it('extends select field and exposes user select wrapper classes', function () {
     $field = UserSelect::make('assignee')
@@ -180,29 +204,7 @@ it('enables dynamic options and default suggestions for option model fields', fu
 });
 
 it('defers initial js options for option model fields but loads suggestions on demand', function () {
-    $userModel = config('auth.providers.users.model');
-
-    if (! is_string($userModel) || ! class_exists($userModel)) {
-        test()->markTestSkipped('No auth user model configured.');
-    }
-
-    try {
-        $userCount = $userModel::query()->count();
-    } catch (Throwable) {
-        test()->markTestSkipped('No users database available.');
-    }
-
-    if ($userCount === 0) {
-        try {
-            if (method_exists($userModel, 'factory')) {
-                $userModel::factory()->create();
-            } else {
-                test()->markTestSkipped('No users in database and no factory available.');
-            }
-        } catch (Throwable) {
-            test()->markTestSkipped('Cannot create user record for empty database.');
-        }
-    }
+    $userModel = UserSelectFixtureRecord::class;
 
     $field = UserSelect::make('members')
         ->optionModel($userModel)
@@ -225,17 +227,7 @@ it('defaults min search length to two characters', function () {
 });
 
 it('returns no search results when query is shorter than min search length', function () {
-    $userModel = config('auth.providers.users.model');
-
-    if (! is_string($userModel) || ! class_exists($userModel)) {
-        test()->markTestSkipped('No auth user model configured.');
-    }
-
-    try {
-        $userModel::query()->count();
-    } catch (Throwable) {
-        test()->markTestSkipped('No users database available.');
-    }
+    $userModel = UserSelectFixtureRecord::class;
 
     $field = UserSelect::make('members')
         ->optionModel($userModel)
@@ -250,11 +242,7 @@ it('applies prefix search constraints to the query', function () {
         ->nameColumn('name')
         ->emailColumn('email');
 
-    $userModel = config('auth.providers.users.model');
-
-    if (! is_string($userModel) || ! class_exists($userModel)) {
-        test()->markTestSkipped('No auth user model configured.');
-    }
+    $userModel = UserSelectFixtureRecord::class;
 
     $query = $userModel::query();
 
@@ -263,21 +251,15 @@ it('applies prefix search constraints to the query', function () {
     $method = new ReflectionMethod($queryEngine, 'applySearchToQuery');
     $method->invoke($queryEngine, $query, 'jan');
 
-    $sql = $query->toSql();
+    $sql = strtolower($query->toSql());
     $bindings = $query->getBindings();
 
     expect($sql)->toContain('like ?')
-        ->and($bindings)->toContain('jan%')
-        ->and($bindings)->toContain('jan@%')
-        ->and($bindings)->toHaveCount(3);
+        ->and($bindings)->toBe(['jan%', 'jan%']);
 });
 
 it('restricts model queries to display columns when resolvers are not customized', function () {
-    $userModel = config('auth.providers.users.model');
-
-    if (! is_string($userModel) || ! class_exists($userModel)) {
-        test()->markTestSkipped('No auth user model configured.');
-    }
+    $userModel = UserSelectFixtureRecord::class;
 
     $field = UserSelect::make('members')
         ->optionModel($userModel)
@@ -289,21 +271,13 @@ it('restricts model queries to display columns when resolvers are not customized
     $method = new ReflectionMethod($queryEngine, 'buildModelQuery');
     $query = $method->invoke($queryEngine);
 
-    expect(strtolower($query->toSql()))->toContain('select');
+    expect($query->getQuery()->columns)->toBe([
+        'fff_test_select_users.id', 'fff_test_select_users.name', 'fff_test_select_users.email',
+    ]);
 });
 
 it('caches search results for repeated queries within the same component instance', function () {
-    $userModel = config('auth.providers.users.model');
-
-    if (! is_string($userModel) || ! class_exists($userModel)) {
-        test()->markTestSkipped('No auth user model configured.');
-    }
-
-    try {
-        $userModel::query()->count();
-    } catch (Throwable) {
-        test()->markTestSkipped('No users database available.');
-    }
+    $userModel = UserSelectFixtureRecord::class;
 
     $field = UserSelect::make('members')
         ->optionModel($userModel)
@@ -405,7 +379,7 @@ it('formats user shape into lean client payload', function () {
 });
 
 it('registers user select playground defaults', function () {
-    $state = app(FlexFieldsPlaygroundBuilder::class)->defaultState();
+    $state = app(UserSelectPlayground::class)->defaultState();
 
     expect($state)->toHaveKeys([
         'user_select__single',
@@ -446,21 +420,8 @@ it('throws when option model class is invalid', function () {
 })->throws(InvalidArgumentException::class);
 
 it('renders model-backed selected user tags on initial load instead of raw ids', function () {
-    $userModel = config('auth.providers.users.model');
-
-    if (! is_string($userModel) || ! class_exists($userModel)) {
-        test()->markTestSkipped('No auth user model configured.');
-    }
-
-    try {
-        $user = $userModel::query()->first();
-    } catch (Throwable) {
-        test()->markTestSkipped('No users database available.');
-    }
-
-    if ($user === null) {
-        test()->markTestSkipped('No users in database.');
-    }
+    $userModel = UserSelectFixtureRecord::class;
+    $user = $userModel::query()->findOrFail(1);
 
     $secondUser = $userModel::query()->whereKeyNot($user->getKey())->first() ?? $user;
 
@@ -496,21 +457,8 @@ it('renders model-backed selected user tags on initial load instead of raw ids',
 });
 
 it('resolves multiple model-backed users with a single database query', function () {
-    $userModel = config('auth.providers.users.model');
-
-    if (! is_string($userModel) || ! class_exists($userModel)) {
-        test()->markTestSkipped('No auth user model configured.');
-    }
-
-    try {
-        $users = $userModel::query()->limit(3)->get();
-    } catch (Throwable) {
-        test()->markTestSkipped('No users database available.');
-    }
-
-    if ($users->count() < 2) {
-        test()->markTestSkipped('Not enough users in database.');
-    }
+    $userModel = UserSelectFixtureRecord::class;
+    $users = $userModel::query()->orderBy('id')->limit(3)->get();
 
     $ids = $users->pluck($users->first()->getKeyName())->all();
 
@@ -530,21 +478,7 @@ it('resolves multiple model-backed users with a single database query', function
 });
 
 it('loads latest users as default suggestions when search is empty', function () {
-    $userModel = config('auth.providers.users.model');
-
-    if (! is_string($userModel) || ! class_exists($userModel)) {
-        test()->markTestSkipped('No auth user model configured.');
-    }
-
-    try {
-        $userCount = $userModel::query()->count();
-    } catch (Throwable) {
-        test()->markTestSkipped('No users database available.');
-    }
-
-    if ($userCount === 0) {
-        test()->markTestSkipped('No users in database.');
-    }
+    $userModel = UserSelectFixtureRecord::class;
 
     $field = UserSelect::make('members')
         ->optionModel($userModel)
@@ -574,28 +508,6 @@ it('returns plain names from resolve option labels for values', function () {
         ->toBe(['jane' => 'Jane Cooper']);
 });
 
-it('filters selected users from dropdown options without mutating livewire state', function () {
-    $contents = file_get_contents(
-        dirname(__DIR__, 2).'/resources/js/components/select-field/headless-select-options.js',
-    );
-
-    expect($contents)
-        ->toContain('keepSelectedOptionsInDropdown')
-        ->toContain('isOptionSelected')
-        ->not->toContain('this.state = this.state.map((value) => String(value))');
-});
-
-it('syncs multiple user removal with livewire state immediately', function () {
-    $contents = file_get_contents(
-        dirname(__DIR__, 2).'/resources/js/components/select-field/headless-user-select.js',
-    );
-
-    expect($contents)
-        ->toContain('removeUserSelectTag')
-        ->toContain('comboboxDeselectValue')
-        ->toContain('initialSelectedUserEntries');
-});
-
 it('guards user select state against stale livewire sync on dropdown open', function () {
     $contents = file_get_contents(
         dirname(__DIR__, 2).'/resources/js/components/select-field/headless-select-state.js',
@@ -614,28 +526,16 @@ it('respects configured max visible avatars', function () {
     expect($field->getMaxVisibleAvatars())->toBe(10);
 });
 
-it('caches duplicate user select queries at the request level', function () {
-    $userModel = config('auth.providers.users.model');
-
-    if (! is_string($userModel) || ! class_exists($userModel)) {
-        test()->markTestSkipped('No auth user model configured.');
-    }
-
-    try {
-        $userCount = $userModel::query()->count();
-    } catch (Throwable) {
-        test()->markTestSkipped('No users database available.');
-    }
-
-    if ($userCount === 0) {
-        test()->markTestSkipped('No users in database.');
-    }
+it('shares equivalent cloned user queries and isolates other field contexts', function () {
+    $userModel = UserSelectFixtureRecord::class;
 
     $field1 = UserSelect::make('assignee_1')
         ->optionModel($userModel)
         ->defaultSuggestionsLimit(5);
 
-    $field2 = UserSelect::make('assignee_2')
+    $field2 = clone $field1;
+
+    $otherField = UserSelect::make('assignee_2')
         ->optionModel($userModel)
         ->defaultSuggestionsLimit(5);
 
@@ -654,13 +554,9 @@ it('caches duplicate user select queries at the request level', function () {
 
     expect($firstQueryCount)->toBeGreaterThan(0)
         ->and($secondQueryCount)->toBe(0);
-});
 
-it('loads tag chips stylesheet for removable selected user tag chips', function () {
-    $tagChipsCss = file_get_contents(__DIR__.'/../../resources/dist/css/tag-chips.css');
+    DB::flushQueryLog();
+    $otherField->getOptionsForJs();
 
-    expect(FlexFieldAssets::stylesheetsFor('user-select'))
-        ->toBe(['overlay-runtime', 'teleported-menu', 'select-field', 'tag-chips', 'user-display', 'user-select'])
-        ->and($tagChipsCss)
-        ->toContain('.fff-tags-field__tag-remove');
+    expect(count(DB::getQueryLog()))->toBeGreaterThan(0);
 });

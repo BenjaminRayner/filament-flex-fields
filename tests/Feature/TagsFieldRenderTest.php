@@ -20,16 +20,16 @@ it('renders tags field with select-style suggestions dropdown shell', function (
     $html = Livewire::test(TestableSignatureForm::class)->html(false);
 
     expect($html)
-        ->toContain('fff-tags-field-input-mount')
-        ->toContain('fff-tags-field-input-ssr')
-        ->toContain('tagsInputMount')
-        ->toContain('onSuggestionsClickOutside')
+        ->toContain('fff-flex-text-input__shell')
+        ->toContain('fff-flex-text-input__control')
+        ->toContain('headlessInlineSearchInput')
+        ->toContain('isEventInsideHeadlessMenu')
         ->toContain('tagsFieldFormComponent({')
         ->toContain('fff-select-dropdown-panel')
         ->toContain('fff-select-dropdown-panel--layout-plain')
         ->toContain('fi-select-input-options-ctn')
         ->toContain('fi-select-input-option')
-        ->toContain('modulepreload')
+        ->toContain('data-fff-asset-consumer')
         ->not->toContain('<datalist');
 });
 
@@ -46,7 +46,7 @@ it('renders initial tags in ssr shell to prevent layout shift', function (): voi
         ->html(false);
 
     expect($html)
-        ->toContain('fff-tags-field-input-ssr')
+        ->toContain('fff-flex-text-input__control')
         ->toContain('fff-tags-field__tags-ssr')
         ->toContain('alpha%')
         ->toContain('beta%')

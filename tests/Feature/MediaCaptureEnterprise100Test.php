@@ -3,23 +3,21 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CreditCardField;
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\FlexSpatieMediaLibraryFileUpload;
-use Bjanczak\FilamentFlexFields\Support\Enterprise\ObservabilityHooks;
+use Bjanczak\FilamentFlexFields\Support\Events\BarcodeCaptured;
+use Bjanczak\FilamentFlexFields\Support\Events\RetentionPruned;
 use Bjanczak\FilamentFlexFields\Support\Media\BarcodeValue;
 use Bjanczak\FilamentFlexFields\Support\Media\CircuitBreakerTranscriptionProvider;
 use Bjanczak\FilamentFlexFields\Support\Media\LaravelStorageSignedUrlResolver;
 use Bjanczak\FilamentFlexFields\Support\Media\MediaCaptureOs;
 use Bjanczak\FilamentFlexFields\Support\Media\NullVoiceNoteTranscription;
-use Bjanczak\FilamentFlexFields\Support\Media\SpatieMediaCaptureAdapter;
 use Bjanczak\FilamentFlexFields\Support\Media\VoiceNoteTranscriptionInterface;
-use Bjanczak\FilamentFlexFields\Tests\Support\FakeCaptureMediaModel;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
     MediaCaptureOs::resetRuntimeState();
-    ObservabilityHooks::clear();
     Cache::flush();
 });
 
@@ -73,8 +71,8 @@ it('resolves signed urls through laravel storage resolver when driver supports t
 
 it('records barcode capture observability events from barcode value dto', function () {
     $events = [];
-    ObservabilityHooks::on(ObservabilityHooks::EVENT_BARCODE_CAPTURE, function (array $payload) use (&$events): void {
-        $events[] = $payload;
+    Event::listen(BarcodeCaptured::class, function (BarcodeCaptured $event) use (&$events): void {
+        $events[] = $event->toArray();
     });
 
     MediaCaptureOs::recordBarcodeCapture(new BarcodeValue('1234567890', 'ean_13'), 'sku_scan');
@@ -90,26 +88,6 @@ it('normalizes barcode value dto from array payload', function () {
 
     expect($barcode)->not->toBeNull()
         ->and($barcode?->toArray())->toBe(['value' => 'SKU-9', 'format' => 'code_128']);
-});
-
-it('resolves spatie signed url override via getPathRelativeToRoot', function () {
-    MediaCaptureOs::registerSignedUploadUrlResolver(
-        fn (string $disk, string $path, array $context): string => "https://signed.test/{$disk}/{$path}",
-    );
-
-    $record = new FakeCaptureMediaModel;
-    $field = FlexSpatieMediaLibraryFileUpload::make('attachment');
-    $field->collection('documents');
-    $field->disk('local');
-    $field->visibility('public');
-    $field->model($record);
-
-    $media = $record->addMediaFromString('pdf')->toMediaCollection('documents', 'local');
-
-    $payload = SpatieMediaCaptureAdapter::resolveUploadedFilePayload($field, $media->uuid);
-
-    expect($payload)->not->toBeNull()
-        ->and($payload['url'])->toBe('https://signed.test/local/media/documents/upload.bin');
 });
 
 it('records retention prune audit events from prune command', function () {
@@ -128,8 +106,8 @@ it('records retention prune audit events from prune command', function () {
     touch(Storage::disk('local')->path('livewire-tmp/old.tmp'), now()->subDays(10)->getTimestamp());
 
     $events = [];
-    ObservabilityHooks::on(ObservabilityHooks::EVENT_RETENTION_PRUNE, function (array $payload) use (&$events): void {
-        $events[] = $payload;
+    Event::listen(RetentionPruned::class, function (RetentionPruned $event) use (&$events): void {
+        $events[] = $event->toArray();
     });
 
     Artisan::call('flex-fields:prune-capture-media', ['--category' => ['temp_captures']]);
@@ -185,9 +163,9 @@ it('uses geocoding rate limit config key in proxy controller', function () {
     expect((int) config('filament-flex-fields.geocoding.rate_limit_per_minute'))->toBe(99);
 });
 
-it('lists retention and barcode events in observability catalog', function () {
-    expect(ObservabilityHooks::listEvents())->toContain(
-        ObservabilityHooks::EVENT_RETENTION_PRUNE,
-        ObservabilityHooks::EVENT_BARCODE_CAPTURE,
-    );
+it('exposes serializable retention and barcode event payloads', function () {
+    expect((new RetentionPruned('temp_captures', 1, ['a.tmp']))->toArray())
+        ->toMatchArray(['category' => 'temp_captures', 'count' => 1, 'dry_run' => false])
+        ->and((new BarcodeCaptured('sku', '123', null))->toArray())
+        ->toMatchArray(['field' => 'sku', 'value' => '123', 'format' => null]);
 });

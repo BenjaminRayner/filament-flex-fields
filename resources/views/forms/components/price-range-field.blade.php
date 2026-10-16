@@ -1,159 +1,35 @@
 @php
+    $configuration = $field->getPriceRangeConfiguration();
     $statePath = $getStatePath();
-    $isDisabled = $isDisabled();
-    $wrapperClasses = $getWrapperClasses();
-    $prefix = $getPrefix();
-    $initialState = $field->normalizeState(is_array($getState()) ? $getState() : []);
-    $rangeSpan = max($getMax() - $getMin(), 1);
-    $initialMinPercent = (($initialState['min'] - $getMin()) / $rangeSpan) * 100;
-    $initialMaxPercent = (($initialState['max'] - $getMin()) / $rangeSpan) * 100;
-    $initialFillWidth = max(0, $initialMaxPercent - $initialMinPercent);
+    $livewireKey = $getLivewireKey();
+    $initial = $configuration['initialState'];
+    $span = $configuration['maxBound'] - $configuration['minBound'];
+    $minimumPercent = ($initial['min'] - $configuration['minBound']) / $span * 100;
+    $maximumPercent = ($initial['max'] - $configuration['minBound']) / $span * 100;
+    $structure = array_diff_key($configuration, ['initialState' => true]);
+    $structure['size'] = $getSize();
+    $structure['variant'] = $getVariant();
+    $structure['rounding'] = $getRounding();
+    $structure['inputs'] = $shouldShowInputs();
+    $structure['invalid'] = $errors->has($statePath);
+    $structure['focusOutline'] = $shouldShowFocusOutline();
+    $histogram = \Bjanczak\FilamentFlexFields\Support\PriceRange\Histogram::presentation($configuration['histogram']);
+    $structure['labels'] = [$getMinInputLabel(), $getMaxInputLabel()];
 @endphp
-
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
-    :attributes="
-        \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
-            ->class($wrapperClasses)
-    "
->
-    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'price-range',
-        'livewireKey' => $getLivewireKey(),
-    ])
-    <div
-        x-load
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('price-range', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-        x-data="priceRangeFormComponent({
-            state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
-            initialState: @js($initialState),
-            minBound: @js($getMin()),
-            maxBound: @js($getMax()),
-            step: @js($getStep()),
-            integer: @js($isInteger()),
-            decimalPlaces: @js($getDecimalPlaces()),
-            locale: @js($field->getLocale()),
-            prefix: @js($prefix),
-            histogram: @js($getHistogram()),
-            disabled: @js($isDisabled),
-        })"
-        x-init="init()"
-        @class([
-            'fff-price-range',
-            'fff-price-range--'.$getSize(),
-            'fff-price-range--'.$getVariant(),
-            'is-disabled' => $isDisabled,
-        ])
-        role="group"
-        aria-label="{{ $getLabel() }}"
-    >
-        <div class="fff-price-range__chart" x-ref="chart" aria-hidden="true">
-            <template x-for="(height, index) in displayHistogram" :key="index">
-                <span
-                    class="fff-price-range__bar"
-                    x-bind:class="{ 'is-in-range': isBarInRange(index) }"
-                    x-bind:style="'height: ' + height + '%'"
-                ></span>
-            </template>
-        </div>
-
-        <div class="fff-price-range__slider">
-            <div
-                x-ref="track"
-                class="fff-price-range__track"
-                x-on:pointerdown="onTrackPointerDown($event)"
-                x-on:pointermove="onTrackPointerMove($event)"
-                x-on:pointerup="onTrackPointerUp($event)"
-                x-on:pointercancel="onTrackPointerUp($event)"
-            >
-                <span class="fff-price-range__track-rail" aria-hidden="true"></span>
-                <span
-                    class="fff-price-range__track-fill"
-                    style="left: {{ $initialMinPercent }}%; width: {{ $initialFillWidth }}%"
-                    x-bind:style="fillStyle"
-                    aria-hidden="true"
-                ></span>
-
-                <button
-                    type="button"
-                    class="fff-price-range__thumb"
-                    x-bind:class="{ 'is-dragging': activeThumb === 'min' }"
-                    style="left: {{ $initialMinPercent }}%"
-                    x-bind:style="thumbStyle(minPercent)"
-                    x-on:pointerdown="onThumbPointerDown('min', $event)"
-                    :disabled="disabled"
-                    :aria-valuemin="minBound"
-                    :aria-valuemax="maxBound"
-                    :aria-valuenow="minValue"
-                    :aria-valuetext="formatValue(minValue)"
-                    aria-label="{{ $getMinInputLabel() }}"
-                ></button>
-
-                <button
-                    type="button"
-                    class="fff-price-range__thumb"
-                    x-bind:class="{ 'is-dragging': activeThumb === 'max' }"
-                    style="left: {{ $initialMaxPercent }}%"
-                    x-bind:style="thumbStyle(maxPercent)"
-                    x-on:pointerdown="onThumbPointerDown('max', $event)"
-                    :disabled="disabled"
-                    :aria-valuemin="minBound"
-                    :aria-valuemax="maxBound"
-                    :aria-valuenow="maxValue"
-                    :aria-valuetext="formatValue(maxValue)"
-                    aria-label="{{ $getMaxInputLabel() }}"
-                ></button>
-            </div>
-        </div>
-
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field"
+    :attributes="\Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())->class($getWrapperClasses())">
+    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'price-range', 'livewireKey' => $livewireKey, 'capabilities' => $shouldShowInputs() ? ['inputs'] : []])
+    <div wire:ignore wire:key="{{ $livewireKey }}.range.{{ md5(serialize($structure)) }}"
+        data-price-range-config="{{ json_encode(array_diff_key($configuration, ['histogram' => true, 'initialState' => true]), JSON_THROW_ON_ERROR) }}"
+        x-fff-load x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('price-range', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+        x-data="priceRangeFormComponent({ state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }} })"
+        @class(['fff-price-range', 'fff-price-range--'.$getSize(), 'fff-price-range--'.$getVariant(), 'is-disabled' => $configuration['disabled']])
+        style="--fff-price-range-min-percent: {{ $minimumPercent }}; --fff-price-range-max-percent: {{ $maximumPercent }}; --fff-price-range-max-bars: {{ $histogram['count'] }}"
+        role="group" aria-label="{{ $getLabel() }}">
+        @include('filament-flex-fields::forms.components.price-range.chart')
+        @include('filament-flex-fields::forms.components.price-range.track')
         @if ($shouldShowInputs())
-            <div class="fff-price-range__inputs">
-                <label @class([
-                    'fff-price-range__input-wrap',
-                    'fff-price-range__input-wrap--has-prefix' => filled($prefix),
-                ])>
-                    <span class="sr-only">{{ $getMinInputLabel() }}</span>
-                    @if (filled($prefix))
-                        <span class="fff-price-range__input-prefix">{{ $prefix }}</span>
-                    @endif
-                    <input
-                        type="number"
-                        class="fff-price-range__input"
-                        value="{{ $initialState['min'] }}"
-                        x-bind:value="minValue"
-                        :min="minBound"
-                        :max="maxBound"
-                        :step="step"
-                        :disabled="disabled"
-                        x-on:change="onMinInput($event)"
-                        x-on:input="onMinInput($event)"
-                    />
-                </label>
-
-                <span class="fff-price-range__inputs-divider" aria-hidden="true"></span>
-
-                <label @class([
-                    'fff-price-range__input-wrap',
-                    'fff-price-range__input-wrap--has-prefix' => filled($prefix),
-                ])>
-                    <span class="sr-only">{{ $getMaxInputLabel() }}</span>
-                    @if (filled($prefix))
-                        <span class="fff-price-range__input-prefix">{{ $prefix }}</span>
-                    @endif
-                    <input
-                        type="number"
-                        class="fff-price-range__input"
-                        value="{{ $initialState['max'] }}"
-                        x-bind:value="maxValue"
-                        :min="minBound"
-                        :max="maxBound"
-                        :step="step"
-                        :disabled="disabled"
-                        x-on:change="onMaxInput($event)"
-                        x-on:input="onMaxInput($event)"
-                    />
-                </label>
-            </div>
+            @include('filament-flex-fields::forms.components.price-range.inputs')
         @endif
     </div>
 </x-dynamic-component>

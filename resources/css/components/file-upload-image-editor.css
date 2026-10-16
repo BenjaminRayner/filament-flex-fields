@@ -1,0 +1,89 @@
+/* FLEX owns this compact editor; Cropper supplies image geometry only. */
+.fff-image-editor { --fff-editor-accent: #ffd60a; --fff-editor-ink: #252528; width: min(960px,calc(100vw - 48px)); height: min(760px,calc(100dvh - 48px)); max-width: none; max-height: none; margin: auto; padding: 0; border: 1px solid #e9e9ec; border-radius: 26px; background: #fff; color: var(--fff-editor-ink); box-shadow: 0 24px 100px #15151d26; overflow: hidden; font-family: inherit; font-size: 13px; line-height: 1.5; }
+.fff-image-editor:not([open]) { display: none; }
+.fff-image-editor[open] { display: block; animation: fff-image-editor-enter 180ms cubic-bezier(.2,.8,.2,1); }
+.fff-image-editor::backdrop { background: #f1f1f4b3; backdrop-filter: blur(12px); }
+.fff-image-editor__workspace { display: grid; grid-template-rows: minmax(0,1fr) auto; height: 100%; min-height: 0; gap: 20px; padding: 70px 24px 20px; }
+.fff-image-editor__canvas { position: relative; min-width: 0; min-height: 0; overflow: hidden; border-radius: 12px; background: #f3f3f5; }
+.fff-image-editor__image-stage { position: absolute; inset: 0; opacity: 0; transition: opacity 160ms ease; }
+.fff-image-editor__image-stage.is-ready { opacity: 1; }
+.fff-image-editor__image { display: block; max-width: 100%; max-height: 100%; }
+.fff-image-editor__action, .fff-image-editor__close, .fff-image-editor__ratio, .fff-image-editor__transform { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 0; color: inherit; font: inherit; cursor: pointer; transition: background-color 150ms ease, box-shadow 150ms ease; }
+.fff-image-editor__action { position: absolute; z-index: 5; top: 15px; min-height: 38px; padding: 9px 14px; border-radius: 999px; font-size: 12px; font-weight: 550; }
+.fff-image-editor__action > svg, .fff-image-editor__close > svg { width: 18px; height: 18px; }
+.fff-image-editor__reset { inset-inline-start: 24px; background: #f2f2f4; }
+.fff-image-editor__save { inset-inline-end: 24px; background: var(--fff-editor-accent); color: #1d1d20; }
+.fff-image-editor__close { position: absolute; z-index: 5; top: 15px; left: 50%; transform: translateX(-50%); width: 38px; height: 38px; padding: 10px; border-radius: 50%; background: #f2f2f4; }
+.fff-image-editor__controls { display: grid; grid-template-rows: 56px 80px; gap: 18px; min-width: 0; }
+.fff-image-editor__control-slot { position: relative; width: min(100%,620px); justify-self: center; }
+.fff-image-editor__transforms { display: flex; align-items: center; justify-content: center; gap: 12px; height: 100%; }
+.fff-image-editor__transform { width: 76px; height: 44px; border-radius: 999px; background: #f2f2f4; font-size: 11px; }
+.fff-image-editor__transform > svg { width: 21px; height: 21px; }
+.fff-image-editor__ratios { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; position: absolute; z-index: 4; bottom: 12px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 24px); padding: 4px; border: 1px solid #ffffffa6; border-radius: 999px; background: #ffffffeb; box-shadow: 0 2px 10px #0000000a; }
+.fff-image-editor__ratio { min-width: 40px; min-height: 30px; padding: 5px 9px; background: transparent; border-radius: 999px; white-space: nowrap; font-size: 11px; }
+.fff-image-editor__ratio[aria-pressed="true"] { background: var(--fff-editor-accent); }
+.fff-image-editor__tools { display: flex; justify-content: safe center; align-items: start; gap: 14px; min-width: 0; overflow-x: auto; padding: 2px 4px 6px; scrollbar-width: none; overscroll-behavior-x: contain; }
+.fff-image-editor__tools::-webkit-scrollbar { display: none; }
+.fff-image-editor__tool { --fff-adjustment-value: 0%; display: flex; align-items: center; flex-direction: column; gap: 7px; flex: 0 0 57px; min-width: 0; padding: 0; border: 0; color: #797980; background: transparent; font: inherit; font-size: 10px; line-height: 14px; cursor: pointer; }
+.fff-image-editor__tool > span:last-child { white-space: nowrap; }
+.fff-image-editor__tool-icon { display: grid; place-items: center; width: 52px; height: 52px; border: 2px solid transparent; border-radius: 50%; color: #55555d; background: linear-gradient(#f1f1f3,#f1f1f3) padding-box,conic-gradient(#0a84ff var(--fff-adjustment-value),#e6e6ea 0) border-box; transition: background-color 150ms ease, color 150ms ease, transform 150ms ease; }
+.fff-image-editor__tool-icon > svg { width: 25px; height: 25px; }
+.fff-image-editor__tool[aria-pressed="true"] { color: #222225; }
+.fff-image-editor__tool[aria-pressed="true"] .fff-image-editor__tool-icon { color: #252528; background: var(--fff-editor-accent); border-color: var(--fff-editor-accent); }
+.fff-image-editor__tool:hover:not(:disabled) .fff-image-editor__tool-icon { transform: scale(1.04); }
+.fff-image-editor__ruler { position: relative; display: grid; grid-template-columns: minmax(70px,110px) minmax(0,1fr) 54px; align-items: center; gap: 18px; width: 100%; height: 56px; padding: 0 18px; border-radius: 16px; background: #f2f2f4; }
+.fff-image-editor__ruler-label { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fff-image-editor__ruler output { text-align: end; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fff-image-editor__ruler-scale { position: relative; height: 40px; min-width: 0; overflow: hidden; mask-image: linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent); }
+.fff-image-editor__ruler-ticks { position: absolute; left: 50%; top: 0; height: 40px; will-change: transform; }
+.fff-image-editor__ruler-tick { position: absolute; bottom: 0; width: 2.25px; height: 40px; margin-left: -1.125px; border-radius: 1px; background: #000; opacity: .44; clip-path: inset(50% 0 0); }
+.fff-image-editor__ruler-tick--major { opacity: .72; }
+.fff-image-editor__ruler-origin { position: absolute; top: 6px; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: #a0a0a0; }
+.fff-image-editor__ruler input[type="range"] { position: absolute; top: 0; left: 128px; right: 72px; width: calc(100% - 200px); height: 100%; margin: 0; padding: 0; opacity: 0; cursor: ew-resize; touch-action: none; }
+.fff-image-editor__ruler:focus-within { outline: 2px solid #d8ac00; outline-offset: 3px; }
+.fff-image-editor__action:hover:not(:disabled), .fff-image-editor__close:hover:not(:disabled), .fff-image-editor__transform:hover:not(:disabled) { background: #e8e8ec; }
+.fff-image-editor__save:hover:not(:disabled) { background: #ffdf3e; }
+.fff-image-editor button:focus-visible { outline: 2px solid #9f7d00; outline-offset: 3px; }
+.fff-image-editor button:disabled, .fff-image-editor input:disabled { opacity: .4; cursor: default; }
+.fff-image-editor__loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 12px; color: #797980; font-size: 12px; }
+.fff-image-editor__spinner { display: inline-block; width: 16px; height: 16px; border: 1.5px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: fff-image-editor-spin 650ms linear infinite; }
+.fff-image-editor__error { position: absolute; z-index: 6; left: 50%; top: 62px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 40px); display: flex; gap: 12px; padding: 12px 16px; border-radius: 14px; background: #fff0f1; color: #ab233a; font-size: 12px; }
+.fff-image-editor__error > button { background: transparent; border: 0; color: inherit; text-decoration: underline; cursor: pointer; }
+.fff-image-editor__accessible { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.fff-image-editor .cropper-bg { background-image: none; background-color: #f3f3f5; }
+.fff-image-editor .cropper-view-box { outline: 1.5px solid #ffffffec; outline-color: #ffffffec; }
+.fff-image-editor .cropper-line, .fff-image-editor .cropper-point { background-color: #fff; }
+.fff-image-editor .cropper-line { opacity: .4; }
+.fff-image-editor .cropper-point { width: 7px; height: 7px; border-radius: 50%; opacity: 1; }
+.fff-image-editor .cropper-modal { background-color: #33333b; opacity: .2; }
+.fff-image-editor .cropper-face { background-color: transparent; }
+.fff-image-editor--circle .cropper-view-box, .fff-image-editor--circle .cropper-face { border-radius: 50%; }
+.fff-image-editor[data-tool="adjust"] .cropper-view-box { outline: none; }
+.fff-image-editor[data-tool="adjust"] .cropper-line, .fff-image-editor[data-tool="adjust"] .cropper-point, .fff-image-editor[data-tool="adjust"] .cropper-dashed, .fff-image-editor[data-tool="adjust"] .cropper-center { visibility: hidden; }
+@media (max-width: 760px) {
+    .fff-image-editor { width: 100vw; height: 100dvh; border-radius: 0; border: 0; }
+    .fff-image-editor__workspace { padding: max(66px,calc(env(safe-area-inset-top) + 56px)) 12px max(18px,env(safe-area-inset-bottom)); gap: 18px; }
+    .fff-image-editor__action { top: max(12px,env(safe-area-inset-top)); }
+    .fff-image-editor__reset { inset-inline-start: 12px; }
+    .fff-image-editor__save { inset-inline-end: 12px; }
+    .fff-image-editor__close { top: max(12px,env(safe-area-inset-top)); }
+    .fff-image-editor__controls { grid-template-rows: 56px 72px; gap: 16px; }
+    .fff-image-editor__tools { justify-content: start; gap: 10px; padding-inline: 5px; }
+    .fff-image-editor__tool { flex-basis: 51px; font-size: 9px; gap: 6px; }
+    .fff-image-editor__tool-icon { width: 46px; height: 46px; }
+    .fff-image-editor__tool-icon > svg { width: 23px; height: 23px; }
+    .fff-image-editor__ruler { grid-template-columns: 75px minmax(0,1fr) 44px; gap: 12px; padding-inline: 14px; }
+    .fff-image-editor__ruler-label { font-size: 11px; }
+    .fff-image-editor__ruler output { font-size: 12px; }
+    .fff-image-editor__ruler input[type="range"] { left: 101px; right: 70px; width: calc(100% - 171px); }
+    .fff-image-editor__ratios { bottom: 10px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+    .fff-image-editor__workspace { grid-template-columns: minmax(0,1fr) 280px; grid-template-rows: minmax(0,1fr); padding: 62px 16px 16px; }
+    .fff-image-editor__controls { align-self: center; }
+    .fff-image-editor__ruler { grid-template-columns: 68px minmax(0,1fr) 40px; gap: 8px; padding-inline: 12px; }
+    .fff-image-editor__ruler input[type="range"] { left: 88px; right: 60px; width: calc(100% - 148px); }
+}
+@keyframes fff-image-editor-enter { from { opacity: 0; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes fff-image-editor-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .fff-image-editor[open], .fff-image-editor__spinner { animation: none; } .fff-image-editor__image-stage, .fff-image-editor__tool-icon, .fff-image-editor__ruler-ticks, .fff-image-editor button { transition: none; } }

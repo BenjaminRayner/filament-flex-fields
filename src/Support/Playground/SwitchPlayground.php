@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SwitchField;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -86,8 +86,8 @@ class SwitchPlayground
                         ->schema([
                             SwitchField::make('switch__admin_icons')
                                 ->label('Is admin')
-                                ->onIcon(GravityIcon::Thunderbolt)
-                                ->offIcon(GravityIcon::Person),
+                                ->onIcon(FlexIcon::Thunderbolt)
+                                ->offIcon(FlexIcon::Person),
                             SwitchField::make('switch__admin_colors')
                                 ->label('Is admin')
                                 ->onColor('success')
@@ -127,8 +127,8 @@ class SwitchPlayground
                                     SwitchField::make('switch__inline_icons')
                                         ->label('Switch only · icons')
                                         ->inline()
-                                        ->onIcon(GravityIcon::Thunderbolt)
-                                        ->offIcon(GravityIcon::Person),
+                                        ->onIcon(FlexIcon::Thunderbolt)
+                                        ->offIcon(FlexIcon::Person),
                                 ]),
                             Grid::make(['default' => 1, 'sm' => 2])
                                 ->extraAttributes(['class' => 'fff-playground-variants'])

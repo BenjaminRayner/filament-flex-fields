@@ -3,9 +3,11 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CreditCardField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\FlexSpatieMediaLibraryFileUpload;
 use Bjanczak\FilamentFlexFields\Support\Media\MediaCaptureOs;
 use Bjanczak\FilamentFlexFields\Support\Media\SpatieMediaCaptureAdapter;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
     MediaCaptureOs::resetRuntimeState();
@@ -34,23 +36,12 @@ it('tokenizes credit card pan when callback is registered', function () {
     ]))->not->toHaveKey('number');
 });
 
-it('omits pan when tokenization is required but callback returns empty', function () {
+it('fails closed when a registered tokenizer returns no token', function () {
     config(['filament-flex-fields.media_capture.pci.require_tokenization' => true]);
     MediaCaptureOs::registerTokenizeCreditCardCallback(fn (string $pan): ?string => null);
-
-    $field = CreditCardField::make('payment');
-
-    expect($field->dehydrateStateForStorage([
-        'number' => '4111111111111111',
-        'name' => 'Jane Doe',
-        'expiry' => '12/28',
-        'cvv' => '123',
-    ]))->toMatchArray([
-        'last4' => '1111',
-        'name' => 'Jane Doe',
-        'expiry' => '12/28',
-    ])->not->toHaveKey('number')
-        ->not->toHaveKey('token');
+    expect(fn () => CreditCardField::make('payment')->dehydrateStateForStorage([
+        'number' => '4111111111111111', 'name' => 'Jane Doe', 'expiry' => '12/28', 'cvv' => '123',
+    ]))->toThrow(ValidationException::class);
 });
 
 it('fails pci validation when never_store_pan is enabled without tokenizer', function () {
@@ -73,7 +64,7 @@ it('fails pci validation when never_store_pan is enabled without tokenizer', fun
 });
 
 it('merges flex capture metadata for spatie uploads', function () {
-    $field = new Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\FlexSpatieMediaLibraryFileUpload('attachment');
+    $field = new FlexSpatieMediaLibraryFileUpload('attachment');
     $field->collection('documents');
 
     expect(SpatieMediaCaptureAdapter::enterpriseCustomProperties($field))->toMatchArray([

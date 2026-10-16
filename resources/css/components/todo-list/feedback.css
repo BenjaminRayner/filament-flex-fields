@@ -1,0 +1,261 @@
+@property --text-line-scale {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 0;
+}
+
+@property --text-x {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 0px;
+}
+
+@property --checkbox-tick-offset {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 20px;
+}
+
+@property --checkbox-lines-offset {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 13.5px;
+}
+
+/*
+ * Checkbox chrome is driven by .is-done / .is-settled ONLY.
+ * Native :checked can lag after parent→children cascade (Alpine keeps input.checked
+ * true while item.done is already false) — never style from :checked alone.
+ */
+.fff-todo-list-field__row.is-done .fff-todo-list-field__checkbox-svg,
+.fff-todo-list-field__row.is-settled .fff-todo-list-field__checkbox-svg {
+    --checkbox-tick-offset: 0;
+    --background: var(--checkbox-active);
+    --border: var(--checkbox-active);
+}
+
+.fff-todo-list-field__row.is-done:not(.is-settled) .fff-todo-list-field__checkbox-svg {
+    --checkbox-tick-duration: 0.2s;
+    --checkbox-tick-easing: cubic-bezier(0, 0.45, 1, 0.5);
+}
+
+.fff-todo-list-field__row.is-done .fff-todo-list-field__checkbox-svg .fff-todo-list-field__tick-fill,
+.fff-todo-list-field__row.is-settled .fff-todo-list-field__checkbox-svg .fff-todo-list-field__tick-fill {
+    opacity: 1;
+    fill: #ffffff;
+}
+
+/* Settled: snap full tip (SSR + post-animation). Live check-on keeps dash draw via --checkbox-tick-offset. */
+.fff-todo-list-field__row.is-settled .fff-todo-list-field__tick:not(.mask) {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    transition: none;
+    stroke: var(--checkbox-active);
+    color: var(--checkbox-active);
+}
+
+.fff-todo-list-field__row.is-settled .fff-todo-list-field__tick.mask {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    transition: none;
+}
+
+.fff-todo-list-field__row.is-done:not(.is-settled) .fff-todo-list-field__tick:not(.mask) {
+    stroke: var(--checkbox-active);
+    color: var(--checkbox-active);
+}
+
+.fff-todo-list-field__row:not(.is-done):not(.is-settled) .fff-todo-list-field__checkbox-svg {
+    --background: transparent;
+    --border: var(--border-default);
+    --checkbox-tick-offset: 20px;
+    --checkbox-tick-duration: 0s;
+}
+
+.fff-todo-list-field__row:not(.is-done):not(.is-settled) .fff-todo-list-field__shape {
+    fill: transparent;
+    stroke: var(--border-default);
+    transition: none;
+}
+
+.fff-todo-list-field__row:not(.is-done):not(.is-settled) .fff-todo-list-field__tick {
+    stroke-dasharray: 20;
+    stroke-dashoffset: 20px;
+    transition: none;
+}
+
+.fff-todo-list-field__row:not(.is-done):not(.is-settled) .fff-todo-list-field__tick-fill {
+    opacity: 0;
+    transition: none;
+}
+
+.fff-todo-list-field__row:not(.is-done):not(.is-settled):hover:not(.is-disabled) .fff-todo-list-field__checkbox-svg {
+    --border: var(--border-hover);
+}
+
+.fff-todo-list-field__row:not(.is-done):not(.is-settled):hover:not(.is-disabled) .fff-todo-list-field__shape {
+    stroke: var(--border-hover);
+}
+
+.fff-todo-list-field:not(.is-motion-ready) .fff-todo-list-field__checkbox-svg,
+.fff-todo-list-field:not(.is-motion-ready) .fff-todo-list-field__shape,
+.fff-todo-list-field:not(.is-motion-ready) .fff-todo-list-field__tick,
+.fff-todo-list-field:not(.is-motion-ready) .fff-todo-list-field__tick-fill,
+.fff-todo-list-field:not(.is-motion-ready) .fff-todo-list-field__strike path {
+    transition: none !important;
+}
+
+/* —— Checkbox SVG (draw-on tick via :checked + dashoffset, mask punch through border) —— */
+.fff-todo-list-field__checkbox {
+    --active-tick: #ffffff;
+    display: block;
+    position: relative;
+    flex-shrink: 0;
+    padding: 2px 10px 2px 2px;
+    cursor: pointer;
+    overflow: visible;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.fff-todo-list-field__checkbox-input {
+    pointer-events: none;
+    display: block;
+    outline: none;
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+}
+
+.fff-todo-list-field__checkbox-svg {
+    --checkbox-tick-offset: 20px;
+    --checkbox-tick-duration: 0.15s;
+    --checkbox-tick-easing: ease;
+    --border: var(--border-default);
+    /* `transparent` — not `none` (none via var() can leave a stuck previous fill). */
+    --background: transparent;
+    display: block;
+    position: absolute;
+    width: 21px;
+    height: 18px;
+    left: 2px;
+    top: 2px;
+    color: var(--checkbox-active);
+    overflow: visible;
+    transition: color 0.25s linear;
+}
+
+.fff-todo-list-field__shape {
+    stroke-width: 1.5px;
+    stroke: var(--border);
+    fill: var(--background);
+    transition: fill 0.25s linear, stroke 0.25s linear;
+}
+
+.fff-todo-list-field__tick {
+    fill: none;
+    stroke-width: 2.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* Reference dash length: the visible path and its mask draw together over 200 ms. */
+    stroke-dasharray: 20;
+    stroke-dashoffset: var(--checkbox-tick-offset);
+    transition: stroke-dashoffset var(--checkbox-tick-duration) var(--checkbox-tick-easing);
+}
+
+.fff-todo-list-field__tick.mask {
+    stroke: var(--active-tick);
+}
+
+.fff-todo-list-field__tick-fill {
+    fill: var(--fff-todo-list-check-fill-mask);
+    opacity: 0;
+}
+
+/* Checked chrome lives on .is-done / .is-settled — never from input:checked. */
+
+/* Spark lines. */
+.fff-todo-list-field__lines {
+    display: block;
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    fill: none;
+    stroke: var(--checkbox-active);
+    stroke-width: 1.25;
+    stroke-linecap: round;
+    top: -4px;
+    right: -2px;
+    stroke-dasharray: 4.5px;
+    stroke-dashoffset: var(--checkbox-lines-offset);
+    pointer-events: none;
+}
+
+/* Strike host covers the title; JS places one SVG per text line. */
+.fff-todo-list-field__strikes {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+}
+
+/* Width/top/left: single-line uses 100%+4px (no JS undershoot). Multi-line set in JS.
+   Left inset must stay 0 when hidden — negative left left a 1–2px stub. */
+.fff-todo-list-field__strike {
+    pointer-events: none;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: calc(100% + 4px);
+    max-width: none;
+    height: 0.62em;
+    transform: translateY(-50%);
+    overflow: hidden;
+    opacity: 1;
+    clip-path: inset(-3px calc((1 - var(--text-line-scale)) * 100%) -3px 0);
+}
+
+.fff-todo-list-field__strike path {
+    fill: none;
+    stroke: var(--checkbox-active);
+    stroke-width: 2.15;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    transition: stroke 0.35s ease;
+}
+
+.fff-todo-list-field__row.is-settled .fff-todo-list-field__strike path {
+    stroke: var(--fff-todo-list-settled);
+}
+
+.fff-todo-list-field--strike-straight .fff-todo-list-field__strike path {
+    d: path('M0 4 L100 4');
+    stroke-width: 2.15;
+}
+
+@keyframes fff-todo-list-enter {
+    0% { opacity: 0; transform: translateY(-0.5rem); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fff-todo-list-exit {
+    0% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(0.75rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fff-todo-list-field__row,
+    .fff-todo-list-field__tick,
+    .fff-todo-list-field__lines,
+    .fff-todo-list-field__title-wrap,
+    .fff-todo-list-field__description,
+    .fff-todo-list-field__strike path {
+        transition: none !important;
+        animation: none !important;
+    }
+}

@@ -237,6 +237,8 @@ it('enables empty tab badges on translatable title tabs by default', function ()
     /** @var TranslatableFields $translatable */
     $translatable = $group->getDefaultChildComponents()[0];
 
-    expect($translatable->getTranslatableTabModifiers())->not->toBeEmpty()
-        ->and($translatable->getTranslatableFieldModifiers())->not->toBeEmpty();
+    TestableSlugForm::$formSchema = [$group];
+    $livewire = Livewire::test(TestableSlugForm::class);
+    $html = $livewire->html(false);
+    expect($html)->toContain('empty')->toContain('dir="ltr"');
 });

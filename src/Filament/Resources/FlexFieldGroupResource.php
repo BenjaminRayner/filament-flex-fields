@@ -17,6 +17,7 @@ use Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin;
 use Bjanczak\FilamentFlexFields\Models\FlexFieldGroup;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsConfig;
 use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldEntityRegistry;
+use Bjanczak\FilamentFlexFields\Support\Translations;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -40,15 +41,30 @@ class FlexFieldGroupResource extends Resource
 
     protected static ?string $slug = 'flex-field-groups';
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-group';
+    protected static \BackedEnum|string|null $navigationIcon = 'hugeicons-dashboard-square-01';
 
-    protected static ?string $navigationLabel = 'Field groups';
+    protected static ?string $navigationLabel = null;
 
-    protected static ?string $modelLabel = 'Field group';
+    protected static ?string $modelLabel = null;
 
-    protected static ?string $pluralModelLabel = 'Field groups';
+    protected static ?string $pluralModelLabel = null;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationLabel(): string
+    {
+        return static::$navigationLabel ?? Translations::get('filament-flex-fields::schema-management.navigation_plural');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return static::$modelLabel ?? Translations::get('filament-flex-fields::schema-management.model_singular');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return static::$pluralModelLabel ?? Translations::get('filament-flex-fields::schema-management.navigation_plural');
+    }
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -73,7 +89,6 @@ class FlexFieldGroupResource extends Resource
 
         return $pluginGroup
             ?? config('filament-flex-fields.schema.navigation_group')
-            ?? config('filament-flex-fields.playground.navigation_group')
             ?? 'Flex Fields';
     }
 
@@ -92,10 +107,11 @@ class FlexFieldGroupResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Group')
+                Section::make(fn () => __('filament-flex-fields::schema-management.group'))
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')
+                            ->label(fn () => __('filament-flex-fields::schema-management.name'))
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
@@ -108,6 +124,7 @@ class FlexFieldGroupResource extends Resource
                             }),
 
                         TextInput::make('slug')
+                            ->label(fn () => __('filament-flex-fields::schema-management.slug'))
                             ->required()
                             ->maxLength(255)
                             ->unique(
@@ -126,44 +143,49 @@ class FlexFieldGroupResource extends Resource
                         FlexFieldTargetModelSelect::missingEntitiesPlaceholder(),
 
                         TextInput::make('order')
+                            ->label(fn () => __('filament-flex-fields::schema-management.order'))
                             ->numeric()
                             ->default(0)
                             ->required(),
 
                         TextInput::make('tenant_id')
-                            ->label('Tenant ID')
+                            ->label(fn () => __('filament-flex-fields::schema-management.tenant_id'))
                             ->maxLength(255)
                             ->nullable()
                             ->dehydrateStateUsing(fn (?string $state): string => filled($state) ? (string) $state : '')
                             ->formatStateUsing(fn (?string $state): ?string => filled($state) ? $state : null)
-                            ->helperText('Optional multi-tenant key. Leave empty for a global group.'),
+                            ->helperText(fn () => __('filament-flex-fields::schema-management.tenant_help')),
                     ]),
 
-                Section::make('Sections')
-                    ->description('Optional layout sections for grouping fields in forms.')
+                Section::make(fn () => __('filament-flex-fields::schema-management.sections'))
+                    ->description(fn () => __('filament-flex-fields::schema-management.sections_description'))
                     ->schema([
                         Repeater::make('sections')
-                            ->label('Sections')
+                            ->label(fn () => __('filament-flex-fields::schema-management.sections'))
                             ->default([])
                             ->schema([
                                 TextInput::make('id')
-                                    ->label('Section ID')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.section_id'))
                                     ->required()
                                     ->alphaDash(),
                                 TextInput::make('label')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.label'))
                                     ->required()
                                     ->maxLength(255),
                                 Select::make('type')
-                                    ->options(collect(FlexFieldSectionType::cases())
-                                        ->mapWithKeys(fn (FlexFieldSectionType $type): array => [$type->value => $type->value])
+                                    ->label(fn () => __('filament-flex-fields::schema-management.type'))
+                                    ->options(fn (): array => collect(FlexFieldSectionType::cases())
+                                        ->mapWithKeys(fn (FlexFieldSectionType $type): array => [$type->value => Translations::get('filament-flex-fields::schema-management.section_type_'.$type->value)])
                                         ->all())
                                     ->default(FlexFieldSectionType::Section->value)
                                     ->required()
                                     ->native(false),
                                 TextInput::make('sort')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.sort'))
                                     ->numeric()
                                     ->default(0),
                                 TextInput::make('description')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.description'))
                                     ->maxLength(500)
                                     ->columnSpanFull(),
                                 VisibilityRuleBuilder::make(
@@ -180,31 +202,34 @@ class FlexFieldGroupResource extends Resource
                             ->columnSpanFull(),
                     ]),
 
-                Section::make('Fields schema')
-                    ->description('Field definitions consumed by FlexFieldStudio, FlexFieldFormBuilder, and table/infolist builders.')
+                Section::make(fn () => __('filament-flex-fields::schema-management.fields_schema'))
+                    ->description(fn () => __('filament-flex-fields::schema-management.fields_description'))
                     ->schema([
                         Repeater::make('fields')
-                            ->label('Fields')
+                            ->label(fn () => __('filament-flex-fields::schema-management.fields'))
                             ->default([])
                             ->schema([
                                 TextInput::make('slug')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.slug'))
                                     ->required()
                                     ->maxLength(255)
                                     ->alphaDash(),
                                 TextInput::make('label')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.label'))
                                     ->required()
                                     ->maxLength(255),
                                 Select::make('type')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.type'))
                                     ->required()
                                     ->searchable()
                                     ->live()
-                                    ->options(self::fieldTypeOptions()),
+                                    ->options(fn (): array => self::fieldTypeOptions()),
                                 FieldOptionsBuilder::make(),
                                 MatrixChoiceBuilder::rowsRepeater(),
                                 MatrixChoiceBuilder::columnsRepeater(),
                                 FieldTypeSettingsBuilder::section(),
                                 Select::make('section_id')
-                                    ->label('Section')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.section'))
                                     ->options(fn (Get $get): array => collect($get('../../sections') ?? [])
                                         ->filter(fn ($section): bool => is_array($section) && filled($section['id'] ?? null))
                                         ->mapWithKeys(fn (array $section): array => [
@@ -214,26 +239,29 @@ class FlexFieldGroupResource extends Resource
                                     ->nullable()
                                     ->native(false),
                                 Select::make('width')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.width'))
                                     ->options(FlexFieldWidth::options())
                                     ->default(FlexFieldWidth::Full->value)
                                     ->native(false),
                                 TextInput::make('sort')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.sort'))
                                     ->numeric()
                                     ->default(0),
                                 Toggle::make('is_required')
-                                    ->label('Required'),
+                                    ->label(fn () => __('filament-flex-fields::schema-management.required')),
                                 Toggle::make('is_encrypted')
-                                    ->label('Encrypt at rest'),
+                                    ->label(fn () => __('filament-flex-fields::schema-management.encrypted')),
                                 TextInput::make('help_text')
-                                    ->label('Help text')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.help_text'))
                                     ->maxLength(500)
                                     ->columnSpanFull(),
                                 TextInput::make('placeholder')
+                                    ->label(fn () => __('filament-flex-fields::schema-management.placeholder'))
                                     ->maxLength(255)
                                     ->columnSpanFull(),
                                 TextInput::make('formula')
-                                    ->label(__('filament-flex-fields::default.schema.formula'))
-                                    ->helperText(__('filament-flex-fields::default.schema.formula_help'))
+                                    ->label(fn () => __('filament-flex-fields::default.schema.formula'))
+                                    ->helperText(fn () => __('filament-flex-fields::default.schema.formula_help'))
                                     ->maxLength(2000)
                                     ->columnSpanFull(),
                                 VisibilityRuleBuilder::make(
@@ -270,14 +298,16 @@ class FlexFieldGroupResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label(fn () => __('filament-flex-fields::schema-management.name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('slug')
+                    ->label(fn () => __('filament-flex-fields::schema-management.slug'))
                     ->searchable()
                     ->sortable()
                     ->copyable(),
                 Tables\Columns\TextColumn::make('target_type')
-                    ->label(__('filament-flex-fields::default.schema.target_model'))
+                    ->label(fn () => __('filament-flex-fields::default.schema.target_model'))
                     ->formatStateUsing(function (?string $state): string {
                         if (! filled($state)) {
                             return '—';
@@ -290,16 +320,18 @@ class FlexFieldGroupResource extends Resource
                     ->description(fn (?string $state): ?string => filled($state) ? (string) $state : null)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('fields')
-                    ->label('Fields')
+                    ->label(fn () => __('filament-flex-fields::schema-management.fields'))
                     ->formatStateUsing(fn ($state): string => is_array($state) ? (string) count($state) : '0')
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('order')
+                    ->label(fn () => __('filament-flex-fields::schema-management.order'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tenant_id')
-                    ->label('Tenant')
+                    ->label(fn () => __('filament-flex-fields::schema-management.tenant'))
                     ->placeholder('—')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label(fn () => __('filament-flex-fields::schema-management.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -333,7 +365,7 @@ class FlexFieldGroupResource extends Resource
         $options = [];
 
         foreach (FieldType::cases() as $type) {
-            $options[$type->value] = $type->value;
+            $options[$type->value] = $type->label();
         }
 
         return $options;

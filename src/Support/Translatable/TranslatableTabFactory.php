@@ -26,6 +26,7 @@ final class TranslatableTabFactory
         bool $spatieTranslatable = false,
         ?Closure $localeFieldUsing = null,
         ?Closure $storageAttributeUsing = null,
+        bool $useTemplateStatePath = false,
     ): array {
         $tabs = [];
 
@@ -41,6 +42,7 @@ final class TranslatableTabFactory
                     spatieTranslatable: $spatieTranslatable,
                     localeFieldUsing: $localeFieldUsing,
                     storageAttributeUsing: $storageAttributeUsing,
+                    useTemplateStatePath: $useTemplateStatePath,
                 );
             }
 

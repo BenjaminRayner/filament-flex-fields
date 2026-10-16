@@ -1,0 +1,14 @@
+<?php
+
+declare(strict_types=1);
+
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+
+return new ComponentDefinition(
+    id: 'calculator-panel',
+    kind: ComponentKind::Field,
+    styles: ['calculator-panel'],
+    stylesFrom: ['overlay-runtime', 'teleported-menu'],
+    capabilities: [],
+);

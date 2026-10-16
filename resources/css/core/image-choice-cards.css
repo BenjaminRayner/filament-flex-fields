@@ -437,3 +437,5 @@
         animation: none !important;
     }
 }
+
+.fff-image-choice-cards:dir(rtl) .fff-image-choice-cards__item { text-align: right; }

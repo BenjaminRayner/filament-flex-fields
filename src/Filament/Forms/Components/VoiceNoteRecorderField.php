@@ -4,292 +4,42 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
-use BackedEnum;
 use Bjanczak\FilamentFlexFields\Concerns\ResolvesConfiguredIcons;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\VoiceNote\PersistsVoiceNotes;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\VoiceNote\VoiceNoteConfiguration;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\VoiceNoteSpatieRecorderField;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
-use Bjanczak\FilamentFlexFields\Support\Media\MediaCaptureOs;
 use Closure;
-use Illuminate\Contracts\Support\Htmlable;
+use Filament\Forms\Components\BaseFileUpload;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use LogicException;
 
 class VoiceNoteRecorderField extends FlexFileUpload
 {
+    use PersistsVoiceNotes;
     use ResolvesConfiguredIcons;
+    use VoiceNoteConfiguration;
 
     protected string $view = 'filament-flex-fields::forms.components.voice-note-recorder-field';
 
-    protected int|Closure $maxDuration = 120; // Default 2 minutes
-
-    protected bool|Closure $uploadImmediately = false;
-
-    protected string|BackedEnum|Htmlable|Closure|null $playIcon = null;
-
-    protected string|BackedEnum|Htmlable|Closure|null $pauseIcon = null;
-
-    protected string|BackedEnum|Htmlable|Closure|null $microphoneIcon = null;
-
-    protected string|BackedEnum|Htmlable|Closure|null $stopIcon = null;
-
-    protected string|BackedEnum|Htmlable|Closure|null $trashIcon = null;
-
-    protected string|BackedEnum|Htmlable|Closure|null $checkmarkIcon = null;
-
-    protected string|Closure|null $storeWaveformIn = null;
-
-    /**
-     * Explicit disk driver (path state). Default for VoiceNoteRecorderField.
-     */
     public function disk(string|Closure|null $name = null): static
     {
-        if ($name === null) {
-            return $this;
-        }
-
-        return parent::disk($name);
+        return $name === null ? $this : parent::disk($name);
     }
 
-    /**
-     * Factory sugar for Spatie UUID-state voice notes.
-     */
-    public static function spatie(string $name): VoiceNoteSpatieRecorderField
+    /** @return VoiceNoteSpatieRecorderField */
+    public static function spatie(string $name): BaseFileUpload
     {
+        if (! class_exists(SpatieMediaLibraryFileUpload::class)) {
+            throw new LogicException('Install filament/spatie-laravel-media-library-plugin before selecting the Spatie upload driver.');
+        }
+
         return VoiceNoteSpatieRecorderField::make($name);
     }
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->acceptedFileTypes([
-            'audio/*',
-            'audio/mpeg',
-            'audio/wav',
-            'audio/webm',
-            'audio/ogg',
-            'audio/x-m4a',
-            'audio/aac',
-        ]);
-
+        $this->configureVoiceNotes();
         $this->deleteFileOnRemove();
-
-        $this->afterPersistUploadedFileUsing(function (VoiceNoteRecorderField $component, string $path): void {
-            $transcriber = MediaCaptureOs::transcriptionInterface();
-
-            if ($transcriber === null) {
-                return;
-            }
-
-            $transcript = $transcriber->transcribe(
-                $component->getDiskName(),
-                $path,
-                ['field' => $component->getName()],
-            );
-
-            if (! is_string($transcript) || $transcript === '') {
-                return;
-            }
-
-            $metadataPath = $component->getStoreMetadataInPath();
-
-            if (blank($metadataPath)) {
-                return;
-            }
-
-            $set = $component->makeSetUtility();
-            $get = $component->makeGetUtility();
-            $existing = $get($metadataPath) ?? [];
-
-            if ($component->isMultiple()) {
-                if (! is_array($existing)) {
-                    $existing = [];
-                }
-
-                $entry = is_array($existing[$path] ?? null) ? $existing[$path] : [];
-                $entry['transcript'] = $transcript;
-                $existing[$path] = $entry;
-                $set($metadataPath, $existing);
-
-                return;
-            }
-
-            $entry = is_array($existing) ? $existing : [];
-            $entry['transcript'] = $transcript;
-            $set($metadataPath, $entry);
-        });
-    }
-
-    public function storeWaveformIn(string|Closure $statePath): static
-    {
-        $this->storeWaveformIn = $statePath;
-
-        return $this;
-    }
-
-    public function getStoreWaveformInPath(): ?string
-    {
-        $path = $this->evaluate($this->storeWaveformIn);
-
-        if (filled($path)) {
-            return (string) $path;
-        }
-
-        return $this->getStoreMetadataInPath();
-    }
-
-    public function maxDuration(int|Closure $seconds): static
-    {
-        $this->maxDuration = $seconds;
-
-        return $this;
-    }
-
-    public function getMaxDuration(): int
-    {
-        return (int) $this->evaluate($this->maxDuration);
-    }
-
-    public function uploadImmediately(bool|Closure $condition = true): static
-    {
-        $this->uploadImmediately = $condition;
-
-        return $this;
-    }
-
-    public function uploadOnSubmit(bool|Closure $condition = true): static
-    {
-        $this->uploadImmediately = fn (): bool => ! $this->evaluate($condition);
-
-        return $this;
-    }
-
-    public function shouldUploadImmediately(): bool
-    {
-        return (bool) $this->evaluate($this->uploadImmediately);
-    }
-
-    public function playIcon(string|BackedEnum|Htmlable|Closure|null $icon): static
-    {
-        $this->playIcon = $icon;
-
-        return $this;
-    }
-
-    public function pauseIcon(string|BackedEnum|Htmlable|Closure|null $icon): static
-    {
-        $this->pauseIcon = $icon;
-
-        return $this;
-    }
-
-    public function microphoneIcon(string|BackedEnum|Htmlable|Closure|null $icon): static
-    {
-        $this->microphoneIcon = $icon;
-
-        return $this;
-    }
-
-    public function stopIcon(string|BackedEnum|Htmlable|Closure|null $icon): static
-    {
-        $this->stopIcon = $icon;
-
-        return $this;
-    }
-
-    public function trashIcon(string|BackedEnum|Htmlable|Closure|null $icon): static
-    {
-        $this->trashIcon = $icon;
-
-        return $this;
-    }
-
-    public function checkmarkIcon(string|BackedEnum|Htmlable|Closure|null $icon): static
-    {
-        $this->checkmarkIcon = $icon;
-
-        return $this;
-    }
-
-    public function getPlayIcon(): string|BackedEnum|Htmlable
-    {
-        return $this->resolveFieldIcon($this->playIcon, 'audio_play_icon', GravityIcon::PlayFill);
-    }
-
-    public function getPauseIcon(): string|BackedEnum|Htmlable
-    {
-        return $this->resolveFieldIcon($this->pauseIcon, 'audio_pause_icon', GravityIcon::PauseFill);
-    }
-
-    public function getMicrophoneIcon(): string|BackedEnum|Htmlable
-    {
-        return $this->resolveFieldIcon($this->microphoneIcon, 'microphone_icon', GravityIcon::Microphone);
-    }
-
-    public function getStopIcon(): string|BackedEnum|Htmlable
-    {
-        return $this->resolveFieldIcon($this->stopIcon, 'stop_icon', GravityIcon::Minus);
-    }
-
-    public function getTrashIcon(): string|BackedEnum|Htmlable
-    {
-        return $this->resolveFieldIcon($this->trashIcon, 'trash_icon', GravityIcon::TrashBin);
-    }
-
-    public function getCheckmarkIcon(): string|BackedEnum|Htmlable
-    {
-        return $this->resolveFieldIcon($this->checkmarkIcon, 'checkmark_icon', GravityIcon::Check);
-    }
-
-    public function getInitialAudioUrl(): ?string
-    {
-        $state = $this->getState();
-
-        if (blank($state)) {
-            return null;
-        }
-
-        if (is_array($state)) {
-            $state = reset($state);
-        }
-
-        if (blank($state) || ! is_string($state)) {
-            return null;
-        }
-
-        // Prefer Filament's getUploadedFileUsing resolver (Flex Forms stages ffstage:
-        // tokens and mints signed fill URLs). Never call disk->url() on tokens.
-        try {
-            $uploaded = $this->getUploadedFiles();
-
-            if (is_array($uploaded)) {
-                foreach ($uploaded as $info) {
-                    if (is_array($info) && filled($info['url'] ?? null)) {
-                        return (string) $info['url'];
-                    }
-                }
-            }
-        } catch (\Throwable) {
-            // Fall through to legacy disk URL for plain relative paths.
-        }
-
-        if (
-            str_starts_with($state, 'livewire-file:')
-            || str_starts_with($state, 'livewire-files:')
-            || str_starts_with($state, 'ffstage:')
-            || str_starts_with($state, 'ffmedia:')
-        ) {
-            return null;
-        }
-
-        $disk = $this->getDisk();
-
-        if (! method_exists($disk, 'url')) {
-            return null;
-        }
-
-        try {
-            return $disk->url($state);
-        } catch (\Throwable) {
-            return null;
-        }
     }
 }

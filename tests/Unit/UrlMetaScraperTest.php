@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use Bjanczak\FilamentFlexFields\Support\LinkPreview\Validation\LinkPreviewUrlRule;
 use Bjanczak\FilamentFlexFields\Support\UrlMeta\UrlMetaScraper;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 
 it('parses open graph metadata from the head section only', function () {
     $html = <<<'HTML'
@@ -98,10 +101,34 @@ it('blocks non-http schemes and malformed urls', function (string $url) {
     'not-a-url' => ['not-a-url'],
 ]);
 
-it('allows public domains when dns resolves to public ips', function () {
-    if (empty(@gethostbynamel('example.com'))) {
-        $this->markTestSkipped('example.com did not resolve in this environment.');
-    }
-
-    expect(app(UrlMetaScraper::class)->isScrapableUrl('https://example.com/page'))->toBeTrue();
+it('allows public address targets without relying on external DNS', function () {
+    expect(app(UrlMetaScraper::class)->isScrapableUrl('https://93.184.216.34/page'))->toBeTrue();
 });
+
+it('ignores malformed metadata image URLs without losing text', function () {
+    $meta = app(UrlMetaScraper::class)->parseFromHtml('<head><title>Still valid</title><meta property="og:image" content="https://[broken"></head>', 'https://example.com');
+    expect($meta)->toBe(['title' => 'Still valid']);
+});
+
+it('fetches a bounded head from larger pages and resolves against the final redirect URL', function () {
+    config()->set('filament-flex-fields.link_preview.cache_ttl_seconds', 60);
+    Http::fake([
+        'https://93.184.216.34/start' => Http::response('', 302, ['Location' => '/folder/page']),
+        'https://93.184.216.34/folder/page' => Http::response('<head><title>Unicode — Łódź</title><meta property="og:image" content="image.jpg"></head>'.str_repeat('a', 200000), 200, ['Content-Type' => 'text/html']),
+    ]);
+    $scraper = app(UrlMetaScraper::class);
+    expect($scraper->scrape('https://93.184.216.34/start'))->toMatchArray(['title' => 'Unicode — Łódź', 'image' => 'https://93.184.216.34/folder/image.jpg']);
+    expect($scraper->cached('https://93.184.216.34/start'))->toMatchArray(['title' => 'Unicode — Łódź']);
+    $scraper->scrape('https://93.184.216.34/start');
+    Http::assertSentCount(2);
+});
+
+it('validates stored values independently from preview availability', function (mixed $value, bool $valid) {
+    $validator = Validator::make(['url' => $value], ['url' => ['nullable', 'string', 'max:2048', new LinkPreviewUrlRule]]);
+    expect($validator->passes())->toBe($valid);
+})->with([
+    ['https://example.com/page', true], ['https://user:pass@example.com', false],
+    ['javascript:alert(1)', false], [['url' => 'https://example.com'], false],
+    ['https://example.com:8080/page', false], ['https://example.com/'.str_repeat('a', 2048), false],
+    [null, true],
+]);

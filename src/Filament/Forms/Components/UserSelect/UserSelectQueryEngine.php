@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\UserSelect;
 
-use BackedEnum;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\UserSelect;
+use Bjanczak\FilamentFlexFields\Support\Select\Transport\SearchQueryInput;
 use Bjanczak\FilamentFlexFields\Support\UserSelectQueryCache;
-use Filament\Support\Services\RelationshipJoiner;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use InvalidArgumentException;
 
 class UserSelectQueryEngine
 {
@@ -30,6 +27,8 @@ class UserSelectQueryEngine
      */
     public function searchRecords(?string $search): array
     {
+        SearchQueryInput::assert((string) $search);
+        $this->state->synchronizeContext($this->select->getUserSelectProviderContextKey());
         if ($this->select->getUserModel() === null) {
             return [];
         }
@@ -46,12 +45,12 @@ class UserSelectQueryEngine
 
         $cacheKey = $this->searchCacheKey($term);
 
-        if (isset($this->state->searchResultsCache[$cacheKey])) {
-            return $this->state->searchResultsCache[$cacheKey];
+        if (($cached = $this->state->cachedSearchResults($cacheKey)) !== null) {
+            return $cached;
         }
 
         $limit = $this->select->getOptionsLimit();
-        $query = $this->buildModelQuery();
+        $query = $this->scopedQuery()->build($term);
         $this->applySearchToQuery($query, $term);
         $this->applySearchRelevanceOrdering($query, $term);
 
@@ -61,8 +60,8 @@ class UserSelectQueryEngine
 
         $tokens = $this->extractSearchTokens($term);
 
-        if (count($results) < $limit && count($tokens) > 1) {
-            $fallbackQuery = $this->buildModelQuery();
+        if ($this->select->getApplySearchUsing() === null && count($results) < $limit && count($tokens) > 1) {
+            $fallbackQuery = $this->scopedQuery()->build($term);
             $this->applyMultiTokenSearchToQuery($fallbackQuery, $tokens, array_keys($results));
             $this->applySearchRelevanceOrdering($fallbackQuery, $term);
 
@@ -73,7 +72,7 @@ class UserSelectQueryEngine
             $results = $results + $additionalResults;
         }
 
-        return $this->state->searchResultsCache[$cacheKey] = $results;
+        return $this->state->rememberSearchResults($cacheKey, $results);
     }
 
     /**
@@ -81,23 +80,25 @@ class UserSelectQueryEngine
      */
     public function fetchDefaultSuggestions(): array
     {
+        $this->state->synchronizeContext($this->select->getUserSelectProviderContextKey());
         $cacheKey = $this->searchCacheKey(null);
 
-        if (isset($this->state->searchResultsCache[$cacheKey])) {
-            return $this->state->searchResultsCache[$cacheKey];
+        if (($cached = $this->state->cachedSearchResults($cacheKey)) !== null) {
+            return $cached;
         }
 
         $keyName = $this->mapper->resolveModelKeyName();
+        $query = $this->buildModelQuery();
 
         $results = $this->mapper->mapQueryRecordsToOptions(
             $this->rememberQuery(
-                $this->buildModelQuery()
-                    ->orderByDesc($keyName)
+                $query
+                    ->orderByDesc($query->qualifyColumn($keyName))
                     ->limit($this->select->getDefaultSuggestionsLimit())
             ),
         );
 
-        return $this->state->searchResultsCache[$cacheKey] = $results;
+        return $this->state->rememberSearchResults($cacheKey, $results);
     }
 
     /**
@@ -105,44 +106,7 @@ class UserSelectQueryEngine
      */
     public function resolveRecordsForValues(array $values): void
     {
-        $uncachedValues = [];
-
-        foreach ($values as $value) {
-            if ($value instanceof BackedEnum) {
-                $value = $value->value;
-            }
-
-            $key = (string) $value;
-
-            if (! isset($this->state->resolvedRecordCache[$key])) {
-                $uncachedValues[] = $value;
-            }
-        }
-
-        if ($uncachedValues === []) {
-            return;
-        }
-
-        if ($this->select->hasRelationship()) {
-            $this->resolveRelationshipRecordsForValues($uncachedValues);
-
-            return;
-        }
-
-        $modelClass = $this->select->getUserModel();
-
-        if ($modelClass === null) {
-            return;
-        }
-
-        $keyName = $this->mapper->resolveModelKeyName();
-
-        $this->rememberQuery(
-            $this->buildModelQuery()->whereIn($keyName, $uncachedValues)
-        )->each(function (Model $record) use ($keyName): void {
-            $key = (string) $record->getAttribute($keyName);
-            $this->state->resolvedRecordCache[$key] = $record;
-        });
+        $this->recordRepository()->resolveBatch($values);
     }
 
     /**
@@ -150,144 +114,42 @@ class UserSelectQueryEngine
      */
     public function resolveRelationshipRecordsForValues(array $values): void
     {
-        $relationship = Relation::noConstraints(fn () => $this->select->getRelationship());
-        $relationshipQuery = app(RelationshipJoiner::class)
-            ->prepareQueryForNoConstraints($relationship);
-
-        $qualifiedRelatedKeyName = $this->select->getQualifiedRelatedKeyForRelationship($relationship);
-
-        $relationshipQuery->whereIn($qualifiedRelatedKeyName, $values);
-
-        $modifyQueryUsing = $this->select->getModifyQueryUsing();
-
-        if ($modifyQueryUsing !== null) {
-            $relationshipQuery = $this->select->evaluate($modifyQueryUsing, [
-                'query' => $relationshipQuery,
-                'search' => null,
-            ]) ?? $relationshipQuery;
-        }
-
-        $keyName = Str::afterLast($qualifiedRelatedKeyName, '.');
-
-        $this->rememberQuery($relationshipQuery)
-            ->each(function (Model $record) use ($keyName): void {
-                $key = (string) $record->getAttribute($keyName);
-                $this->state->resolvedRecordCache[$key] = $record;
-            });
+        $this->recordRepository()->resolveBatch($values);
     }
 
     public function resolveRecordForValue(mixed $value): ?Model
     {
-        if ($value instanceof BackedEnum) {
-            $value = $value->value;
-        }
-
-        $key = (string) $value;
-
-        if (isset($this->state->resolvedRecordCache[$key])) {
-            return $this->state->resolvedRecordCache[$key];
-        }
-
-        if ($this->select->hasRelationship()) {
-            $record = $this->select->evaluate($this->select->getSelectedRecordResolver(), [
-                'state' => $value,
-            ]);
-
-            if ($record instanceof Model) {
-                $this->state->resolvedRecordCache[$key] = $record;
-            }
-
-            return $record instanceof Model ? $record : null;
-        }
-
-        $this->resolveRecordsForValues([$value]);
-
-        return $this->state->resolvedRecordCache[$key] ?? null;
+        return $this->recordRepository()->resolveOne($value);
     }
 
     public function buildModelQuery(): Builder
     {
-        $modelClass = $this->select->getUserModel();
+        return $this->scopedQuery()->build();
+    }
 
-        if ($modelClass === null || ! class_exists($modelClass)) {
-            throw new InvalidArgumentException('UserSelect requires a valid Eloquent model class via optionModel().');
-        }
+    protected function recordRepository(): UserSelectRecordRepository
+    {
+        return new UserSelectRecordRepository($this->select, $this->mapper, $this->state, $this->queryCache);
+    }
 
-        if (! is_subclass_of($modelClass, Model::class)) {
-            throw new InvalidArgumentException("UserSelect model [{$modelClass}] must extend [".Model::class.'].');
-        }
-
-        /** @var Builder $query */
-        $query = $modelClass::query();
-
-        $modifyQueryUsing = $this->select->getModifyQueryUsing();
-
-        if ($modifyQueryUsing !== null) {
-            $query = $this->select->evaluate($modifyQueryUsing, [
-                'query' => $query,
-            ]) ?? $query;
-        }
-
-        return $this->restrictModelQueryColumns($query);
+    protected function scopedQuery(): UserSelectScopedQuery
+    {
+        return new UserSelectScopedQuery($this->select, $this->mapper);
     }
 
     protected function applySearchToQuery(Builder $query, string $search): void
     {
-        $applySearchUsing = $this->select->getApplySearchUsing();
-
-        if ($applySearchUsing !== null) {
-            $this->select->evaluate($applySearchUsing, [
-                'query' => $query,
-                'search' => trim($search),
-            ]);
+        if (($callback = $this->select->getApplySearchUsing()) !== null) {
+            $this->select->evaluate($callback, ['query' => $query, 'search' => trim($search)]);
 
             return;
         }
-
-        $term = trim($search);
-        $nameColumn = $this->qualifySearchColumn($query, $this->select->getNameColumn());
-        $emailColumn = $this->select->getEmailColumn();
-        $qualifiedEmailColumn = $emailColumn !== null
-            ? $this->qualifySearchColumn($query, $emailColumn)
-            : null;
-        $escaped = addcslashes($term, '%_\\');
-        $prefixPattern = $escaped.'%';
-
-        $query->where(function (Builder $inner) use ($nameColumn, $qualifiedEmailColumn, $prefixPattern, $escaped): void {
-            $inner->where($nameColumn, 'like', $prefixPattern);
-
-            if ($qualifiedEmailColumn !== null) {
-                $inner
-                    ->orWhere($qualifiedEmailColumn, 'like', $prefixPattern)
-                    ->orWhere($qualifiedEmailColumn, 'like', $escaped.'@%');
-            }
-        });
+        (new UserSelectSearchQuery($this->select))->applyPrefix($query, $search);
     }
 
     protected function applySearchRelevanceOrdering(Builder $query, string $search): void
     {
-        $term = trim($search);
-        $escaped = addcslashes($term, '%_\\');
-        $prefixPattern = $escaped.'%';
-        $nameColumn = $this->qualifySearchColumn($query, $this->select->getNameColumn());
-        $emailColumn = $this->select->getEmailColumn();
-
-        if ($emailColumn === null) {
-            $query
-                ->orderByRaw("CASE WHEN {$nameColumn} LIKE ? THEN 0 ELSE 1 END", [$prefixPattern])
-                ->orderBy($nameColumn);
-
-            return;
-        }
-
-        $qualifiedEmailColumn = $this->qualifySearchColumn($query, $emailColumn);
-
-        $query
-            ->orderByRaw(
-                "CASE WHEN {$nameColumn} LIKE ? THEN 0 WHEN {$qualifiedEmailColumn} LIKE ? THEN 1 ELSE 2 END",
-                [$prefixPattern, $prefixPattern],
-            )
-            ->orderBy($nameColumn);
+        (new UserSelectSearchQuery($this->select))->applyRelevance($query, $search);
     }
 
     /**
@@ -296,34 +158,9 @@ class UserSelectQueryEngine
      */
     protected function applyMultiTokenSearchToQuery(Builder $query, array $tokens, array $excludeValues): void
     {
-        $nameColumn = $this->qualifySearchColumn($query, $this->select->getNameColumn());
-        $emailColumn = $this->select->getEmailColumn();
-        $qualifiedEmailColumn = $emailColumn !== null
-            ? $this->qualifySearchColumn($query, $emailColumn)
-            : null;
-
-        $query->where(function (Builder $inner) use ($nameColumn, $qualifiedEmailColumn, $tokens): void {
-            foreach ($tokens as $token) {
-                $escaped = addcslashes($token, '%_\\');
-                $prefixPattern = $escaped.'%';
-                $wordPattern = '% '.$escaped.'%';
-
-                $inner->where(function (Builder $tokenQuery) use ($nameColumn, $qualifiedEmailColumn, $prefixPattern, $wordPattern, $escaped): void {
-                    $tokenQuery
-                        ->where($nameColumn, 'like', $prefixPattern)
-                        ->orWhere($nameColumn, 'like', $wordPattern);
-
-                    if ($qualifiedEmailColumn !== null) {
-                        $tokenQuery
-                            ->orWhere($qualifiedEmailColumn, 'like', $prefixPattern)
-                            ->orWhere($qualifiedEmailColumn, 'like', $escaped.'@%');
-                    }
-                });
-            }
-        });
-
+        (new UserSelectSearchQuery($this->select))->applyTokens($query, $tokens);
         if ($excludeValues !== []) {
-            $query->whereNotIn($this->mapper->resolveModelKeyName(), $excludeValues);
+            $query->whereNotIn($query->qualifyColumn($this->mapper->resolveModelKeyName()), $excludeValues);
         }
     }
 
@@ -350,13 +187,8 @@ class UserSelectQueryEngine
 
     protected function searchCacheKey(?string $search): string
     {
-        return hash('xxh128', implode('|', [
-            $this->select->getUserModel() ?? '',
-            $search ?? '',
-            (string) $this->select->getOptionsLimit(),
-            (string) $this->select->getDefaultSuggestionsLimit(),
-            $this->select->getNameColumn(),
-            $this->select->getEmailColumn() ?? '',
+        return hash('sha256', serialize([
+            $this->select->getUserSelectProviderContextKey(), $search,
         ]));
     }
 
@@ -365,12 +197,7 @@ class UserSelectQueryEngine
      */
     protected function extractSearchTokens(string $search): array
     {
-        $tokens = preg_split('/\s+/u', trim($search)) ?: [];
-
-        return array_values(array_filter(
-            $tokens,
-            fn (string $token): bool => mb_strlen($token) >= $this->select->getMinSearchLength(),
-        ));
+        return (new UserSelectSearchQuery($this->select))->tokens($search);
     }
 
     protected function qualifySearchColumn(Builder $query, string $column): string
@@ -388,6 +215,6 @@ class UserSelectQueryEngine
      */
     protected function rememberQuery(Builder|Relation|QueryBuilder $query): Collection
     {
-        return $this->queryCache->remember($query);
+        return $this->queryCache->remember($query, $this->select->getUserSelectProviderContextKey());
     }
 }

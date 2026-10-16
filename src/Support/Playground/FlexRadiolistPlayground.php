@@ -6,7 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexRadiolist;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -54,10 +54,10 @@ class FlexRadiolistPlayground
                         'archived' => 'Archived',
                     ])
                     ->icons([
-                        'standard' => GravityIcon::Trolley,
-                        'express' => GravityIcon::Thunderbolt,
-                        'super_fast' => GravityIcon::Rocket,
-                        'archived' => GravityIcon::Archive,
+                        'standard' => FlexIcon::Trolley,
+                        'express' => FlexIcon::Thunderbolt,
+                        'super_fast' => FlexIcon::Rocket,
+                        'archived' => FlexIcon::Archive,
                     ])
                     ->descriptions([
                         'standard' => '4–10 business days',
@@ -141,10 +141,10 @@ class FlexRadiolistPlayground
     protected function fileIcons(): array
     {
         return [
-            'documents' => GravityIcon::Folder,
-            'budget' => GravityIcon::LayoutCells,
-            'reports' => GravityIcon::FileText,
-            'archived' => GravityIcon::Archive,
+            'documents' => FlexIcon::Folder,
+            'budget' => FlexIcon::LayoutCells,
+            'reports' => FlexIcon::FileText,
+            'archived' => FlexIcon::Archive,
         ];
     }
 

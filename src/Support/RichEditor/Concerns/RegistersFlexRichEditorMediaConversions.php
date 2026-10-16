@@ -16,7 +16,7 @@ trait RegistersFlexRichEditorMediaConversions
     /**
      * @param  array<string, array<string, mixed>|RichEditorImageVariant>  $variants
      */
-    protected function registerFlexRichEditorMediaConversions(array $variants): void
+    protected function registerFlexRichEditorMediaConversions(array $variants, bool $queued = false): void
     {
         if (! method_exists($this, 'addMediaConversion')) {
             return;
@@ -27,10 +27,6 @@ trait RegistersFlexRichEditorMediaConversions
             : null;
 
         foreach (RichEditorImageVariant::normalizeCollection($variants) as $variant) {
-            if ($variant->master) {
-                continue;
-            }
-
             $conversion = $this->addMediaConversion($variant->name);
 
             if ($variant->webp && method_exists($conversion, 'format')) {
@@ -53,7 +49,9 @@ trait RegistersFlexRichEditorMediaConversions
                 $conversion->quality(85);
             }
 
-            if (method_exists($conversion, 'nonQueued')) {
+            if ($queued && method_exists($conversion, 'queued')) {
+                $conversion->queued();
+            } elseif (method_exists($conversion, 'nonQueued')) {
                 $conversion->nonQueued();
             }
         }

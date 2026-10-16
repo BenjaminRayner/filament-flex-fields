@@ -6,9 +6,11 @@ use Bjanczak\FilamentFlexFields\Data\FlexFieldDefinition;
 use Bjanczak\FilamentFlexFields\Enums\FieldType;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\VideoField;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldFormBuilder;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
+use Bjanczak\FilamentFlexFields\Support\Playground\VideoFieldPlayground;
+use Bjanczak\FilamentFlexFields\Support\Video\VideoIcon;
 use Bjanczak\FilamentFlexFields\Support\VideoSources;
+use BladeUI\Icons\Factory;
 use Filament\Support\Icons\Heroicon;
 
 it('exposes video field configuration api', function () {
@@ -85,14 +87,10 @@ it('sanitizes unsafe video urls', function () {
 it('rejects unsafe video state during validation', function () {
     $field = VideoField::make('clip');
 
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
+    $validator = validator(['clip' => 'javascript:alert(1)'], ['clip' => $field->getValidationRules()]);
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->errors()->first('clip'))->toBe(__('filament-flex-fields::default.validation.media.invalid_url'));
 
-    $message = null;
-    $rule('clip', 'javascript:alert(1)', function (string $failMessage) use (&$message): void {
-        $message = $failMessage;
-    });
-
-    expect($message)->toBe(__('filament-flex-fields::default.validation.media.invalid_url'));
 });
 
 it('supports auto ratio without aspect style', function () {
@@ -172,7 +170,7 @@ it('builds video field auto hide controls from flex field definition', function 
 });
 
 it('registers video field playground variants', function () {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
+    $builder = app(VideoFieldPlayground::class);
     $state = $builder->defaultState();
 
     expect($state)->toHaveKeys([
@@ -258,20 +256,26 @@ it('rejects unsupported video controls layouts', function () {
     VideoField::make('clip')->controlsLayout('stacked')->getControlsLayout();
 })->throws(InvalidArgumentException::class);
 
-it('uses gravity ui icons for video controls by default', function () {
+it('uses original Video.js icons for video controls by default', function () {
     $field = VideoField::make('clip');
 
-    expect($field->getPlayIcon())->toBe(GravityIcon::PlayFill)
-        ->and($field->getPauseIcon())->toBe(GravityIcon::PauseFill)
-        ->and($field->getVolumeIcon())->toBe(GravityIcon::VolumeFill)
-        ->and($field->getMuteIcon())->toBe(GravityIcon::VolumeSlashFill)
-        ->and($field->getFullscreenIcon())->toBe(GravityIcon::ChevronsExpandUpRight)
-        ->and($field->getExitFullscreenIcon())->toBe(GravityIcon::ChevronsCollapseUpRight)
-        ->and($field->getPictureInPictureIcon())->toBe(GravityIcon::CopyPicture)
-        ->and($field->getExitPictureInPictureIcon())->toBe(GravityIcon::ChevronsCollapseUpRight)
-        ->and($field->getCastIcon())->toBe(GravityIcon::Tv)
-        ->and($field->getAirPlayIcon())->toBe(GravityIcon::AntennaSignal)
-        ->and($field->getPlaceholderIcon())->toBe(GravityIcon::Video);
+    expect($field->getPlayIcon())->toBe(VideoIcon::Play)
+        ->and($field->getPauseIcon())->toBe(VideoIcon::Pause)
+        ->and($field->getVolumeIcon())->toBe(VideoIcon::VolumeHigh)
+        ->and($field->getMuteIcon())->toBe(VideoIcon::VolumeOff)
+        ->and($field->getVolumeLowIcon())->toBe(VideoIcon::VolumeLow)
+        ->and($field->getSettingsIcon())->toBe(VideoIcon::Settings)
+        ->and($field->getSpeedIcon())->toBe(VideoIcon::Speed)
+        ->and($field->getQualityIcon())->toBe(VideoIcon::Quality)
+        ->and($field->getExitCastIcon())->toBe(VideoIcon::CastExit)
+        ->and($field->getExitAirPlayIcon())->toBe(VideoIcon::AirPlayExit)
+        ->and($field->getFullscreenIcon())->toBe(VideoIcon::FullscreenEnter)
+        ->and($field->getExitFullscreenIcon())->toBe(VideoIcon::FullscreenExit)
+        ->and($field->getPictureInPictureIcon())->toBe(VideoIcon::PictureInPictureEnter)
+        ->and($field->getExitPictureInPictureIcon())->toBe(VideoIcon::PictureInPictureExit)
+        ->and($field->getCastIcon())->toBe(VideoIcon::CastEnter)
+        ->and($field->getAirPlayIcon())->toBe(VideoIcon::AirPlayEnter)
+        ->and($field->getPlaceholderIcon())->toBe(FlexIcon::Video);
 });
 
 it('allows overriding video control icons', function () {
@@ -385,3 +389,58 @@ it('disables playback rate control for youtube facade embeds', function () {
             ->playbackRates(true)
             ->hasPlaybackRateControl($youtube))->toBeTrue();
 });
+
+it('preserves custom icons across low volume and connected remote states', function (): void {
+    $field = VideoField::make('clip')
+        ->volumeIcon(Heroicon::OutlinedSpeakerWave)
+        ->castIcon(Heroicon::OutlinedTv)
+        ->airPlayIcon(Heroicon::OutlinedTv);
+
+    expect($field->getVolumeLowIcon())->toBe(Heroicon::OutlinedSpeakerWave)
+        ->and($field->getExitCastIcon())->toBe(Heroicon::OutlinedTv)
+        ->and($field->getExitAirPlayIcon())->toBe(Heroicon::OutlinedTv);
+
+    $field->volumeLowIcon(VideoIcon::VolumeLow)
+        ->exitCastIcon(VideoIcon::CastExit)
+        ->exitAirPlayIcon(VideoIcon::AirPlayExit);
+
+    expect($field->getVolumeLowIcon())->toBe(VideoIcon::VolumeLow)
+        ->and($field->getExitCastIcon())->toBe(VideoIcon::CastExit)
+        ->and($field->getExitAirPlayIcon())->toBe(VideoIcon::AirPlayExit);
+});
+
+it('renders the locally registered original Video.js icon set', function (): void {
+    $icons = (new ReflectionClass(VideoIcon::class))->getConstants();
+
+    foreach ($icons as $icon) {
+        $html = app(Factory::class)->svg($icon)->toHtml();
+        expect($html)->toContain('viewBox="0 0 18 18"')->not->toContain('<img');
+    }
+});
+
+it('supports preview sources and sorted storyboard frames through fluent and stored schemas', function () {
+    $frames = [
+        ['start' => 5, 'end' => 10, 'src' => '/sprite.jpg', 'x' => 192, 'y' => 0, 'width' => 192, 'height' => 108],
+        ['start' => 0, 'end' => 5, 'src' => '/first.jpg'],
+    ];
+    $field = VideoField::make('clip')->src('/clip.mp4')->previewSource(fn () => '/preview.mp4')->previewThumbnails(fn () => $frames);
+    expect($field->getPreviewSource())->toBe('/preview.mp4')
+        ->and($field->getPreviewThumbnails()[0]['start'])->toBe(0.0)
+        ->and($field->getPreviewThumbnails())->toHaveCount(2);
+    $component = (new FlexFieldFormBuilder)->makeComponent(new FlexFieldDefinition(slug: 'clip', label: 'Clip', type: FieldType::Video, config: ['preview_source' => '/preview.mp4', 'preview_thumbnails' => $frames]));
+    expect($component)->toBeInstanceOf(VideoField::class)
+        ->and($component->getPreviewSource())->toBe('/preview.mp4')
+        ->and($component->getPreviewThumbnails())->toBe($field->getPreviewThumbnails());
+});
+
+it('rejects malformed preview frame configuration', function (array $frames) {
+    VideoField::make('clip')->previewThumbnails($frames);
+})->throws(InvalidArgumentException::class)->with([
+    'executable URL' => [[['start' => 0, 'end' => 1, 'src' => 'javascript:alert(1)']]],
+    'overlap' => [[['start' => 0, 'end' => 2, 'src' => '/a.jpg'], ['start' => 1, 'end' => 3, 'src' => '/b.jpg']]],
+    'inverted range' => [[['start' => 3, 'end' => 2, 'src' => '/a.jpg']]],
+    'nonfinite time' => [[['start' => 0, 'end' => INF, 'src' => '/a.jpg']]],
+    'unpaired crop' => [[['start' => 0, 'end' => 2, 'src' => '/a.jpg', 'width' => 192]]],
+    'negative crop' => [[['start' => 0, 'end' => 2, 'src' => '/a.jpg', 'x' => -1]]],
+    'unknown option' => [[['start' => 0, 'end' => 2, 'src' => '/a.jpg', 'script' => 'x']]],
+]);

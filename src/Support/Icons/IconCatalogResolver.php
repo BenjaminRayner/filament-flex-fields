@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Icons;
 
+use Bjanczak\FilamentFlexFields\Support\Runtime\OptionalSharedCache;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
 use BladeUI\Icons\Factory;
 use BladeUI\Icons\IconsManifest;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class IconCatalogResolver
@@ -31,19 +32,20 @@ class IconCatalogResolver
         array $exclude = [],
         ?int $limitPerSet = null,
     ): IconCatalogIndex {
-        $fingerprint = md5(json_encode([
-            array_keys($catalog),
+        $fingerprint = IconCatalogFingerprint::of([
+            IconCatalogIndexBuilder::CACHE_REVISION,
+            $catalog,
             $whitelist,
             $exclude,
             $limitPerSet,
-        ], JSON_THROW_ON_ERROR));
+        ]);
 
-        $cacheKey = 'fff.icon-index.v3.'.$fingerprint;
+        $cacheKey = 'fff.icon-index.'.IconCatalogFingerprint::namespace().'.'.$fingerprint;
         $ttlDays = (int) config('filament-flex-fields.ui.icon_picker_index_cache_days', 7);
 
-        $data = Cache::remember($cacheKey, now()->addDays(max(1, $ttlDays)), function () use ($catalog, $whitelist, $exclude, $limitPerSet): array {
+        $data = RequestState::resolve(OptionalSharedCache::class)->remember($cacheKey, min(90, max(1, $ttlDays)) * 86400, function () use ($catalog, $whitelist, $exclude, $limitPerSet): array {
             return $this->buildIndex($catalog, $whitelist, $exclude, $limitPerSet)->toArray();
-        });
+        }, IconCatalogPayload::index(...));
 
         return IconCatalogIndex::fromArray($data);
     }
@@ -52,7 +54,7 @@ class IconCatalogResolver
      * @param  list<string>  $setNames
      * @return array<string, array{prefix: string, label: string, icons: list<string>}>
      */
-    public function buildCatalogFromManifest(array $setNames): array
+    public function buildCatalogFromManifest(array $setNames, bool $fresh = false): array
     {
         $setNames = array_values(array_unique($setNames));
         sort($setNames);
@@ -61,13 +63,34 @@ class IconCatalogResolver
             return [];
         }
 
-        $bundledManifest = $this->readBundledManifest();
+        $bundledManifest = $fresh ? null : $this->readBundledManifest();
 
-        if ($bundledManifest !== null) {
-            return array_intersect_key($bundledManifest, array_flip($setNames));
+        if ($bundledManifest === null) {
+            return $this->buildCatalogFromBladeIcons($setNames);
         }
 
-        return $this->buildCatalogFromBladeIcons($setNames);
+        $registered = $this->factory->all();
+        $catalog = [];
+        $missing = [];
+        foreach ($setNames as $name) {
+            if (isset($bundledManifest[$name], $registered[$name])
+                && ($registered[$name]['prefix'] ?? $name) === $bundledManifest[$name]['prefix']) {
+                $catalog[$name] = $bundledManifest[$name];
+            } else {
+                $missing[] = $name;
+            }
+        }
+
+        // Bundled sets accelerate known catalogs; custom sets still come from Blade Icons.
+        $resolved = $catalog + $this->buildCatalogFromBladeIcons($missing);
+        $ordered = [];
+        foreach ($setNames as $name) {
+            if (isset($resolved[$name])) {
+                $ordered[$name] = $resolved[$name];
+            }
+        }
+
+        return $ordered;
     }
 
     /**
@@ -85,9 +108,13 @@ class IconCatalogResolver
             return null;
         }
 
-        $decoded = json_decode((string) file_get_contents($path), true);
+        $payload = file_get_contents($path, false, null, 0, 4_194_305);
+        if (! is_string($payload) || strlen($payload) > 4_194_304) {
+            return null;
+        }
+        $decoded = json_decode($payload, true, 8);
 
-        return is_array($decoded) ? $decoded : null;
+        return IconCatalogPayload::catalog($decoded) ? $decoded : null;
     }
 
     /**
@@ -147,109 +174,9 @@ class IconCatalogResolver
         array $exclude,
         ?int $limitPerSet,
     ): IconCatalogIndex {
-        $excludeLookup = array_fill_keys(array_map(
-            static fn (string $icon): string => mb_strtolower(trim($icon)),
-            $exclude,
-        ), true);
-
-        $entries = [];
-        $allowedLookup = [];
-        $setSummaries = [];
-
-        if ($whitelist !== []) {
-            foreach ($whitelist as $icon) {
-                $icon = trim($icon);
-
-                if ($icon === '' || isset($excludeLookup[mb_strtolower($icon)])) {
-                    continue;
-                }
-
-                $setKey = $this->resolveIconSetKey($catalog, $icon);
-
-                if ($setKey === null) {
-                    continue;
-                }
-
-                $label = $this->formatIconLabel($icon);
-                $entries[] = [
-                    'name' => $icon,
-                    'label' => $label,
-                    'set' => $setKey,
-                    'nameLower' => mb_strtolower($icon),
-                    'labelLower' => mb_strtolower($label),
-                ];
-                $allowedLookup[$icon] = true;
-            }
-
-            usort($entries, static fn (array $left, array $right): int => strnatcasecmp($left['name'], $right['name']));
-
-            foreach ($catalog as $key => $setData) {
-                $count = count(array_filter(
-                    $entries,
-                    static fn (array $entry): bool => $entry['set'] === $key,
-                ));
-
-                if ($count === 0) {
-                    continue;
-                }
-
-                $setSummaries[] = [
-                    'key' => $key,
-                    'prefix' => $setData['prefix'],
-                    'label' => $setData['label'],
-                    'count' => $count,
-                ];
-            }
-
-            return new IconCatalogIndex(
-                $entries,
-                $this->partitionEntriesBySet($entries),
-                $allowedLookup,
-                $setSummaries,
-            );
-        }
-
-        foreach ($catalog as $setKey => $setData) {
-            $setIcons = $setData['icons'];
-
-            if ($limitPerSet !== null) {
-                $setIcons = array_slice($setIcons, 0, max(0, $limitPerSet));
-            }
-
-            $count = 0;
-
-            foreach ($setIcons as $icon) {
-                if (isset($excludeLookup[mb_strtolower($icon)])) {
-                    continue;
-                }
-
-                $label = $this->formatIconLabel($icon);
-                $entries[] = [
-                    'name' => $icon,
-                    'label' => $label,
-                    'set' => $setKey,
-                    'nameLower' => mb_strtolower($icon),
-                    'labelLower' => mb_strtolower($label),
-                ];
-                $allowedLookup[$icon] = true;
-                $count++;
-            }
-
-            if ($count > 0) {
-                $setSummaries[] = [
-                    'key' => $setKey,
-                    'prefix' => $setData['prefix'],
-                    'label' => $setData['label'],
-                    'count' => $count,
-                ];
-            }
-        }
-
-        return new IconCatalogIndex(
-            $entries,
-            $this->partitionEntriesBySet($entries),
-            $allowedLookup,
-            $setSummaries,
+        return (new IconCatalogIndexBuilder)->build(
+            $catalog, $whitelist, $exclude, $limitPerSet,
+            fn (string $icon): string => $this->formatIconLabel($icon),
         );
     }
 
@@ -274,7 +201,7 @@ class IconCatalogResolver
     protected function resolveIconSetKey(array $catalog, string $icon): ?string
     {
         foreach ($catalog as $setKey => $setData) {
-            if (str_starts_with($icon, $setData['prefix'].'-')) {
+            if (str_starts_with($icon, $setData['prefix'].'-') && in_array($icon, $setData['icons'], true)) {
                 return $setKey;
             }
         }
@@ -336,12 +263,17 @@ class IconCatalogResolver
             return [];
         }
 
-        $cacheKey = 'fff.icon-catalog.v2.'.md5(implode('|', $setNames));
+        $source = [
+            $setNames,
+            array_intersect_key($this->factory->all(), array_flip($setNames)),
+            (bool) config('filament-flex-fields.ui.icon_picker_use_bundled_manifest', true),
+        ];
+        $cacheKey = 'fff.icon-catalog.'.IconCatalogFingerprint::namespace().'.'.IconCatalogFingerprint::of($source);
         $ttlDays = (int) config('filament-flex-fields.ui.icon_picker_catalog_cache_days', 7);
 
-        return Cache::remember($cacheKey, now()->addDays(max(1, $ttlDays)), function () use ($setNames): array {
+        return RequestState::resolve(OptionalSharedCache::class)->remember($cacheKey, min(90, max(1, $ttlDays)) * 86400, function () use ($setNames): array {
             return $this->buildCatalogFromManifest($setNames);
-        });
+        }, IconCatalogPayload::catalog(...));
     }
 
     /**
@@ -390,64 +322,17 @@ class IconCatalogResolver
         array $exclude = [],
         ?int $limitPerSet = null,
     ): array {
-        $excludeLookup = array_fill_keys(array_map(
-            static fn (string $icon): string => mb_strtolower(trim($icon)),
-            $exclude,
-        ), true);
-
-        if ($whitelist !== []) {
-            $allowed = [];
-
-            foreach ($whitelist as $icon) {
-                $icon = trim($icon);
-
-                if ($icon === '') {
-                    continue;
-                }
-
-                $normalized = mb_strtolower($icon);
-
-                if (isset($excludeLookup[$normalized])) {
-                    continue;
-                }
-
-                if ($set !== null && ! $this->iconMatchesSet($catalog, $set, $icon)) {
-                    continue;
-                }
-
-                $allowed[] = $icon;
-            }
-
-            sort($allowed, SORT_NATURAL | SORT_FLAG_CASE);
-
-            return array_values(array_unique($allowed));
-        }
-
+        $entries = $this->buildIndex($catalog, $whitelist, $exclude, $limitPerSet)->toArray()['entries'];
         $icons = [];
-
-        foreach ($catalog as $setKey => $setData) {
-            if ($set !== null && $setKey !== $set && ($setData['prefix'] ?? '') !== $set) {
+        foreach ($entries as $entry) {
+            if ($set !== null && $entry['set'] !== $set && ($catalog[$entry['set']]['prefix'] ?? null) !== $set) {
                 continue;
             }
-
-            $setIcons = $setData['icons'];
-
-            if ($limitPerSet !== null) {
-                $setIcons = array_slice($setIcons, 0, max(0, $limitPerSet));
-            }
-
-            foreach ($setIcons as $icon) {
-                if (isset($excludeLookup[mb_strtolower($icon)])) {
-                    continue;
-                }
-
-                $icons[] = $icon;
-            }
+            $icons[] = $entry['name'];
         }
-
         sort($icons, SORT_NATURAL | SORT_FLAG_CASE);
 
-        return array_values(array_unique($icons));
+        return $icons;
     }
 
     /**
@@ -456,11 +341,11 @@ class IconCatalogResolver
     protected function iconMatchesSet(array $catalog, string $set, string $icon): bool
     {
         if (isset($catalog[$set])) {
-            return str_starts_with($icon, $catalog[$set]['prefix'].'-');
+            return in_array($icon, $catalog[$set]['icons'], true);
         }
 
         foreach ($catalog as $setData) {
-            if (($setData['prefix'] ?? '') === $set && str_starts_with($icon, $set.'-')) {
+            if (($setData['prefix'] ?? '') === $set && in_array($icon, $setData['icons'], true)) {
                 return true;
             }
         }

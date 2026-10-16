@@ -82,54 +82,12 @@ it('normalizes rich option arrays for segment control', function () {
         ->and($options['light']['icon'])->toBe(GravityIcon::Sun);
 });
 
-it('server renders segment selected state before alpine hydrates', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/segment-control.blade.php');
-    $trackItems = file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/segment-control-track-items.blade.php');
-    $css = file_get_contents(__DIR__.'/../../resources/css/components/segment-control.css');
+it('composes file-upload source tabs from the shared segment component and runtime', function () {
+    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-file-upload.blade.php');
+    $runtime = file_get_contents(__DIR__.'/../../resources/js/file-upload/runtime/controller.js');
 
-    expect($blade)
-        ->toContain('$currentState = $getState()')
-        ->toContain('$normalizedCurrentState')
-        ->toContain('overflowShell: @js(! $isFullWidth)')
-        ->toContain('x-filament-flex-fields::segment-overflow-shell');
-
-    expect($trackItems)
-        ->toContain('$isSelected = $normalizedCurrentState !== null && (string) $value === $normalizedCurrentState')
-        ->toContain('data-segment-selected="{{ $isSelected ? \'true\' : \'false\' }}"')
-        ->toContain('aria-checked="{{ $isSelected ? \'true\' : \'false\' }}"')
-        ->toContain('@unless ($isSelected)')
-        ->toContain('x-show="isSelected(@js($value))"');
-
-    expect($blade)->toContain("'is-hydrated': indicatorHydrated");
-
-    expect($css)
-        ->toContain('.fff-segment-track:not(.is-hydrated) .fff-segment-item[data-segment-selected=\'true\']')
-        ->toContain('.fff-segment-track.is-hydrated .fff-segment-item[data-segment-selected=\'true\']')
-        ->toContain('.fff-segment-overflow-shell')
-        ->toContain('data-left-right-scroll')
-        ->toContain('scrollbar-width: none')
-        ->toContain('w-fit min-w-0 max-w-full');
-
-    $overflowShell = file_get_contents(__DIR__.'/../../resources/views/components/segment-overflow-shell.blade.php');
-
-    expect($overflowShell)
-        ->toContain('segmentOverflowInteractive')
-        ->toContain('is-overflow-interactive')
-        ->toContain('data-fff-segment-overflow')
-        ->toContain('FlexFieldAssets::segmentOverflowSsrInlineContents()')
-        ->not->toContain('document.currentScript.parentElement');
-});
-
-it('hydrates file-upload source tabs with the same segment indicator flags as segment-tabs', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/flex-file-upload-source-tabs.blade.php');
-    $behavior = file_get_contents(__DIR__.'/../../resources/js/support/flex-file-upload-sources.js');
-
-    expect($blade)
-        ->toContain("'is-hydrated': indicatorHydrated")
-        ->toContain("'is-animated': indicatorAnimated");
-
-    expect($behavior)
-        ->toContain('indicatorHydrated: false')
-        ->toContain('this.indicatorHydrated = true')
-        ->toContain('enableIndicatorAnimation()');
+    expect($blade)->toContain('<x-filament-flex-fields::segment-control')
+        ->not->toContain('fff-segment-indicator');
+    expect($runtime)->toContain('createSegmentRuntime')
+        ->not->toContain('indicatorStyle');
 });

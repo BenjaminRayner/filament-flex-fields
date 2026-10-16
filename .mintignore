@@ -26,3 +26,25 @@ phpunit.xml.dist
 pest.php
 playwright.config.mjs
 vitest.config.*
+
+# Internal component contracts and audit notes are not customer documentation
+.internal/
+.internal/**
+.ai/
+.agents/
+.codex/
+.cursor/
+
+AGENTS.md
+COMMERCIAL.md
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+
+# Local build and documentation verification outputs
+build/
+
+# Maintenance scripts are not browser custom JavaScript
+update-blade-css.js
+
+# Vendor reference copies are engineering material, not custom browser scripts
+.reference/

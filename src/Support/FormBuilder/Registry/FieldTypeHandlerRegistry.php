@@ -15,6 +15,7 @@ use Bjanczak\FilamentFlexFields\Support\FormBuilder\Handlers\MediaFieldTypeHandl
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Handlers\NumericFieldTypeHandler;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Handlers\PassthroughFieldTypeHandler;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Handlers\TextFieldTypeHandler;
+use Bjanczak\FilamentFlexFields\Support\Schema\Configuration\BuiltinConfigurationContract;
 use Filament\Schemas\Components\Component;
 use InvalidArgumentException;
 
@@ -58,6 +59,8 @@ final class FieldTypeHandlerRegistry
 
     public function makeComponent(FlexFieldDefinition $definition, string $statePathPrefix = 'flex_field_values'): Component
     {
+        BuiltinConfigurationContract::assert($definition->type, $definition->config);
+
         $statePath = filled($statePathPrefix)
             ? "{$statePathPrefix}.{$definition->slug}"
             : $definition->slug;

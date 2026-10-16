@@ -1,0 +1,117 @@
+---
+title: "Style and namespace your extension"
+description: "Share FLEX tokens, isolate CSS names and generate stable instance SVG identities."
+---
+
+Use the same namespace as your `ComponentPackage`. Existing family registration
+rejects overlapping package namespaces. The public helper creates separate names
+for tokens, fonts and keyframes; it never loads another stylesheet or copies the
+implementation of a child component.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Theme\AppearanceNamespace;
+use Bjanczak\FilamentFlexFields\Support\Theme\FlexFieldsTheme;
+
+$appearance = new AppearanceNamespace('acme-rating');
+// Or obtain it from your typed installation: $package->appearance().
+
+app(FlexFieldsTheme::class)->mergePackageTheme($appearance, [
+    'color' => 'var(--fff-field-focus-border)',
+    'radius' => '0.75rem',
+]);
+
+$token = $appearance->token('color');
+// --fff-ext-acme-rating--token-color
+$font = $appearance->font('display');
+// fff-ext-acme-rating--font-display
+$animation = $appearance->keyframe('enter');
+// fff-ext-acme-rating--motion-enter
+```
+
+```css
+.fff-acme-rating-value {
+    color: var(--fff-ext-acme-rating--token-color, inherit);
+    border-radius: var(
+        --fff-ext-acme-rating--token-radius,
+        var(--fff-global-radius, 0.75rem)
+    );
+}
+
+@keyframes fff-ext-acme-rating--motion-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+```
+
+Use inherited public tokens for the shared design foundation:
+
+| Purpose | Tokens |
+| --- | --- |
+| Panel accent and focus | `--fff-field-focus-border`, `--fff-field-focus-ring`, `--fff-field-focus-ring-width` |
+| Field surface | `--fff-field-bg`, `--fff-field-border`, `--fff-field-border-width` |
+| Surface border and elevation | `--fff-surface-border`, `--fff-surface-border-width`, `--fff-surface-shadow` |
+| Size | `--fff-control-h-sm/md/lg`, `--fff-text-sm/md/lg`, `--fff-icon-sm/md/lg` |
+| Density and rounding | `--fff-density-scale`, `--fff-global-radius`, `--fff-global-menu-radius` |
+| Motion | `--fff-motion-duration-fast/base/slow`, `--fff-motion-ease-standard` |
+
+The slash notation above lists separate variables, for example
+`--fff-text-sm`, `--fff-text-md` and `--fff-text-lg`.
+Keep author selectors scoped to your own explicit classes. `stylesFrom` retains
+the actual style owner; the namespace helper does not rewrite CSS, acquire fonts,
+validate arbitrary third-party stylesheet contents or grant origin permissions.
+Declare font/binary resources in your asset graph and use your namespaced family
+name in `@font-face`. Keep native `.dark`, logical properties and `dir` support;
+changing appearance alone does not require a factory restart or resource fetch.
+
+## Repeated SVGs and server rendering
+
+A gradient, mask, filter or clip path needs an instance identity. A component name
+alone is insufficient when the same component appears twice, in a repeater, table
+or suspended modal.
+
+```php
+$instance = $context->identity('acme-rating-field', 'rating');
+$gradientId = $appearance->svgId($instance, 'gradient');
+```
+
+Render that ID and its `url(#...)` reference together. In JavaScript, pass the
+same server-rendered instance string:
+
+```javascript
+import { createAppearanceNamespace } from '@bjanczak/flex-fields/sdk/v1';
+
+const appearance = createAppearanceNamespace('acme-rating');
+const gradientId = appearance.svgId(instance, 'gradient');
+const colorToken = appearance.token('color');
+```
+
+PHP and JS encode the exact UTF-8 bytes identically. There is no random counter,
+async hash, document scan, ID cache or retained element. Namespace and local names
+are portable lowercase identities (48 and64 characters); the owner key accepts
+at most512 valid UTF-8 bytes without control characters. Give independently
+rendered owners different identities. Duplicating identical markup with the same
+owner key cannot produce distinct SVG IDs automatically.
+
+## Theme configuration admission
+
+The existing aliases (`primary`, `radius`, `field_bg` and their documented related
+aliases) and literal `--fff-*`/`fff_*` variables remain available. Package tokens
+use `mergePackageTheme()` to generate names without overriding the core namespace.
+Theme updates validate atomically: invalid input leaves the previous map intact.
+Each complete map is limited to512 entries and64KiB of names/values, with at
+most2048 bytes per value. Values are strings or finite numbers. Objects, arrays,
+unknown aliases, malformed names, declaration delimiters, markup, escapes,
+comments and explicit resource-loading/executable functions reject. Ordinary
+`var()`, `calc()`, gradients, colors, quoted font names and comma-separated shadow
+values remain supported. Values are not semantically type-checked as individual
+CSS properties; trusted application configuration and stylesheet authors still
+own their values and resource permissions.
+
+Previously ignored unknown aliases and nonscalar values now fail explicitly.
+Remove those obsolete settings before upgrading. Theme maps remain request/job
+scoped and detach caller references; author helpers themselves retain no state.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

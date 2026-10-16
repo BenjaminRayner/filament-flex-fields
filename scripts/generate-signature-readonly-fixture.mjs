@@ -1,148 +1,52 @@
-/**
- * Generates the readonly playground signature fixture using the same
- * quadratic path format as SignatureField exports (dense sampled points).
- */
-import fs from 'node:fs';
-import path from 'node:path';
+/** Convert the trusted Inkscape fixture to the pad's compact absolute M/L/Q/Z format. */
+import fs from 'node:fs'
+import path from 'node:path'
 
-const packageRoot = path.resolve(import.meta.dirname, '..');
-const outputPath = path.join(packageRoot, 'resources/fixtures/signature-readonly-preview.svg');
-
-const viewBoxWidth = 1000;
-const viewBoxHeight = 320;
-const penColor = '#18181b';
-const defaultPenWidth = 2.5;
-
-function roundCoord(value) {
-    return Math.round(value * 10) / 10;
+const root = path.resolve(import.meta.dirname, '..')
+const source = fs.readFileSync(path.join(root, 'resources/fixtures/signature-readonly-preview.svg'), 'utf8')
+const output = path.join(root, 'resources/fixtures/signature-readonly-preview.normalized.svg')
+const viewBox = source.match(/viewBox="([^"]+)"/)?.[1].split(/\s+/).map(Number)
+const translation = source.match(/transform="translate\(([^)]+)\)"/)?.[1].split(/[\s,]+/).map(Number) ?? [0, 0]
+if (!viewBox || viewBox.length !== 4 || ![...viewBox, ...translation].every(Number.isFinite)) throw new Error('Invalid source geometry')
+const width = 600, height = 260, padding = 12
+const scale = Math.min((width - padding * 2) / viewBox[2], (height - padding * 2) / viewBox[3])
+const fit = ([x, y]) => [(x + translation[0] - viewBox[0]) * scale + (width - viewBox[2] * scale) / 2, (y + translation[1] - viewBox[1]) * scale + (height - viewBox[3] * scale) / 2]
+const midpoint = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
+const coords = p => p.map(n => Number(n.toFixed(3))).join(',')
+function quadratic(p0, p1, p2, p3, depth = 0) {
+    const q = [(3 * (p1[0] + p2[0]) - p0[0] - p3[0]) / 4, (3 * (p1[1] + p2[1]) - p0[1] - p3[1]) / 4]
+    const error = Math.max(Math.hypot(p1[0] - (p0[0] + 2 * q[0]) / 3, p1[1] - (p0[1] + 2 * q[1]) / 3), Math.hypot(p2[0] - (p3[0] + 2 * q[0]) / 3, p2[1] - (p3[1] + 2 * q[1]) / 3))
+    if (error <= .025 || depth >= 12) return `Q${coords(q)} ${coords(p3)}`
+    const a = midpoint(p0, p1), b = midpoint(p1, p2), c = midpoint(p2, p3), d = midpoint(a, b), e = midpoint(b, c), m = midpoint(d, e)
+    return quadratic(p0, a, d, m, depth + 1) + quadratic(m, e, c, p3, depth + 1)
 }
-
-function sampleCubic(p0, p1, p2, p3, steps, widthAt = () => defaultPenWidth) {
-    const points = [];
-
-    for (let index = 0; index <= steps; index++) {
-        const t = index / steps;
-        const inverse = 1 - t;
-
-        points.push({
-            x: inverse ** 3 * p0.x + 3 * inverse ** 2 * t * p1.x + 3 * inverse * t ** 2 * p2.x + t ** 3 * p3.x,
-            y: inverse ** 3 * p0.y + 3 * inverse ** 2 * t * p1.y + 3 * inverse * t ** 2 * p2.y + t ** 3 * p3.y,
-            width: widthAt(t),
-        });
+const paths = [...source.matchAll(/<path\b[^>]*\bd="([^"]+)"[^>]*>/g)].map(([, data]) => {
+    const tokens = data.match(/[a-zA-Z]|[-+]?(?:\d*\.\d+|\d+\.?\d*)(?:[eE][-+]?\d+)?/g) ?? []
+    let i = 0, command = '', current = [0, 0], start = current, result = ''
+    const point = relative => {
+        if (i + 1 >= tokens.length || !Number.isFinite(Number(tokens[i])) || !Number.isFinite(Number(tokens[i + 1]))) throw new Error('Invalid fixture coordinate')
+        const p = [Number(tokens[i++]), Number(tokens[i++])]
+        return relative ? [p[0] + current[0], p[1] + current[1]] : p
     }
-
-    return points;
-}
-
-function joinStrokes(strokeParts) {
-    const points = [];
-
-    for (const part of strokeParts) {
-        if (points.length > 0) {
-            points.pop();
+    while (i < tokens.length) {
+        if (/^[A-Za-z]$/.test(tokens[i])) command = tokens[i++]
+        const relative = command === command.toLowerCase()
+        switch (command.toUpperCase()) {
+            case 'M': current = point(relative); start = current; result += `M${coords(fit(current))}`; command = relative ? 'l' : 'L'; break
+            case 'L': current = point(relative); result += `L${coords(fit(current))}`; break
+            case 'C': { const p1 = point(relative), p2 = point(relative), p3 = point(relative); result += quadratic(fit(current), fit(p1), fit(p2), fit(p3)); current = p3; break }
+            case 'Z': result += 'Z'; current = start; command = ''; break
+            default: throw new Error('Unsupported fixture path command: ' + command)
         }
-
-        points.push(...part);
     }
-
-    return points;
+    return `<path d="${result}" fill="#18181b" fill-rule="evenodd"/>`
+})
+if (!paths.length) throw new Error('Fixture has no ink')
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">${paths.join('')}</svg>\n`
+if (Buffer.byteLength(svg) > 48 * 1024) throw new Error('Normalized fixture exceeds the field budget')
+if (process.argv.includes('--check')) {
+    if (fs.readFileSync(output, 'utf8') !== svg) throw new Error('Rebuild the normalized signature fixture from its source')
+} else {
+    fs.writeFileSync(output, svg)
 }
-
-function pointsToQuadraticPath(points) {
-    if (points.length === 0) {
-        return '';
-    }
-
-    if (points.length === 1) {
-        const point = points[0];
-
-        return `M${roundCoord(point.x)},${roundCoord(point.y)}`;
-    }
-
-    if (points.length === 2) {
-        return `M${roundCoord(points[0].x)},${roundCoord(points[0].y)}L${roundCoord(points[1].x)},${roundCoord(points[1].y)}`;
-    }
-
-    let path = `M${roundCoord(points[0].x)},${roundCoord(points[0].y)}`;
-
-    for (let index = 1; index < points.length - 1; index++) {
-        const control = points[index];
-        const midX = (points[index].x + points[index + 1].x) / 2;
-        const midY = (points[index].y + points[index + 1].y) / 2;
-
-        path += `Q${roundCoord(control.x)},${roundCoord(control.y)} ${roundCoord(midX)},${roundCoord(midY)}`;
-    }
-
-    const last = points[points.length - 1];
-    const prev = points[points.length - 2];
-
-    path += `Q${roundCoord(prev.x)},${roundCoord(prev.y)} ${roundCoord(last.x)},${roundCoord(last.y)}`;
-
-    return path;
-}
-
-function strokesToSvg(strokes) {
-    const paths = strokes.map((stroke) => {
-        const d = pointsToQuadraticPath(stroke.points);
-        const width = stroke.width ?? defaultPenWidth;
-
-        return `<path d="${d}" fill="none" stroke="${penColor}" stroke-width="${roundCoord(width)}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    }).join('');
-
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewBoxWidth} ${viewBoxHeight}">${paths}</svg>`;
-}
-
-/** Hand-authored cursive "James Wilson" style signature (sampled like real pad input). */
-const strokes = [
-    {
-        width: 3.1,
-        points: joinStrokes([
-            sampleCubic({ x: 108, y: 214 }, { x: 102, y: 176 }, { x: 118, y: 132 }, { x: 152, y: 112 }, 18, (t) => 2.8 + t * 0.8),
-            sampleCubic({ x: 152, y: 112 }, { x: 188, y: 92 }, { x: 214, y: 118 }, { x: 206, y: 152 }, 16, (t) => 3.2 - t * 0.3),
-            sampleCubic({ x: 206, y: 152 }, { x: 198, y: 186 }, { x: 168, y: 204 }, { x: 142, y: 188 }, 14, (t) => 2.9 - t * 0.2),
-            sampleCubic({ x: 142, y: 188 }, { x: 124, y: 176 }, { x: 118, y: 154 }, { x: 136, y: 142 }, 12, (t) => 2.6 + t * 0.4),
-            sampleCubic({ x: 136, y: 142 }, { x: 158, y: 130 }, { x: 182, y: 146 }, { x: 198, y: 168 }, 14, (t) => 2.8 + Math.sin(t * Math.PI) * 0.5),
-        ]),
-    },
-    {
-        width: 2.7,
-        points: joinStrokes([
-            sampleCubic({ x: 198, y: 168 }, { x: 228, y: 154 }, { x: 258, y: 176 }, { x: 282, y: 158 }, 14),
-            sampleCubic({ x: 282, y: 158 }, { x: 304, y: 142 }, { x: 322, y: 164 }, { x: 342, y: 148 }, 12),
-            sampleCubic({ x: 342, y: 148 }, { x: 358, y: 134 }, { x: 376, y: 158 }, { x: 396, y: 142 }, 12),
-            sampleCubic({ x: 396, y: 142 }, { x: 412, y: 128 }, { x: 432, y: 152 }, { x: 452, y: 136 }, 12),
-            sampleCubic({ x: 452, y: 136 }, { x: 468, y: 124 }, { x: 486, y: 148 }, { x: 506, y: 132 }, 12),
-        ]),
-    },
-    {
-        width: 2.9,
-        points: joinStrokes([
-            sampleCubic({ x: 524, y: 148 }, { x: 552, y: 124 }, { x: 588, y: 152 }, { x: 622, y: 128 }, 16),
-            sampleCubic({ x: 622, y: 128 }, { x: 652, y: 108 }, { x: 684, y: 138 }, { x: 712, y: 118 }, 14),
-            sampleCubic({ x: 712, y: 118 }, { x: 738, y: 100 }, { x: 764, y: 128 }, { x: 792, y: 108 }, 14),
-            sampleCubic({ x: 792, y: 108 }, { x: 818, y: 90 }, { x: 846, y: 118 }, { x: 872, y: 98 }, 14),
-            sampleCubic({ x: 872, y: 98 }, { x: 894, y: 82 }, { x: 914, y: 108 }, { x: 928, y: 92 }, 10),
-            sampleCubic({ x: 928, y: 92 }, { x: 938, y: 84 }, { x: 946, y: 102 }, { x: 934, y: 112 }, 8),
-        ]),
-    },
-    {
-        width: 2.2,
-        points: joinStrokes([
-            sampleCubic({ x: 122, y: 232 }, { x: 268, y: 246 }, { x: 428, y: 224 }, { x: 588, y: 238 }, 20, (t) => 2.0 + Math.sin(t * Math.PI) * 0.5),
-            sampleCubic({ x: 588, y: 238 }, { x: 712, y: 248 }, { x: 828, y: 222 }, { x: 918, y: 236 }, 16, (t) => 2.2 - t * 0.3),
-        ]),
-    },
-    {
-        width: 2.4,
-        points: joinStrokes([
-            sampleCubic({ x: 878, y: 112 }, { x: 902, y: 132 }, { x: 922, y: 154 }, { x: 908, y: 176 }, 10),
-            sampleCubic({ x: 908, y: 176 }, { x: 896, y: 192 }, { x: 872, y: 186 }, { x: 858, y: 168 }, 8),
-        ]),
-    },
-];
-
-const svg = strokesToSvg(strokes);
-
-fs.writeFileSync(outputPath, `${svg}\n`);
-
-console.log(`Wrote ${outputPath}`);
+console.log('Normalized the source signature fixture:', Buffer.byteLength(svg), 'bytes')

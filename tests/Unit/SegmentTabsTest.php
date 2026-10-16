@@ -7,8 +7,9 @@ use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs\SegmentTab;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields;
 use Bjanczak\FilamentFlexFields\Support\Composition\SegmentTabsV2;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Tests\Support\TestableTranslatableForm;
+use Filament\Schemas\Schema;
 
 it('exposes segment tabs configuration via fluent api', function () {
     $tabs = SegmentTabs::make('Settings')
@@ -32,6 +33,8 @@ it('exposes segment tabs configuration via fluent api', function () {
                     FlexTextInput::make('api_key'),
                 ]),
         ]);
+
+    Schema::make(new TestableTranslatableForm)->components([$tabs])->getComponents();
 
     expect($tabs->getLabel())->toBe('Settings')
         ->and($tabs->getVariant())->toBe('ghost')
@@ -73,15 +76,6 @@ it('supports field-style helper text on segment tabs and translatable fields', f
     expect($foreachPos)->not->toBeFalse()
         ->and($helperPos)->not->toBeFalse()
         ->and($helperPos)->toBeGreaterThan($foreachPos);
-});
-
-it('loads segment control styles for segment tabs', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/schemas/components/segment-tabs.blade.php');
-
-    expect($blade)
-        ->toContain('partials.load-stylesheet')
-        ->and($blade)->toContain("'component' => 'segment-tabs'")
-        ->and(FlexFieldAssets::stylesheetsFor('segment-tabs'))->toBe(['segment-control', 'segment-tabs']);
 });
 
 it('defaults ghost variant color to primary for segment tabs', function () {

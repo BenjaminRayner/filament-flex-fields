@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectField;
 
-use BackedEnum;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\Select\Bootstrap\HeadlessConfiguration;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\InitialSelectionLabels;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionLabelIndex;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionValue;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\TransportOptionTree;
 use Bjanczak\FilamentFlexFields\Support\Translations;
 use Closure;
-use Filament\Support\Enums\IconSize;
 use Illuminate\Contracts\Support\Htmlable;
 
 /**
@@ -22,7 +24,7 @@ trait InteractsWithSelectHeadlessRuntime
     public function shouldUseHeadlessEngine(): bool
     {
         // Mirror select-field.blade.php: native only when not searchable/multiple/HTML.
-        return (bool) ($this->isSearchable() || $this->isMultiple() || $this->isHtmlAllowed() || ! $this->isNative());
+        return (bool) ($this->isSearchable() || $this->isMultiple() || $this->isHtmlAllowed() || $this->usesRichOptionHtml() || ! $this->isNative());
     }
 
     /**
@@ -32,128 +34,7 @@ trait InteractsWithSelectHeadlessRuntime
      */
     public function getHeadlessAlpineConfig(): array
     {
-        $isUserSelectField = method_exists($this, 'renderUserOption');
-        $state = $this->getRawState();
-        $isMultiple = $this->isMultiple();
-        $messages = $this->getSelectMessagesForJs();
-        $smartSuggest = $this->getSmartSuggestConfigForJs();
-        $needsAsyncMessages = $this->hasDynamicSearchResults()
-            || $this->hasPaginatedSearchResults()
-            || $this->hasDynamicOptions();
-        $chipRemoveIconHtml = view('filament-flex-fields::forms.components.partials.tag-pill-remove-icon')->render();
-        $clearIconHtml = \Filament\Support\generate_icon_html($this->getClearIcon(), size: IconSize::ExtraSmall)?->toHtml() ?? '';
-        $selectedOptionCheckIconHtml = \Filament\Support\generate_icon_html($this->getSelectedOptionCheckIcon(), size: IconSize::Small)?->toHtml() ?? '';
-        $id = $this->getId();
-
-        $initialOptions = ($isUserSelectField && method_exists($this, 'getInitialOptionsForJs'))
-            ? $this->getInitialOptionsForJs()
-            : $this->getHeadlessInitialOptionsForJs();
-
-        $skipInitialOptionLabels = $isUserSelectField
-            && $isMultiple
-            && method_exists($this, 'getInitialSelectedUserEntriesForJs')
-            && filled($this->getInitialSelectedUserEntriesForJs());
-
-        $initialOptionLabels = $skipInitialOptionLabels
-            ? []
-            : ($isUserSelectField
-                ? ((filled($state) && $isMultiple) ? $this->getOptionLabelsForJs() : [])
-                : ((filled($state) && $isMultiple)
-                    ? $this->getHeadlessInitialOptionLabelsForJs()
-                    : []));
-
-        $minSearchLength = ($isUserSelectField && method_exists($this, 'getMinSearchLength'))
-            ? (int) $this->getMinSearchLength()
-            : 0;
-
-        $iconHtml = static function (mixed $icon, IconSize $size): string {
-            return \Filament\Support\generate_icon_html($icon, size: $size)?->toHtml() ?? '';
-        };
-
-        return [
-            'initialState' => $state,
-            'statePath' => $this->getStatePath(),
-            'componentKey' => $this->getKey(),
-            'menuDomId' => $id.'-fff-headless-menu',
-            'multiple' => $isMultiple,
-            'searchable' => $this->isSearchable(),
-            'options' => $initialOptions,
-            'placeholder' => $this->getPlaceholder(),
-            'disabled' => $this->isDisabled(),
-            'clearable' => $this->isClearableInUi(),
-            'keepSelectedOptionsInDropdown' => $this->shouldKeepSelectedOptionsInDropdown(),
-            'isHtmlAllowed' => $this->isHtmlAllowed() || $this->usesRichOptionHtml(),
-            'isGridLayout' => $this->getOptionLayout() === 'grid',
-            'useRichListDropdownLayout' => $this->shouldUseRichListDropdownLayout(),
-            'selectedOptionCheckIconHtml' => $selectedOptionCheckIconHtml,
-            'hasDynamicSearchResults' => $this->hasDynamicSearchResults(),
-            'hasPaginatedSearchResults' => $this->hasPaginatedSearchResults(),
-            'hasDynamicOptions' => $this->hasDynamicOptions(),
-            'hasClientSideOptionList' => $this->hasClientSideOptionList(),
-            'isPreloaded' => $this->isPreloaded(),
-            'hasInitialNoOptionsMessage' => $this->hasInitialNoOptionsMessage(),
-            'searchDebounce' => $this->getSearchDebounce(),
-            'minSearchLength' => $minSearchLength,
-            'optionsLimit' => $this->getOptionsLimit(),
-            'searchableOptionFields' => $this->getSearchableOptionFields(),
-            'livewireId' => $this->resolveHeadlessLivewireId(),
-            'maxItems' => $this->getMaxItems(),
-            'maxItemsMessage' => $this->getMaxItemsMessage(),
-            'position' => $this->getPosition(),
-            'loadingMessage' => $needsAsyncMessages ? $messages['loading'] : '',
-            'searchingMessage' => $needsAsyncMessages ? $messages['searching'] : '',
-            'loadingMoreMessage' => ($needsAsyncMessages && $this->hasPaginatedSearchResults())
-                ? $messages['loadingMore']
-                : '',
-            'noOptionsMessage' => $messages['noOptions'],
-            'noMoreOptionsMessage' => ($needsAsyncMessages && $this->hasPaginatedSearchResults())
-                ? ($messages['noMoreOptions'] ?? '')
-                : '',
-            'noSearchResultsMessage' => $this->isSearchable() ? $messages['noSearchResults'] : '',
-            'searchPrompt' => ($needsAsyncMessages && $this->isSearchable()) ? $messages['searchPrompt'] : '',
-            'initialOptionLabel' => (blank($state) || $isMultiple) ? null : $this->getInitialTriggerLabel(),
-            'initialOptionLabels' => $initialOptionLabels,
-            'initialSelectedUserEntries' => ($isUserSelectField && method_exists($this, 'getInitialSelectedUserEntriesForJs'))
-                ? $this->getInitialSelectedUserEntriesForJs()
-                : [],
-            'isUserSelectField' => $isUserSelectField,
-            'verifiedIconHtml' => $isUserSelectField
-                ? $iconHtml(GravityIcon::SealCheck, IconSize::ExtraSmall)
-                : '',
-            'tagRemoveIconHtml' => $isUserSelectField ? $chipRemoveIconHtml : $clearIconHtml,
-            'userSelectNoOptionsIconHtml' => $isUserSelectField
-                ? $iconHtml(GravityIcon::Persons, IconSize::Large)
-                : '',
-            'userSelectNoResultsIconHtml' => $isUserSelectField
-                ? $iconHtml(GravityIcon::Magnifier, IconSize::Large)
-                : '',
-            'selectNoOptionsIconHtml' => ! $isUserSelectField
-                ? $iconHtml(GravityIcon::LayoutCells, IconSize::Large)
-                : '',
-            'selectNoResultsIconHtml' => (! $isUserSelectField && $this->isSearchable())
-                ? $iconHtml(GravityIcon::Magnifier, IconSize::Large)
-                : '',
-            'selectEmptyStateHints' => $this->isSearchable() || $needsAsyncMessages
-                ? $this->getSelectEmptyStateHintsForJs()
-                : [],
-            'userSelectEmptyStateHints' => ($isUserSelectField && method_exists($this, 'getUserSelectEmptyStateHintsForJs'))
-                ? $this->getUserSelectEmptyStateHintsForJs()
-                : [],
-            'canOptionLabelsWrap' => $this->canOptionLabelsWrap(),
-            'isReorderable' => $this->isReorderable(),
-            'smartSuggestEnabled' => $smartSuggest['enabled'],
-            'recentOptionValues' => $smartSuggest['recent'],
-            'suggestedOptionValues' => $smartSuggest['suggested'],
-            'allowCreateOption' => $smartSuggest['allowCreate'],
-            'createOptionLabel' => $smartSuggest['createLabel'],
-            'entityMentionsEnabled' => $smartSuggest['entityMentions'],
-            'mentionTrigger' => $smartSuggest['mentionTrigger'],
-            'entityMentionSectionLabel' => __('filament-flex-fields::default.select_field.entity_mentions.section'),
-            'inlineSearch' => $this->hasInlineSearch(),
-            'optionGroupSeparators' => $this->hasOptionGroupSeparators(),
-            'dropdownAlign' => $this->getDropdownAlign(),
-            'matchTriggerWidth' => $this->getVariant() !== 'item-card',
-        ];
+        return (new HeadlessConfiguration($this))->build($this->resolveHeadlessLivewireId());
     }
 
     protected function resolveHeadlessLivewireId(): ?string
@@ -254,63 +135,27 @@ trait InteractsWithSelectHeadlessRuntime
             return [];
         }
 
-        if ($this->hasDynamicOptions() && ! $this->isPreloaded()) {
+        if ($this->getOptionLabelsUsing) {
+            $labels = $this->getOptionLabels();
             $entries = [];
-
-            foreach ($state as $value) {
-                if ($value instanceof BackedEnum) {
-                    $value = $value->value;
+            foreach ($state as $candidate) {
+                $value = OptionValue::normalize($candidate);
+                if ($value === null) {
+                    continue;
                 }
-
-                $stringValue = (string) $value;
-
-                $entries[] = [
-                    'value' => $stringValue,
-                    'label' => $stringValue,
-                    'triggerLabel' => $stringValue,
-                ];
+                $label = (string) ($labels[$value] ?? $value);
+                $entries[] = ['value' => (string) $value, 'label' => $label, 'triggerLabel' => $label];
             }
 
             return $entries;
         }
 
-        $entries = [];
-        $options = $this->getOptions();
+        $index = ($this->hasDynamicOptions() && ! $this->isPreloaded()) ? null
+            : new OptionLabelIndex($this->getOptions(), fn (array $label): bool => $this->isOptionGroupArray($label));
 
-        foreach ($state as $value) {
-            if ($value instanceof BackedEnum) {
-                $value = $value->value;
-            }
-
-            $stringValue = (string) $value;
-            $label = $this->findOptionLabel($options, $value);
-
-            if (is_array($label)) {
-                $normalized = $this->normalizeOption($value, $label);
-                $dropdownLabel = $this->formatOptionLabelForJs($normalized, compact: false);
-                $triggerLabel = $this->formatOptionLabelForJs($normalized, compact: true);
-
-                $entry = [
-                    'value' => $stringValue,
-                    'label' => $dropdownLabel,
-                    'triggerLabel' => $triggerLabel,
-                ];
-
-                $entries[] = $entry;
-
-                continue;
-            }
-
-            $textLabel = is_string($label) ? $label : $stringValue;
-
-            $entries[] = [
-                'value' => $stringValue,
-                'label' => $textLabel,
-                'triggerLabel' => $textLabel,
-            ];
-        }
-
-        return $entries;
+        return (new InitialSelectionLabels)->project(array_values($state), $index,
+            fn (string|int $value, array $label, bool $compact): string => $this->formatOptionLabelForJs($this->normalizeOption($value, $label), compact: $compact),
+        );
     }
 
     protected function shouldDeferHeadlessOptionsUntilOpen(): bool
@@ -345,14 +190,7 @@ trait InteractsWithSelectHeadlessRuntime
     protected function flattenOptionsForHeadless(array $options): array
     {
         $flat = [];
-
-        foreach ($options as $option) {
-            if (isset($option['options']) && is_array($option['options'])) {
-                $flat = array_merge($flat, $this->flattenOptionsForHeadless($option['options']));
-
-                continue;
-            }
-
+        foreach ((new TransportOptionTree)->leaves($options) as $option) {
             $flat[] = [
                 'value' => (string) ($option['value'] ?? ''),
                 'label' => (string) ($option['triggerLabel'] ?? $option['label'] ?? $option['value'] ?? ''),

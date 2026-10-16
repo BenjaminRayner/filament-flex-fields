@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'navigation_plural' => 'Grupy pól',
+    'model_singular' => 'Grupa pól',
+    'group' => 'Grupa',
+    'sections' => 'Sekcje',
+    'sections_description' => 'Opcjonalne sekcje układu grupujące pola formularza.',
+    'section_id' => 'ID sekcji',
+    'fields_schema' => 'Schemat pól',
+    'fields_description' => 'Definicje pól używane w formularzach, tabelach i listach informacji.',
+    'fields' => 'Pola',
+    'section' => 'Sekcja',
+    'required' => 'Wymagane',
+    'encrypted' => 'Szyfruj zapisane dane',
+    'help_text' => 'Tekst pomocy',
+    'tenant_id' => 'ID dzierżawcy',
+    'tenant' => 'Dzierżawca',
+    'tenant_help' => 'Opcjonalny klucz dzierżawcy. Pozostaw puste dla grupy globalnej.',
+    'name' => 'Nazwa',
+    'slug' => 'Slug',
+    'order' => 'Kolejność',
+    'label' => 'Etykieta',
+    'type' => 'Typ',
+    'sort' => 'Kolejność sortowania',
+    'description' => 'Opis',
+    'placeholder' => 'Tekst zastępczy',
+    'width' => 'Szerokość',
+    'updated_at' => 'Zaktualizowano',
+    'section_type_section' => 'Sekcja',
+    'section_type_fieldset' => 'Zestaw pól',
+    'section_type_headless' => 'Bez kontenera',
+];

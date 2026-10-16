@@ -6,11 +6,11 @@ namespace Bjanczak\FilamentFlexFields\Filament\Tables\Columns;
 
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\Concerns\EmitsFlexFieldTableColumnAssets;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldStylesheetQueue;
 use Bjanczak\FilamentFlexFields\Support\SignaturePreviewColumnRenderCache;
 use Bjanczak\FilamentFlexFields\Support\SignatureSvg;
 use Closure;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\HtmlString;
 
@@ -26,11 +26,9 @@ class SignaturePreviewColumn extends TextColumn
     {
         parent::setUp();
 
-        FlexFieldStylesheetQueue::enqueueFor('signature-preview-column');
-
         $this->html();
 
-        $this->formatStateUsing(fn (mixed $state, SignaturePreviewColumn $column): string => $column->formatSignaturePreview($state));
+        $this->formatStateUsing(fn (mixed $state, SignaturePreviewColumn $column): Htmlable => new HtmlString($column->formatSignaturePreview($state)));
     }
 
     public function previewSize(string|ControlSize|Closure $size): static

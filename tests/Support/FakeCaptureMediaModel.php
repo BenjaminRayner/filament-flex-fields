@@ -66,6 +66,11 @@ final class FakeCaptureMediaAdder
     /** @var array<string, mixed> */
     private array $properties = [];
 
+    public function preservingOriginal(): static
+    {
+        return $this;
+    }
+
     public function __construct(
         private readonly FakeCaptureMediaModel $model,
         private readonly string $content,

@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ChoiceCheckboxCards;
+use Bjanczak\FilamentFlexFields\Support\ChoiceLists\State\ChecklistStateCast;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
-use Filament\Schemas\Components\StateCasts\OptionsArrayStateCast;
 
 it('exposes choice checkbox cards configuration via fluent api', function () {
     $field = ChoiceCheckboxCards::make('toppings')
@@ -60,7 +60,7 @@ it('casts state to options array', function () {
 
     $casts = collect($field->getDefaultStateCasts());
 
-    expect($casts->contains(fn ($cast): bool => $cast instanceof OptionsArrayStateCast))->toBeTrue();
+    expect($casts->contains(fn ($cast): bool => $cast instanceof ChecklistStateCast))->toBeTrue();
 });
 
 it('includes array validation rule', function () {
@@ -160,29 +160,8 @@ it('exposes choice card size css variables per size', function () {
         ->and($large['--fff-choice-cards-label-size'])->toBe('1.125rem');
 });
 
-it('server renders selected state and prevents native label toggle fights', function () {
-    $radioBlade = file_get_contents(__DIR__.'/../../resources/views/forms/components/choice-cards.blade.php');
-    $checkboxBlade = file_get_contents(__DIR__.'/../../resources/views/forms/components/choice-checkbox-cards.blade.php');
-    $css = file_get_contents(__DIR__.'/../../resources/css/core/choice-cards.css');
-
-    expect($radioBlade)
-        ->toContain('$currentState = $getState()')
-        ->toContain('$isInitiallySelected')
-        ->toContain("'is-selected' => \$isInitiallySelected")
-        ->toContain('@checked($isInitiallySelected)')
-        ->toContain('x-on:click.prevent')
-        ->toContain("this.\$root.classList.add('is-hydrated')");
-
-    expect($checkboxBlade)
-        ->toContain('$currentState = $getState()')
-        ->toContain('$isInitiallySelected')
-        ->toContain("'is-selected' => \$isInitiallySelected")
-        ->toContain('@checked($isInitiallySelected)')
-        ->toContain('x-on:click.prevent')
-        ->toContain('x-on:keydown.space.prevent');
-
-    expect($css)
-        ->toContain('.fff-choice-cards:not(.is-hydrated)')
-        ->toContain(':has(> .fff-choice-cards__input:checked)')
-        ->toContain('pointer-events: none');
+it('uses shared server-rendered cards and an instance-owned lazy factory', function () {
+    $shared = file_get_contents(__DIR__.'/../../resources/views/forms/components/choice-cards/field.blade.php');
+    expect($shared)->toContain('data-card-config', '@checked($isInitiallySelected)', 'data-card-option', 'x-ignore', 'x-fff-load')
+        ->not->toContain('x-init', 'x-bind:checked', 'x-on:change');
 });

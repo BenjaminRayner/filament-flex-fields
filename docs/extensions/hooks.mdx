@@ -1,0 +1,29 @@
+---
+title: "Owned runtime hooks"
+description: "Register an injector hook and cancel only the subscription owned by your instance."
+---
+
+When your integration configures an already ready FLEX injector, give the hook
+registration the same owner signal as your component:
+
+```javascript
+function configurePreloadPolicy(injector, effects) {
+    const release = injector.registerInjectorHooks({
+        shouldSkipBackgroundPreload: () => true,
+    }, { signal: effects.signal });
+
+    return release;
+}
+```
+
+The release function is safe to call repeatedly. Disposing `effects` removes this
+registration; another component's registration remains active. The latest active
+registration supplies the override. Hooks must return synchronously with the
+declared type. Invalid, asynchronous or recursive decisions use the core default.
+They do not authorize application data changes. Use your namespaced lifecycle
+guard for a veto and enforce server authorization on the save path.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

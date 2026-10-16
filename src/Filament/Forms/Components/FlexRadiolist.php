@@ -7,9 +7,13 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 use BackedEnum;
 use Bjanczak\FilamentFlexFields\Concerns\HasChecklistOptions;
 use Bjanczak\FilamentFlexFields\Concerns\ResolvesConfiguredIcons;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\ChoiceLists\HasChoiceListAppearance;
+use Bjanczak\FilamentFlexFields\Support\ChoiceLists\Presentation\SizeStyles;
+use Bjanczak\FilamentFlexFields\Support\ChoiceLists\State\RadioStateCast;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Closure;
 use Filament\Forms\Components\Field;
+use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\In;
@@ -17,28 +21,13 @@ use InvalidArgumentException;
 
 class FlexRadiolist extends Field
 {
-    use HasChecklistOptions {
-        getNormalizedOptions as getChecklistNormalizedOptions;
-    }
+    use HasChecklistOptions { getNormalizedOptions as protected normalizedChoiceOptions; }
+    use HasChoiceListAppearance;
     use ResolvesConfiguredIcons;
 
     protected string $view = 'filament-flex-fields::forms.components.flex-radiolist';
 
-    protected string|Closure|null $color = 'primary';
-
     protected string|Closure $variant = 'default';
-
-    public function color(string|Closure|null $color): static
-    {
-        $this->color = $color;
-
-        return $this;
-    }
-
-    public function getColor(): ?string
-    {
-        return $this->evaluate($this->color);
-    }
 
     public function variant(string|Closure $variant): static
     {
@@ -49,8 +38,7 @@ class FlexRadiolist extends Field
 
     public function getVariant(): string
     {
-        $variant = (string) $this->evaluate($this->variant);
-
+        $variant = $this->evaluate($this->variant);
         if (! in_array($variant, ['default', 'label-only'], true)) {
             throw new InvalidArgumentException("Flex radiolist variant [{$variant}] is not supported.");
         }
@@ -65,71 +53,51 @@ class FlexRadiolist extends Field
 
     public function getLockIcon(): string|BackedEnum|Htmlable
     {
-        return $this->resolveConfiguredIcon('flex_radiolist_lock_icon', GravityIcon::Lock);
+        return $this->resolveConfiguredIcon('flex_radiolist_lock_icon', FlexIcon::Lock);
     }
 
-    /**
-     * @return list<string>
-     */
+    /** @return list<string> */
     public function getWrapperClasses(): array
     {
-        $classes = [
-            'fff-flex-radiolist',
-            'fff-flex-radiolist--'.$this->getSize(),
-            'fff-flex-radiolist--'.$this->getVariant(),
-        ];
-
-        if ($color = $this->getColor()) {
-            $classes[] = 'fi-color-'.$color;
-        }
-
-        return $classes;
+        return $this->choiceListClasses('fff-flex-radiolist', $this->getVariant());
     }
 
-    /**
-     * @return array<string|int, array{
-     *     label: string,
-     *     description: ?string,
-     *     icon: ?string,
-     *     disabled: bool,
-     * }>
-     */
+    /** @return array<string|int, array{label:string,description:?string,icon:?string,disabled:bool}> */
     public function getNormalizedOptions(): array
     {
-        $options = $this->getChecklistNormalizedOptions();
-
-        if (! $this->isLabelOnlyVariant()) {
-            return $options;
+        $options = $this->normalizedChoiceOptions();
+        if ($this->isLabelOnlyVariant()) {
+            foreach ($options as &$option) {
+                $option['description'] = null;
+                $option['icon'] = null;
+            }
+            unset($option);
         }
 
-        return array_map(
-            fn (array $option): array => [
-                ...$option,
-                'icon' => null,
-                'description' => null,
-            ],
-            $options,
-        );
+        return $options;
     }
 
-    /**
-     * @return array<string, string>
-     */
+    /** @return array<string,string> */
     public function getRadiolistSizeStyles(): array
     {
-        return collect($this->getChecklistSizeStyles())
-            ->mapWithKeys(fn (string $value, string $key): array => [
-                str_replace('flex-checklist', 'flex-radiolist', $key) => $value,
-            ])
-            ->all();
+        return SizeStyles::for($this->getSize(), 'flex-radiolist');
+    }
+
+    /** @return array<StateCast> */
+    public function getDefaultStateCasts(): array
+    {
+        return [...parent::getDefaultStateCasts(), new RadioStateCast];
     }
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->rule(function (FlexRadiolist $component): In {
-            return Rule::in($component->getOptionKeys());
+        $this->rule('bail');
+        $this->rule(static fn (): Closure => static function (string $attribute, mixed $value, Closure $fail): void {
+            if ($value !== null && ! is_string($value) && ! is_int($value)) {
+                $fail(__('validation.in', ['attribute' => $attribute]));
+            }
         });
+        $this->rule(static fn (FlexRadiolist $component): In => Rule::in($component->getEnabledOptionKeys()));
     }
 }

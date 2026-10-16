@@ -8,13 +8,11 @@ use Bjanczak\FilamentFlexFields\Data\FlexFieldDefinition;
 use Bjanczak\FilamentFlexFields\Enums\FlexFieldWidth;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexSlider;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators\FlexSliderFieldConfigurator;
+use Bjanczak\FilamentFlexFields\Support\Intelligence\Forms\FormulaFields;
 use Bjanczak\FilamentFlexFields\Support\Intelligence\FormulaEngine;
 use Bjanczak\FilamentFlexFields\Support\Schema\JsonFieldConditions;
 use Filament\Forms\Components\Field;
 use Filament\Schemas\Components\Component;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
-use Throwable;
 
 trait AppliesFieldDefinitionMeta
 {
@@ -71,27 +69,16 @@ trait AppliesFieldDefinitionMeta
             return;
         }
 
-        $expression = (string) $definition->formula;
-        $targetSlug = $definition->slug;
-
-        $field->disabled();
-        $field->dehydrated();
-
-        $field->afterStateHydrated(function (Field $component, mixed $state) use ($expression, $targetSlug, $statePathPrefix): void {
-            if (filled($state)) {
-                return;
-            }
-
-            $get = $component->makeGetUtility();
-            $set = $component->makeSetUtility();
-
-            self::recalculateFormulaTarget($expression, $targetSlug, $get, $set, $statePathPrefix);
-        });
+        $binding = new FormulaFields(
+            FormulaEngine::compileMap([$definition->slug => (string) $definition->formula]),
+            $statePathPrefix !== '' ? $statePathPrefix.'.' : '',
+        );
+        $binding->bindOutput($field, $definition->slug);
     }
 
     /**
      * @param  array<string, Component>  $componentsBySlug
-     * @param  array<string, string>  $formulas  slug => expression
+     * @param  array<string, string>  $formulas
      */
     protected function wireFormulaDependencies(array $componentsBySlug, array $formulas, string $statePathPrefix = ''): void
     {
@@ -99,83 +86,10 @@ trait AppliesFieldDefinitionMeta
             return;
         }
 
-        if (FormulaEngine::detectCycle($formulas) !== []) {
-            return;
-        }
-
-        $inputSlugs = [];
-
-        foreach ($formulas as $expression) {
-            foreach (FormulaEngine::fieldReferences($expression) as $dependencySlug) {
-                if (! array_key_exists($dependencySlug, $formulas)) {
-                    $inputSlugs[$dependencySlug] = true;
-                }
-            }
-        }
-
-        foreach (array_keys($inputSlugs) as $dependencySlug) {
-            $component = $componentsBySlug[$dependencySlug] ?? null;
-
-            if (! $component instanceof Field) {
-                continue;
-            }
-
-            $component->live();
-            $component->afterStateUpdated(function (mixed $state, Set $set, Get $get) use ($formulas, $statePathPrefix): void {
-                self::recalculateFormulaMap($formulas, $get, $set, $statePathPrefix);
-            });
-        }
-    }
-
-    /**
-     * @param  array<string, string>  $formulas
-     */
-    protected static function recalculateFormulaMap(
-        array $formulas,
-        Get $get,
-        Set $set,
-        string $statePathPrefix = '',
-    ): void {
-        $pathFor = static fn (string $slug): string => filled($statePathPrefix)
-            ? "{$statePathPrefix}.{$slug}"
-            : $slug;
-
-        $values = [];
-
-        foreach ($formulas as $expression) {
-            foreach (FormulaEngine::fieldReferences($expression) as $fieldKey) {
-                if (array_key_exists($fieldKey, $formulas) || array_key_exists($fieldKey, $values)) {
-                    continue;
-                }
-
-                $values[$fieldKey] = $get($pathFor($fieldKey));
-            }
-        }
-
-        try {
-            $results = FormulaEngine::evaluateMap($formulas, $values);
-        } catch (Throwable) {
-            return;
-        }
-
-        foreach ($results as $targetSlug => $result) {
-            $set($pathFor($targetSlug), (string) $result);
-        }
-    }
-
-    protected static function recalculateFormulaTarget(
-        string $expression,
-        string $targetSlug,
-        Get $get,
-        Set $set,
-        string $statePathPrefix = '',
-    ): void {
-        self::recalculateFormulaMap(
-            [$targetSlug => $expression],
-            $get,
-            $set,
-            $statePathPrefix,
-        );
+        (new FormulaFields(
+            FormulaEngine::compileMap($formulas),
+            $statePathPrefix !== '' ? $statePathPrefix.'.' : '',
+        ))->bind($componentsBySlug);
     }
 
     protected function applyFieldConditions(Component $field, FlexFieldDefinition $definition, string $statePathPrefix = ''): void
@@ -193,17 +107,17 @@ trait AppliesFieldDefinitionMeta
         }
 
         if ($field instanceof Field) {
-            $this->applyRequiredWhen($field, $definition);
+            $this->applyRequiredWhen($field, $definition, $statePathPrefix);
         }
     }
 
-    protected function applyRequiredWhen(Field $field, FlexFieldDefinition $definition): void
+    protected function applyRequiredWhen(Field $field, FlexFieldDefinition $definition, string $statePathPrefix = ''): void
     {
         if ($definition->requiredWhen === null) {
             return;
         }
 
-        $requiredWhen = JsonFieldConditions::compileRequiredWhen($definition->requiredWhen);
+        $requiredWhen = JsonFieldConditions::compileRequiredWhen($definition->requiredWhen, $statePathPrefix);
 
         if ($definition->isRequired) {
             $field->required();

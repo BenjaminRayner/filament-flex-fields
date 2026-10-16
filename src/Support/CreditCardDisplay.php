@@ -16,13 +16,26 @@ class CreditCardDisplay
 
     public const int MASKED_DIGIT_COUNT = 16;
 
+    public static function brand(string $number): string
+    {
+        $digits = self::sanitizeDigits($number);
+        if (str_starts_with($digits, '4')) {
+            return 'visa';
+        }
+        if (preg_match('/^(5[1-5]|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)/', $digits)) {
+            return 'mastercard';
+        }
+
+        return 'unknown';
+    }
+
     public static function maskedNumber(string $digits): string
     {
         $digits = preg_replace('/\D/', '', $digits) ?? '';
 
         $parts = [];
 
-        for ($index = 0; $index < self::MASKED_DIGIT_COUNT; $index += 4) {
+        for ($index = 0; $index < max(self::MASKED_DIGIT_COUNT, strlen($digits)); $index += 4) {
             $chunk = mb_substr($digits, $index, 4, 'UTF-8');
             $mask = str_repeat(self::MASK_CHAR, 4);
             $parts[] = mb_substr($chunk.$mask, 0, 4, 'UTF-8');
@@ -39,7 +52,7 @@ class CreditCardDisplay
             return str_repeat(self::MASK_CHAR, 3);
         }
 
-        $length = str_starts_with($cvv, '3') ? 4 : 3;
+        $length = max(3, strlen($cvv));
 
         return self::padEnd($cvv, $length);
     }

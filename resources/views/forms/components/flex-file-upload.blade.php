@@ -1,316 +1,116 @@
 @php
     use Filament\Support\Enums\Alignment;
-
-    $fieldWrapperView = $getFieldWrapperView();
+    use Bjanczak\FilamentFlexFields\Support\FlexIcon;
+    use Bjanczak\FilamentFlexFields\Support\Segments\SegmentItem;
     $id = $getId();
-    $automaticallyCropImagesAspectRatio = $getAutomaticallyCropImagesAspectRatio();
-    $automaticallyResizeImagesHeight = $getAutomaticallyResizeImagesHeight();
-    $automaticallyResizeImagesWidth = $getAutomaticallyResizeImagesWidth();
-    $isAvatar = $isAvatar();
-    $isMultiple = $isMultiple();
     $key = $getKey();
     $statePath = $getStatePath();
+    $livewireKey = $getLivewireKey();
     $isDisabled = $isDisabled();
+    $isMultiple = $isMultiple();
+    $isAvatar = $isAvatar();
+    $avatarPlaceholder = $field->getDefaultAvatar();
     $hasImageEditor = $hasImageEditor();
     $isImageEditorExplicitlyEnabled = $isImageEditorExplicitlyEnabled();
     $hasCircleCropper = $hasCircleCropper();
-    $livewireKey = $getLivewireKey();
-    $flexConfig = $field->getFlexFileUploadAlpineConfiguration();
+    $automaticallyCropImagesAspectRatio = $getAutomaticallyCropImagesAspectRatio();
+    $automaticallyResizeImagesHeight = $getAutomaticallyResizeImagesHeight();
+    $automaticallyResizeImagesWidth = $getAutomaticallyResizeImagesWidth();
+    $alignment = $getAlignment() ?? Alignment::Start;
+    if (is_string($alignment)) $alignment = Alignment::tryFrom($alignment) ?? $alignment;
+    $presentation = $field->getUploadPresentation();
+    $uploadRequirements = $field->getUploadRequirements();
+    $initialIndex = $field->getUploadedFiles() ?? [];
+    $initialFiles = $presentation->files($initialIndex, $isPreviewable(), $shouldAppendFiles());
+    $runtimeConfig = $field->getFlexFileUploadAlpineConfiguration();
+    $flexConfig = [...$runtimeConfig, 'initialFiles' => $initialFiles];
+    // State snapshots hydrate new owners; they must not restart an existing owner.
+    $presentationKey = $livewireKey.'.'.hash('sha256', json_encode($runtimeConfig, JSON_THROW_ON_ERROR)).'.presentation';
+    $fileIconUrls = $flexConfig['fileIcons']['urls'];
     $placeholder = $field->getEffectivePlaceholder();
     $hasUploadSourceTabs = $field->hasUploadSourceTabs();
-
-    $alignment = $getAlignment() ?? Alignment::Start;
-
-    if (! $alignment instanceof Alignment) {
-        $alignment = filled($alignment) ? (Alignment::tryFrom($alignment) ?? $alignment) : null;
-    }
-
-    $hasUploadMeta = $flexConfig['showUploadSummary'] || filled($flexConfig['remainingSlotsTemplate']);
-    $hasDualUploadMeta = $flexConfig['showUploadSummary'] && filled($flexConfig['remainingSlotsTemplate']);
-    $bindWebcamModalEvents = $hasUploadSourceTabs && $field->shouldAllowWebcamUpload();
+    $webcamModalId = $flexConfig['webcamModalId'];
+    $sourceItems = array_map(fn ($source) => new SegmentItem($source->value,
+        $field->getUploadSourceTabLabel($source), $field->getUploadSourceTabIcon($source),
+        panelId: $id.'-source-'.$source->value), $field->getEnabledUploadSources());
 @endphp
 
-<x-dynamic-component
-    :component="$fieldWrapperView"
-    :field="$field"
-    label-tag="div"
-    :attributes="
-        \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
-    "
->
-    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'flex-file-upload',
-        'livewireKey' => $getLivewireKey(),
-    ])
-    @if ($hasUploadSourceTabs)
-        @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'segment-control',
-        'livewireKey' => $getLivewireKey(),
-    ])
-    @endif
-    <x-filament-flex-fields::lazy-alpine-mount :mount-immediately="$isDisabled">
-    <div
-        x-load
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('flex-file-upload', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-        x-data="flexFileUploadFormComponent({
-            showUploadSummary: @js($flexConfig['showUploadSummary']),
-            requireReplaceConfirmation: @js($flexConfig['requireReplaceConfirmation']),
-            replaceConfirmationMessage: @js($flexConfig['replaceConfirmationMessage']),
-            summaryTemplate: @js($flexConfig['summaryTemplate']),
-            remainingSlotsTemplate: @js($flexConfig['remainingSlotsTemplate']),
-            maxFiles: @js($flexConfig['maxFiles']),
-            showFileIcon: @js($flexConfig['showFileIcon']),
-            isMultiple: @js($isMultiple),
-            hasUploadSourceTabs: @js($flexConfig['hasUploadSourceTabs']),
-            uploadSourceTabKeys: @js($flexConfig['uploadSourceTabKeys']),
-            defaultUploadSource: @js($flexConfig['defaultUploadSource']),
-            allowUrlUpload: @js($flexConfig['allowUrlUpload']),
-            allowWebcamUpload: @js($flexConfig['allowWebcamUpload']),
-            schemaComponentKey: @js($flexConfig['schemaComponentKey']),
-            statePath: @js($flexConfig['statePath']),
-            isPreviewable: @js($flexConfig['isPreviewable']),
-            shouldAppendFiles: @js($flexConfig['shouldAppendFiles']),
-            isDisabled: @js($isDisabled),
-            webcamFacingMode: @js($flexConfig['webcamFacingMode']),
-            webcamModalId: @js($flexConfig['webcamModalId'] ?? null),
-            labels: @js($flexConfig['labels']),
-        })"
-        x-init="init()"
-        @if ($bindWebcamModalEvents)
-        x-on:close-modal.window="onWebcamModalClosed($event)"
-        x-on:modal-closed.window="onWebcamModalClosed($event)"
-        x-on:x-modal-opened.window="onWebcamModalOpened($event)"
-        @endif
-        x-on:register-file-pond="registerFilePond($event.detail)"
-        x-bind:class="{ 'is-ready': displayReady }"
-        @class([
-            ...$field->getWrapperClasses(),
-            'fff-flex-file-upload__shell',
-            'fff-flex-file-upload--multiple' => $isMultiple,
-            'fff-flex-file-upload--has-meta' => $hasUploadMeta,
-            'fff-flex-file-upload--has-dual-meta' => $hasDualUploadMeta,
-        ])
-    >
-        @if ($hasUploadSourceTabs)
-            @include('filament-flex-fields::forms.components.partials.flex-file-upload-source-tabs')
-
-            <div class="fff-flex-file-upload__source-panels">
-                <div
-                    id="{{ $id }}-source-file"
-                    role="tabpanel"
-                    aria-labelledby="{{ $id }}-source-file-trigger"
-                    x-bind:class="{ 'is-active': isUploadSource('file') }"
-                    x-bind:aria-hidden="! isUploadSource('file')"
-                    class="fff-flex-file-upload__source-panel fff-flex-file-upload__source-panel--file"
-                >
-        @endif
-
-        <div class="fff-flex-file-upload__stage">
-            @include('filament-flex-fields::forms.components.partials.flex-file-upload-skeleton')
-
-            @if ($hasUploadSourceTabs)
-            <img
-                x-show="instantPreviewUrl && urlImporting"
-                x-cloak
-                x-bind:src="instantPreviewUrl"
-                alt=""
-                class="fff-flex-file-upload__instant-preview"
-            >
-            @endif
-
-            <div
-            x-load
-            x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('file-upload', 'filament/forms') }}"
-            x-data="fileUploadFormComponent({
-                        acceptedFileTypes: @js($getAcceptedFileTypes()),
-                        automaticallyCropImagesAspectRatio: @js($automaticallyCropImagesAspectRatio),
-                        automaticallyOpenImageEditorForAspectRatio: @js($getAutomaticallyOpenImageEditorForAspectRatio()),
-                        automaticallyResizeImagesMode: @js($getAutomaticallyResizeImagesMode()),
-                        automaticallyResizeImagesHeight: @js($automaticallyResizeImagesHeight),
-                        automaticallyResizeImagesWidth: @js($automaticallyResizeImagesWidth),
-                        cancelUploadUsing: (fileKey) => {
-                            $wire.cancelUpload(`{{ $statePath }}.${fileKey}`)
-                        },
-                        canEditSvgs: @js($canEditSvgs()),
-                        confirmSvgEditingMessage: @js(__('filament-forms::components.file_upload.editor.svg.messages.confirmation')),
-                        deleteUploadedFileUsing: async (fileKey) => {
-                            return await $wire.callSchemaComponentMethod(
-                                @js($key),
-                                'deleteUploadedFile',
-                                { fileKey },
-                            )
-                        },
-                        disabledSvgEditingMessage: @js(__('filament-forms::components.file_upload.editor.svg.messages.disabled')),
-                        getUploadedFilesUsing: async () => {
-                            return await Livewire.fireAction(
-                                $wire.__instance,
-                                'callSchemaComponentMethod',
-                                [@js($key), 'getUploadedFiles'],
-                                { async: true },
-                            )
-                        },
-                        hasCircleCropper: @js($hasCircleCropper),
-                        hasImageEditor: @js($hasImageEditor),
-                        imageEditorEmptyFillColor: @js($getImageEditorEmptyFillColor()),
-                        imageEditorMode: @js($getImageEditorMode()),
-                        imageEditorViewportHeight: @js($getImageEditorViewportHeight()),
-                        imageEditorViewportWidth: @js($getImageEditorViewportWidth()),
-                        imagePreviewHeight: @js($getImagePreviewHeight()),
-                        isAvatar: @js($isAvatar),
-                        isDeletable: @js($isDeletable()),
-                        isDisabled: @js($isDisabled),
-                        isDownloadable: @js($isDownloadable()),
-                        isImageEditorExplicitlyEnabled: @js($isImageEditorExplicitlyEnabled),
-                        isMultiple: @js($isMultiple),
-                        isOpenable: @js($isOpenable()),
-                        isPasteable: @js($isPasteable()),
-                        isPreviewable: @js($isPreviewable()),
-                        isReorderable: @js($isReorderable()),
-                        isSvgEditingConfirmed: @js($isSvgEditingConfirmed()),
-                        itemPanelAspectRatio: @js($getItemPanelAspectRatio()),
-                        loadingIndicatorPosition: @js($getLoadingIndicatorPosition()),
-                        locale: @js(app()->getLocale()),
-                        maxFiles: @js($maxFiles = $getMaxFiles()),
-                        maxFilesValidationMessage: @js($maxFiles ? trans_choice('validation.max.array', $maxFiles, ['attribute' => $getValidationAttribute(), 'max' => $maxFiles]) : null),
-                        maxParallelUploads: @js($getMaxParallelUploads()),
-                        maxSize: @js(($size = $getMaxSize()) ? "{$size}KB" : null),
-                        mimeTypeMap: @js($getMimeTypeMap()),
-                        minSize: @js(($size = $getMinSize()) ? "{$size}KB" : null),
-                        panelAspectRatio: @js($getPanelAspectRatio()),
-                        panelLayout: @js($getPanelLayout()),
-                        placeholder: @js($placeholder),
-                        removeUploadedFileButtonPosition: @js($getRemoveUploadedFileButtonPosition()),
-                        removeUploadedFileUsing: async (fileKey) => {
-                            return await $wire.callSchemaComponentMethod(
-                                @js($key),
-                                'removeUploadedFile',
-                                { fileKey },
-                            )
-                        },
-                        reorderUploadedFilesUsing: async (fileKeys) => {
-                            return await $wire.callSchemaComponentMethod(
-                                @js($key),
-                                'reorderUploadedFiles',
-                                { fileKeys },
-                            )
-                        },
-                        shouldAppendFiles: @js($shouldAppendFiles()),
-                        shouldAutomaticallyUpscaleImagesWhenResizing: @js($shouldAutomaticallyUpscaleImagesWhenResizing()),
-                        shouldOrientImageFromExif: @js($shouldOrientImagesFromExif()),
-                        shouldTransformImage: @js($automaticallyCropImagesAspectRatio || $automaticallyResizeImagesHeight || $automaticallyResizeImagesWidth),
-                        state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
-                        uploadButtonPosition: @js($getUploadButtonPosition()),
-                        uploadingMessage: @js($getUploadingMessage()),
-                        uploadProgressIndicatorPosition: @js($getUploadProgressIndicatorPosition()),
-                        uploadUsing: (fileKey, file, success, error, progress) => {
-                            $wire.upload(
-                                `{{ $statePath }}.${fileKey}`,
-                                file,
-                                () => {
-                                    success(fileKey)
-                                },
-                                error,
-                                (progressEvent) => {
-                                    progress(true, progressEvent.detail.progress, 100)
-                                },
-                            )
-                        },
-                    })"
-            wire:ignore
-            wire:key="{{ $livewireKey }}.upload.{{
-                substr(md5(serialize([
-                    $isDisabled,
-                ])), 0, 64)
-            }}"
-            {{
-                $attributes
-                    ->merge([
-                        'aria-labelledby' => "{$id}-label",
-                        'id' => $id,
-                        'role' => 'group',
-                    ], escape: false)
-                    ->merge($getExtraAlpineAttributes(), escape: false)
-                    ->class([
-                        'fff-flex-file-upload__live',
-                        'fi-fo-file-upload',
-                        'fi-fo-file-upload-avatar' => $isAvatar,
-                        ($alignment instanceof Alignment) ? "fi-align-{$alignment->value}" : $alignment,
-                    ])
-            }}
-            x-effect="$dispatch('register-file-pond', { component: $data, pond: pond })"
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field" label-tag="div"
+    :attributes="\Filament\Support\prepare_inherited_attributes($getExtraAttributeBag()->merge(['data-fff-local-paint' => '']))">
+    <x-filament-flex-fields::assets component="flex-file-upload" :consumer="$livewireKey"
+        :schema-component="$field" :capabilities="$hasUploadSourceTabs ? ['sources'] : []" />
+    <x-filament-flex-fields::lazy-alpine-mount :eager="true">
+        <div x-fff-load
+            wire:key="{{ $presentationKey }}"
+            x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('flex-file-upload', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+            data-fff-upload-config="{{ json_encode($flexConfig, JSON_THROW_ON_ERROR) }}"
+            data-fff-viewer-owner="{{ $key }}"
+            x-data="flexFileUploadFormComponent(JSON.parse($el.dataset.fffUploadConfig))"
+            x-on:register-file-pond="registerFilePond($event.detail)"
+            @class($field->getWrapperClasses())
+            style="--fff-upload-columns: {{ $presentation->gridColumns }}; --fff-upload-avatar-size: {{ $presentation->avatarSize }}px; --fff-upload-tile-size: {{ $presentation->gridTileSize }}px;"
         >
-            <div class="fi-fo-file-upload-input-ctn">
-                <input
-                    x-ref="input"
-                    {{
-                        $getExtraInputAttributeBag()
-                            ->merge([
-                                'aria-labelledby' => "{$id}-label",
-                                'disabled' => $isDisabled,
-                                'multiple' => $isMultiple,
-                                'type' => 'file',
-                            ], escape: false)
-                    }}
-                />
-            </div>
-
-            <div
-                x-show="error"
-                x-text="error"
-                x-cloak
-                class="fi-fo-file-upload-error-message"
-            ></div>
-
-            @if ($hasImageEditor && (! $isDisabled))
-                @include('filament-flex-fields::forms.components.partials.flex-file-upload-image-editor')
-            @endif
-        </div>{{-- .fff-flex-file-upload__live --}}
-        </div>{{-- .fff-flex-file-upload__stage --}}
-
-        @if ($hasUploadSourceTabs)
-            </div>{{-- file upload source tabpanel --}}
-
-            @if ($field->shouldAllowUrlUpload())
-                @include('filament-flex-fields::forms.components.partials.flex-file-upload-url-panel')
-            @endif
-
-            @if ($field->shouldAllowWebcamUpload())
-                @include('filament-flex-fields::forms.components.partials.flex-file-upload-webcam-panel')
-            @endif
-            </div>{{-- .fff-flex-file-upload__source-panels --}}
-        @endif
-
-        @if ($hasUploadSourceTabs && $field->shouldAllowUrlUpload())
-            <p
-                x-show="$data.urlError"
-                x-cloak
-                x-text="$data.urlError"
-                class="fff-flex-file-upload__source-error fff-flex-file-upload__source-error--global"
-                role="alert"
-            ></p>
-        @endif
-
-        @if ($hasUploadMeta)
-            <div @class(['fff-flex-file-upload__meta', 'fff-flex-file-upload__meta--dual' => $hasDualUploadMeta])>
-                @if ($flexConfig['showUploadSummary'])
-                    <div
-                        x-show="showUploadSummary && summaryLabel"
-                        x-cloak
-                        class="fff-flex-file-upload__summary"
-                    >
-                        <span x-text="summaryLabel"></span>
+            <input x-ref="flexPicker" type="file" hidden aria-hidden="true" tabindex="-1" wire:ignore
+                accept="{{ implode(',', $getAcceptedFileTypes() ?? []) }}" @disabled($isDisabled) @if ($isMultiple) multiple @endif
+                x-on:change="selectPickedFiles($event.target)" />
+            @if ($field->hasFileViewer())
+                <template data-fff-viewer-entry-chrome>
+                    <div class="fff-upload-viewer-entry__chrome">
+                        @include('filament-flex-fields::forms.components.file-upload.viewer-chrome', ['pending' => true])
+                        @include('filament-flex-fields::forms.components.file-upload.viewer-navigation', ['pending' => true])
                     </div>
-                @endif
-
-                @if (filled($flexConfig['remainingSlotsTemplate']))
-                    <div
-                        x-show="remainingSlotsLabel"
-                        x-cloak
-                        class="fff-flex-file-upload__remaining-slots"
-                    >
-                        <span x-text="remainingSlotsLabel"></span>
-                    </div>
-                @endif
+                    @if ($field->hasFileViewerMetadata())
+                        <div class="fff-upload-viewer-entry__information">
+                            <div class="fff-upload-viewer-entry__loading" role="status" aria-label="{{ __('filament-flex-fields::default.file_upload.visual.loading') }}">
+                                <span class="fff-upload-viewer-entry__spinner" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                    @endif
+                </template>
+            @endif
+            @if ($hasUploadSourceTabs)
+                <x-filament-flex-fields::segment-control :items="$sourceItems" :selected="$flexConfig['defaultUploadSource']" :retain-intent="true" :identity="$livewireKey"
+                    :size="$getSize()" :variant="$field->getUploadSourceTabsVariant()" :color="$field->getUploadSourceTabsColor()"
+                    :separators="false" :full-width="true" :disabled="$isDisabled" role="tablist"
+                    :label="__('filament-flex-fields::default.file_upload.visual.heading')" />
+            @endif
+            <div id="{{ $id }}-source-file" class="fff-flex-file-upload__panel"
+                @if ($hasUploadSourceTabs) role="tabpanel" aria-labelledby="{{ $id }}-source-file-trigger" x-show="isUploadSource('file')" @endif
+            >
+                @include('filament-flex-fields::forms.components.file-upload.dropzone')
             </div>
-        @endif
-    </div>
+            @include('filament-flex-fields::forms.components.file-upload.native-transport')
+            @if ($flexConfig['allowUrlUpload'])
+                <div id="{{ $id }}-source-url" class="fff-flex-file-upload__panel" role="tabpanel"
+                    aria-labelledby="{{ $id }}-source-url-trigger" x-show="isUploadSource('url')" x-cloak>
+                    @include('filament-flex-fields::forms.components.file-upload.url')
+                </div>
+            @endif
+            @if ($flexConfig['allowWebcamUpload'])
+                <div id="{{ $id }}-source-webcam" class="fff-flex-file-upload__panel" role="tabpanel"
+                    aria-labelledby="{{ $id }}-source-webcam-trigger" x-show="isUploadSource('webcam')" x-cloak>
+                    @include('filament-flex-fields::forms.components.file-upload.webcam')
+                    @include('filament-flex-fields::forms.components.partials.flex-file-upload-webcam-modal')
+                </div>
+            @endif
+            @if (! $isAvatar) @include('filament-flex-fields::forms.components.file-upload.files') @endif
+            @if ($isAvatar && $field->hasFileMetadataEditor())
+                <button type="button" class="fff-flex-file-upload__queue-action" x-show="files[0]?.complete" x-cloak
+                    x-on:click="fileAction(files[0].pondId, 'metadata')" x-bind:disabled="isDisabled">
+                    <x-filament::icon icon="hugeicons-file-edit" />{{ __('filament-flex-fields::default.file_upload.metadata.edit') }}
+                </button>
+            @endif
+            <p class="fff-flex-file-upload__error" x-show="actionError || transportError" x-text="actionError || transportError" x-cloak role="alert"></p>
+            @if ($field->isPausable() || $flexConfig['showUploadSummary'] || $flexConfig['remainingSlotsTemplate'])
+                <div class="fff-flex-file-upload__footer">
+                    @if ($flexConfig['showUploadSummary'] || $flexConfig['remainingSlotsTemplate'])
+                        <div class="fff-flex-file-upload__summary" aria-live="polite">
+                            <span x-show="summaryLabel" x-text="summaryLabel" x-cloak></span><span class="fff-flex-file-upload__remaining" x-text="remainingSlotsLabel">{{ $field->getRemainingSlotsLabel() }}</span>
+                        </div>
+                    @endif
+                    @include('filament-flex-fields::forms.components.file-upload.queue')
+                </div>
+            @endif
+        </div>
     </x-filament-flex-fields::lazy-alpine-mount>
 </x-dynamic-component>

@@ -1,8 +1,118 @@
 ---
 title: "MatrixChoiceField"
+description: "Build configurable choice matrices for Filament forms with row and column options, selection rules and server-side validation."
+icon: "grid-2x2-check"
+"canonical": "https://flex-fields.bjanczak.com/docs/matrixchoicefield"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/matrix-choice.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "MatrixChoiceField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/matrix-choice-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/matrix-choice-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/matrix-choice.webp"
+"twitter:image:alt": "MatrixChoiceField in the FLEX Fields playground"
 ---
 
-![MatrixChoiceField](/art/sc-2.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/matrixchoicefield#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/matrixchoicefield",
+      "name": "MatrixChoiceField",
+      "description": "Build configurable choice matrices for Filament forms with row and column options, selection rules and server-side validation.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/matrixchoicefield#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/matrixchoicefield#article",
+      "url": "https://flex-fields.bjanczak.com/docs/matrixchoicefield",
+      "headline": "MatrixChoiceField",
+      "description": "Build configurable choice matrices for Filament forms with row and column options, selection rules and server-side validation.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/matrixchoicefield#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/matrix-choice-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/matrix-choice-motion.mp4#video",
+      "name": "MatrixChoiceField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of MatrixChoiceField in the FLEX Fields playground for Filament. Build configurable choice matrices for Filament forms with row and column options, selection rules and server-side validation.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/matrix-choice.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT3.7S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/matrix-choice-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/matrixchoicefield#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/matrix-choice-motion.mp4"
+  poster="/art/previews/matrix-choice.webp"
+  width="1920"
+  height="1080"
+  aria-label="MatrixChoiceField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/matrix-choice-motion.mp4">Watch the MatrixChoiceField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -169,7 +279,7 @@ Each key in `matrixColumns()` is a selectable column id (stored in state).
 ```
 
 - Default state: `[]`
-- On dehydrate, empty rows and invalid keys are stripped
+- On form save, unknown rows, invalid column keys and malformed selections fail validation. Empty rows are omitted from the saved value after successful validation.
 - Use Eloquent cast `'field' =&gt; 'array'` or `'field' =&gt; 'json'`
 
 ### Validation
@@ -355,7 +465,7 @@ Filament accent for selected radio/checkbox indicators. Default: `primary`.
 
 ### Inherited Filament field API
 
-Also supports standard [Inherited Filament field API](/docs/shared-concepts):
+Also supports standard [Inherited Filament field API](/docs/configuration):
 
 | Method | Typical use |
 |--------|-------------|
@@ -440,7 +550,7 @@ Also supports standard [Inherited Filament field API](/docs/shared-concepts):
 
 - Radio/checkbox indicators reuse Flex Radiolist / Flex Checklist animation tokens (`fff-choice-cards-indicator-pop`).
 - All clicks are handled on `fff-matrix-choice__cell`; inner inputs use `pointer-events-none` to prevent double-toggle.
-- Conditional rules run in Alpine on every state change; `pruneDisabledSelections()` clears invalid picks.
+- Conditional rules update locally when the selection changes. Newly disabled selections are cleared; the server independently rejects submitted selections that violate those rules.
 ---
 
 ### Playground
@@ -452,7 +562,7 @@ Slug: **`matrix-choice`**
 | Mood grid | Radio mode, compact size |
 | Feature priorities | Checkbox mode, per-row limits, conditional disabling |
 
-`/admin/flex-fields-playground/matrix-choice` — see [Playground](/docs/index#playground).
+`/admin/flex-fields/matrix-choice` — see [Playground](/docs/index#playground).
 
 ---
 
@@ -466,3 +576,23 @@ Slug: **`matrix-choice`**
 | [NpsField](/docs/nps-field) | Single-axis survey scale (NPS / CSAT) |
 
 ---
+
+### Keyboard and text direction
+
+Tab enters the grid and the next Tab leaves it. Arrow keys move spatially between
+enabled cells; Home and End reach the enabled endpoints of the current row.
+Space or Enter selects the focused cell. Holding the key does not toggle it
+repeatedly. Horizontal arrows follow RTL direction.
+
+```php
+MatrixChoiceField::make('availability')
+    ->rows(['monday' => 'Monday', 'tuesday' => 'Tuesday'])
+    ->matrixColumns(['morning' => 'Morning', 'afternoon' => 'Afternoon'])
+    ->extraAttributes(['dir' => 'rtl']);
+```
+
+Radio row values must be string or integer column keys. Checkbox row values must
+be lists of unique string or integer column keys. Booleans, nested objects,
+associative lists, unknown rows and selections in disabled cells fail server
+validation. Per-row maximums also prevent further selection immediately in the UI.
+Reactive row, column and cell configuration is reevaluated when the form renders.

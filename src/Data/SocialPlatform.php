@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Data;
 
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Bjanczak\FilamentFlexFields\Support\Translations;
 
 enum SocialPlatform: string
@@ -54,7 +54,7 @@ enum SocialPlatform: string
             self::Telegram => ['t.me', 'telegram.me', 'telegram.org'],
             self::WhatsApp => ['wa.me', 'api.whatsapp.com', 'whatsapp.com'],
             self::Pinterest => ['pinterest.com', 'pin.it'],
-            self::Threads => ['threads.net'],
+            self::Threads => ['threads.com', 'threads.net'],
             self::Discord => ['discord.com', 'discord.gg'],
             self::Messenger => ['m.me', 'messenger.com', 'm.facebook.com'],
             self::Reddit => ['reddit.com'],
@@ -65,14 +65,25 @@ enum SocialPlatform: string
         };
     }
 
+    public function brandIcon(): string
+    {
+        return 'hugeicons-'.match ($this) {
+            self::X => 'new-twitter',
+            self::LinkedIn => 'linkedin-02',
+            self::Facebook => 'facebook-02',
+            self::Website => 'globe',
+            default => $this->value,
+        };
+    }
+
     public function uiIcon(): string
     {
         return match ($this) {
-            self::YouTube, self::Vimeo => GravityIcon::Video,
-            self::GitHub => GravityIcon::Code,
-            self::Telegram, self::WhatsApp, self::Messenger, self::Discord => GravityIcon::Comments,
-            self::Website => GravityIcon::Link,
-            default => GravityIcon::Globe,
+            self::YouTube, self::Vimeo => FlexIcon::Video,
+            self::GitHub => FlexIcon::Code,
+            self::Telegram, self::WhatsApp, self::Messenger, self::Discord => FlexIcon::Comments,
+            self::Website => FlexIcon::Link,
+            default => FlexIcon::Globe,
         };
     }
 

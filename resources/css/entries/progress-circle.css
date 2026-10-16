@@ -1,7 +1,7 @@
 @import "../utilities-baseline.css";
 @import "../base.css";
 
-@source "../../src/Filament/Schemas/Components/ProgressCircle.php";
-@source "../views/schemas/components/progress-circle.blade.php";
+@source "../../../src/Filament/Schemas/Components/ProgressCircle.php";
+@source "../../views/schemas/components/progress-circle.blade.php";
 
 @import "../components/progress-circle.css";

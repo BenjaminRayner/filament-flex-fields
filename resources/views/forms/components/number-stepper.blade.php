@@ -1,142 +1,52 @@
 @php
-    $statePath = $getStatePath();
-    $minValue = $getMinValue();
-    $maxValue = $getMaxValue();
-    $step = $getStep();
-    $isInteger = $isInteger();
-    $isNullable = $isNullable();
-    $isDisabled = $isDisabled();
-    $size = $getSize();
-    $variant = $getVariant();
-    $displayPrefix = $getDisplayPrefix();
-    $displaySuffix = $getDisplaySuffix();
-    $nullLabel = $getNullLabel() ?? '—';
-    $decrementIcon = $getDecrementIcon();
-    $incrementIcon = $getIncrementIcon();
-    $isReversed = $isReversed();
-    $decimalPlaces = $getDecimalPlaces();
-    $isWheelAnimated = $isWheelAnimated();
-    $widthAnchorText = $getWidthAnchorText();
-    $widthAnchorMainText = $getWidthAnchorMainText();
+    $runtime = $field->getStepperRuntimeConfiguration();
+    $statePath = $runtime['statePath'];
+    $liveDebounceMs = $runtime['liveDebounce'];
     $initialState = $getState();
-    $initialDisplayMain = $field->formatDisplayMain($initialState);
-    $hasInitialDisplayValue = $field->hasDisplayValue($initialState);
-    $initialSizerText = $field->getInitialSizerText($initialState);
-
-    // Filament silently drops `debounce` for `$entangle()`-bound fields (it only
-    // ever emits `, true)`/`, false)` for the `live` flag), so `->live(debounce:
-    // ...)` would otherwise fire a Livewire request on every +/- click. Instead,
-    // entangle non-live here and let the Alpine component debounce its own
-    // explicit `$wire.set(..., true)` commit when a debounce is configured.
-    $liveDebounceMs = $field->isLiveDebounced() ? $field->getNormalizedLiveDebounce() : null;
+    $initialMain = $field->formatDisplayMain($initialState);
+    $initialSuffix = $field->getSuffixForValue($initialState);
+    $initialSizer = $field->getInitialSizerText($initialState);
+    $stateBinding = '$entangle('.\Illuminate\Support\Js::from($statePath).')';
     $stateBindingExpression = $liveDebounceMs !== null
-        ? "\$entangle('{$statePath}', false)"
-        : $applyStateBindingModifiers("\$entangle('{$statePath}')");
+        ? '$entangle('.\Illuminate\Support\Js::from($statePath).', false)'
+        : $applyStateBindingModifiers($stateBinding);
+    $buttons = [
+        ['action' => 'decrement', 'canProperty' => 'canDecrement', 'canInitially' => $field->canStepValue($initialState, -1), 'icon' => $getDecrementIcon(), 'label' => __('filament-flex-fields::default.number_stepper_decrease')],
+        ['action' => 'increment', 'canProperty' => 'canIncrement', 'canInitially' => $field->canStepValue($initialState, 1), 'icon' => $getIncrementIcon(), 'label' => __('filament-flex-fields::default.number_stepper_increase')],
+    ];
+    if ($isReversed()) {
+        $buttons = array_reverse($buttons);
+    }
 @endphp
 
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
->
-    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'number-stepper',
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
+    @include('filament-flex-fields::partials.load-stylesheet', [
+        'component' => 'number-stepper',
         'livewireKey' => $getLivewireKey(),
     ])
+
     <div
-        x-load
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('number-stepper', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+        x-fff-load
+        x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('number-stepper', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
         x-data="numberStepperFormComponent({
+            ...@js($runtime),
             state: $wire.{{ $stateBindingExpression }},
-            statePath: @js($statePath),
             liveDebounce: @js($liveDebounceMs),
-            min: @js($minValue),
-            max: @js($maxValue),
-            step: @js($step),
-            integer: @js($isInteger),
-            nullable: @js($isNullable),
-            disabled: @js($isDisabled),
-            nullLabel: @js($nullLabel),
-            prefix: @js($displayPrefix),
-            suffix: @js($displaySuffix),
-            decimalPlaces: @js($decimalPlaces),
-            locale: @js($field->getLocale()),
-            wheelAnimated: @js($isWheelAnimated),
-            widthAnchor: @js($widthAnchorText),
         })"
-        x-init="init()"
         @class([
             'fff-number-stepper',
-            'fff-number-stepper--'.$size,
-            'fff-number-stepper--'.$variant,
-            'is-disabled' => $isDisabled,
-            'is-reversed' => $isReversed,
+            'fff-number-stepper--'.$getSize(),
+            'fff-number-stepper--'.$getVariant(),
+            'is-disabled' => $runtime['disabled'],
+            'is-reversed' => $isReversed(),
         ])
         role="group"
         aria-label="{{ $getLabel() }}"
+        data-value="{{ is_scalar($initialState) ? $initialState : '' }}"
+        x-bind:data-value="numericState ?? ''"
     >
-        @if ($isReversed)
-            @include('filament-flex-fields::forms.components.partials.number-stepper-button', [
-                'action' => 'increment',
-                'canProperty' => 'canIncrement',
-                'icon' => $incrementIcon,
-                'label' => __('filament-flex-fields::default.number_stepper_increase'),
-            ])
-        @else
-            @include('filament-flex-fields::forms.components.partials.number-stepper-button', [
-                'action' => 'decrement',
-                'canProperty' => 'canDecrement',
-                'icon' => $decrementIcon,
-                'label' => __('filament-flex-fields::default.number_stepper_decrease'),
-            ])
-        @endif
-
-        <div class="fff-number-stepper__value">
-            <span
-                class="fff-number-stepper__value-sizer"
-                aria-hidden="true"
-                x-text="valueSizerText"
-            >{{ $initialSizerText }}</span>
-
-            <div class="fff-number-stepper__value-display">
-                <span
-                    class="fff-number-stepper__ssr-value"
-                    x-bind:class="{ 'is-replaced': flowReady }"
-                >
-                    @if ($hasInitialDisplayValue)
-                        {{-- Keep main+suffix adjacent: HTML whitespace between inline spans adds a full-size gap that vanishes when NumberFlow hydrates (visible jump before '%'). --}}
-                        <span class="fff-number-stepper__ssr-main">{{ $initialDisplayMain }}</span>@if (filled($displaySuffix))<span class="fff-number-stepper__ssr-suffix">&nbsp;{{ $displaySuffix }}</span>@endif
-                    @else
-                        {{ $nullLabel }}
-                    @endif
-                </span>
-
-                <span
-                    x-text="nullLabel"
-                    class="fff-number-stepper__null-label"
-                    x-bind:class="{ 'is-ready': flowReady && ! hasValue }"
-                ></span>
-
-                <number-flow
-                    x-ref="numberFlow"
-                    class="fff-number-stepper__flow"
-                    x-bind:class="{ 'is-ready': flowReady && hasValue }"
-                ></number-flow>
-            </div>
-        </div>
-
-        @if ($isReversed)
-            @include('filament-flex-fields::forms.components.partials.number-stepper-button', [
-                'action' => 'decrement',
-                'canProperty' => 'canDecrement',
-                'icon' => $decrementIcon,
-                'label' => __('filament-flex-fields::default.number_stepper_decrease'),
-            ])
-        @else
-            @include('filament-flex-fields::forms.components.partials.number-stepper-button', [
-                'action' => 'increment',
-                'canProperty' => 'canIncrement',
-                'icon' => $incrementIcon,
-                'label' => __('filament-flex-fields::default.number_stepper_increase'),
-            ])
-        @endif
+        @include('filament-flex-fields::forms.components.partials.number-stepper-button', $buttons[0])
+        @include('filament-flex-fields::forms.components.partials.number-stepper.display')
+        @include('filament-flex-fields::forms.components.partials.number-stepper-button', $buttons[1])
     </div>
 </x-dynamic-component>

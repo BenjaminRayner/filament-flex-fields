@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\RatingColumn;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
+use Bjanczak\FilamentFlexFields\Support\Catalog\FlexCatalog;
+use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundRegistry;
 use Bjanczak\FilamentFlexFields\Support\Playground\RatingColumnPlayground;
 use Bjanczak\FilamentFlexFields\Support\RatingColumnRenderCache;
 use Filament\Schemas\Components\Section;
@@ -99,9 +100,9 @@ it('caches identical rating renders within the same request', function () {
     expect(RatingColumnRenderCache::entries())->toHaveCount(1);
 });
 
-it('registers rating column playground section after rating field', function () {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
-    $components = $builder->build();
+it('groups the independent rating column preview under Rating', function () {
+    $builder = app(RatingColumnPlayground::class);
+    $components = $builder->components();
 
     $sectionHeadings = collect($components)
         ->filter(fn ($component): bool => $component instanceof Section)
@@ -109,12 +110,9 @@ it('registers rating column playground section after rating field', function () 
         ->values()
         ->all();
 
-    $ratingIndex = array_search('Rating', $sectionHeadings, true);
-    $ratingColumnIndex = array_search('RatingColumn', $sectionHeadings, true);
-
-    expect($ratingIndex)->not->toBeFalse()
-        ->and($ratingColumnIndex)->not->toBeFalse()
-        ->and($ratingColumnIndex)->toBeGreaterThan($ratingIndex);
+    expect($sectionHeadings)->toContain('RatingColumn')
+        ->and(FlexFieldsPlaygroundRegistry::find('rating-column'))->toBeNull()
+        ->and(app(FlexCatalog::class)->groupedEntriesFor('rating')['rating-column']['demoClass'])->toBe(RatingColumnPlayground::class);
 });
 
 it('renders rating column playground demo rows with stars and empty cells', function () {
@@ -134,4 +132,22 @@ it('renders rating column playground demo rows with stars and empty cells', func
 
     expect($section)->not->toBeNull()
         ->and($section->getHeading())->toBe('RatingColumn');
+});
+
+it('rejects nonfinite and forged column values without rendering invalid fills', function (): void {
+    $column = RatingColumn::make('score');
+    foreach ([NAN, INF, -INF, true, false, [], ['3'], 'INF', 'NaN'] as $value) {
+        expect($column->formatRatingDisplay($value))->toBe('');
+    }
+});
+
+it('emits a fresh owner outside cached visual markup for every standalone cell', function (): void {
+    $column = RatingColumn::make('score')->ratingIcon(makeRatingColumnTestIcon());
+    $one = $column->formatRatingDisplay(3.7);
+    $two = $column->formatRatingDisplay(3.7);
+    preg_match('/data-fff-asset-consumer-id="([^"]+)"/', $one, $first);
+    preg_match('/data-fff-asset-consumer-id="([^"]+)"/', $two, $second);
+    expect($first[1])->not->toBe($second[1])
+        ->and($one)->not->toContain('rating-field.js')
+        ->and($two)->toContain('data-fff-asset-consumer="rating-column"');
 });

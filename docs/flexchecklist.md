@@ -1,27 +1,122 @@
 ---
 title: "FlexChecklist"
-description: Multi-select checklist with row animations, icons, descriptions, and locked disabled options.
+description: "Filament checkbox lists with animated indicators, icons, descriptions, keyboard navigation and validated selection limits."
+icon: "clipboard-check"
+"canonical": "https://flex-fields.bjanczak.com/docs/flexchecklist"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/flex-checklist.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "FlexChecklist in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/flex-checklist-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/flex-checklist-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/flex-checklist.webp"
+"twitter:image:alt": "FlexChecklist in the FLEX Fields playground"
 ---
 
-[← Back to Table of Contents](/docs/index)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/flexchecklist#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/flexchecklist",
+      "name": "FlexChecklist",
+      "description": "Filament checkbox lists with animated indicators, icons, descriptions, keyboard navigation and validated selection limits.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flexchecklist#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/flexchecklist#article",
+      "url": "https://flex-fields.bjanczak.com/docs/flexchecklist",
+      "headline": "FlexChecklist",
+      "description": "Filament checkbox lists with animated indicators, icons, descriptions, keyboard navigation and validated selection limits.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flexchecklist#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/flex-checklist-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/flex-checklist-motion.mp4#video",
+      "name": "FlexChecklist — FLEX Fields demonstration",
+      "description": "A recorded demonstration of FlexChecklist in the FLEX Fields playground for Filament. Filament checkbox lists with animated indicators, icons, descriptions, keyboard navigation and validated selection limits.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/flex-checklist.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT3.617S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/flex-checklist-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flexchecklist#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
 
-### Summary
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/flex-checklist-motion.mp4"
+  poster="/art/previews/flex-checklist.webp"
+  width="1920"
+  height="1080"
+  aria-label="FlexChecklist — FLEX Fields demonstration"
+>
+  <a href="/art/previews/flex-checklist-motion.mp4">Watch the FlexChecklist demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
-**Multi-select** checklist with row layout, optional icons and descriptions, and animated checkbox indicators.
+Choose several options in a compact list. Each row can include an icon, description and an animated checkbox. Use [FlexRadiolist](/docs/flexradiolist) when only one choice is allowed.
 
-| | |
-|---|---|
-| **Class** | `Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexChecklist` |
-| **State type** | `list<string\|int>` — selected option keys |
-| **FieldType** | `flex_checklist` |
-| **Playground** | `flex-checklist` slug in Flex Fields playground |
-| **State cast** | `OptionsArrayStateCast` |
-
----
-
-### Basic usage
-
-#### Standard checklist
+## Basic checklist
 
 ```php
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexChecklist;
@@ -29,129 +124,177 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexChecklist;
 FlexChecklist::make('features')
     ->label('Included features')
     ->options([
-        'wifi' => 'Wi‑Fi',
+        'wifi' => 'Wi-Fi',
         'parking' => 'Parking',
         'breakfast' => 'Breakfast',
-    ]);
+    ])
+    ->default(['wifi']);
 ```
 
-#### Rich options with icons and descriptions
+The state is a list of selected keys, such as `['wifi', 'breakfast']`. Numeric keys are accepted and normalized to strings when the field saves its state. An empty selection is `[]`.
+
+## Icons and descriptions
+
+<Tabs>
+<Tab title="Rich options">
 
 ```php
 FlexChecklist::make('permissions')
     ->options([
         'read' => [
-            'label' => 'Read',
-            'description' => 'Can view records',
-            'icon' => 'heroicon-o-eye',
+            'label' => 'View records',
+            'description' => 'Read-only access to project records',
+            'icon' => 'hugeicons-view',
         ],
         'write' => [
-            'label' => 'Write',
-            'description' => 'Can edit records',
-            'icon' => 'heroicon-o-pencil',
+            'label' => 'Edit records',
+            'desc' => 'Update existing project records',
+            'icon' => 'hugeicons-pencil-edit-01',
         ],
-    ])
-    ->color('success');
+    ]);
 ```
 
----
+`desc` is an alias for `description`. Explicit option icons and descriptions take precedence over the separate helper arrays.
 
-### State & validation
-
-#### Stored value
-
-State is an **array** of unique string or integer keys.
-
-```php
-$record->features; // ['wifi', 'breakfast']
-```
-
-#### Validation rules (built-in)
-
-| Rule | Description |
-|------|-------------|
-| `array` | Always enforced. |
-| Option keys | Selected keys must exist in `options()`. |
-| `minSelections(n)` | Minimum items (default 1 if `required()`). |
-| `maxSelections(n)` | Maximum items allowed. |
-| `exactSelections(n)` | Requires exactly `n` items. |
-
----
-
-### Configuration API
-
-All methods accept `Closure` unless noted.
-
-| Method | Type | Default | Description |
-|--------|------|---------|-------------|
-| `options(array\|Closure $options)` | Setup | `[]` | Option map: `key => label` or rich array (`label`, `description`, `icon`, `disabled`). |
-| `icons(array\|Closure $icons)` | Setup | `[]` | Per-key icon map (overrides `options`). |
-| `descriptions(array\|Closure $desc)` | Setup | `[]` | Per-key description map (overrides `options`). |
-| `disabledOptions(array\|Closure $keys)` | Setup | `[]` | Keys rendered locked with a lock icon. |
-| `color(string\|Closure\|null $color)` | Setup | `'primary'` | Accent color for selected rows. |
-| `size(string\|Closure $size)` | Setup | `'md'` | Row scale: `sm`, `md`, `lg`. |
-| `minSelections(int\|Closure $n)` | Validation | `null` | Minimum required selections. |
-| `maxSelections(int\|Closure $n)` | Validation | `null` | Maximum allowed selections. |
-| `exactSelections(int\|Closure $n)` | Validation | `null` | Requires exactly `n` selections. |
-
-#### Public helper methods
-
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `getLockIcon()` | `mixed` | Resolved icon for disabled rows. |
-| `getNormalizedOptions()` | `array` | Merged metadata for all options. |
-| `getWrapperClasses()` | `array` | List of CSS classes for the root element. |
-
----
-
-### Real-world examples
-
-#### Project file manager
+</Tab>
+<Tab title="Separate helper arrays">
 
 ```php
 FlexChecklist::make('files')
-    ->label('Project files')
     ->options([
-        'budget' => 'Budget.xlsx',
-        'reports' => 'Reports.pdf',
-        'archive' => 'Archive.zip',
+        'documents' => 'Documents',
+        'reports' => 'Reports',
     ])
     ->icons([
-        'budget' => 'heroicon-o-table-cells',
-        'reports' => 'heroicon-o-document-text',
-        'archive' => 'heroicon-o-archive-box',
+        'documents' => 'hugeicons-folder-01',
+        'reports' => 'hugeicons-file-01',
     ])
-    ->disabledOptions(['archive']);
+    ->descriptions([
+        'documents' => 'Shared project folder',
+        'reports' => 'Monthly reports',
+    ]);
 ```
 
----
+Icons and descriptions are optional. Omit them for a plain text list.
 
-### Playground
+</Tab>
+</Tabs>
 
-`/admin/flex-fields-playground/flex-checklist`
+## Selection limits
 
-See [Playground](/docs/index#playground) for setup.
+```php
+FlexChecklist::make('services')
+    ->options([
+        'cleaning' => 'Cleaning',
+        'catering' => 'Catering',
+        'transport' => 'Transport',
+    ])
+    ->required()
+    ->minSelections(1)
+    ->maxSelections(2);
+```
 
----
+At the maximum, unchecked options become unavailable immediately. Selected options remain available so users can deselect them. Minimum counts are checked when the form is validated; users can temporarily clear a selection while editing.
 
-### Related components
+```php
+FlexChecklist::make('finalists')
+    ->options($candidates)
+    ->exactSelections(3);
+```
 
-| Component | When to use instead |
-|-----------|---------------------|
-| [FlexRadiolist](/docs/flexradiolist) | For single-select lists with the same row layout. |
-| [ChoiceCheckboxCards](/docs/choicecheckboxcards) | For larger, more prominent multi-select cards. |
-| [ItemCardGroup](/docs/itemcardgroup) | For grouping rows that aren't form inputs. |
+`exactSelections()` takes precedence over minimum and maximum. It also caps additions in the interface. Limits accept nonnegative integers, closures or `null`. `null` removes that limit. A required checklist has an effective minimum of one unless a minimum is explicitly set. Negative counts and a minimum greater than the maximum, without an exact limit, are invalid configurations.
 
----
+## Unavailable options
 
-### CSS classes (reference)
+```php
+FlexChecklist::make('services')
+    ->options([
+        'standard' => 'Standard service',
+        'priority' => 'Priority service',
+        'retired' => [
+            'label' => 'Retired service',
+            'description' => 'No longer available',
+            'disabled' => true,
+        ],
+    ])
+    ->disabledOptions(['priority']);
+```
 
-| Class | Role |
-|-------|------|
-| `fff-flex-checklist` | Root wrapper |
-| `fff-flex-checklist--{sm\|md\|lg}` | Size modifier |
-| `fff-flex-checklist__row` | Individual option row |
-| `fff-flex-checklist__row--selected` | Active row state |
-| `fff-flex-checklist__row--disabled` | Disabled/locked state |
-| `fff-flex-checklist__indicator` | Checkbox container |
-| `fff-flex-checklist__content` | Text and icon container |
+Disabled options display a lock, cannot be selected or deselected by the user, and are excluded from accepted submissions. If an existing record contains a key that is now disabled, resolve that stored selection or re-enable the option before saving. Disabling the entire field follows Filament's normal disabled-field behavior.
+
+## Sizes and colors
+
+```php
+use Bjanczak\FilamentFlexFields\Enums\ControlSize;
+
+FlexChecklist::make('features')
+    ->options($features)
+    ->size(ControlSize::Lg)
+    ->color('success');
+```
+
+Sizes are `sm`, `md` and `lg` (default). Each also accepts the corresponding `ControlSize` enum. The default accent is the panel's primary color. Standard panel colors include `primary`, `secondary`, `success`, `warning` and `danger`. `color(null)` omits the color class. 
+
+## Dynamic options and dependent forms
+
+```php
+use Filament\Schemas\Components\Utilities\Get;
+
+FlexChecklist::make('services')
+    ->options(fn (Get $get): array => match ($get('package')) {
+        'premium' => ['cleaning' => 'Cleaning', 'catering' => 'Catering'],
+        default => ['cleaning' => 'Cleaning'],
+    })
+    ->live();
+```
+
+Options, icons, descriptions, disabled keys, size, color and limits accept closures evaluated by Filament. A parent field must be `live()` when its change should rebuild dependent options. Clear dependent selections when their available keys change; unavailable old values fail server validation rather than being silently accepted. Filament's `afterStateUpdated()` and standard field configuration remain available.
+
+## Saving to a model
+
+Use a JSON column and an array cast for multiple choices:
+
+```php
+protected function casts(): array
+{
+    return [
+        'features' => 'array',
+    ];
+}
+```
+
+Save through the validated Filament form state. The built-in rules reject non-list arrays, nested values, booleans, floats, duplicates, unknown keys, disabled options and invalid counts. Malformed state is retained until validation so it cannot disappear during casting and accidentally pass validation. Options supplied by a database query must still be scoped to the current user's permissions.
+
+## Keyboard and mobile
+
+- Tab enters the list at its active option.
+- Up/Down and Home/End move focus without changing checkbox selections.
+- Left/Right also move focus and respect RTL direction.
+- Space or Enter toggles the focused option once per press.
+- Disabled options and unchecked options blocked by the limit are skipped.
+
+The whole row responds to a click or tap. Text wraps at narrower widths. Reduced-motion preferences suppress indicator animation. Each list has independent state and event ownership, including when several lists use the same option keys.
+
+Direction is inherited from the surrounding page. To set RTL for one field:
+
+```php
+FlexChecklist::make('selection')
+    ->options($options)
+    ->extraAttributes(['dir' => 'rtl']);
+```
+
+## Configuration reference
+
+| Method | Default | Purpose |
+|---|---|---|
+| `options(array\|Closure)` | `[]` | Keyed labels or rich option arrays. |
+| `icons(array\|Closure)` | `[]` | Per-key icons. |
+| `descriptions(array\|Closure)` | `[]` | Per-key supporting text. |
+| `disabledOptions(array\|Closure)` | `[]` | Keys unavailable for selection and submission. |
+| `minSelections(int\|Closure\|null)` | `null` | Minimum selected count. |
+| `maxSelections(int\|Closure\|null)` | `null` | Maximum selected count and interface cap. |
+| `exactSelections(int\|Closure\|null)` | `null` | Exact count; overrides min/max. |
+| `size(string\|ControlSize\|Closure)` | `md` | Row, text, icon and indicator size. |
+| `color(string\|Closure\|null)` | `primary` | Panel accent color. |
+
+Rich option keys are `label`, `description` (or `desc`), `icon` and `disabled`. Labels and descriptions render as escaped text. In JSON field definitions, the field type is `flex_checklist`.

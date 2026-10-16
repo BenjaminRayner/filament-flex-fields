@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TodoListField;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -179,7 +179,7 @@ class TodoListFieldPlayground
                         ->allowEdit()
                         ->editable('created')
                         ->editWithDescription()
-                        ->editIcon(GravityIcon::Pencil)
+                        ->editIcon(FlexIcon::Pencil)
                         ->allowDelete()
                         ->deletable('created')
                         ->maxItems(8)
@@ -200,10 +200,11 @@ class TodoListFieldPlayground
 
                     TodoListField::make('todo_list__deletable_all')
                         ->label('Delete any item')
-                        ->helperText('Hover a row → X removes seed options too · deletable(all) · deleteUsing echo (demo)')
+                        ->helperText('Delete opens a confirmation modal · cancel keeps the task · includes subtasks')
                         ->options($seed)
                         ->allowCreate()
                         ->allowDelete()
+                        ->deleteConfirmation()
                         ->deletable('all')
                         ->deleteUsing(fn (array $item): bool => true)
                         ->maxItems(8)
@@ -296,7 +297,7 @@ class TodoListFieldPlayground
                         ->celebration(false)
                         ->sounds(),
 
-                    Section::make('Search · virtualize · infinite scroll')
+                    Section::make('Search · virtualize · pagination')
                         ->compact()
                         ->schema([
                             TodoListField::make('todo_list__variable_virtual')
@@ -318,6 +319,14 @@ class TodoListFieldPlayground
                                 ->allowCreate()
                                 ->celebration(false)
                                 ->sounds(),
+                            TodoListField::make('todo_list__paginated')
+                                ->label('Numbered pagination · 8 tasks per page')
+                                ->helperText('Previous/next navigation keeps completion and edits across pages. Search returns to the first page.')
+                                ->options($long)
+                                ->searchable()
+                                ->paginated(8)
+                                ->celebration(false)
+                                ->sounds(false),
                             TodoListField::make('todo_list__infinite')
                                 ->label('Infinite scroll (page size 8)')
                                 ->helperText('virtualizing + infiniteScroll — load more on scroll; use remoteLoader() for AJAX pages')
@@ -337,93 +346,6 @@ class TodoListFieldPlayground
                         ->required()
                         ->celebration(false)
                         ->sounds(false),
-
-                    PlaygroundCodeSnippet::make(<<<'PHP'
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TodoListField;
-
-TodoListField::make('tasks')
-    ->options([
-        'water' => ['label' => 'Water', 'description' => 'Stay hydrated'],
-        'inbox' => 'Clear inbox',
-        'party' => [
-            'label' => 'Launch party',
-            'celebration' => 'sparkles', // per-item override
-        ],
-    ])
-    ->allowCreate()
-    ->allowDelete()
-    ->deletable('created')
-    ->allowEdit()
-    ->editable('created')
-    ->editWithDescription()
-    ->searchable()
-    ->virtualizing()
-    ->infiniteScroll(20) // page size; remoteLoader('loadTodoPage') for AJAX
-    ->sounds()
-    ->celebration('fireworks')
-    ->celebrationFullscreen() // all-done viewport-covering canvas
-    ->celebrationDurationMs(5500)
-    ->strikethroughStyle('hand') // or 'straight'
-    ->doneSettleMs(500)
-    ->minDone(1)
-    ->color('primary');
-
-// Reorder + lock example
-TodoListField::make('checklist')
-    ->options([
-        'a' => 'Pack',
-        'b' => ['label' => 'Required waiver', 'locked' => true],
-    ])
-    ->reorderable()
-    ->reorderUsing(function (array $items): bool {
-        // e.g. foreach ($items as $position => $row) {
-        //     Task::whereKey($row['id'])->update(['position' => $position]);
-        // }
-        return true; // false reverts
-    })
-    ->allowDelete()
-    ->deletable('all');
-
-// Sub-stack + undo toast (default on) + optional date
-TodoListField::make('trip')
-    ->options([
-        'pack' => [
-            'label' => 'Pack bag',
-            'date' => '12 Sep', // optional meta
-            'children' => [
-                'passport' => 'Passport',
-                'charger' => 'Charger',
-            ],
-        ],
-    ])
-    ->undoCompletionNotifications() // false to disable
-    ->createUsing(function (array $item): array {
-        // e.g. $task = Task::create(['title' => $item['label']]);
-        // return [...$item, 'id' => (string) $task->id];
-        return $item;
-    })
-    ->deleteUsing(function (array $item): bool {
-        // e.g. Task::whereIn('id', [$item['id'], ...collect($item['children'] ?? [])->pluck('id')])->delete();
-        return true; // false cancels
-    })
-    ->reorderUsing(function (array $items): bool {
-        // e.g. foreach ($items as $i => $row) { Task::whereKey($row['id'])->update(['position' => $i]); }
-        return true;
-    })
-    ->afterToggled(function (array $changed, array $items): void {
-        // e.g. foreach ($changed as $row) { Task::whereKey($row['id'])->update(['done' => $row['done']]); }
-    });
-
-// Or sync the full list with Livewire: ->live()->afterStateUpdated(fn ($state) => ...)
-
-// Custom celebration (browser) — playground demo key: playground-burst
-window.FilamentFlexFieldsTodoList.registerCelebration('playground-burst', {
-  durationMs: 3200,
-  start({ canvas, durationMs, playSound, fullscreen, reducedMotion }) {
-    // rAF canvas loop… return { stop() {} }
-  },
-})
-PHP, filename: 'todo-list-usage.php'),
                 ]),
         ];
     }

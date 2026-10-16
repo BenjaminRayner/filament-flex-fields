@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\NumberStepper;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -43,6 +43,10 @@ class NumberStepperPlayground
             'number_stepper__nullable' => null,
             'number_stepper__min_edge' => 0,
             'number_stepper__digit_overflow' => 99,
+            'number_stepper__seats' => 1,
+            'number_stepper__long_unit_sm' => 1,
+            'number_stepper__long_unit_md' => 1,
+            'number_stepper__long_unit_lg' => 1,
         ];
     }
 
@@ -76,8 +80,8 @@ class NumberStepperPlayground
                         NumberStepper::make('number_stepper__custom_icons')
                             ->label('Custom icons')
                             ->icons([
-                                'decrement' => GravityIcon::MagnifierMinus,
-                                'increment' => GravityIcon::MagnifierPlus,
+                                'decrement' => FlexIcon::MagnifierMinus,
+                                'increment' => FlexIcon::MagnifierPlus,
                             ])
                             ->minValue(0)
                             ->maxValue(200),
@@ -135,6 +139,13 @@ class NumberStepperPlayground
                             ->suffix('items')
                             ->minValue(0)
                             ->maxValue(99),
+                        NumberStepper::make('number_stepper__seats')
+                            ->label('Seats · animated unit')
+                            ->suffixForms(['one' => 'seat', 'other' => 'seats'])
+                            ->locale('en')
+                            ->minValue(1)
+                            ->maxValue(5)
+                            ->helperText('The unit follows the value. At 1 and 5, pressing beyond the limit springs back without changing the number.'),
                         NumberStepper::make('number_stepper__reversed')
                             ->label('Reversed layout')
                             ->reversed()
@@ -205,21 +216,31 @@ class NumberStepperPlayground
                             ->minValue(0)
                             ->maxValue(5),
                     ]),
-                PlaygroundCodeSnippet::make(<<<'PHP'
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\NumberStepper;
-
-NumberStepper::make('nights')
-    ->label('Nights')
-    ->minValue(1)
-    ->maxValue(30)
-    ->live(debounce: 250);
-
-NumberStepper::make('price')
-    ->prefix('$')
-    ->decimalPlaces(2)
-    ->integer(false)
-    ->step(0.5);
-PHP),
+                Grid::make(['default' => 1, 'sm' => 2, 'lg' => 3])
+                    ->extraAttributes(['class' => 'fff-playground-variants'])
+                    ->schema([
+                        NumberStepper::make('number_stepper__long_unit_sm')
+                            ->label('Long unit · SM')
+                            ->size('sm')
+                            ->locale('en')
+                            ->suffixForms(['one' => 'reservation', 'other' => 'reservations'])
+                            ->minValue(1)
+                            ->maxValue(150),
+                        NumberStepper::make('number_stepper__long_unit_md')
+                            ->label('Long unit · MD')
+                            ->size('md')
+                            ->locale('en')
+                            ->suffixForms(['one' => 'reservation', 'other' => 'reservations'])
+                            ->minValue(1)
+                            ->maxValue(150),
+                        NumberStepper::make('number_stepper__long_unit_lg')
+                            ->label('Long unit · LG')
+                            ->size('lg')
+                            ->locale('en')
+                            ->suffixForms(['one' => 'reservation', 'other' => 'reservations'])
+                            ->minValue(1)
+                            ->maxValue(150),
+                    ]),
             ]);
     }
 

@@ -65,5 +65,5 @@ it('round-trips csv values for toggle and text fields', function (): void {
 
     expect($imported['42']['company'])->toBe('Acme')
         ->and($imported['42']['active'])->toBeTrue()
-        ->and($imported['42']['budget'])->toBe('1200.5');
+        ->and($imported['42']['budget'])->toBe(1200.5);
 });

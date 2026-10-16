@@ -4,124 +4,81 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\SocialLinks;
 
-use Bjanczak\FilamentFlexFields\Data\SocialPlatform;
-
 final class SocialLinksNormalizer
 {
-    /**
-     * @return list<array{platform: string, url: string}>
-     */
-    public static function normalize(mixed $state): array
+    public static function isValidShape(mixed $state): bool
     {
-        if (! is_array($state)) {
-            return [];
+        if ($state === null) {
+            return true;
         }
-
-        $links = [];
-
-        if (self::isAssociativePlatformMap($state)) {
-            foreach ($state as $platform => $url) {
-                if (! is_string($platform)) {
-                    continue;
-                }
-
-                $platform = trim($platform);
-
-                if ($platform === '') {
-                    continue;
-                }
-
-                $links[] = [
-                    'platform' => $platform,
-                    'url' => is_string($url) ? trim($url) : '',
-                ];
-            }
-
-            return $links;
-        }
-
-        foreach ($state as $entry) {
-            if (! is_array($entry)) {
-                continue;
-            }
-
-            $platform = isset($entry['platform']) ? trim((string) $entry['platform']) : '';
-            $url = isset($entry['url']) ? trim((string) $entry['url']) : '';
-
-            if ($platform === '') {
-                continue;
-            }
-
-            $links[] = [
-                'platform' => $platform,
-                'url' => $url,
-            ];
-        }
-
-        return self::deduplicatePlatforms($links);
-    }
-
-    /**
-     * @param  list<array{platform: string, url: string}>  $links
-     * @return list<array{platform: string, url: string}>
-     */
-    public static function deduplicatePlatforms(array $links): array
-    {
-        $seen = [];
-        $normalized = [];
-
-        foreach ($links as $link) {
-            $platform = $link['platform'];
-
-            if (isset($seen[$platform])) {
-                continue;
-            }
-
-            $seen[$platform] = true;
-            $normalized[] = $link;
-        }
-
-        return $normalized;
-    }
-
-    /**
-     * @param  list<array{platform: string, url: string}>  $links
-     * @return list<array{platform: string, url: string}>|null
-     */
-    public static function dehydrate(array $links): ?array
-    {
-        $persisted = array_values(array_filter(
-            $links,
-            fn (array $link): bool => trim($link['url'] ?? '') !== '',
-        ));
-
-        if ($persisted === []) {
-            return null;
-        }
-
-        return $persisted;
-    }
-
-    public static function isEmpty(mixed $state): bool
-    {
-        return self::dehydrate(self::normalize($state)) === null;
-    }
-
-    /**
-     * @param  array<mixed, mixed>  $state
-     */
-    private static function isAssociativePlatformMap(array $state): bool
-    {
-        if ($state === []) {
+        if (! is_array($state) || count($state) > 128) {
             return false;
         }
+        foreach ($state as $key => $entry) {
+            if (! array_is_list($state)) {
+                if (! is_string($key) || ! self::validText($key, 128) || ! self::validText($entry, 4096)) {
+                    return false;
+                }
 
-        foreach (array_keys($state) as $key) {
-            if (! is_string($key) || SocialPlatform::tryFrom($key) === null) {
+                continue;
+            }
+            if (! is_array($entry) || count($entry) !== 2 || ! array_key_exists('platform', $entry) || ! array_key_exists('url', $entry)
+                || ! self::validText($entry['platform'], 128) || ! self::validText($entry['url'], 4096)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private static function validText(mixed $value, int $limit): bool
+    {
+        return is_string($value) && strlen($value) <= $limit && preg_match('//u', $value) === 1 && ! preg_match('/[\x00-\x1f\x7f]/', $value);
+    }
+
+    /** @return list<array{platform: string, url: string}> */
+    public static function normalize(mixed $state): array
+    {
+        if (! self::isValidShape($state) || $state === null) {
+            return [];
+        }
+        $links = [];
+        foreach ($state as $key => $entry) {
+            $links[] = is_string($key)
+                ? ['platform' => trim($key), 'url' => trim($entry)]
+                : ['platform' => trim($entry['platform']), 'url' => trim($entry['url'])];
+        }
+
+        return $links;
+    }
+
+    /** @param list<array{platform: string, url: string}> $links
+     * @return list<array{platform: string, url: string}> */
+    public static function deduplicatePlatforms(array $links): array
+    {
+        $seen = [];
+        $result = [];
+        foreach ($links as $link) {
+            if (! isset($seen[$link['platform']])) {
+                $result[] = $link;
+                $seen[$link['platform']] = true;
+            }
+        }
+
+        return $result;
+    }
+
+    /** @param list<array{platform: string, url: string}> $links
+     * @return list<array{platform: string, url: string}>|null */
+    public static function dehydrate(array $links): ?array
+    {
+        $links = array_values(array_filter($links, fn (array $link): bool => $link['url'] !== ''));
+
+        return $links === [] ? null : $links;
+    }
+
+    public static function isEmpty(mixed $state): bool
+    {
+        return self::isValidShape($state) && self::dehydrate(self::normalize($state)) === null;
     }
 }

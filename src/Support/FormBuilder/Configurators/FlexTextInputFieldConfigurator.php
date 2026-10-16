@@ -6,6 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Contracts\FieldConfigurator;
+use Bjanczak\FilamentFlexFields\Support\TextInput\TextInputOptions;
 use Filament\Schemas\Components\Component;
 use Filament\Support\Colors\Color;
 
@@ -122,6 +123,22 @@ final class FlexTextInputFieldConfigurator implements FieldConfigurator
 
         if (array_key_exists('read_only', $config) && (bool) $config['read_only']) {
             $field->readOnly();
+        }
+
+        $options = TextInputOptions::schemaOverrides($config);
+        $resolved = TextInputOptions::resolve($options);
+        foreach ($options as $method => $_) {
+            $field->{$method}($resolved[$method]);
+        }
+        foreach (['rounding', 'emoji_picker_label', 'speech_dictation_label', 'emoji_icon', 'microphone_icon', 'clear_icon',
+            'copy_icon', 'show_password_icon', 'hide_password_icon', 'password_strength_labels', 'suggestions'] as $key) {
+            if (array_key_exists($key, $config) && $config[$key] !== null) {
+                $method = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
+                $field->{$method}($config[$key]);
+            }
+        }
+        if (array_key_exists('copyable', $config)) {
+            $field->copyable((bool) $config['copyable'], $config['copy_message'] ?? null, $config['copy_message_duration'] ?? null);
         }
 
         return $field;

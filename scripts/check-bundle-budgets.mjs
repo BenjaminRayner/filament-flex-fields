@@ -23,7 +23,6 @@ const HEAVY_INTERSECT_FIELDS = new Set([
 /** @type {Record<string, { rawKb?: number, gzipKb?: number }>} */
 const CSS_BUDGETS = {
     'core.css': { rawKb: 80, gzipKb: 50 },
-    'utilities-foundation.css': { rawKb: 35, gzipKb: 10 },
     // v3 headless Select + teleported menu chrome grew picker CSS; budgets track current dist + ~10% headroom.
     'phone-field.css': { rawKb: 40, gzipKb: 12 },
     'country-field.css': { rawKb: 36, gzipKb: 10 },
@@ -35,7 +34,8 @@ const CSS_BUDGETS = {
     'playground.css': { rawKb: 60, gzipKb: 20 },
     'rich-editor-field.css': { rawKb: 45, gzipKb: 12 },
     'flex-date-time-field.css': { rawKb: 36, gzipKb: 6 },
-    'flex-file-upload.css': { rawKb: 60, gzipKb: 8 },
+    // Upload-owned action menu and readable image progress; other CSS budgets stay independent.
+    'flex-file-upload.css': { rawKb: 60, gzipKb: 8.5 },
     'barcode-scanner-field.css': { rawKb: 12, gzipKb: 3 },
     'icon-picker-field.css': { rawKb: 28, gzipKb: 6 },
 };
@@ -53,7 +53,8 @@ const JS_BUDGETS = {
     'flex-rich-editor.js': { rawKb: 35, gzipKb: 12 },
     'flex-rich-editor-youtube-extension.js': { rawKb: 10, gzipKb: 4 },
     'flex-date-time-field.js': { rawKb: 48, gzipKb: 13 },
-    'flex-file-upload.js': { rawKb: 26, gzipKb: 8 },
+    // File Upload owns multiple upload sources and media actions; keep bounded headroom for its entry.
+    'flex-file-upload.js': { rawKb: 32, gzipKb: 10.5 },
     'flex-slider.js': { rawKb: 38, gzipKb: 13 },
     'icon-picker-field.js': { rawKb: 35, gzipKb: 9.2 },
     'select-field.js': { rawKb: 56, gzipKb: 14 },

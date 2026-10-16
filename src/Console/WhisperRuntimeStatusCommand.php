@@ -7,7 +7,9 @@ namespace Bjanczak\FilamentFlexFields\Console;
 use Bjanczak\FilamentFlexFields\Support\WhisperRuntime;
 use Bjanczak\FilamentFlexFields\Support\WhisperRuntimeManifest;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'fff:whisper:status')]
 class WhisperRuntimeStatusCommand extends Command
 {
     protected $signature = 'fff:whisper:status';

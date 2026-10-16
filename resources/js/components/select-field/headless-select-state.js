@@ -1,3 +1,11 @@
+/** Match PHP OptionValue identities while preserving literal string "false". */
+export function normalizeHeadlessStateValue(value) {
+    if (typeof value === 'boolean') return value ? '1' : '0'
+    if (typeof value === 'string') return value
+    if (typeof value === 'number' && Number.isFinite(value)) return String(value)
+    return null
+}
+
 /**
  * Normalize Filament/Alpine bound state into combobox engine selected values.
  *
@@ -11,14 +19,15 @@ export function normalizeInitialSelectedValues(state, multiple) {
             return []
         }
 
-        return state.map((value) => String(value))
+        return state.map(normalizeHeadlessStateValue).filter(value => value !== null)
     }
 
     if (state == null || state === '') {
         return []
     }
 
-    return [String(state)]
+    const value = normalizeHeadlessStateValue(state)
+    return value === null ? [] : [value]
 }
 
 /**
@@ -100,7 +109,7 @@ export function canWriteHeadlessWireState(currentState) {
  * @returns {string[]|string|null}
  */
 export function wireStateFromEngineValues(values, multiple) {
-    const list = Array.isArray(values) ? values.map((value) => String(value)) : []
+    const list = Array.isArray(values) ? values.map(normalizeHeadlessStateValue).filter(value => value !== null) : []
 
     if (multiple) {
         return list.slice()
@@ -125,7 +134,7 @@ export function commitHeadlessSelectionToWire(currentState, values, multiple) {
     const nextState = wireStateFromEngineValues(values, multiple)
 
     if (multiple) {
-        const current = Array.isArray(currentState) ? currentState.map((value) => String(value)) : null
+        const current = Array.isArray(currentState) ? currentState.map(normalizeHeadlessStateValue).filter(value => value !== null) : null
 
         if (current !== null && current.length === nextState.length && current.every((value, index) => value === nextState[index])) {
             return { skip: true }
@@ -134,7 +143,7 @@ export function commitHeadlessSelectionToWire(currentState, values, multiple) {
         return { skip: false, nextState }
     }
 
-    if (String(currentState ?? '') === String(nextState ?? '')) {
+    if ((normalizeHeadlessStateValue(currentState) ?? '') === (normalizeHeadlessStateValue(nextState) ?? '')) {
         return { skip: true }
     }
 
@@ -176,7 +185,7 @@ export function pruneSelectedValuesToAllowed(selectedValues, allowedValues) {
  * @param {unknown} results
  */
 export function shouldApplyRemoteOptionsFromFetchResult(results) {
-    return results !== null
+    return Array.isArray(results)
 }
 
 /**

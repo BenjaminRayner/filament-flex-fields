@@ -11,6 +11,7 @@
 
 @if (! empty($childSchema->getComponents()))
     <div
+        @if ($childSchema->isLoadingDeferred()) data-fff-deferred-panel @endif
         @class([
             'fff-segment-tabs__panel',
             'is-active' => $isActivePanel,

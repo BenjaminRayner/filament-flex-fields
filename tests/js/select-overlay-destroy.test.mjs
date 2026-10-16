@@ -1,3 +1,5 @@
+// Node fixture supplies the browser Element identity used by dropdown ownership.
+globalThis.Element ??= class Element {}
 import assert from 'node:assert/strict'
 import { describe, it, beforeEach, afterEach } from 'node:test'
 

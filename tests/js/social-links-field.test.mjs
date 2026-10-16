@@ -82,3 +82,17 @@ describe('social-link-validation', () => {
         assert.equal(formatSocialLinkUrl(''), '')
     })
 })
+
+
+it('does not admit a built-in platform outside an explicit choice set', () => {
+    assert.equal(validateSocialLink('github', 'https://github.com/a', platformDefinitions), 'unknown_platform')
+    assert.equal(validateSocialLink('website', 'https://example.com', new Map()), 'unknown_platform')
+})
+
+it('rejects unsafe schemes, embedded credentials and overlong URLs', () => {
+    for (const value of ['javascript:alert(1)', 'https://trusted.example@evil.example', 'https://example.com/' + 'x'.repeat(4096)]) {
+        assert.equal(validateSocialLink('website', value, platformDefinitions), 'invalid_url')
+    }
+    assert.equal(formatSocialLinkUrl('javascript:alert(1)'), 'javascript:alert(1)')
+    assert.equal(formatSocialLinkUrl('example.com:8080/path'), 'https://example.com:8080/path')
+})

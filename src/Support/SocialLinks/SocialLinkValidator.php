@@ -36,11 +36,11 @@ final class SocialLinkValidator
             return Translations::get('filament-flex-fields::default.social_links.validation.platform_not_allowed');
         }
 
-        if (! filter_var($url, FILTER_VALIDATE_URL)) {
+        if (strlen($url) > 4096 || preg_match('/[\x00-\x20\x7f]/', $url) || ! filter_var($url, FILTER_VALIDATE_URL) || parse_url($url, PHP_URL_USER) !== null || parse_url($url, PHP_URL_PASS) !== null) {
             return Translations::get('filament-flex-fields::default.social_links.validation.invalid_url');
         }
 
-        $scheme = parse_url($url, PHP_URL_SCHEME);
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
 
         if (! in_array($scheme, ['http', 'https'], true)) {
             return Translations::get('filament-flex-fields::default.social_links.validation.invalid_url');

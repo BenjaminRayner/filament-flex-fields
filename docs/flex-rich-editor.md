@@ -1,14 +1,126 @@
 ---
 title: "FlexRichEditor"
+description: "Configure a rich text editor for Filament with formatting tools, media attachments, link editing and customizable toolbar groups."
+icon: "notebook-pen"
+"canonical": "https://flex-fields.bjanczak.com/docs/flex-rich-editor"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/flex-rich-editor.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "FlexRichEditor in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/flex-rich-editor-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/flex-rich-editor-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/flex-rich-editor.webp"
+"twitter:image:alt": "FlexRichEditor in the FLEX Fields playground"
 ---
+
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/flex-rich-editor#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/flex-rich-editor",
+      "name": "FlexRichEditor",
+      "description": "Configure a rich text editor for Filament with formatting tools, media attachments, link editing and customizable toolbar groups.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flex-rich-editor#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/flex-rich-editor#article",
+      "url": "https://flex-fields.bjanczak.com/docs/flex-rich-editor",
+      "headline": "FlexRichEditor",
+      "description": "Configure a rich text editor for Filament with formatting tools, media attachments, link editing and customizable toolbar groups.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flex-rich-editor#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/flex-rich-editor-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/flex-rich-editor-motion.mp4#video",
+      "name": "FlexRichEditor — FLEX Fields demonstration",
+      "description": "A recorded demonstration of FlexRichEditor in the FLEX Fields playground for Filament. Configure a rich text editor for Filament with formatting tools, media attachments, link editing and customizable toolbar groups.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/flex-rich-editor.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT7.733S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/flex-rich-editor-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flex-rich-editor#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/flex-rich-editor-motion.mp4"
+  poster="/art/previews/flex-rich-editor.webp"
+  width="1920"
+  height="1080"
+  aria-label="FlexRichEditor — FLEX Fields demonstration"
+>
+  <a href="/art/previews/flex-rich-editor-motion.mp4">Watch the FlexRichEditor demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
 ### Summary
 
-**JSON-first** rich text editor built on Filament `RichEditor` / TipTap — premium shell, Gravity icons, content limits with live feedback, responsive image pipeline, optional Spatie Media Library, YouTube embeds, block images, editor image overlay, fullscreen, autosave, paste cleanup, and keyboard-accessible toolbar.
+**JSON-first** rich text editor built on Filament `RichEditor` / TipTap, with a FLEX interface, Hugeicons, content limits with live feedback, responsive images, optional Spatie Media Library, YouTube embeds, custom blocks, fullscreen, autosave, paste cleanup, and a keyboard-accessible toolbar.
 
-> **Scope of this doc:** only **package-specific** APIs (`variant()`, `imageVariants()`, `youtube()`, toolbar role presets, `FlexRichContentRenderer`, etc.). Everything else comes from Filament `RichEditor` — see [Filament Rich Editor](https://filamentphp.com/docs/forms/rich-editor).
+The field inherits the document features and configuration of [Filament Rich Editor](https://filamentphp.com/docs/5.x/forms/rich-editor). FLEX supplies the interface and its additional upload, rendering and editing options described below. Options introduced in newer Filament releases require that release in your application.
 
 | | |
 |---|---|
@@ -34,6 +146,58 @@ FlexRichEditor::make('body')
 
 Content is stored as a TipTap JSON document. Render HTML on the frontend with `makeFlexRichContentRenderer()` (see [Rendering HTML](#rendering-html)).
 
+## Filament configuration with the FLEX interface
+
+Use the inherited configuration methods on `FlexRichEditor`; you do not need a second native editor. For example:
+
+```php
+FlexRichEditor::make('body')
+    ->toolbarButtons([
+        ['bold', 'italic', 'underline', 'link'],
+        ['h2', 'h3', 'bulletList', 'orderedList'],
+        ['undo', 'redo'],
+    ])
+    ->minHeight('320px')
+    ->maxHeight('560px')
+    ->columnSpanFull();
+```
+
+The interface adapts to the panel's light or dark theme. `secondary` has a subtle gray background, `primary` and `soft` use the field surface, and `flat` has a transparent surface. Tool buttons with visible labels expand to fit their text.
+
+### Merge tags and custom blocks
+
+Enable merge tags to let authors insert placeholders:
+
+```php
+FlexRichEditor::make('template')
+    ->mergeTags([
+        'customer_name' => 'Customer name',
+        'order_number' => 'Order number',
+    ])
+    ->toolbarButtons([
+        ['bold', 'italic', 'link'],
+        ['mergeTags'],
+    ]);
+```
+
+Custom block classes extend Filament's `RichContentCustomBlock`. Configure them on the same field; FLEX displays their picker in its own panel. In Filament versions that support grouped, searchable blocks, you can also use:
+
+```php
+FlexRichEditor::make('body')
+    ->customBlocks([
+        'Content' => [CalloutBlock::class, HeroBlock::class],
+    ])
+    ->searchableCustomBlocks()
+    ->customBlocksGrid()
+    ->stickyToolbar()
+    ->toolbarButtons([
+        ['bold', 'italic', 'link'],
+        ['customBlocks'],
+    ]);
+```
+
+The block's configuration action and document format remain compatible with Filament. Mentions, text colors, custom tools/plugins, floating toolbars, attachment providers and HTML or JSON state also use the inherited API; consult the version-specific Filament documentation for their complete configuration.
+
 ---
 
 ## Configuration catalog (package API)
@@ -57,7 +221,7 @@ FlexRichEditor-specific options only. The field extends Filament `RichEditor`; i
 | `minCharacters()` | `int` | — | [Limits](#content-limits) |
 | `maxCharacters()` | `int` | — | [Limits](#content-limits) |
 | `maxWords()` | `int` | — | [Limits](#content-limits) |
-| `limitBehavior()` | `soft`, `hard` | `soft` | [Limit behavior](#limit-behavior-soft-vs-hard) |
+| `limitBehavior()` | `soft`, `hard` | `soft` | [Limit behavior](#content-limits) |
 | `readingTime()` | `bool`, optional WPM | `false`, 200 wpm | [Reading time](#reading-time) |
 | `altTextRequired()` | `bool` | `false` | [Alt text](#alt-text-required) |
 
@@ -84,7 +248,7 @@ FlexRichEditor-specific options only. The field extends Filament `RichEditor`; i
 
 Static helpers (presets): `getFlexDefaultToolbarButtons()`, `getFlexFullToolbarButtons()`, `getFlexDefaultFloatingToolbars()`, `getFlexExtraTools()`, `getNativeComparisonToolbarButtons()`.
 
-To override button layout, use Filament’s `toolbarButtons()` / `floatingToolbars()` / `tools()` with these presets — see [Filament Rich Editor](https://filamentphp.com/docs/forms/rich-editor).
+To override button layout, use Filament’s `toolbarButtons()` / `floatingToolbars()` / `tools()` with these presets — see [Filament Rich Editor](https://filamentphp.com/docs/5.x/forms/rich-editor).
 
 ### File attachments & images (package layer)
 
@@ -101,7 +265,7 @@ Requires Filament `fileAttachments()` / disk options to be enabled first. This t
 | `maxImageHeight()` | int px | — | [Single-pass optimization](#single-pass-image-optimization) |
 | `maxImageLongEdge()` | int px | — | [Single-pass optimization](#single-pass-image-optimization) |
 | `stripExif()` | `bool` | `true` | [Single-pass optimization](#single-pass-image-optimization) |
-| `imageVariants()` | array / `RichEditorImageVariant` | `[]` | [Named variants](#named-image-variants) |
+| `imageVariants()` | array / `RichEditorImageVariant` | thumb 250 px + large 1500 px, WebP | [Named variants](#named-image-variants) |
 | `pruneOrphanedAttachmentsOnSave()` | `bool` | `true` | [Orphan cleanup](#automatic-attachment-cleanup) |
 
 ### HTML rendering
@@ -109,7 +273,7 @@ Requires Filament `fileAttachments()` / disk options to be enabled first. This t
 | Method | Type / values | Default | Example section |
 |--------|---------------|---------|-----------------|
 | `responsiveImages()` | `bool` | auto when variants set | [Responsive HTML](#responsive-images-in-html-output) |
-| `lazyImages()` | `bool` | `true` | [Lazy loading](#lazy-images-onoff) |
+| `lazyImages()` | `bool` | `true` | [Lazy loading](#lazy-images-on/off) |
 | `imageSizes()` | CSS `sizes` string | `100vw` | [Image sizes](#image-sizes-attribute) |
 | `makeFlexRichContentRenderer()` | mixed JSON | — | [Rendering HTML](#rendering-html) |
 
@@ -472,19 +636,6 @@ FlexRichEditor::make('body')
     ->fileAttachments(true);
 ```
 
-### Native Filament comparison (playground)
-
-```php
-use Filament\Forms\Components\RichEditor;
-
-RichEditor::make('body')
-    ->json()
-    ->toolbarButtons(FlexRichEditor::make('_ref')->getNativeComparisonToolbarButtons())
-    ->floatingToolbars(FlexRichEditor::make('_ref')->getFlexDefaultFloatingToolbars());
-```
-
----
-
 ## Toolbar roles
 
 Presets in `config('filament-flex-fields.rich_editor.toolbar_roles')`.
@@ -560,7 +711,7 @@ FlexRichEditor::make('body')
 
 ## Custom tools
 
-Flex adds Gravity-icon tools via `FlexRichEditor::getFlexExtraTools()`:
+Flex adds Hugeicons tools via `FlexRichEditor::getFlexExtraTools()`:
 
 - `clearFormatting` — clear nodes + marks
 - `clearContent` — empty document
@@ -680,7 +831,21 @@ FlexRichEditor::make('body')
 
 ## Named image variants
 
-Generates `photo__thumb.webp`, `photo__large.webp`, and `photo.jpg.flex-variants.json`.
+The default disk uploader creates a WebP thumbnail with a maximum long edge of **250 px** and a WebP master with a maximum long edge of **1500 px**. Small images are not enlarged. The optimized master replaces the disk original only after all outputs and their manifest have been written successfully.
+
+```php
+FlexRichEditor::make('body')
+    ->fileAttachments(true)
+    ->fileAttachmentsDisk('public')
+    ->fileAttachmentsDirectory('articles/images');
+
+// Keep the original upload without automatic variants.
+FlexRichEditor::make('body')->imageVariants([]);
+```
+
+The attachment modal uses FLEX File Upload and FLEX Text Input for alternative text. Its submit button waits for temporary uploads to finish. The editor previews the temporary image; permanent variants are generated when the form saves the attachment.
+
+On a disk, a master such as `photo.webp` has a `photo__thumb.webp` thumbnail and a `photo.webp.flex-variants.json` manifest. Generation supports local and stream-capable remote disks, preserves visibility, and stages all variants privately before publication. Raster processing has limits of 64 MiB per input and 50 megapixels; inputs exceeding these limits fail instead of starting unbounded processing.
 
 ### Array config
 
@@ -702,8 +867,8 @@ use Bjanczak\FilamentFlexFields\Support\RichEditor\RichEditorImageVariant;
 FlexRichEditor::make('body')
     ->fileAttachments(true)
     ->imageVariants([
-        RichEditorImageVariant::make('thumb')->maxLongEdge(320)->webp(),
-        RichEditorImageVariant::make('hero')->maxLongEdge(2000)->master()->webp(),
+        'thumb' => RichEditorImageVariant::make('thumb')->maxLongEdge(320)->webp(),
+        'hero' => RichEditorImageVariant::make('hero')->maxLongEdge(2000)->master()->webp(),
     ]);
 ```
 
@@ -726,7 +891,7 @@ FlexRichEditor::make('body')
     ->pruneOrphanedAttachmentsOnSave(false);
 ```
 
-On save: compares image IDs in JSON before/after; deletes removed masters, variants, and `.flex-variants.json` manifests. Scoped directories also sweep unreferenced files.
+On save: compares image IDs in JSON before/after; deletes removed masters, variants, and `.flex-variants.json` manifests. Cleanup is limited to attachments removed from this document. Other files in the same directory are preserved.
 
 ### Spatie Media Library
 
@@ -890,6 +1055,8 @@ FlexRichEditor::make('body')
 
 ## Spatie Media Library (optional)
 
+Spatie keeps ownership of originals, conversions and queued jobs. The uploader does not resize its original before passing it to Spatie. Register the desired conversions on your media model; field configuration alone does not register model conversions. Until a queued conversion exists, preview/rendering falls back to the original.
+
 ### 1. Model — register conversions
 
 ```php
@@ -908,10 +1075,12 @@ class Post extends Model implements HasMedia
             'thumb' => ['max_long_edge' => 320, 'webp' => true],
             'medium' => ['max_long_edge' => 1200, 'webp' => true],
             'large' => ['max_long_edge' => 2000, 'master' => true, 'webp' => true],
-        ]);
+        ], queued: true); // Run a configured Laravel queue worker.
     }
 }
 ```
+
+The helper creates every named Spatie conversion, including `large`. On Spatie, `master` identifies the preferred display variant; it does not replace or delete the original. Omit `queued: true` for synchronous conversions.
 
 ### 2. Form
 
@@ -1170,7 +1339,7 @@ npm run test:js -- tests/js/rich-editor-chrome.test.mjs tests/js/rich-editor-too
 ### Playwright E2E (playground)
 
 ```bash
-FLEX_FIELDS_PLAYGROUND_URL=https://your-app.test/admin/flex-fields-playground \
+FLEX_FIELDS_PLAYGROUND_URL=https://your-app.test/admin/flex-fields \
   npm run test:e2e:rich-editor
 ```
 
@@ -1178,13 +1347,12 @@ FLEX_FIELDS_PLAYGROUND_URL=https://your-app.test/admin/flex-fields-playground \
 
 ### Playground
 
-`/admin/flex-fields-playground/flex-rich-editor` — see [Playground](/docs/index#playground).
+`/admin/flex-fields/flex-rich-editor` — see [Playground](/docs/index#playground).
 
 Slug: **`flex-rich-editor`**
 
 Includes:
 
-- Native Filament `RichEditor` comparison
 - Full **Article body** demo (attachments, variants, limits, YouTube, fullscreen, autosave)
 - Variant grid: compact / secondary / soft / flat
 - Attachments-only and full-toolbar sections
@@ -1193,25 +1361,27 @@ Includes:
 
 ## Assets (CSS & JS)
 
-Each field loads its own CSS bundle and Alpine component on demand (`x-load`). Optional support scripts load only when configured.
+Each field loads its own CSS bundle and Alpine component on demand (`x-fff-load`). Optional support scripts load only when configured.
 
 | Asset | Kind | When it loads |
 |-------|------|----------------|
 | `rich-editor-field.css` | Lazy CSS | `load-stylesheet` in blade when the field renders |
-| `flex-rich-editor.js` | Alpine component | `x-load` on the editor root |
+| `flex-rich-editor.js` | Alpine component | `x-fff-load` on the editor root |
 | `flex-rich-editor-paste-extension.js` | TipTap extension | When `pasteCleanup()` is enabled |
 | `flex-rich-editor-block-image-extension.js` | TipTap extension | Always (block images) |
 | `flex-rich-editor-youtube-extension.js` | TipTap extension | When `youtube()` is enabled |
 
 ### Does it duplicate Filament’s rich editor?
 
-**On a page with only `FlexRichEditor`:** no double download of Filament’s `rich-editor` Alpine asset. The blade loads `flex-rich-editor`, not `filament/forms` → `rich-editor`.
+FLEX owns the editor shell, toolbar and supporting modules. The shell lazily
+imports Filament’s registered `rich-editor` runtime and awaits its initialization;
+it does not bundle a second copy of the native runtime. Multiple FLEX editors
+share that dependency. The playground contains only FLEX examples.
 
-**JS bundle:** at build time, `flex-rich-editor.js` bundles Filament’s `rich-editor-form-component` (esbuild alias to `vendor/filament/forms/dist/components/rich-editor.js`) plus Flex chrome (~500 KB raw — same order of magnitude as native Filament). That is a **single runtime script**, not Filament + Flex side by side.
-
-**CSS:** Filament does not ship a separate `rich-editor.css` asset. Flex adds `rich-editor-field.css` for the `fff-rich-editor-*` shell and overrides on shared `fi-fo-rich-editor-*` markup classes. No second full editor stylesheet.
-
-**Exception — playground comparison:** the Flex Rich Editor playground page may render native `RichEditor` next to `FlexRichEditor` for demo purposes. That page loads **both** `rich-editor` and `flex-rich-editor` scripts — intentional, not typical production usage.
+The scoped `rich-editor-field.css` stylesheet owns the FLEX chrome. Built-in
+controls use Hugeicons with a consistent stroke width of 2; document content is
+outside this chrome rule. The contenteditable uses `aria-labelledby` to reference
+its visible field label rather than an invalid HTML `label[for]` association.
 
 ---
 
@@ -1220,7 +1390,7 @@ Each field loads its own CSS bundle and Alpine component on demand (`x-load`). O
 - Footer stats use `requestAnimationFrame` batching (not per-keystroke DOM thrashing).
 - Image overlay sync runs on selection changes only.
 - Attachment manifest reads are cached per request during HTML rendering.
-- Bundle budget (CI): `flex-rich-editor.js` ~497 KB raw / ~157 KB gzip (aligned with Filament native).
+- CI checks the emitted shell and shared dependency graph against the package bundle budgets. The Filament runtime remains a separately loaded dependency.
 
 ```bash
 cd packages/filament-flex-fields && npm run check:budgets
@@ -1243,7 +1413,7 @@ cd packages/filament-flex-fields && npm run check:budgets
 
 `FlexRichEditor` extends `Filament\Forms\Components\RichEditor`. Options not documented on this page behave as in Filament.
 
-- [Filament Rich Editor documentation](https://filamentphp.com/docs/forms/rich-editor)
+- [Filament Rich Editor documentation](https://filamentphp.com/docs/5.x/forms/rich-editor)
 - JSON storage is enabled by default in `setUp()` (`json()`)
 
 ---
@@ -1255,4 +1425,4 @@ cd packages/filament-flex-fields && npm run check:budgets
 | [FlexTextareaField](/docs/flextextareafield) | Plain multiline text without rich formatting |
 | [FlexFileUpload](/docs/flexfileupload-and-fleximageupload) | Inline image attachments without TipTap |
 | [TranslatableFields](/docs/translatablefields) | Locale tabs wrapping a translatable rich body |
-| Filament `RichEditor` | Native editor without Flex chrome — see [Filament docs](https://filamentphp.com/docs/forms/rich-editor) |
+| Filament `RichEditor` | Native editor without Flex chrome — see [Filament docs](https://filamentphp.com/docs/5.x/forms/rich-editor) |

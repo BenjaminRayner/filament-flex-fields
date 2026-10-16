@@ -1,5 +1,6 @@
 ---
 title: "Compliance pack"
+icon: "shield-check"
 ---
 
 # Compliance pack

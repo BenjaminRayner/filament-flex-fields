@@ -4,216 +4,68 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Tables\Columns;
 
-use BackedEnum;
 use Bjanczak\FilamentFlexFields\Concerns\CalculatesRatingFill;
-use Bjanczak\FilamentFlexFields\Enums\ControlSize;
-use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\Concerns\EmitsFlexFieldTableColumnAssets;
+use Bjanczak\FilamentFlexFields\Filament\Concerns\EmitsFlexDisplayAssets;
+use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\Concerns\RatingColumn\ConfiguresRatingColumn;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldStylesheetQueue;
+use Bjanczak\FilamentFlexFields\Support\Rating\Presentation;
+use Bjanczak\FilamentFlexFields\Support\Rating\RatingValue;
 use Bjanczak\FilamentFlexFields\Support\RatingColumnRenderCache;
-use Closure;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\HtmlString;
-use InvalidArgumentException;
 
 class RatingColumn extends TextColumn
 {
     use CalculatesRatingFill;
-    use EmitsFlexFieldTableColumnAssets;
+    use ConfiguresRatingColumn;
+    use EmitsFlexDisplayAssets;
 
-    protected int|Closure $ratingMax = 5;
+    protected int $standaloneRenderSequence = 0;
 
-    protected string|Closure|null $ratingDisplayColor = 'warning';
-
-    protected string|BackedEnum|Htmlable|Closure|null $ratingDisplayIcon = null;
-
-    protected bool|Closure $shouldShowRatingValue = true;
-
-    protected string|ControlSize|Closure $ratingDisplaySize = 'md';
+    protected function flexDisplayComponentId(): string
+    {
+        return 'rating-column';
+    }
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        FlexFieldStylesheetQueue::enqueueFor('rating-column');
-
-        $this->formatStateUsing(fn (mixed $state, RatingColumn $column): Htmlable => new HtmlString($column->formatRatingDisplay($state)));
-    }
-
-    public function stars(int|Closure $count): static
-    {
-        if ($count instanceof Closure) {
-            $this->ratingMax = $count;
-
-            return $this;
-        }
-
-        if ($count < 1) {
-            throw new InvalidArgumentException('Rating max must be at least 1.');
-        }
-
-        $this->ratingMax = $count;
-
-        return $this;
-    }
-
-    public function ratingColor(string|Closure|null $color): static
-    {
-        $this->ratingDisplayColor = $color;
-
-        return $this;
-    }
-
-    public function ratingIcon(string|BackedEnum|Htmlable|Closure|null $icon): static
-    {
-        $this->ratingDisplayIcon = $icon;
-
-        return $this;
-    }
-
-    public function showValue(bool|Closure $condition = true): static
-    {
-        $this->shouldShowRatingValue = $condition;
-
-        return $this;
-    }
-
-    public function ratingSize(string|ControlSize|Closure $size): static
-    {
-        $this->ratingDisplaySize = $size;
-
-        return $this;
-    }
-
-    public function getMax(): int
-    {
-        $max = (int) $this->evaluate($this->ratingMax);
-
-        if ($max < 1) {
-            throw new InvalidArgumentException('Rating max must be at least 1.');
-        }
-
-        return $max;
-    }
-
-    public function getRatingColor(): string
-    {
-        $color = $this->evaluate($this->ratingDisplayColor);
-
-        return filled($color) ? (string) $color : 'warning';
-    }
-
-    public function getRatingIcon(): string|BackedEnum|Htmlable
-    {
-        $icon = $this->evaluate($this->ratingDisplayIcon);
-
-        if ($icon instanceof Htmlable) {
-            return $icon;
-        }
-
-        if ($icon instanceof BackedEnum) {
-            return $icon;
-        }
-
-        if (filled($icon)) {
-            return (string) $icon;
-        }
-
-        return Heroicon::Star;
-    }
-
-    public function shouldShowValue(): bool
-    {
-        return (bool) $this->evaluate($this->shouldShowRatingValue);
-    }
-
-    public function getRatingDisplaySize(): string
-    {
-        $size = $this->evaluate($this->ratingDisplaySize);
-
-        if ($size instanceof ControlSize) {
-            return $size->value;
-        }
-
-        return (string) $size;
-    }
-
-    public function formatRatingDisplay(mixed $state): string
-    {
-        $value = $this->normalizeRatingFromState($state);
-
-        if ($value === null) {
-            return '';
-        }
-
-        $cacheKey = $this->renderCacheKey($value);
-
-        return $this->withFlexFieldColumnAssets(
-            'rating-column',
-            RatingColumnRenderCache::remember($cacheKey, function () use ($value): string {
-                /** @var View $view */
-                $view = view('filament-flex-fields::tables.columns.rating-column', [
-                    'value' => $value,
-                    'max' => $this->getMax(),
-                    'size' => $this->getRatingDisplaySize(),
-                    'color' => $this->getRatingColor(),
-                    'icon' => $this->getRatingIcon(),
-                    'items' => $this->getItemIndexes(),
-                    'showValue' => $this->shouldShowValue(),
-                    'fillPercentageFor' => fn (int $index): float => $this->getFillPercentageForValue($value, $index),
-                ]);
-
-                return $view->render();
-            }),
-        );
-    }
-
-    protected function renderCacheKey(float $value): string
-    {
-        return hash('xxh128', json_encode([
-            'column' => $this->getName(),
-            'value' => $value,
-            'max' => $this->getMax(),
-            'size' => $this->getRatingDisplaySize(),
-            'color' => $this->getRatingColor(),
-            'icon' => $this->ratingIconCacheToken(),
-            'showValue' => $this->shouldShowValue(),
-        ], JSON_THROW_ON_ERROR));
-    }
-
-    protected function ratingIconCacheToken(): string
-    {
-        $icon = $this->getRatingIcon();
-
-        if ($icon instanceof Htmlable) {
-            return 'html:'.hash('xxh128', (string) $icon);
-        }
-
-        if ($icon instanceof BackedEnum) {
-            return 'enum:'.$icon::class.':'.$icon->value;
-        }
-
-        return 'string:'.(string) $icon;
+        $this->formatStateUsing(fn (mixed $state): Htmlable => new HtmlString($this->renderRatingVisual($state)));
     }
 
     public function normalizeRatingFromState(mixed $state): ?float
     {
-        if ($state === null || $state === '') {
-            return null;
+        return RatingValue::display($state, $this->getMax());
+    }
+
+    public function formatRatingDisplay(mixed $state): string
+    {
+        $html = $this->renderRatingVisual($state);
+        if ($html === '') {
+            return '';
         }
-
-        if (! is_numeric($state)) {
-            return null;
+        if ($this->hasCriticalFlexDisplayStyles) {
+            FlexFieldStylesheetQueue::requireCritical('rating-column');
         }
+        $identity = 'rating-column.'.$this->getName().'.'.spl_object_id($this).'.'.(++$this->standaloneRenderSequence);
 
-        $value = (float) $state;
+        return FlexFieldStylesheetQueue::emitDomRootConsumerMarkup('rating-column', $identity, $this->hasCriticalFlexDisplayStyles).$html;
+    }
 
-        if ($value < 0) {
-            return null;
+    protected function renderRatingVisual(mixed $state): string
+    {
+        $value = $this->normalizeRatingFromState($state);
+        if ($value === null) {
+            return '';
         }
+        $presentation = Presentation::make($value, $this->getMax(), $this->getRatingDisplaySize(),
+            $this->getRatingColor(), $this->getRatingIcon(), $this->shouldShowValue(), table: true);
+        $key = hash('xxh128', serialize($presentation));
+        $html = RatingColumnRenderCache::remember($key, static fn (): string => view(
+            'filament-flex-fields::tables.columns.rating-column', ['presentation' => $presentation],
+        )->render());
 
-        return min($value, (float) $this->getMax());
+        return $html;
     }
 }

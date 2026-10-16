@@ -11,7 +11,7 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SwitchField;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\ItemCard;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\ItemCardGroup;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\ItemCardStack;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Section;
@@ -59,30 +59,30 @@ class ItemCardGroupPlayground
         ];
 
         return [
-            PlaygroundRelatedHubs::view('item-card-group'),
             Section::make('Standalone Variants')
                 ->description('Self-contained surfaces with variant styling when used outside ItemCardGroup.')
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     ItemCardStack::make()
+                        ->key('variant-stack', isInheritable: false)
                         ->schema([
                             ItemCard::make('Default')
                                 ->description('Surface background with shadow')
-                                ->icon(GravityIcon::Globe)
+                                ->icon(FlexIcon::Globe)
                                 ->chevron(),
                             ItemCard::make('Secondary')
                                 ->description('Secondary surface, no shadow')
-                                ->icon(GravityIcon::Palette)
+                                ->icon(FlexIcon::Palette)
                                 ->variant('secondary')
                                 ->chevron(),
                             ItemCard::make('Tertiary')
                                 ->description('Tertiary surface, no shadow')
-                                ->icon(GravityIcon::Moon)
+                                ->icon(FlexIcon::Moon)
                                 ->variant('tertiary')
                                 ->chevron(),
                             ItemCard::make('Outline')
                                 ->description('Transparent with border, no shadow')
-                                ->icon(GravityIcon::Key)
+                                ->icon(FlexIcon::Key)
                                 ->variant('outline')
                                 ->chevron(),
                         ]),
@@ -92,10 +92,11 @@ class ItemCardGroupPlayground
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     ItemCardStack::make()
+                        ->key('navigation-stack', isInheritable: false)
                         ->schema([
                             ItemCard::make('Profile')
                                 ->description('Update your personal information')
-                                ->icon(GravityIcon::Person)
+                                ->icon(FlexIcon::Person)
                                 ->chevron()
                                 ->pressableAction(
                                     Action::make('standaloneOpenProfile')
@@ -106,7 +107,7 @@ class ItemCardGroupPlayground
                                 ),
                             ItemCard::make('Security')
                                 ->description('Manage passwords and 2FA')
-                                ->icon(GravityIcon::Key)
+                                ->icon(FlexIcon::Key)
                                 ->chevron()
                                 ->pressableAction(
                                     Action::make('standaloneOpenSecurity')
@@ -117,7 +118,7 @@ class ItemCardGroupPlayground
                                 ),
                             ItemCard::make('Cloud sync')
                                 ->description('Sync settings across devices')
-                                ->icon(GravityIcon::Cloud)
+                                ->icon(FlexIcon::Cloud)
                                 ->chevron()
                                 ->pressableAction(
                                     Action::make('standaloneOpenCloudSync')
@@ -134,7 +135,7 @@ class ItemCardGroupPlayground
                 ->schema([
                     ItemCard::make('Language')
                         ->description('Choose your preferred language')
-                        ->icon(GravityIcon::Globe)
+                        ->icon(FlexIcon::Globe)
                         ->schema([
                             SelectField::make('icg__standalone_language')
                                 ->options($languageOptions)
@@ -148,7 +149,7 @@ class ItemCardGroupPlayground
                 ->schema([
                     ItemCard::make('Dark mode')
                         ->description('Use dark theme across the app')
-                        ->icon(GravityIcon::Moon)
+                        ->icon(FlexIcon::Moon)
                         ->schema([
                             SwitchField::make('icg__standalone_dark_mode')
                                 ->inline()
@@ -160,7 +161,7 @@ class ItemCardGroupPlayground
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     ItemCard::make('Appearance')
-                        ->icon(GravityIcon::Palette)
+                        ->icon(FlexIcon::Palette)
                         ->chevron()
                         ->pressableAction(
                             Action::make('standaloneOpenAppearance')
@@ -193,6 +194,7 @@ class ItemCardGroupPlayground
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     ItemCardStack::make()
+                        ->key('image-stack', isInheritable: false)
                         ->schema([
                             ItemCard::make('Alex Rivera')
                                 ->description('Rounded square crop (default icon shape)')
@@ -215,13 +217,14 @@ class ItemCardGroupPlayground
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     ItemCardGroup::make('Account')
+                        ->key('account-group', isInheritable: false)
                         ->description('Manage your account settings and preferences')
                         ->pressable()
                         ->separated()
                         ->schema([
                             ItemCard::make('Profile')
                                 ->description('Update your personal information')
-                                ->icon(GravityIcon::Person)
+                                ->icon(FlexIcon::Person)
                                 ->chevron()
                                 ->pressableAction(
                                     Action::make('openProfile')
@@ -232,7 +235,7 @@ class ItemCardGroupPlayground
                                 ),
                             ItemCard::make('Security')
                                 ->description('Manage your password and 2FA')
-                                ->icon(GravityIcon::Key)
+                                ->icon(FlexIcon::Key)
                                 ->chevron()
                                 ->pressableAction(
                                     Action::make('openSecurity')
@@ -243,7 +246,7 @@ class ItemCardGroupPlayground
                                 ),
                             ItemCard::make('Cloud sync')
                                 ->description('Sync settings across devices')
-                                ->icon(GravityIcon::Cloud)
+                                ->icon(FlexIcon::Cloud)
                                 ->chevron()
                                 ->pressableAction(
                                     Action::make('openCloudSync')
@@ -259,59 +262,63 @@ class ItemCardGroupPlayground
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     ItemCardGroup::make('Default')
+                        ->key('default-group', isInheritable: false)
                         ->description('Surface background with shadow')
                         ->pressable()
                         ->separated()
                         ->schema([
                             ItemCard::make('Profile')
                                 ->description('Update your personal information')
-                                ->icon(GravityIcon::Person)
+                                ->icon(FlexIcon::Person)
                                 ->chevron(),
                             ItemCard::make('Security')
                                 ->description('Manage your password and 2FA')
-                                ->icon(GravityIcon::Key)
+                                ->icon(FlexIcon::Key)
                                 ->chevron(),
                         ]),
                     ItemCardGroup::make('Secondary')
+                        ->key('secondary-group', isInheritable: false)
                         ->description('Secondary surface, no shadow')
                         ->variant('secondary')
                         ->separated()
                         ->schema([
                             ItemCard::make('Language')
                                 ->description('Choose your preferred language')
-                                ->icon(GravityIcon::Globe)
+                                ->icon(FlexIcon::Globe)
                                 ->chevron(),
                             ItemCard::make('Appearance')
                                 ->description('Customize theme and display')
-                                ->icon(GravityIcon::Palette)
+                                ->icon(FlexIcon::Palette)
                                 ->chevron(),
                         ]),
                     ItemCardGroup::make('Tertiary')
+                        ->key('tertiary-group', isInheritable: false)
                         ->description('Tertiary surface, no separators')
                         ->variant('tertiary')
                         ->withoutSeparators()
                         ->schema([
                             ItemCard::make('Cloud sync')
                                 ->description('Sync settings across devices')
-                                ->icon(GravityIcon::Cloud)
+                                ->icon(FlexIcon::Cloud)
                                 ->chevron(),
                             ItemCard::make('Backup')
                                 ->description('Automatic backup schedule')
-                                ->icon(GravityIcon::Archive)
+                                ->icon(FlexIcon::Archive)
                                 ->chevron(),
                         ]),
                     ItemCardGroup::make('Outline')
+                        ->key('outline-group', isInheritable: false)
                         ->description('Transparent with border, no shadow')
                         ->variant('outline')
                         ->separated()
                         ->schema([
                             ItemCard::make('Devices')
                                 ->description('Manage connected devices')
-                                ->icon(GravityIcon::Smartphone)
+                                ->icon(FlexIcon::Smartphone)
                                 ->chevron(),
                             ItemCard::make('Privacy')
                                 ->description('Control your data and visibility')
-                                ->icon(GravityIcon::ShieldCheck)
+                                ->icon(FlexIcon::ShieldCheck)
                                 ->chevron(),
                         ]),
                 ]),
@@ -320,12 +327,13 @@ class ItemCardGroupPlayground
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     ItemCardGroup::make('Source Control')
+                        ->key('source-control-group', isInheritable: false)
                         ->headerStyle('outside')
                         ->separated()
                         ->schema([
                             ItemCard::make('GitHub')
                                 ->description('Connected as @jrgarciadev on GitHub')
-                                ->icon(GravityIcon::Code)
+                                ->icon(FlexIcon::Code)
                                 ->schema([
                                     ActionGroup::make([
                                         Action::make('outsideSyncRepositories')
@@ -349,23 +357,24 @@ class ItemCardGroupPlayground
                                 ]),
                             ItemCard::make('GitLab')
                                 ->description('Connect GitLab for repository management')
-                                ->icon(GravityIcon::Server)
+                                ->icon(FlexIcon::Server)
                                 ->schema([
                                     Action::make('outsideConnectGitLab')
                                         ->label('Connect')
-                                        ->icon(GravityIcon::ArrowUpRightFromSquare)
+                                        ->icon(FlexIcon::ArrowUpRightFromSquare)
                                         ->iconPosition(IconPosition::After)
                                         ->itemCard()
                                         ->url('https://gitlab.com/users/sign_in', shouldOpenInNewTab: true),
                                 ]),
                         ]),
                     ItemCardGroup::make('Settings')
+                        ->key('settings-group', isInheritable: false)
                         ->description('Manage your account preferences and notification channels')
                         ->separated()
                         ->schema([
                             ItemCard::make('Language')
                                 ->description('Enable automatic language detection')
-                                ->icon(GravityIcon::Globe)
+                                ->icon(FlexIcon::Globe)
                                 ->schema([
                                     SwitchField::make('icg__language')
                                         ->inline()
@@ -374,7 +383,7 @@ class ItemCardGroupPlayground
                                 ]),
                             ItemCard::make('Event Invites')
                                 ->description('How you receive event invitations')
-                                ->icon(GravityIcon::Envelope)
+                                ->icon(FlexIcon::Envelope)
                                 ->schema([
                                     SelectField::make('icg__event_invites')
                                         ->options($channelOptions)
@@ -384,7 +393,7 @@ class ItemCardGroupPlayground
                                 ]),
                             ItemCard::make('Theme')
                                 ->description('Follow your system appearance')
-                                ->icon(GravityIcon::Palette)
+                                ->icon(FlexIcon::Palette)
                                 ->schema([
                                     SwitchField::make('icg__theme')
                                         ->inline()
@@ -393,7 +402,7 @@ class ItemCardGroupPlayground
                                 ]),
                             ItemCard::make('Event Reminders')
                                 ->description('Reminder delivery channels')
-                                ->icon(GravityIcon::Bell)
+                                ->icon(FlexIcon::Bell)
                                 ->schema([
                                     SelectField::make('icg__event_reminders')
                                         ->options($channelOptions)
@@ -403,7 +412,7 @@ class ItemCardGroupPlayground
                                 ]),
                             ItemCard::make('Dark mode')
                                 ->description('Override system theme on this device')
-                                ->icon(GravityIcon::Moon)
+                                ->icon(FlexIcon::Moon)
                                 ->schema([
                                     SwitchField::make('icg__dark_mode')
                                         ->inline()
@@ -412,7 +421,7 @@ class ItemCardGroupPlayground
                                 ]),
                             ItemCard::make('Marketing')
                                 ->description('Promotional messages and updates')
-                                ->icon(GravityIcon::Megaphone)
+                                ->icon(FlexIcon::Megaphone)
                                 ->schema([
                                     SelectField::make('icg__marketing')
                                         ->options($channelOptions)
@@ -422,7 +431,7 @@ class ItemCardGroupPlayground
                                 ]),
                             ItemCard::make('Hold confirm')
                                 ->description('Hold the button until it fills to trigger the action')
-                                ->icon(GravityIcon::Hand)
+                                ->icon(FlexIcon::Hand)
                                 ->schema([
                                     Action::make('holdConfirmDefault')
                                         ->label('Update')
@@ -435,11 +444,11 @@ class ItemCardGroupPlayground
                                 ]),
                             ItemCard::make('Hold confirm (fast)')
                                 ->description('800ms hold, sweep from the right')
-                                ->icon(GravityIcon::Hand)
+                                ->icon(FlexIcon::Hand)
                                 ->schema([
                                     Action::make('holdConfirmFast')
                                         ->label('Hold to Delete')
-                                        ->icon(GravityIcon::TrashBin)
+                                        ->icon(FlexIcon::TrashBin)
                                         ->color('danger')
                                         ->holdConfirm(800)
                                         ->action(fn () => Notification::make()
@@ -449,11 +458,11 @@ class ItemCardGroupPlayground
                                 ]),
                             ItemCard::make('Hold confirm (slow)')
                                 ->description('4s hold, sweep from the left')
-                                ->icon(GravityIcon::Hand)
+                                ->icon(FlexIcon::Hand)
                                 ->schema([
                                     Action::make('holdConfirmSlow')
                                         ->label('Hold to Delete')
-                                        ->icon(GravityIcon::TrashBin)
+                                        ->icon(FlexIcon::TrashBin)
                                         ->color('danger')
                                         ->holdConfirm(4000, 'left')
                                         ->action(fn () => Notification::make()

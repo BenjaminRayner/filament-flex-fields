@@ -45,7 +45,7 @@ export function isValidSlot(slot) {
     }
 
     if (slotIsOvernight(slot)) {
-        return true
+        return timeToMinutes(from) >= timeToMinutes(to)
     }
 
     return timeToMinutes(from) < timeToMinutes(to)
@@ -75,7 +75,7 @@ export function validateDaySlots(slots, {
         .filter((slot) => slot.from && slot.to)
 
     for (const slot of normalized) {
-        if (! slotIsOvernight(slot) && timeToMinutes(slot.from) >= timeToMinutes(slot.to)) {
+        if (slotHasInvalidRange(slot)) {
             return 'from_before_to'
         }
     }
@@ -137,7 +137,7 @@ export function slotHasInvalidRange(slot) {
     }
 
     if (slotIsOvernight(slot)) {
-        return false
+        return timeToMinutes(from) < timeToMinutes(to)
     }
 
     return timeToMinutes(from) >= timeToMinutes(to)

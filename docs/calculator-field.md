@@ -1,9 +1,118 @@
 ---
 title: "CalculatorField"
 description: Numeric input with a shared iOS-style calculator panel, per-field session memory, and full numeric constraints.
+icon: "calculator"
+"canonical": "https://flex-fields.bjanczak.com/docs/calculator-field"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/calculator-field.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "CalculatorField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/calculator-field-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/calculator-field-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/calculator-field.webp"
+"twitter:image:alt": "CalculatorField in the FLEX Fields playground"
 ---
 
-![CalculatorField](/art/sc-34.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/calculator-field#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/calculator-field",
+      "name": "CalculatorField",
+      "description": "Numeric input with a shared iOS-style calculator panel, per-field session memory, and full numeric constraints.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/calculator-field#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/calculator-field#article",
+      "url": "https://flex-fields.bjanczak.com/docs/calculator-field",
+      "headline": "CalculatorField",
+      "description": "Numeric input with a shared iOS-style calculator panel, per-field session memory, and full numeric constraints.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/calculator-field#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/calculator-field-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/calculator-field-motion.mp4#video",
+      "name": "CalculatorField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of CalculatorField in the FLEX Fields playground for Filament. Numeric input with a shared iOS-style calculator panel, per-field session memory, and full numeric constraints.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/calculator-field.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT4.783S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/calculator-field-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/calculator-field#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/calculator-field-motion.mp4"
+  poster="/art/previews/calculator-field.webp"
+  width="1920"
+  height="1080"
+  aria-label="CalculatorField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/calculator-field-motion.mp4">Watch the CalculatorField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -30,17 +139,21 @@ Works with all standard Filament field APIs: `required()`, `disabled()`, `readOn
 
 | Viewport | Behavior |
 |----------|----------|
-| **Desktop** (`≥768px`) | Floating glass panel near the trigger; draggable header; backdrop dismiss |
+| **Desktop** (`≥768px`) | Floating glass panel initially anchored by the shared Select surface; drag its header anywhere inside the viewport; outside/Escape dismiss |
 | **Mobile** (`<768px`) | Bottom sheet with drag handle, larger keys, safe-area padding |
 
 | Feature | Detail |
 |---------|--------|
 | **Singleton panel** | One teleported panel serves every `CalculatorField` on the page |
-| **Per-field sessions** | Expression, result preview, and label are remembered per field id |
-| **Context switch** | Open panel on field A, click field B's trigger — panel stays open and restores B's session |
-| **Display vs Insert** | Panel shows full precision while typing; field constraints apply only on **Insert** |
+| **Per-field sessions** | Expression is weakly owned by each rendered field node; identical state paths in different forms cannot collide |
+| **Context switch** | Click another enabled calculator input or trigger — the existing panel updates its label, expression and constraints without closing, reopening or replaying its entrance |
+| **Dragging** | Position is retained from first placement and updated by header dragging; field switches and scrolling preserve it, viewport resize clamps it; mobile uses the shared bottom sheet |
+| **Keypad** | Compact 236 px desktop panel, round borderless digit/function/operator keys and a wide zero; gray digit backgrounds in light and dark themes |
+| **Display vs Insert** | Live preview and insertion use the field precision/bounds; invalid or out-of-range results cannot be inserted |
 
-The panel mount renders **once** per page via `@once` in the field Blade view (`data-fff-calculator-panel-host`).
+The field extends `FlexTextInput` and includes its actual Blade renderer. An inert panel template is available per field; a document runtime creates at most one actual panel on first open. Closing/reopening preserves expressions while the owner field remains mounted. Removing the last field disposes the panel and listeners. There is no server mount queue, page-global Alpine panel or copied input markup.
+
+Expressions are limited to 2,048 characters, 512 tokens and 64 nesting levels. The parser supports arithmetic, parentheses, unary signs and percentage without `eval`. Precision is 0–12 decimal places; integer results must fit the exact browser integer range. `decimalPlaces()` and `roundingMode()` apply on input blur and dehydration as well as calculator insertion. Native Filament owns numeric casts and validation.
 
 ---
 
@@ -134,7 +247,7 @@ CalculatorField::make('margin')
 | Stage | What happens |
 |-------|----------------|
 | **Panel display** | Full-precision preview; `decimalPlaces()` does **not** round the live result |
-| **Insert / blur / input** | `normalizeNumericFieldValue()` applies `decimalPlaces`, `roundingMode`, `min`/`max`, `step`, `integer` |
+| **Insert / blur / input** | The shared text input handles manual editing; calculator results respect precision, rounding and min/max limits. Values outside those limits are rejected. |
 
 Example: with `->decimalPlaces(2)` and `->roundingMode('truncate')`, typing `9.9999` in the panel shows `9.9999`; **Insert** stores `9.99`.
 
@@ -198,7 +311,7 @@ CalculatorField::make('weight')->size('sm'); // default: md
 CalculatorField::make('weight')->size('lg');
 ```
 
-See [Control size](/docs/shared-concepts) (`sm`, `md`, `lg`).
+See [Control size](/docs/configuration) (`sm`, `md`, `lg`).
 
 #### Rounding (border radius)
 
@@ -437,7 +550,7 @@ Translations live under `filament-flex-fields::default.calculator.*` (`title`, `
 
 ### Playground
 
-`/admin/flex-fields-playground/calculator-field`
+`/admin/flex-fields/calculator-field`
 
 See [Playground](/docs/index#playground) for setup.
 

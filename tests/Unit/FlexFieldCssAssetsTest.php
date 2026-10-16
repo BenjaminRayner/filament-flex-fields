@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Bjanczak\FilamentFlexFields\Assets\FlexFieldsCss;
-use Bjanczak\FilamentFlexFields\FilamentFlexFieldsServiceProvider;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
 use Filament\Support\Facades\FilamentAsset;
 
@@ -29,22 +27,6 @@ it('keeps the core bundle under the gzip budget', function () {
     $gzipKb = $gzipBytes / 1024;
 
     expect($gzipKb)->toBeLessThan(50);
-});
-
-it('keeps table column styles in lazy bundles instead of core', function () {
-    $coreCss = file_get_contents(__DIR__.'/../../resources/dist/css/core.css');
-    $userColumnCss = file_get_contents(__DIR__.'/../../resources/dist/css/user-column.css');
-    $ratingColumnCss = file_get_contents(__DIR__.'/../../resources/dist/css/rating-column.css');
-
-    expect($coreCss)
-        ->not->toContain('.fff-user-column')
-        ->not->toContain('.fff-rating-column')
-        ->not->toContain('.fff-rating__icon-clip');
-
-    expect($userColumnCss)->toContain('.fff-user-column');
-    expect($ratingColumnCss)
-        ->toContain('.fff-rating-column')
-        ->toContain('.fff-rating__icon-clip');
 });
 
 it('uses root css tokens for icon column label colors in dark mode', function () {
@@ -93,7 +75,7 @@ it('keeps video field glass controls on a single border with circular buttons', 
         ->toContain('.fff-video-field__glass-btn::after')
         ->toContain('box-shadow: var(--fff-video-field-glass-inset)')
         ->toContain('--fff-video-slider-pointer')
-        ->toContain('.fff-video-field__progress-wrap.is-pointing .fff-video-field__progress-thumb')
+        ->toContain('.fff-video-field__progress-wrap:is(.is-pointing, :focus-visible) .fff-video-field__progress-thumb')
         ->toContain('.fff-video-field__progress-wrap.is-pointing:not(.is-disabled) .fff-video-field__progress-thumbnail')
         ->toContain('.fff-video-field__settings-item')
         ->toContain('.fff-video-field__settings-separator')
@@ -102,13 +84,14 @@ it('keeps video field glass controls on a single border with circular buttons', 
         ->toContain('.fff-video-field__tooltip-label')
         ->toContain('--fff-video-field-radius: 1.5rem')
         ->toContain('--fff-video-field-controls-inset: 0.75rem')
-        ->toContain('.fff-video-field__progress-block--default .fff-video-field__progress-wrap')
+        ->toContain('--fff-video-slider-track-h: 0.25rem')
+        ->toContain('height: var(--fff-video-slider-track-h)')
         ->toContain('transform-origin: bottom')
         ->not->toContain('.fff-video-field__volume--expand')
         ->not->toContain('.dark .fff-video-field__frame')
-        ->toContain('[data-menu-root-view][data-menu-view-state="inactive"]')
-        ->toContain('[data-submenu][data-starting-style][data-direction="forward"]')
-        ->toContain('--fff-video-field-menu-transition-duration: 250ms')
+        ->toContain('.fff-video-field__settings-panel:not([data-submenu])')
+        ->toContain('.fff-video-field__settings-panel[data-submenu]')
+        ->toContain('contain: layout style paint')
         ->toContain('.fff-video-field__tooltip')
         ->not->toContain('border: 1px solid var(--fff-video-field-glass-border)');
 });
@@ -185,35 +168,6 @@ it('builds lazy component css bundles for x-load form fields', function () {
     }
 });
 
-it('keeps playground-only demo styles out of the core bundle', function () {
-    $coreCss = file_get_contents(__DIR__.'/../../resources/dist/css/core.css');
-    $playgroundCss = file_get_contents(__DIR__.'/../../resources/dist/css/playground.css');
-
-    expect($coreCss)->not->toContain('.fff-playground-toolbar')
-        ->and($playgroundCss)->toContain('.fff-playground-toolbar')
-        ->and($playgroundCss)->toContain('.fff-user-column-playground__table')
-        ->and($playgroundCss)->toContain('.fff-code-snippet');
-});
-
-it('paints select and flex text input chrome in core to prevent reload FOUC', function () {
-    $coreCss = file_get_contents(__DIR__.'/../../resources/dist/css/core.css');
-
-    expect($coreCss)
-        ->toContain('.fi-input-wrp.fff-select-field')
-        ->toContain('--fff-field-border')
-        ->toContain('.fff-flex-text-input__shell')
-        ->toContain('--tw-ring-shadow:0 0 #0000!important');
-});
-
-it('dedupes playground base chrome from per-slug bundles', function () {
-    $playgroundCss = file_get_contents(__DIR__.'/../../resources/dist/css/playground.css');
-    $selectFieldPlaygroundCss = file_get_contents(__DIR__.'/../../resources/dist/css/playground-select-field.css');
-
-    expect($playgroundCss)->toContain('.fff-playground-toolbar')
-        ->and($selectFieldPlaygroundCss)->not->toContain('.fff-playground-toolbar')
-        ->and($selectFieldPlaygroundCss)->toContain('.fff-select-field');
-});
-
 it('registers asset injector script alongside lazy css assets', function () {
     $registered = collect(FilamentAsset::getScripts(['janczakb/filament-flex-fields']))
         ->map(fn ($asset) => $asset->getId())
@@ -255,48 +209,9 @@ it('registers lazy stylesheets for every lazy component asset id', function () {
     }
 });
 
-it('registers playground css assets only when playground is enabled', function () {
-    $provider = new FilamentFlexFieldsServiceProvider(app());
-    $method = new ReflectionMethod($provider, 'registeredStylesheets');
-
-    config()->set('filament-flex-fields.playground.enabled', false);
-
-    $disabledIds = array_map(
-        fn (FlexFieldsCss $asset): string => $asset->getId(),
-        $method->invoke($provider),
-    );
-
-    config()->set('filament-flex-fields.playground.enabled', true);
-
-    $enabledIds = array_map(
-        fn (FlexFieldsCss $asset): string => $asset->getId(),
-        $method->invoke($provider),
-    );
-
-    expect($disabledIds)
-        ->not->toContain(FlexFieldAssets::PLAYGROUND_STYLESHEET_ID)
-        ->and($enabledIds)
-        ->toContain(FlexFieldAssets::PLAYGROUND_STYLESHEET_ID)
-        ->toContain(FlexFieldAssets::playgroundBundleStylesheetId('user-column'));
-});
-
-it('registers playground theme hook only when playground is enabled', function () {
-    $providerSource = file_get_contents(__DIR__.'/../../src/FilamentFlexFieldsServiceProvider.php');
-
-    expect($providerSource)
-        ->toContain('if (FlexFieldsConfig::isPlaygroundEnabled())')
-        ->toContain("Blade::render('filament-flex-fields::partials.playground-theme')");
-});
-
 it('renders lazy stylesheet links in form component blades', function () {
     $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/phone-field.blade.php');
 
     expect($blade)->toContain('partials.load-stylesheet')
         ->and($blade)->toContain("'component' => 'phone-field'");
-});
-
-it('renders playground stylesheet on the playground page', function () {
-    $stylesPartial = file_get_contents(__DIR__.'/../../resources/views/partials/playground-page-stylesheets.blade.php');
-
-    expect($stylesPartial)->toContain('playgroundStylesheetHrefsForRequest()');
 });

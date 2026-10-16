@@ -7,7 +7,7 @@ use Bjanczak\FilamentFlexFields\Support\Compliance\CompliancePack;
 use Bjanczak\FilamentFlexFields\Support\Locale\FlexFieldsLocale;
 use Carbon\Carbon;
 
-it('lists supported locales including new locale stubs', function (): void {
+it('lists supported locales with complete bundled catalogs', function (): void {
     expect(FlexFieldsLocale::supportedLocales())->toBe([
         'en',
         'pl',
@@ -89,7 +89,7 @@ it('exports compliance report snapshot', function (): void {
         ->and($report['generated_at'])->not->toBe('');
 });
 
-it('loads locale stub translation files for new locales', function (string $locale): void {
+it('loads translated component catalogs for bundled locales', function (string $locale): void {
     $path = __DIR__."/../../resources/lang/{$locale}/default.php";
 
     expect(file_exists($path))->toBeTrue();

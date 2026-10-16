@@ -4,25 +4,37 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\RichEditor;
 
+/** Scoped to a request; never memoizes authorization decisions. */
 class RichEditorSpatieMediaRepository
 {
-    /**
-     * @var array<string, object|null>
-     */
-    private static array $cache = [];
+    /** @var array<string, object|null> */
+    private array $cache = [];
 
     public function findByUuid(string $uuid): ?object
     {
-        if (array_key_exists($uuid, self::$cache)) {
-            return self::$cache[$uuid];
-        }
-
         $mediaClass = 'Spatie\\MediaLibrary\\MediaCollections\\Models\\Media';
 
         if (! class_exists($mediaClass)) {
-            return self::$cache[$uuid] = null;
+            return null;
         }
 
-        return self::$cache[$uuid] = $mediaClass::query()->where('uuid', $uuid)->first();
+        $query = $mediaClass::query()->where('uuid', $uuid)->applyScopes();
+        $connection = $query->getModel()->getConnection();
+        $key = hash('sha256', serialize([$connection->getName(), $connection->getDatabaseName(), $query->getQuery()->toSql(), $query->getQuery()->getBindings()]));
+
+        if (array_key_exists($key, $this->cache)) {
+            return $this->cache[$key];
+        }
+
+        if (count($this->cache) >= 256) {
+            array_shift($this->cache);
+        }
+
+        return $this->cache[$key] = $query->first();
+    }
+
+    public function clear(): void
+    {
+        $this->cache = [];
     }
 }

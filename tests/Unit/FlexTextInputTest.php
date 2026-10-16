@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextareaField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+use Bjanczak\FilamentFlexFields\Support\Assets\ComponentAssetPlan;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TextInput\Actions\CopyAction;
 use Filament\Support\Icons\Heroicon;
 
 it('extends filament text input and exposes styling api', function () {
@@ -123,7 +126,7 @@ it('supports native text input configuration methods', function () {
         ->and(FlexTextInput::make('phone')->tel()->isTel())->toBeTrue();
 });
 
-it('uses gravity ui icons for copy and password suffix actions by default', function () {
+it('uses Hugeicons for copy and password suffix actions by default', function () {
     $field = FlexTextInput::make('token')
         ->password()
         ->revealable()
@@ -134,8 +137,8 @@ it('uses gravity ui icons for copy and password suffix actions by default', func
         ->all();
 
     expect($icons['copy'])->toBe(GravityIcon::Copy)
-        ->and($icons['showPassword'])->toBe(GravityIcon::Eye)
-        ->and($icons['hidePassword'])->toBe(GravityIcon::EyeClosed);
+        ->and($icons['showPassword'])->toBe('hugeicons-view')
+        ->and($icons['hidePassword'])->toBe('hugeicons-view-off');
 });
 
 it('uses native copy button feedback icon instead of filament tooltip handler', function () {
@@ -146,10 +149,7 @@ it('uses native copy button feedback icon instead of filament tooltip handler', 
 
     expect($copy)->not->toBeNull();
 
-    $property = new ReflectionProperty($copy, 'alpineClickHandler');
-    $rawHandler = $property->getValue($copy);
-
-    expect($rawHandler)->toBe('return')
+    expect($copy)->toBeInstanceOf(CopyAction::class)
         ->and($field->getCopySuccessIcon())->toBe(GravityIcon::Check)
         ->and($field->getCopyFeedbackDurationMs())->toBe(2500);
 });
@@ -206,9 +206,9 @@ it('calculates password strength for server-side rendering', function () {
         'label' => '',
         'percent' => 0,
     ])->and($field->calculatePasswordStrength('secret-password'))->toMatchArray([
-        'score' => 3,
-        'label' => 'Good',
-        'percent' => 75,
+        'score' => 1,
+        'label' => 'Weak',
+        'percent' => 25,
     ]);
 });
 
@@ -230,9 +230,9 @@ it('supports custom password strength labels', function () {
         'Dobre',
         'Silne',
     ])->and($field->calculatePasswordStrength('secret-password'))->toMatchArray([
-        'score' => 3,
-        'label' => 'Dobre',
-        'percent' => 75,
+        'score' => 1,
+        'label' => 'Słabe',
+        'percent' => 25,
     ]);
 
     $partialField = FlexTextInput::make('password')
@@ -245,42 +245,28 @@ it('supports custom password strength labels', function () {
         ->and($partialField->getPasswordStrengthLabels()[0])->toBe('Very weak');
 });
 
-it('renders inline affix focus handler for prefix icon fields', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-text-input-field.blade.php');
-
-    expect($blade)
-        ->toContain('focusInputFromAffix()')
-        ->toContain('onInput($event)')
-        ->toContain('fi-input-has-inline-prefix');
-});
-
-it('includes emoji picker panel styles via lazy dependency bundle', function () {
+it('rendads emoji picker styles only for an enabled instance capability', function () {
     expect(FlexFieldAssets::stylesheetsFor('flex-text-input'))
-        ->toBe(['emoji-picker', 'flex-text-input'])
+        ->toBe(['flex-text-input'])
+        ->and(ComponentAssetPlan::for('flex-text-input', ['emoji-picker'])->stylesheets)
+        ->toBe(['flex-text-input', 'overlay-runtime', 'teleported-menu', 'emoji-picker'])
         ->and(file_get_contents(__DIR__.'/../../resources/css/components/emoji-picker.css'))
-        ->toContain('.fff-emoji-picker__panel');
+        ->toContain('.fff-emoji-picker__host')
+        ->not->toContain('z-[9999]');
 
     $flexTextInputCss = file_get_contents(__DIR__.'/../../resources/css/components/flex-text-input.css');
 
     expect($flexTextInputCss)->not->toContain('@import "./emoji-picker.css"');
 });
 
-it('neutralizes filament input wrapper focus ring inside the flex shell', function () {
-    $css = file_get_contents(__DIR__.'/../../resources/css/components/flex-text-input.css');
-
-    expect($css)
-        ->toContain('.fff-flex-text-input__wrapper.fi-input-wrp:focus-within')
-        ->toContain('.fff-flex-text-input__wrapper.fi-input-wrp:not(.fi-disabled):not(:has(.fi-ac-action:focus)):focus-within')
-        ->toContain('.fff-flex-text-input__input:focus-visible');
-});
-
-it('isolates alpine root from livewire morphing', function () {
+it('neuteps native binding morphable with stable per-instance ownership', function () {
     $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-text-input-field.blade.php');
 
     expect($blade)
         ->toContain('$livewireKey = $getLivewireKey();')
-        ->toContain('wire:ignore')
-        ->toContain('wire:key="{{ $livewireKey }}.{{ substr(md5(serialize([$isDisabled, $isReadOnly, $getSize()])), 0, 64) }}"');
+        ->not->toContain('wire:ignore')
+        ->not->toContain('x-init=')
+        ->toContain('wire:key="{{ $livewireKey }}.control"');
 });
 
 it('supports verification status below the input shell', function () {
@@ -295,10 +281,33 @@ it('supports verification status below the input shell', function () {
 });
 
 it('renders verification status markup in the flex text input blade', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-text-input-field.blade.php');
+    $blade = file_get_contents(__DIR__.'/../../resources/views/components/text-input/feedback.blade.php');
 
     expect($blade)
         ->toContain('fff-flex-text-input__verification-status')
         ->toContain('fff-flex-text-input__verification-status-label')
         ->toContain('$hasVerificationStatus');
+});
+
+it('does not restore removed Gravity action icons from previously published configuration', function () {
+    config()->set('filament-flex-fields.ui.flex_text_input_emoji_icon', 'gravityui-face-smile');
+    config()->set('filament-flex-fields.ui.flex_text_input_microphone_icon', 'gravityui-microphone');
+    config()->set('filament-flex-fields.ui.flex_text_input_show_password_icon', 'gravityui-eye');
+    config()->set('filament-flex-fields.ui.flex_textarea_emoji_icon', 'gravityui-face-smile');
+    config()->set('filament-flex-fields.ui.flex_textarea_microphone_icon', 'gravityui-microphone');
+    $input = FlexTextInput::make('input');
+    $textarea = FlexTextareaField::make('note');
+    expect($input->getEmojiIcon())->toBe('hugeicons-look-top')
+        ->and($input->getMicrophoneIcon())->toBe('flexhugeicons-mic-01')
+        ->and($input->getShowPasswordIcon())->toBe('hugeicons-view')
+        ->and($textarea->getEmojiIcon())->toBe('hugeicons-look-top')
+        ->and($textarea->getMicrophoneIcon())->toBe('flexhugeicons-mic-01');
+});
+
+it('uses View and ViewOff for password reveal while preserving explicit icon configuration', function () {
+    $field = FlexTextInput::make('password')->password()->revealable();
+    expect($field->getShowPasswordIcon())->toBe('hugeicons-view')
+        ->and($field->getHidePasswordIcon())->toBe('hugeicons-view-off');
+    $field->showPasswordIcon('hugeicons-star');
+    expect($field->getShowPasswordIcon())->toBe('hugeicons-star');
 });

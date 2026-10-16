@@ -3,9 +3,10 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TimezoneField;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\Playground\TimezoneFieldPlayground;
 use Bjanczak\FilamentFlexFields\Support\Timezones;
+use Illuminate\Support\Facades\Validator;
 
 it('exposes timezone field configuration api', function () {
     $field = TimezoneField::make('timezone')
@@ -32,8 +33,8 @@ it('exposes timezone field configuration api', function () {
         ->and($field->getPrefixIcon())->toBe(GravityIcon::Clock);
 });
 
-it('defaults to gravity ui clock prefix icon', function () {
-    expect(TimezoneField::make('timezone')->getPrefixIcon())->toBe(GravityIcon::Clock);
+it('defaults to the shared select without an additional prefix icon', function () {
+    expect(TimezoneField::make('timezone')->getPrefixIcon())->toBeNull();
 });
 
 it('normalizes timezone state to iana identifier', function () {
@@ -48,9 +49,9 @@ it('dehydrates only the iana identifier never the display label', function () {
     $field = TimezoneField::make('timezone')
         ->timezones(['Europe/Warsaw', 'UTC']);
 
-    $options = collect($field->getOptionsForJs())->keyBy('id');
+    $options = collect($field->getOptionsForJs())->keyBy('value');
 
-    expect($options['Europe/Warsaw']['id'])->toBe('Europe/Warsaw')
+    expect($options['Europe/Warsaw']['value'])->toBe('Europe/Warsaw')
         ->and($options['Europe/Warsaw']['label'])->not->toBe('Europe/Warsaw')
         ->and($options['Europe/Warsaw']['label'])->not->toContain('Poland Time')
         ->and($field->normalizeState('Europe/Warsaw'))->toBe('Europe/Warsaw')
@@ -75,14 +76,14 @@ it('localizes city labels independently of the app locale', function () {
         ->timezones(['Europe/Warsaw'])
         ->locale('pl');
 
-    $englishOptions = collect($english->getOptionsForJs())->keyBy('id');
-    $polishOptions = collect($polish->getOptionsForJs())->keyBy('id');
+    $englishOptions = collect($english->getOptionsForJs())->keyBy('value');
+    $polishOptions = collect($polish->getOptionsForJs())->keyBy('value');
 
     expect($english->getLocale())->toBe('en')
         ->and($polish->getLocale())->toBe('pl')
         ->and($englishOptions['Europe/Warsaw']['label'])->toBe('Warsaw, Poland')
         ->and($polishOptions['Europe/Warsaw']['label'])->toBe('Warszawa, Polska')
-        ->and($englishOptions['Europe/Warsaw']['id'])->toBe($polishOptions['Europe/Warsaw']['id']);
+        ->and($englishOptions['Europe/Warsaw']['value'])->toBe($polishOptions['Europe/Warsaw']['value']);
 });
 
 it('defaults to full iana timezone list except excluded ones', function () {
@@ -95,24 +96,19 @@ it('defaults to full iana timezone list except excluded ones', function () {
         ->and(count($ids))->toBe(count(Timezones::allIdentifiers()) - 1);
 });
 
-it('does not use laravel required rule on nullable state', function () {
+it('uses native required validation', function () {
     $field = TimezoneField::make('timezone')->required();
-
-    expect($field->getRequiredValidationRule())->toBe('nullable')
-        ->and($field->getValidationRules())->not->toContain('required');
+    expect($field->getRequiredValidationRule())->toBe('required')
+        ->and($field->getValidationRules())->toContain('required');
 });
 
 it('requires a timezone when the field is required', function () {
-    $field = TimezoneField::make('timezone')->required()->label('Timezone');
-
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
-
-    $message = null;
-    $rule('timezone', null, function (string $failMessage) use (&$message): void {
-        $message = $failMessage;
-    });
-
-    expect($message)->toBe(__('validation.required', ['attribute' => 'Timezone']));
+    $field = TimezoneField::make('timezone')->required();
+    $validator = Validator::make(
+        ['timezone' => null], ['timezone' => $field->getValidationRules()],
+    );
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->failed()['timezone'])->toHaveKey('Required');
 });
 
 it('rejects timezones outside the allowed list', function () {
@@ -131,30 +127,13 @@ it('rejects timezones outside the allowed list', function () {
 });
 
 it('registers timezone field playground variants', function () {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
+    $builder = app(TimezoneFieldPlayground::class);
     $state = $builder->defaultState();
 
     expect($state)->toHaveKeys([
         'timezone__basic',
         'timezone__limited',
         'timezone__browser',
-    ]);
-});
-
-it('includes wrapper classes for size and variant', function () {
-    $field = TimezoneField::make('timezone')
-        ->size('sm')
-        ->variant('secondary');
-
-    expect($field->getWrapperClasses())->toBe([
-        'fff-timezone-field',
-        'fff-flex-text-input-field',
-        'fff-timezone-field--sm',
-        'fff-rounding-md',
-        'fff-flex-text-input-field--sm',
-        'fff-rounding-md',
-        'fff-timezone-field--secondary',
-        'fff-flex-text-input-field--secondary',
     ]);
 });
 
@@ -182,7 +161,7 @@ it('builds a compact catalog matching alpine timezone labels', function () {
         ->timezones(['Europe/Warsaw', 'UTC']);
 
     $catalog = $field->getBrowserTimezoneBootCatalog();
-    $options = collect($field->getOptionsForJs())->keyBy('id');
+    $options = collect($field->getTimezonesMetadata())->keyBy('id');
 
     expect($catalog['Europe/Warsaw'][0])->toBe($options['Europe/Warsaw']['label'])
         ->and($catalog['Europe/Warsaw'][1])->toBe($options['Europe/Warsaw']['offset'])

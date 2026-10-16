@@ -10,12 +10,11 @@ import {
     resolveScrubDuration,
 } from '../../resources/js/components/video-field.js'
 import {
-    VideoPreviewFrameCache,
     createVideoProgressSlider,
     getPercentFromPointerEvent,
-    getSliderPreviewLeft,
-    resolvePreviewCacheKey,
-} from '../../resources/js/core/video-field-progress-slider.js'
+} from '../../resources/js/video/input/slider.js'
+
+import { createVideoPreview, VideoPreviewFrameCache, resolvePreviewCacheKey } from '../../resources/js/video/preview.js'
 
 test('resolveProgressHoverRatio clamps within track bounds', () => {
     assert.equal(resolveProgressHoverRatio(50, 0, 100), 0.5)
@@ -43,13 +42,6 @@ test('getPercentFromPointerEvent clamps pointer position on track', () => {
     assert.equal(getPercentFromPointerEvent({ clientX: 100, clientY: 10 }, rect), 50)
     assert.equal(getPercentFromPointerEvent({ clientX: -20, clientY: 10 }, rect), 0)
     assert.equal(getPercentFromPointerEvent({ clientX: 240, clientY: 10 }, rect), 100)
-})
-
-test('getSliderPreviewLeft clamps preview within track width', () => {
-    assert.equal(
-        getSliderPreviewLeft(50, 176),
-        'min(max(0px, calc(50.000% - 88px)), calc(100% - 176px))',
-    )
 })
 
 test('resolvePreviewCacheKey buckets preview seeks', () => {
@@ -97,9 +89,9 @@ test('formatVideoTime renders scrub preview labels', () => {
 })
 
 test('formatPlaybackRateLabel renders normalized speed labels', () => {
-    assert.equal(formatPlaybackRateLabel(1), '1x')
-    assert.equal(formatPlaybackRateLabel(1.5), '1.5x')
-    assert.equal(formatPlaybackRateLabel(0.5), '0.5x')
+    assert.equal(formatPlaybackRateLabel(1), '1×')
+    assert.equal(formatPlaybackRateLabel(1.5), '1.5×')
+    assert.equal(formatPlaybackRateLabel(0.5), '0.5×')
 })
 
 test('resolveDefaultQualityKey prefers explicit default option', () => {
@@ -116,4 +108,86 @@ test('resolveCoarsePointer reads coarse pointer media query', () => {
     assert.equal(resolveCoarsePointer({ matches: true }), true)
     assert.equal(resolveCoarsePointer({ matches: false }), false)
     assert.equal(resolveCoarsePointer(null), false)
+})
+
+test('compact time toggles duration independently from the playback clock', async () => {
+    const { createVideoPlayer } = await import('../../resources/js/video/player.js')
+    const player = createVideoPlayer()
+    player.duration = 90; player.currentTime = 15
+    assert.equal(player.endTimeLabel, '-1:15')
+    player.toggleTimeDisplay()
+    assert.equal(player.endTimeLabel, '1:30')
+    player.currentTime = 25
+    assert.equal(player.endTimeLabel, '1:30')
+    player.toggleTimeDisplay()
+    assert.equal(player.endTimeLabel, '-1:05')
+    player.destroy()
+})
+
+
+test('preview seeks use the latest pointer, reuse decoded frames and release owned work', async () => {
+    const { createResourceScope } = await import('../../resources/js/runtime/lifecycle/resource-scope.js')
+    const scope = createResourceScope(), jobs = new Map(), paints = []
+    const doc = { createElement: () => ({ width: 0, height: 0, ownerDocument: doc, getContext: () => ({ drawImage() {} }) }) }
+    const video = Object.assign(new EventTarget(), { readyState: 4, videoWidth: 1920, videoHeight: 1080, duration: 20, currentTime: 0, src: '', load() {}, pause() {}, removeAttribute() { this.src = '' } })
+    const canvas = { ownerDocument: doc, getContext: () => ({ drawImage(source) { paints.push(source.currentTime ?? 'cache') } }) }
+    const component = { duration: 20, videoSrc: '/clip.mp4', progressPointing: true, $refs: { previewVideo: video, previewCanvas: canvas } }
+    const runtime = { scope, get disposed() { return scope.disposed }, cancel: key => jobs.delete(key), schedule: (key, fn) => jobs.set(key, fn) }
+    const preview = createVideoPreview(component, runtime)
+    const flush = () => { const fn = jobs.get('preview'); jobs.delete('preview'); fn?.() }
+    preview.schedule(.25); flush()
+    assert.equal(video.src, '/clip.mp4')
+    assert.equal(video.currentTime, 5)
+    preview.schedule(.5); flush()
+    video.dispatchEvent(new Event('seeked'))
+    assert.deepEqual(paints, [10])
+    assert.equal(component.previewFrameReady, true)
+    assert.equal(canvas.width, 192)
+    assert.equal(canvas.height, 108)
+    assert.equal(scope.snapshot().resources, 1)
+    preview.schedule(.5); flush()
+    assert.deepEqual(paints, [10]) // Repeated pointer samples must not redraw the same frame.
+    preview.schedule(.25); flush(); video.dispatchEvent(new Event('seeked'))
+    preview.schedule(.5); flush()
+    assert.deepEqual(paints, [10, 5, 'cache'])
+    preview.schedule(.75); flush()
+    preview.cancel()
+    video.dispatchEvent(new Event('seeked'))
+    assert.equal(paints.length, 3)
+    assert.equal(scope.snapshot().resources, 1)
+    preview.reset()
+    assert.equal(component.previewFrameReady, false)
+    assert.equal(video.src, '')
+    scope.dispose()
+    assert.equal(scope.snapshot().resources, 0)
+})
+
+test('native PiP events update only their player and stop after owner disposal', async () => {
+    const { bindNativePlayback } = await import('../../resources/js/video/playback.js')
+    const { createResourceScope } = await import('../../resources/js/runtime/lifecycle/resource-scope.js')
+    const doc = Object.assign(new EventTarget(), { defaultView: {}, pictureInPictureEnabled: true, pictureInPictureElement: null })
+    const make = () => {
+        const scope = createResourceScope()
+        const video = Object.assign(new EventTarget(), { requestPictureInPicture() {}, pause() {}, removeAttribute() {}, load() {} })
+        const component = { pictureInPictureable: true, isPictureInPicture: false, $el: { ownerDocument: doc }, $refs: { video, frame: {} }, syncPlayback() {}, revealUi() {}, updateClock() {}, dismissAllControlTooltips() {} }
+        bindNativePlayback(component, { scope, get disposed() { return scope.disposed } })
+        return { scope, video, component }
+    }
+    const first = make(), second = make()
+    doc.pictureInPictureElement = first.video
+    first.video.dispatchEvent(new Event('enterpictureinpicture'))
+    assert.equal(first.component.isPictureInPicture, true)
+    assert.equal(second.component.isPictureInPicture, false)
+    doc.pictureInPictureElement = null
+    first.video.dispatchEvent(new Event('leavepictureinpicture'))
+    assert.equal(first.component.isPictureInPicture, false)
+    first.scope.dispose()
+    doc.pictureInPictureElement = first.video
+    first.video.dispatchEvent(new Event('enterpictureinpicture'))
+    assert.equal(first.component.isPictureInPicture, false)
+    doc.pictureInPictureElement = second.video
+    second.video.dispatchEvent(new Event('enterpictureinpicture'))
+    assert.equal(second.component.isPictureInPicture, true)
+    second.scope.dispose()
+    assert.equal(first.scope.snapshot().resources + second.scope.snapshot().resources, 0)
 })

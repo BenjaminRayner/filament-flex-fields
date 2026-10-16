@@ -1,0 +1,76 @@
+---
+title: "Troubleshooting"
+description: "Find missing registration, publication, child configuration and lifecycle problems in your extension."
+---
+
+Start with the server-side installation report. It describes declared dependencies
+without loading a page or submitting a form.
+
+```shell
+php artisan fff:assets:doctor --definitions --json
+php artisan fff:assets:explain acme-summary-field --json
+```
+
+<AccordionGroup>
+  <Accordion title="My component is unknown">
+    Confirm Composer discovers your provider and it runs after FLEX's services have
+    registered. Collect definitions in provider boot, before the collection barrier.
+    Use the exact kebab-case identity declared in `ComponentDefinition`. Do not add
+    definitions during a request or while rendering a field.
+  </Accordion>
+  <Accordion title="The field appears without styles">
+    Build the package, include its manifest and referenced release in the installation,
+    then run `php artisan filament:assets` in the application. Every rendered instance
+    must emit its consumer boundary. Check that each stylesheet has one owner and
+    dependent surfaces reference it through `stylesFrom`.
+  </Accordion>
+  <Accordion title="A column loads the field's editor JavaScript">
+    Use a shared display stylesheet and CSS-only dependencies for display surfaces.
+    Do not use `uses` to reference an interactive field when you only need appearance.
+    Declare optional interactive features as capabilities and enable them per instance.
+  </Accordion>
+  <Accordion title="A child option is rejected">
+    Check the child's declared option name, type, bounds and method binding. A saved
+    JSON schema cannot supply PHP closures or choose arbitrary methods. Use the
+    trusted PHP configuration callback for relationships and query callbacks. A locked
+    option must retain its declared default.
+  </Accordion>
+  <Accordion title="A Select relation shows the wrong record">
+    Render the actual Select child inside the native schema relationship context.
+    Give each child its own relative state path and owner identity. Keep query scopes,
+    relation callbacks and authorization application-owned; an asset declaration does
+    not provide a model or relation context by itself.
+  </Accordion>
+  <Accordion title="A closed dialog still has listeners or a camera stream">
+    Register instance effects through `createResourceScope()` and dispose the scope in
+    `destroy()`. Track streams, workers and observers with that owner. A suspended parent
+    remains an owner while its child is open. Closing the child must not destroy the parent.
+  </Accordion>
+  <Accordion title="Opening a dialog reveals unfinished HTML">
+    Await `surface.activate()` and check `surface.ready` before revealing the dialog. Retain a recoverable
+    pending/error state. Do not reveal with an arbitrary timeout. A rejected or aborted
+    preparation is not a ready surface.
+  </Accordion>
+  <Accordion title="The SDK import fails">
+    Build with `createFlexSdkPlugin()`, `metafile: true` and `write: false`, then compile
+    a complete manifest. Import only `@bjanczak/flex-fields/sdk/v1` from the component
+    factory mounted inside a compatible FLEX runtime. Do not copy private runtime
+    modules or start a second Alpine instance.
+  </Accordion>
+  <Accordion title="Users still request an older release after an update">
+    An open document may legitimately reference an older immutable release. Publish the
+    new complete release before traffic and retain previous generations according to
+    your deployment policy. Do not overwrite a content-addressed release directory.
+  </Accordion>
+</AccordionGroup>
+
+## Inspect a mounted instance
+
+```javascript
+const report = window.FffAssetInjector.explainOwner(componentElement);
+console.log(report.status, report.owners, report.factories);
+```
+
+`componentElement` is your rendered instance in the current document. This report
+is a snapshot, so request it again after a lifecycle change. See
+[diagnostics](/docs/extensions/diagnostics) for report fields and privacy limits.

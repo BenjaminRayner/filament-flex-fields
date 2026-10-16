@@ -233,7 +233,7 @@ describe('mega — remote soft-fail × selection preserve', () => {
             it(`remote ${JSON.stringify(results)} selected=${JSON.stringify(selected)}`, () => {
                 const apply = shouldApplyRemoteOptionsFromFetchResult(results)
 
-                if (results === null) {
+                if (!Array.isArray(results)) {
                     assert.equal(apply, false)
                     // soft-fail: do not prune
                     assert.deepEqual(selected, selected)

@@ -4,53 +4,25 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Http\Controllers;
 
+use Bjanczak\FilamentFlexFields\Support\LinkPreview\LinkPreviewUrl;
+use Bjanczak\FilamentFlexFields\Support\LinkPreview\MetadataPresentation;
+use Bjanczak\FilamentFlexFields\Support\LinkPreview\PreviewRequestLimiter;
 use Bjanczak\FilamentFlexFields\Support\UrlMeta\UrlMetaScraper;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Validation\ValidationException;
 
-class UrlMetaScrapeController extends Controller
+final class UrlMetaScrapeController extends Controller
 {
     public function scrape(Request $request, UrlMetaScraper $scraper): JsonResponse
     {
-        $this->ensureWithinRateLimit($request);
-
+        PreviewRequestLimiter::check($request);
         $url = $request->query('url');
-
-        if (! is_string($url) || $url === '' || ! $scraper->isScrapableUrl($url)) {
-            return response()->json([
-                'error' => __('filament-flex-fields::default.link_preview.invalid_url'),
-            ], 400);
+        if (! is_string($url) || strlen($url) > 2048 || ! LinkPreviewUrl::isPublicSyntax($url)) {
+            return response()->json(['error' => __('filament-flex-fields::default.link_preview.invalid_url')], 400);
         }
 
-        return response()->json($scraper->scrape($url));
-    }
-
-    protected function ensureWithinRateLimit(Request $request): void
-    {
-        $maxAttempts = (int) config('filament-flex-fields.link_preview.rate_limit_per_minute', 30);
-
-        if ($maxAttempts <= 0) {
-            return;
-        }
-
-        try {
-            $key = 'fff-url-meta:'.($request->user()?->getAuthIdentifier() ?? $request->ip() ?? 'anonymous');
-
-            if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
-                throw ValidationException::withMessages([
-                    'url' => [__('filament-flex-fields::default.link_preview.rate_limited')],
-                ]);
-            }
-
-            RateLimiter::hit($key, 60);
-        } catch (ValidationException $exception) {
-            throw $exception;
-        } catch (QueryException $exception) {
-            report($exception);
-        }
+        return response()->json(MetadataPresentation::forBrowser($scraper->scrape($url)))
+            ->header('Cache-Control', 'private, no-store');
     }
 }

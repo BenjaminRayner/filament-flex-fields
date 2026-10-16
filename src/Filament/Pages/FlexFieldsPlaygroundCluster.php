@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Pages;
 
-use Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundRegistry;
+use Bjanczak\FilamentFlexFields\Support\Translations;
 use Filament\Clusters\Cluster;
-use Filament\Facades\Filament;
-use Filament\Navigation\NavigationItem;
 use Filament\Pages\Enums\SubNavigationPosition;
 use Illuminate\Support\Facades\Auth;
 
 class FlexFieldsPlaygroundCluster extends Cluster
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-beaker';
+    public const SLUG = 'flex-fields';
 
-    protected static ?string $navigationLabel = 'Flex Fields Playground';
+    protected static string|\BackedEnum|null $navigationIcon = 'flexbrand-logo';
 
-    protected static ?string $title = 'Flex Fields Playground';
+    protected static ?string $navigationLabel = 'FLEX FIELDS';
 
-    protected static ?string $slug = 'flex-fields-playground';
+    protected static ?string $title = 'FLEX';
+
+    protected static ?string $slug = self::SLUG;
 
     protected static ?int $navigationSort = 91;
 
@@ -39,18 +39,12 @@ class FlexFieldsPlaygroundCluster extends Cluster
 
     public static function getNavigationGroup(): string|\UnitEnum|null
     {
-        return config(
-            'filament-flex-fields.playground.navigation_group',
-            FilamentFlexFieldsPlugin::make()->getNavigationGroup(),
-        );
+        return Translations::get('filament-flex-fields::catalog.navigation_group');
     }
 
     public static function getNavigationSort(): ?int
     {
-        return (int) config(
-            'filament-flex-fields.playground.navigation_sort',
-            FilamentFlexFieldsPlugin::make()->getNavigationSort() ?? static::$navigationSort,
-        );
+        return (int) config('filament-flex-fields.navigation.sort', static::$navigationSort);
     }
 
     public function mount(): void
@@ -58,36 +52,8 @@ class FlexFieldsPlaygroundCluster extends Cluster
         redirect(FlexFieldsPlaygroundIndexPage::getUrl());
     }
 
-    /**
-     * @return list<NavigationItem>
-     */
     public function getSubNavigation(): array
     {
-        $items = [
-            NavigationItem::make('All components')
-                ->icon('heroicon-o-squares-2x2')
-                ->url(FlexFieldsPlaygroundIndexPage::getUrl())
-                ->sort(-100)
-                ->isActiveWhen(fn (): bool => request()->routeIs(
-                    FlexFieldsPlaygroundIndexPage::getRouteName(),
-                ) || str_ends_with(rtrim(request()->path(), '/'), '/flex-fields-playground/index')),
-        ];
-
-        foreach (FlexFieldsPlaygroundRegistry::ordered() as $slug => $definition) {
-            $item = NavigationItem::make($definition['label'])
-                ->icon($definition['icon'])
-                ->group($definition['category']->label())
-                ->url(FlexFieldsPlaygroundComponentPage::getUrl(configuration: $slug))
-                ->sort($definition['sort'])
-                ->isActiveWhen(fn (): bool => Filament::getCurrentPageConfigurationKey() === $slug);
-
-            if (isset($definition['badge'])) {
-                $item->badge($definition['badge'], $definition['badgeColor'] ?? null);
-            }
-
-            $items[] = $item;
-        }
-
-        return $items;
+        return [];
     }
 }

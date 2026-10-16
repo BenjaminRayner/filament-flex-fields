@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
 use Bjanczak\FilamentFlexFields\Enums\DateTimeFieldMode;
+use Bjanczak\FilamentFlexFields\Enums\DateTimeGranularity;
 
-class FlexDateTimePicker extends FlexDateTimeField
+class FlexDateTimePicker extends FlexCivilDateField
 {
     public function getMode(): DateTimeFieldMode
     {
@@ -17,6 +18,10 @@ class FlexDateTimePicker extends FlexDateTimeField
     {
         parent::setUp();
 
+        $this->granularity = DateTimeGranularity::Minute;
+        $this->closeOnSelect = false;
+        $this->dateEditable = false;
+        $this->dateClearable = true;
         $this->showCalendar = true;
         $this->showCalendarButton = true;
     }

@@ -9,6 +9,7 @@ use Bjanczak\FilamentFlexFields\Enums\FieldType;
 use Bjanczak\FilamentFlexFields\Models\FlexFieldGroup;
 use Bjanczak\FilamentFlexFields\Support\Intelligence\FormulaEngine;
 use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 use JsonException;
 use Throwable;
 
@@ -27,6 +28,9 @@ final class FlexFieldGroupValidator
 
         $schema = $group->toRegistrySchema();
         $dryRun = $this->importExport->dryRunValidate($schema);
+        if (! $dryRun['ok']) {
+            return $dryRun;
+        }
         $errors = [...$errors, ...$dryRun['errors']];
 
         $fields = $group->fields ?? [];
@@ -41,7 +45,7 @@ final class FlexFieldGroupValidator
         }
 
         $slugs = [];
-        $sectionIds = $this->collectSectionIds(is_array($group->sections) ? $group->sections : []);
+        $sectionIds = $this->collectSectionIds(is_array($group->sections) ? array_values($group->sections) : []);
         $formulas = [];
 
         foreach ($fields as $index => $field) {
@@ -86,7 +90,12 @@ final class FlexFieldGroupValidator
             }
 
             try {
-                FlexFieldDefinition::fromArray($this->normalizeFieldAttributes($field));
+                $definition = FlexFieldDefinition::fromArray($this->normalizeFieldAttributes($field));
+                foreach ([$definition->visibleWhen, $definition->requiredWhen, $definition->disabledWhen] as $condition) {
+                    if ($condition !== null) {
+                        JsonFieldConditions::assertValid($condition);
+                    }
+                }
             } catch (Throwable $exception) {
                 $label = is_string($slug) && filled($slug) ? $slug : (string) $index;
                 $errors[] = "Field \"{$label}\" could not be parsed: {$exception->getMessage()}";
@@ -100,7 +109,7 @@ final class FlexFieldGroupValidator
             }
 
             if (is_string($slug) && filled($slug)) {
-                $formula = $field['formula'] ?? $field['calculated'] ?? null;
+                $formula = FieldFormula::resolve($field);
 
                 if (is_string($formula) && trim($formula) !== '') {
                     $formulas[$slug] = trim($formula);
@@ -164,7 +173,13 @@ final class FlexFieldGroupValidator
      */
     public function normalizeFieldAttributes(array $field): array
     {
+        $this->assertFieldList([$field]);
         $field = $this->decodeJsonAttributes($field);
+        foreach (['type_settings', 'field_options', 'field_matrix_rows', 'field_matrix_columns'] as $key) {
+            if (array_key_exists($key, $field) && $field[$key] !== null && ! is_array($field[$key])) {
+                throw new InvalidArgumentException('Field '.$key.' must be an array.');
+            }
+        }
         $field = FlexFieldTypeSettingsStorage::mergeIntoField($field);
         $field = FlexFieldMatrixStorage::mergeIntoField($field);
         $field = $this->mergeFieldOptionsIntoConfig($field);
@@ -183,6 +198,7 @@ final class FlexFieldGroupValidator
         if ($fields === null) {
             return [];
         }
+        $this->assertFieldList($fields);
 
         return array_values(array_map(
             fn (array $field): array => $this->prepareFieldForForm($field),
@@ -199,11 +215,26 @@ final class FlexFieldGroupValidator
         if ($fields === null) {
             return [];
         }
+        $this->assertFieldList($fields);
 
         return array_values(array_map(
             fn (array $field): array => $this->normalizeFieldAttributes($field),
             $fields,
         ));
+    }
+
+    /** @param array<array-key, mixed> $fields */
+    private function assertFieldList(array $fields): void
+    {
+        SchemaPayloadContract::budget()->assert($fields);
+        if (! array_is_list($fields) || count($fields) > SchemaPayloadContract::MAX_FIELDS) {
+            throw new InvalidArgumentException('Field groups require a bounded field list.');
+        }
+        foreach ($fields as $field) {
+            if (! is_array($field) || (array_key_exists('type', $field) && ! is_string($field['type']))) {
+                throw new InvalidArgumentException('Field group records must be objects with a string type.');
+            }
+        }
     }
 
     /**
@@ -257,10 +288,15 @@ final class FlexFieldGroupValidator
             if (is_string($value)) {
                 try {
                     $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
-                    $field[$jsonKey] = is_array($decoded) ? $decoded : $value;
-                } catch (JsonException) {
-                    // Validation will catch invalid JSON separately.
+                } catch (JsonException $exception) {
+                    throw new InvalidArgumentException('Invalid field JSON attribute: '.$jsonKey, 0, $exception);
                 }
+                if (! is_array($decoded)) {
+                    throw new InvalidArgumentException('Field JSON attribute must contain an object or array: '.$jsonKey);
+                }
+                $field[$jsonKey] = $decoded;
+            } elseif (! is_array($value)) {
+                throw new InvalidArgumentException('Field JSON attribute must contain an object or array: '.$jsonKey);
             }
         }
 

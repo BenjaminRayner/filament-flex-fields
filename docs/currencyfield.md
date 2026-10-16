@@ -1,9 +1,118 @@
 ---
 title: "CurrencyField"
 description: Revolut-style currency input with locale-aware formatting, digit animations, optional currency picker, and minor-unit storage.
+icon: "banknote"
+"canonical": "https://flex-fields.bjanczak.com/docs/currencyfield"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/currency-field.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "CurrencyField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/currency-field-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/currency-field-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/currency-field.webp"
+"twitter:image:alt": "CurrencyField in the FLEX Fields playground"
 ---
 
-![CurrencyField](/art/sc-5.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/currencyfield#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/currencyfield",
+      "name": "CurrencyField",
+      "description": "Revolut-style currency input with locale-aware formatting, digit animations, optional currency picker, and minor-unit storage.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/currencyfield#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/currencyfield#article",
+      "url": "https://flex-fields.bjanczak.com/docs/currencyfield",
+      "headline": "CurrencyField",
+      "description": "Revolut-style currency input with locale-aware formatting, digit animations, optional currency picker, and minor-unit storage.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/currencyfield#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/currency-field-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/currency-field-motion.mp4#video",
+      "name": "CurrencyField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of CurrencyField in the FLEX Fields playground for Filament. Revolut-style currency input with locale-aware formatting, digit animations, optional currency picker, and minor-unit storage.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/currency-field.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT7.183S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/currency-field-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/currencyfield#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/currency-field-motion.mp4"
+  poster="/art/previews/currency-field.webp"
+  width="1920"
+  height="1080"
+  aria-label="CurrencyField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/currency-field-motion.mp4">Watch the CurrencyField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -169,7 +278,7 @@ CurrencyField::make('donation_amount')
 
 ### Playground
 
-`/admin/flex-fields-playground/currency-field`
+`/admin/flex-fields/currency-field`
 
 See [Playground](/docs/index#playground) for setup.
 

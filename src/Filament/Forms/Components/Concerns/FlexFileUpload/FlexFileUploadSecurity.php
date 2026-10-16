@@ -42,6 +42,8 @@ trait FlexFileUploadSecurity
 
     protected bool $flexRecommendedDefaultsApplied = false;
 
+    protected bool $flexImageDimensionValidationEnabled = false;
+
     public function applyRecommendedSecurityDefaults(): static
     {
         $this->flexRecommendedDefaultsApplied = true;
@@ -63,7 +65,7 @@ trait FlexFileUploadSecurity
         return $this
             ->acceptedFileTypes(FileUploadMimePresets::documents())
             ->validationMessages([
-                'mimetypes' => Translations::get('filament-flex-fields::default.file_upload.validation.documents_only'),
+                'mimetypes' => fn (): string => Translations::get('filament-flex-fields::default.file_upload.validation.documents_only'),
             ]);
     }
 
@@ -72,7 +74,7 @@ trait FlexFileUploadSecurity
         return $this
             ->acceptedFileTypes(FileUploadMimePresets::images())
             ->validationMessages([
-                'mimetypes' => Translations::get('filament-flex-fields::default.file_upload.validation.images_only'),
+                'mimetypes' => fn (): string => Translations::get('filament-flex-fields::default.file_upload.validation.images_only'),
             ]);
     }
 
@@ -81,7 +83,7 @@ trait FlexFileUploadSecurity
         return $this
             ->acceptedFileTypes(FileUploadMimePresets::spreadsheets())
             ->validationMessages([
-                'mimetypes' => Translations::get('filament-flex-fields::default.file_upload.validation.spreadsheets_only'),
+                'mimetypes' => fn (): string => Translations::get('filament-flex-fields::default.file_upload.validation.spreadsheets_only'),
             ]);
     }
 
@@ -201,6 +203,7 @@ trait FlexFileUploadSecurity
 
     protected function registerImageDimensionRule(): void
     {
+        $this->flexImageDimensionValidationEnabled = true;
         $this->rule(static function (BaseFileUpload $component): ?Closure {
             /** @var static $component */
             $minWidth = $component->getFlexMinImageWidth();
@@ -293,6 +296,17 @@ trait FlexFileUploadSecurity
         $value = $this->evaluate($this->flexMaxImageHeight);
 
         return is_numeric($value) ? (int) $value : null;
+    }
+
+    /** Resize targets alone are not upload validation limits.
+     * @return array{minWidth: ?int, minHeight: ?int, maxWidth: ?int, maxHeight: ?int}|null
+     */
+    public function getUploadValidationDimensions(): ?array
+    {
+        return $this->flexImageDimensionValidationEnabled ? [
+            'minWidth' => $this->getFlexMinImageWidth(), 'minHeight' => $this->getFlexMinImageHeight(),
+            'maxWidth' => $this->getFlexMaxImageWidth(), 'maxHeight' => $this->getFlexMaxImageHeight(),
+        ] : null;
     }
 
     /**

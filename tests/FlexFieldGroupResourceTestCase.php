@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Tests;
 
-use Bjanczak\BladeGravityIcons\BladeGravityIconsServiceProvider;
+use Bjanczak\BladeHugeicons\BladeHugeiconsServiceProvider;
 use Bjanczak\FilamentFlexFields\FilamentFlexFieldsServiceProvider;
 use Bjanczak\FilamentFlexFields\Tests\Support\FlexFieldsTestPanelProvider;
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
@@ -49,7 +49,7 @@ abstract class FlexFieldGroupResourceTestCase extends Orchestra
             TranslationServiceProvider::class,
             BladeIconsServiceProvider::class,
             BladeHeroiconsServiceProvider::class,
-            BladeGravityIconsServiceProvider::class,
+            BladeHugeiconsServiceProvider::class,
             FilamentFlexFieldsServiceProvider::class,
             FilamentServiceProvider::class,
             LivewireServiceProvider::class,

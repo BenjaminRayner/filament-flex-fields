@@ -27,13 +27,14 @@ it('renders flex matrix table shell with lazy stylesheet hooks', function (): vo
             ]),
     ];
 
-    $html = Livewire::test(TestableFlexMatrixTableForm::class)->html(false);
+    $html = Livewire::test(TestableFlexMatrixTableForm::class)->set('data.specs', ['length' => ['value' => '24.5'], 'beam' => ['value' => '6.2']])->html(false);
 
     expect($html)
         ->toContain('fff-matrix-choice')
+        ->toContain('--fff-matrix-choice-columns: 1;', '--fff-matrix-choice-columns-template: var(--fff-matrix-choice-row-label-width) 1fr;')
         ->toContain('fff-matrix-choice__row-title')
         ->toContain('Overall Length')
         ->toContain('Meters')
         ->toContain('data-fff-asset-batch')
-        ->toContain('data-fff-asset-consumer="matrix-choice-field"');
+        ->toContain('data-fff-asset-consumer="flex-matrix-table"');
 });

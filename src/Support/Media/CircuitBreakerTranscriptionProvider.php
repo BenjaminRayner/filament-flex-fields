@@ -4,65 +4,33 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Media;
 
-use Illuminate\Support\Facades\Cache;
+use Bjanczak\FilamentFlexFields\Support\Runtime\CircuitBreaker;
+use Throwable;
 
+/** Transcription adapter; null is a valid no-transcription result, exceptions are failures. */
 final class CircuitBreakerTranscriptionProvider implements VoiceNoteTranscriptionInterface
 {
+    private readonly CircuitBreaker $circuit;
+
     public function __construct(
         private readonly VoiceNoteTranscriptionInterface $provider,
-        private readonly int $failureThreshold = 3,
-        private readonly int $openSeconds = 30,
-    ) {}
+        int $failureThreshold = 3,
+        int $openSeconds = 30,
+        ?string $cacheScope = null,
+        int $probeSeconds = 60,
+    ) {
+        $this->circuit = new CircuitBreaker(
+            'transcription:'.$provider::class.':'.($cacheScope ?? 'default'),
+            $failureThreshold, $openSeconds, $probeSeconds,
+        );
+    }
 
     public function transcribe(string $disk, string $path, array $context = []): ?string
     {
-        if ($this->isOpen()) {
-            return null;
-        }
-
         try {
-            $result = $this->provider->transcribe($disk, $path, $context);
-            $this->recordSuccess();
-
-            return $result;
-        } catch (\Throwable) {
-            $this->recordFailure();
-
+            return $this->circuit->run(fn (): ?string => $this->provider->transcribe($disk, $path, $context));
+        } catch (Throwable) {
             return null;
         }
-    }
-
-    private function isOpen(): bool
-    {
-        return (bool) Cache::get($this->openKey(), false);
-    }
-
-    private function recordFailure(): void
-    {
-        $key = $this->failureKey();
-        $failures = (int) Cache::get($key, 0) + 1;
-
-        Cache::put($key, $failures, now()->addMinutes(5));
-
-        if ($failures >= $this->failureThreshold) {
-            Cache::put($this->openKey(), true, now()->addSeconds($this->openSeconds));
-            Cache::forget($key);
-        }
-    }
-
-    private function recordSuccess(): void
-    {
-        Cache::forget($this->failureKey());
-        Cache::forget($this->openKey());
-    }
-
-    private function failureKey(): string
-    {
-        return 'fff-transcription:circuit:failures';
-    }
-
-    private function openKey(): string
-    {
-        return 'fff-transcription:circuit:open';
     }
 }

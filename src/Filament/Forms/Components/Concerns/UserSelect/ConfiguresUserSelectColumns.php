@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\UserSelect;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\UserSelect;
+use Bjanczak\FilamentFlexFields\Support\Select\Configuration\PickerConfiguration;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionLabelIndex;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionValue;
 use Closure;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
@@ -87,26 +90,26 @@ trait ConfiguresUserSelectColumns
 
     public function getNameColumn(): string
     {
-        return (string) $this->evaluate($this->nameColumn);
+        return PickerConfiguration::text($this->evaluate($this->nameColumn), 'nameColumn');
     }
 
     public function getEmailColumn(): ?string
     {
-        $column = $this->evaluate($this->emailColumn);
+        $column = PickerConfiguration::optionalText($this->evaluate($this->emailColumn), 'emailColumn');
 
         return filled($column) ? (string) $column : null;
     }
 
     public function getAvatarColumn(): ?string
     {
-        $column = $this->evaluate($this->avatarColumn);
+        $column = PickerConfiguration::optionalText($this->evaluate($this->avatarColumn), 'avatarColumn');
 
         return filled($column) ? (string) $column : null;
     }
 
     public function getVerificationColumn(): ?string
     {
-        $column = $this->evaluate($this->verificationColumn);
+        $column = PickerConfiguration::optionalText($this->evaluate($this->verificationColumn), 'verificationColumn');
 
         return filled($column) ? (string) $column : null;
     }
@@ -144,5 +147,26 @@ trait ConfiguresUserSelectColumns
     public function findOptionLabelForState(array $options, mixed $state): array|string|null
     {
         return $this->findOptionLabel($options, $state);
+    }
+
+    /** One index per selected-value batch, including nested PHP groups.
+     * @param  array<int|string, mixed>  $options
+     * @param  array<int|string, mixed>  $values
+     * @return array<int|string, array<string, mixed>|string>
+     */
+    public function findOptionLabelsForStates(array $options, array $values): array
+    {
+        $index = new OptionLabelIndex(
+            $options, fn (array $label): bool => $this->isOptionGroupArray($label),
+        );
+        $labels = [];
+        foreach ($values as $value) {
+            $key = OptionValue::normalize($value);
+            if ($key !== null && ($label = $index->find($key)) !== null) {
+                $labels[$key] = $label;
+            }
+        }
+
+        return $labels;
     }
 }

@@ -1,0 +1,39 @@
+---
+title: "Depend on another extension"
+description: "Declare Composer dependencies and collect definitions independently of provider order."
+---
+
+When a family depends on a component registered by another service provider, use
+`collectFamily()` in your provider's ordinary `boot()` method:
+
+```php
+public function boot(ComponentRegistrar $components): void
+{
+    $components->collectFamily([
+        new ComponentRegistration(
+            new ComponentDefinition(
+                id: 'acme-summary-field',
+                kind: ComponentKind::Field,
+                uses: ['partner-rating-field'],
+            ),
+        ),
+    ]);
+}
+```
+
+Install the package that supplies `partner-rating-field`. Both providers may
+collect their definitions in either order. FLEX checks the whole collection after
+the ordinary providers have booted; an unresolved dependency or collision rejects
+that collection. Pending definitions are not available for rendering before that
+commit. Each family still has its own 128-member limit.
+
+The application registry becomes read-only after this commit. Registering from a
+request, a queue job or a later `booted()` callback raises a configuration error.
+Restart long-running workers when updating your package's definitions. Use
+`registerFamily()` when all dependencies are already registered or are included in
+the same family.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

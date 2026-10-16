@@ -1,0 +1,100 @@
+{
+  "format": 1,
+  "scope": [
+    "bootstrap",
+    "components",
+    "flex-rich-editor-block-image-extension",
+    "flex-rich-editor-paste-extension",
+    "flex-rich-editor-youtube-extension",
+    "injector",
+    "inspector"
+  ],
+  "builds": [
+    {
+      "id": "bootstrap",
+      "inputs": 4,
+      "outputs": 1,
+      "outputBytes": 4165
+    },
+    {
+      "id": "components",
+      "inputs": 1306,
+      "outputs": 183,
+      "outputBytes": 2086524
+    },
+    {
+      "id": "flex-rich-editor-block-image-extension",
+      "inputs": 1,
+      "outputs": 1,
+      "outputBytes": 1223
+    },
+    {
+      "id": "flex-rich-editor-paste-extension",
+      "inputs": 1,
+      "outputs": 1,
+      "outputBytes": 1097
+    },
+    {
+      "id": "flex-rich-editor-youtube-extension",
+      "inputs": 6,
+      "outputs": 1,
+      "outputBytes": 8218
+    },
+    {
+      "id": "injector",
+      "inputs": 1,
+      "outputs": 1,
+      "outputBytes": 260
+    },
+    {
+      "id": "inspector",
+      "inputs": 1,
+      "outputs": 1,
+      "outputBytes": 4230
+    }
+  ],
+  "sameSourceRepeated": 0,
+  "ownSourceRepeated": 0,
+  "extraAttributedBytes": 0,
+  "duplicates": [],
+  "coverage": {
+    "attributedJavascript": 189,
+    "opaqueDistributedJavascript": 0,
+    "sourceAttributionComplete": true,
+    "opaque": [
+      {
+        "format": 1,
+        "id": "whisper-prebuilt",
+        "reason": "Optional separately installed browser JS/ONNX WASM; exact source bytes verified against the installer manifest.",
+        "files": {
+          "node_modules/@huggingface/transformers/dist/transformers.min.js": {
+            "bytes": 586230,
+            "sha256": "8d6716d9086f57c30a4bf367dba61b887593573c770c454465e8019b2703e743"
+          },
+          "node_modules/@huggingface/transformers/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.mjs": {
+            "bytes": 24381,
+            "sha256": "c57ca56328877353a575e51bbca6f18450027d6c9bf2307a2cb2c41363b4de9f"
+          },
+          "node_modules/@huggingface/transformers/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm": {
+            "bytes": 14264838,
+            "sha256": "06ba057753da3847e4c24f02d91ab133455b0817c69a44993a9a53a2146df9e3"
+          }
+        },
+        "provenance": {
+          "node_modules/@huggingface/transformers/node_modules/onnxruntime-web/package.json": {
+            "bytes": 4639,
+            "sha256": "ce2ce78732a15ddcaf52fe5f26c801a05ff149abda4e875dc2837d8a99e455b2"
+          },
+          "node_modules/@huggingface/transformers/package.json": {
+            "bytes": 2648,
+            "sha256": "301ae33e44c5ef32b8bd649b880637d4927dbaf248568f7a533e3e2ff831fb0e"
+          },
+          "src/Support/WhisperRuntimeManifest.php": {
+            "bytes": 2284,
+            "sha256": "d76b42c71d4a4fb8d5845af75af28eb9de5286cf47e2e3066158881203a368a6"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexChecklist;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexRadiolist;
+use Bjanczak\FilamentFlexFields\Support\ChoiceLists\State\ChecklistStateCast;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
-use Filament\Schemas\Components\StateCasts\OptionsArrayStateCast;
 
 it('uses gravity ui lock icon by default', function () {
     expect(FlexChecklist::make('permissions')->getLockIcon())->toBe(GravityIcon::Lock)
@@ -83,7 +83,7 @@ it('casts state to options array', function () {
 
     $casts = collect($field->getDefaultStateCasts());
 
-    expect($casts->contains(fn ($cast): bool => $cast instanceof OptionsArrayStateCast))->toBeTrue();
+    expect($casts->contains(fn ($cast): bool => $cast instanceof ChecklistStateCast))->toBeTrue();
 });
 
 it('includes array validation rule', function () {
@@ -219,11 +219,46 @@ it('accepts desc as an inline option alias for description', function () {
     expect($field->getNormalizedOptions()['documents']['description'])->toBe('Updated 2 days ago');
 });
 
-it('routes checkbox clicks through the row handler only', function () {
+it('renders through the shared choice-list templates with no duplicated row logic', function () {
     $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-checklist.blade.php');
-
-    expect($blade)
-        ->toContain('x-on:click="toggle(@js($key))"')
-        ->not->toContain('x-on:click.stop="toggle')
-        ->not->toContain('<label class="fff-flex-checklist__checkbox"');
+    $row = file_get_contents(__DIR__.'/../../resources/views/forms/components/choice-lists/row.blade.php');
+    expect($blade)->toContain('choice-lists.field', "'multiple' => true")
+        ->and($row)->toContain('data-choice-option', 'checklist-indicator')
+        ->not->toContain('x-on:click', 'x-bind:checked');
 });
+
+it('rejects malformed, repeated, unknown and disabled selections', function (mixed $value) {
+    $field = FlexChecklist::make('permissions')->options(['a' => 'A', 'b' => 'B', 'locked' => 'Locked'])->disabledOptions(['locked']);
+    $rules = $field->getValidationRules();
+    $validator = validator(['permissions' => $value], ['permissions' => $rules]);
+    expect($validator->fails())->toBeTrue();
+})->with([
+    'nested' => [[['a']]],
+    'boolean' => [[true]],
+    'float' => [[1.2]],
+    'duplicate' => [['a', 'a']],
+    'associative' => [['named' => 'a']],
+    'unknown' => [['missing']],
+    'locked' => [['locked']],
+    'scalar' => ['a'],
+]);
+
+it('preserves invalid state for validation and decodes stored JSON safely', function () {
+    $cast = new ChecklistStateCast;
+    expect($cast->get('["a","b"]'))->toBe(['a', 'b'])
+        ->and($cast->get([['a']]))->toBe([['a']])
+        ->and($cast->set(['a', 'a']))->toBe(['a', 'a'])
+        ->and($cast->get(['name' => 'a']))->toBe(['name' => 'a'])
+        ->and($cast->set([true]))->toBe([true])
+        ->and($cast->get('broken json'))->toBe('broken json')
+        ->and($cast->get(null))->toBe([]);
+});
+
+it('checks selection limit configuration and exact selection takes precedence', function () {
+    expect(FlexChecklist::make('a')->minSelections(3)->maxSelections(1)->exactSelections(2)->getSelectionLimits()->violation(2, false))->toBeNull();
+    FlexChecklist::make('b')->minSelections(3)->maxSelections(1)->getSelectionLimits();
+})->throws(InvalidArgumentException::class);
+
+it('rejects negative selection limits', function () {
+    FlexChecklist::make('a')->exactSelections(-1)->getSelectionLimits();
+})->throws(InvalidArgumentException::class);

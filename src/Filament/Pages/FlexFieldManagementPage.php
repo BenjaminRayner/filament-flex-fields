@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Gate;
 
 class FlexFieldManagementPage extends Page
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string|\BackedEnum|null $navigationIcon = 'hugeicons-grid-view';
 
     protected static ?string $navigationLabel = 'Flex field studio';
 
@@ -104,7 +104,7 @@ class FlexFieldManagementPage extends Page
     {
         return [
             Action::make('createGroup')
-                ->label(__('filament-flex-fields::default.schema.management_create_group'))
+                ->label(fn () => __('filament-flex-fields::default.schema.management_create_group'))
                 ->url(fn (): string => FlexFieldGroupResource::getUrl('create', [
                     'target_type' => $this->entity,
                 ])),
@@ -120,14 +120,14 @@ class FlexFieldManagementPage extends Page
 
         foreach (app(FlexFieldEntityRegistry::class)->all() as $entityModel) {
             $items[] = NavigationItem::make($entityModel->label)
-                ->icon($entityModel->icon ?? 'heroicon-o-rectangle-stack')
+                ->icon($entityModel->icon ?? 'hugeicons-layers-01')
                 ->url(static::getUrl(['entity' => $entityModel->modelClass]))
                 ->isActiveWhen(fn (): bool => $this->entity === $entityModel->modelClass);
         }
 
         if ($items === []) {
-            $items[] = NavigationItem::make(__('filament-flex-fields::default.schema.management_default_entity'))
-                ->icon('heroicon-o-rectangle-stack')
+            $items[] = NavigationItem::make(fn () => __('filament-flex-fields::default.schema.management_default_entity'))
+                ->icon('hugeicons-layers-01')
                 ->url(static::getUrl())
                 ->isActiveWhen(fn (): bool => true);
         }

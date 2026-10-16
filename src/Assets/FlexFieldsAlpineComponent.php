@@ -4,31 +4,30 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Assets;
 
+use Bjanczak\FilamentFlexFields\Assets\Concerns\ResolvesAssetContentVersion;
+use Bjanczak\FilamentFlexFields\Assets\Concerns\ResolvesImmutableAssetRelease;
 use Filament\Support\Assets\AlpineComponent;
-use Throwable;
 
 class FlexFieldsAlpineComponent extends AlpineComponent
 {
-    /**
-     * @var array<string, string>
-     */
-    protected static array $versionCache = [];
+    use ResolvesAssetContentVersion;
+    use ResolvesImmutableAssetRelease;
 
-    public function getVersion(): string
+    protected bool $hasContentHash = false;
+
+    public function contentHashed(bool $condition = true): static
     {
-        $path = $this->getPublicPath();
+        $this->hasContentHash = $condition;
 
-        if (isset(self::$versionCache[$path])) {
-            return self::$versionCache[$path];
-        }
+        return $this;
+    }
 
-        try {
-            if (file_exists($path)) {
-                return self::$versionCache[$path] = (string) filemtime($path);
-            }
-        } catch (Throwable) {
-        }
-
-        return self::$versionCache[$path] = parent::getVersion();
+    public function getSrc(): string
+    {
+        // ESM imports address hashed chunks by filename without a query string.
+        // Preload must use exactly that same module identity.
+        return $this->hasContentHash || $this->immutablePublicPath() !== null
+            ? asset($this->getRelativePublicPath())
+            : parent::getSrc();
     }
 }

@@ -1,131 +1,17 @@
-import { flushOverlaySheetToScreenBottom, syncOverlaySheetToVisualViewport } from './overlay-sheet-scroll-lock.js'
+import { createResourceScope } from '../runtime/lifecycle/resource-scope.js'
+import { resolveOverlaySheetPeekHeight, resolveOverlaySheetExpandedHeight, notifyOverlaySheetGeometry,
+    overlaySheetCanExpand, OVERLAY_SHEET_RESIZE_TRANSITION } from './overlay-sheet-sizing.js'
+export { fitOverlaySheetToContent, resolveOverlaySheetPeekHeight, resolveOverlaySheetMinHeight,
+    resolveOverlaySheetExpandedHeight, notifyOverlaySheetGeometry, overlaySheetCanExpand,
+    OVERLAY_SHEET_MIN_HEIGHT_PX, OVERLAY_SHEET_GEOMETRY_EVENT } from './overlay-sheet-sizing.js'
 
 const DRAG_THRESHOLD_PX = 8
 const DISMISS_FRACTION = 0.3
 const VELOCITY_THRESHOLD = 0.5
-const PEEK_VIEWPORT_FRACTION = 0.5
-const EXPANDED_VIEWPORT_FRACTION = 0.8
-const PEEK_MAX_PX = 32 * 16
-/** Floor so empty/loading states (icon + label) are never clipped under the search row. */
-export const OVERLAY_SHEET_MIN_HEIGHT_PX = 280
-const SNAP_EASE = 'height 0.25s cubic-bezier(0.32, 0.72, 0, 1), max-height 0.25s cubic-bezier(0.32, 0.72, 0, 1), transform 0.25s cubic-bezier(0.32, 0.72, 0, 1)'
+const SNAP_EASE = OVERLAY_SHEET_RESIZE_TRANSITION
 const EXIT_EASE = 'transform 0.2s cubic-bezier(0.32, 0.72, 0, 1)'
 const EXIT_MS = 200
 
-export const OVERLAY_SHEET_GEOMETRY_EVENT = 'fff-overlay-sheet-geometry'
-
-/**
- * Notify consumers (virtual lists) that sheet height / snap changed.
- *
- * @param {HTMLElement | null | undefined} panel
- */
-export function notifyOverlaySheetGeometry(panel) {
-    if (! panel || typeof panel.dispatchEvent !== 'function') {
-        return
-    }
-
-    try {
-        panel.dispatchEvent(new CustomEvent(OVERLAY_SHEET_GEOMETRY_EVENT, {
-            bubbles: true,
-            detail: {
-                snap: panel.dataset?.fffOverlaySnap ?? null,
-                height: panel.getBoundingClientRect?.().height ?? 0,
-            },
-        }))
-    } catch {
-        // Ignore environments without CustomEvent.
-    }
-}
-
-/**
- * @param {HTMLElement | Window | null | undefined} panelOrWin
- * @param {Window} [win]
- * @returns {{ panel: HTMLElement | null, win: Window }}
- */
-function resolveSheetHeightArgs(panelOrWin, win) {
-    const looksLikeWindow = Boolean(
-        panelOrWin
-        && typeof panelOrWin.innerHeight === 'number'
-        && ! ('dataset' in panelOrWin)
-        && ! ('style' in panelOrWin && panelOrWin.style && typeof panelOrWin.style.setProperty === 'function'),
-    )
-
-    if (panelOrWin && ! looksLikeWindow) {
-        return {
-            panel: /** @type {HTMLElement} */ (panelOrWin),
-            win: win ?? globalThis.window,
-        }
-    }
-
-    return {
-        panel: null,
-        win: /** @type {Window} */ (panelOrWin ?? win ?? globalThis.window),
-    }
-}
-
-/**
- * @param {HTMLElement | null | undefined} panel
- * @param {Window} win
- * @returns {number}
- */
-function resolveSheetLayoutViewportHeight(panel, win = globalThis.window) {
-    const frozen = Number.parseInt(panel?.dataset?.fffSheetLayoutViewport || '', 10)
-
-    if (Number.isFinite(frozen) && frozen > 0) {
-        return frozen
-    }
-
-    const height = win?.innerHeight ?? 0
-
-    if (panel?.dataset && height > 0) {
-        panel.dataset.fffSheetLayoutViewport = String(height)
-    }
-
-    return height
-}
-
-/**
- * @param {HTMLElement | Window | null | undefined} [panelOrWin]
- * @param {Window} [win]
- * @returns {number}
- */
-export function resolveOverlaySheetPeekHeight(panelOrWin = globalThis.window, win) {
-    const args = resolveSheetHeightArgs(panelOrWin, win)
-    const viewport = resolveSheetLayoutViewportHeight(args.panel, args.win)
-
-    return Math.min(Math.round(viewport * PEEK_VIEWPORT_FRACTION), PEEK_MAX_PX)
-}
-
-/**
- * Minimum sheet height (never larger than the peek cap on short viewports).
- *
- * @param {HTMLElement | Window | null | undefined} [panelOrWin]
- * @param {Window} [win]
- * @returns {number}
- */
-export function resolveOverlaySheetMinHeight(panelOrWin = globalThis.window, win) {
-    const args = resolveSheetHeightArgs(panelOrWin, win)
-
-    return Math.min(OVERLAY_SHEET_MIN_HEIGHT_PX, resolveOverlaySheetPeekHeight(args.panel, args.win))
-}
-
-/**
- * @param {HTMLElement | Window | null | undefined} [panelOrWin]
- * @param {Window} [win]
- * @returns {number}
- */
-export function resolveOverlaySheetExpandedHeight(panelOrWin = globalThis.window, win) {
-    const args = resolveSheetHeightArgs(panelOrWin, win)
-    const viewport = resolveSheetLayoutViewportHeight(args.panel, args.win)
-
-    return Math.round(viewport * EXPANDED_VIEWPORT_FRACTION)
-}
-
-/**
- * @param {HTMLElement} panel
- * @param {string} property
- * @param {string} value
- */
 function setSheetStyle(panel, property, value) {
     panel.style.setProperty(property, value, 'important')
 }
@@ -146,177 +32,6 @@ function setSheetTransform(panel, value) {
     if (panel.style) {
         panel.style.transform = value
     }
-}
-
-/**
- * Size the sheet to its content, capped at the peek max. Returns fitted height.
- *
- * @param {HTMLElement} panel
- * @param {Window} [win]
- * @returns {{ fitted: number, cap: number, canExpand: boolean }}
- */
-export function fitOverlaySheetToContent(panel, win = globalThis.window) {
-    const cap = resolveOverlaySheetPeekHeight(panel, win)
-    const minHeight = resolveOverlaySheetMinHeight(panel, win)
-
-    if (! panel) {
-        return { fitted: cap, cap, canExpand: false }
-    }
-
-    // Skip mid-enter measures — layout thrash fights the transform slide.
-    if (panel.dataset?.fffSheetEntering === 'true') {
-        const cached = Number(panel.dataset.fffSheetFittedHeight)
-
-        return {
-            fitted: Number.isFinite(cached) && cached > 0 ? cached : minHeight,
-            cap,
-            canExpand: panel.dataset.fffOverlaySnap === 'peek',
-        }
-    }
-
-    // Height changes must be instant — CSS sheet transition is transform-only,
-    // but drag snap may leave SNAP_EASE on style.transition; clear it for fits.
-    const previousTransition = panel.style?.transition
-    if (typeof panel.style?.setProperty === 'function') {
-        panel.style.setProperty('transition', 'none', 'important')
-    }
-
-    setSheetStyle(panel, 'width', '100%')
-    setSheetStyle(panel, 'min-width', '0')
-    setSheetStyle(panel, 'max-width', 'none')
-    setSheetStyle(panel, 'left', '0')
-    setSheetStyle(panel, 'right', '0')
-    setSheetStyle(panel, 'inset-inline', '0')
-    setSheetStyle(panel, 'top', 'auto')
-    // Physical screen bottom (under Safari chrome). Never lift for visualViewport.
-    flushOverlaySheetToScreenBottom(panel, win)
-    setSheetStyle(panel, 'height', 'auto')
-    setSheetStyle(panel, 'min-height', `${minHeight}px`)
-    setSheetStyle(panel, 'max-height', `${cap}px`)
-    panel.style.setProperty('--fff-overlay-sheet-max-height', `${cap}px`)
-    panel.style.setProperty('--fff-overlay-sheet-min-height', `${minHeight}px`)
-    panel.classList.add('fff-overlay-sheet--measuring')
-
-    const measured = Math.ceil(Math.max(
-        panel.scrollHeight || 0,
-        panel.getBoundingClientRect().height || 0,
-        measureOverlaySheetNaturalHeight(panel),
-    ))
-
-    panel.classList.remove('fff-overlay-sheet--measuring')
-
-    const fitted = Math.min(Math.max(measured, minHeight), cap)
-
-    setSheetStyle(panel, 'height', `${fitted}px`)
-    setSheetStyle(panel, 'min-height', `${minHeight}px`)
-    setSheetStyle(panel, 'max-height', `${fitted}px`)
-    panel.style.setProperty('--fff-overlay-sheet-max-height', `${fitted}px`)
-    panel.dataset.fffSheetFittedHeight = String(fitted)
-    panel.dataset.fffOverlaySheetMinHeight = String(minHeight)
-
-    void panel.offsetHeight
-
-    if (typeof panel.style?.removeProperty === 'function') {
-        panel.style.removeProperty('transition')
-    } else if (panel.style) {
-        panel.style.transition = previousTransition || ''
-    }
-
-    const canExpand = measured > cap + 8 || overlaySheetCanExpand(panel, fitted)
-
-    panel.dataset.fffOverlaySnap = canExpand ? 'peek' : 'content'
-
-    syncOverlaySheetToVisualViewport(panel, win)
-    notifyOverlaySheetGeometry(panel)
-
-    return { fitted, cap, canExpand }
-}
-
-/**
- * Sum intrinsic heights of sheet chrome + list content (avoids flex:1/min-height:0 collapse).
- *
- * @param {HTMLElement} panel
- * @returns {number}
- */
-function measureOverlaySheetNaturalHeight(panel) {
-    if (! panel || typeof panel.querySelectorAll !== 'function') {
-        return 0
-    }
-
-    const handle = panel.querySelector('[data-fff-overlay-handle], .fff-overlay-sheet__handle')
-    const search = panel.querySelector('.fi-select-input-search-ctn, .fff-teleported-menu__search, [data-fff-overlay-search]')
-    const list = panel.querySelector(
-        '.fi-select-input-options-ctn, .fff-select-dropdown-scroller, [data-fff-overlay-scroll], .fff-phone-field__country-list, .fff-country-field__list, .fff-timezone-field__list, .fff-currency-field__list',
-    )
-
-    let total = 0
-
-    for (const node of [handle, search, list]) {
-        if (! node || typeof node.getBoundingClientRect !== 'function') {
-            continue
-        }
-
-        const boxHeight = Math.ceil(node.getBoundingClientRect().height || node.offsetHeight || 0)
-        const scrollHeight = Math.ceil(node.scrollHeight || 0)
-
-        total += Math.max(boxHeight, scrollHeight)
-    }
-
-    total += readOverlaySheetVerticalPadding(panel)
-
-    return total
-}
-
-/**
- * Include sheet chrome padding (esp. safe-area bottom) in content-fit height.
- *
- * @param {HTMLElement} panel
- * @returns {number}
- */
-function readOverlaySheetVerticalPadding(panel) {
-    if (! panel || typeof globalThis.getComputedStyle !== 'function') {
-        return 0
-    }
-
-    try {
-        const styles = globalThis.getComputedStyle(panel)
-
-        return Math.ceil(
-            (Number.parseFloat(styles.paddingTop) || 0)
-            + (Number.parseFloat(styles.paddingBottom) || 0),
-        )
-    } catch {
-        return 0
-    }
-}
-
-/**
- * @param {HTMLElement} panel
- * @param {number} peekHeight
- * @returns {boolean}
- */
-export function overlaySheetCanExpand(panel, peekHeight) {
-    if (! panel) {
-        return false
-    }
-
-    if ((panel.scrollHeight || 0) > peekHeight + 8) {
-        return true
-    }
-
-    if (typeof panel.querySelectorAll !== 'function') {
-        return false
-    }
-
-    const nodes = panel.querySelectorAll('*')
-
-    for (const node of nodes) {
-        if (node.scrollHeight > node.clientHeight + 1) {
-            return true
-        }
-    }
-
-    return false
 }
 
 /**
@@ -400,6 +115,9 @@ export function bindOverlaySheetDismiss({ panel, onDismiss, onCancel, window: wi
         return () => {}
     }
 
+    const scope = createResourceScope()
+    let releaseSnapFrame = () => {}
+    let releaseDismiss = () => {}
     let startY = 0
     let lastY = 0
     let lastTs = 0
@@ -444,6 +162,7 @@ export function bindOverlaySheetDismiss({ panel, onDismiss, onCancel, window: wi
         const height = snap === 'expanded' ? expandedHeight() : peekHeight()
 
         panel.dataset.fffOverlaySnap = snap === 'content' ? 'content' : snap
+        panel.dataset.fffSheetPreferredHeight = String(height)
         setSheetStyle(panel, 'height', `${height}px`)
         setSheetStyle(panel, 'max-height', `${height}px`)
         panel.style.setProperty('--fff-overlay-sheet-max-height', `${height}px`)
@@ -459,8 +178,14 @@ export function bindOverlaySheetDismiss({ panel, onDismiss, onCancel, window: wi
         }
 
         // After layout commits so list clientHeight matches the new snap.
-        win.requestAnimationFrame?.(() => notifyOverlaySheetGeometry(panel))
-            ?? notifyOverlaySheetGeometry(panel)
+        releaseSnapFrame()
+        if (typeof win.requestAnimationFrame === 'function') {
+            const frame = win.requestAnimationFrame(() => {
+                releaseSnapFrame()
+                if (!scope.disposed && panel.isConnected !== false) notifyOverlaySheetGeometry(panel)
+            })
+            releaseSnapFrame = scope.defer(() => win.cancelAnimationFrame?.(frame))
+        } else notifyOverlaySheetGeometry(panel)
     }
 
     const ensureInitialSnap = () => {
@@ -490,6 +215,7 @@ export function bindOverlaySheetDismiss({ panel, onDismiss, onCancel, window: wi
     ensureInitialSnap()
 
     const handlePointerDown = (event) => {
+        if (scope.disposed || panel.classList.contains('is-dismissing') || panel.dataset?.fffSheetEntering === 'true') return
         if (event.pointerType === 'mouse' && event.button !== 0) {
             return
         }
@@ -655,12 +381,9 @@ export function bindOverlaySheetDismiss({ panel, onDismiss, onCancel, window: wi
 
             let settled = false
             const finish = () => {
-                if (settled) {
-                    return
-                }
-
+                if (settled || scope.disposed) return
                 settled = true
-                panel.removeEventListener('transitionend', onEnd)
+                releaseDismiss()
                 panel.classList.remove('is-dismissing', 'is-open')
                 if (typeof panel.style?.setProperty === 'function') {
                     panel.style.setProperty('transition', 'none', 'important')
@@ -690,8 +413,9 @@ export function bindOverlaySheetDismiss({ panel, onDismiss, onCancel, window: wi
                 finish()
             }
 
-            panel.addEventListener('transitionend', onEnd)
-            win.setTimeout(finish, EXIT_MS + 40)
+            const releaseListener = scope.listen(panel, 'transitionend', onEnd)
+            const timer = win.setTimeout(finish, EXIT_MS + 40)
+            releaseDismiss = scope.defer(() => { releaseListener(); win.clearTimeout(timer) })
 
             return
         }
@@ -701,17 +425,18 @@ export function bindOverlaySheetDismiss({ panel, onDismiss, onCancel, window: wi
         onCancel?.()
     }
 
-    panel.addEventListener('pointerdown', handlePointerDown)
-    // Non-passive so preventDefault can block iOS visualViewport pan during drag.
-    panel.addEventListener('pointermove', handlePointerMove, { passive: false })
-    panel.addEventListener('pointerup', handlePointerUp)
-    panel.addEventListener('pointercancel', handlePointerUp)
+    scope.listen(panel, 'pointerdown', handlePointerDown)
+    scope.listen(panel, 'pointermove', handlePointerMove, { passive: false })
+    scope.listen(panel, 'pointerup', handlePointerUp)
+    scope.listen(panel, 'pointercancel', handlePointerUp)
 
     return () => {
-        panel.removeEventListener('pointerdown', handlePointerDown)
-        panel.removeEventListener('pointermove', handlePointerMove)
-        panel.removeEventListener('pointerup', handlePointerUp)
-        panel.removeEventListener('pointercancel', handlePointerUp)
+        scope.dispose()
+        if (pointerId !== null) {
+            try { panel.releasePointerCapture?.(pointerId) } catch { /* Pointer may already be released. */ }
+        }
+        dragging = false
+        delete panel.dataset?.fffSheetDragging
         clearInlineMotion()
         panel.style.height = ''
         panel.style.maxHeight = ''

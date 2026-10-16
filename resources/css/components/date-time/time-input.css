@@ -1,0 +1,5 @@
+.fff-clock-field { min-width:0; }
+.fff-clock-field__inputs { display:grid; min-width:0; gap:12px; }
+.fff-clock-field__inputs.is-range { grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--fff-clock-input-min-width,8rem)),1fr)); }
+.fff-clock-field__zone { margin:6px 0 0; font-size:11px; color:var(--fff-text-input-placeholder,#71717a); }
+@media (max-width:360px) { .fff-clock-field__inputs.is-range { grid-template-columns:1fr; } }

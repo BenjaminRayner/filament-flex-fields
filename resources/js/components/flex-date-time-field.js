@@ -1,5 +1,7 @@
+import { formatCivilDate } from '../date-time/domain/civil-date.js'
 import {
     CalendarDate,
+    formatDateValue,
     CalendarDateTime,
     Time,
     getSegmentParts,
@@ -20,10 +22,12 @@ import {
     getSegmentMaxLength,
 } from '../core/date-time/segmented-input.js'
 import { createExclusiveDropdownMixin } from '../core/flex-dropdown-coordinator.js'
+import { createCalendarOverlayAdapter } from '../core/date-time/calendar-overlay.js'
 import { createCalendarInteractionsBehavior } from '../core/date-time/calendar-interactions.js'
 import { buildScrollableYearRange } from '../core/date-time/calendar-panel.js'
 import { loadCalendarPanelModule } from '../core/date-time/calendar-panel-loader.js'
 import { createSegmentEditingBehavior } from '../core/date-time/segment-editing.js'
+import { publishOwnerData } from '../runtime/alpine/owner-data.js'
 
 const exclusiveDropdown = createExclusiveDropdownMixin({
     openKey: 'calendarOpen',
@@ -67,6 +71,7 @@ export default function flexDateTimeFieldFormComponent({
 }) {
     return {
         ...exclusiveDropdown,
+        ...createCalendarOverlayAdapter(),
         ...createSegmentEditingBehavior(),
         ...createCalendarInteractionsBehavior(),
         ...timePanelStubs,
@@ -387,12 +392,15 @@ export default function flexDateTimeFieldFormComponent({
                 timePanelModule = module
             }
 
-            Object.assign(this, module.createTimePanelBehavior())
+            if (this.__fffPickerDisposed) return
+            publishOwnerData(this, module.createTimePanelBehavior())
             this.timePanelReady = true
         },
 
         init() {
+            if (!this.beginPickerInitialization()) return
             this.wireExclusiveFlexDropdown()
+            this.bindSelectMenuLifecycle({ wireExclusive: false })
 
             const hasInitialSegments = this.isRange
                 ? this.segmentsHaveValues(this.rangeSegments?.start)
@@ -419,8 +427,6 @@ export default function flexDateTimeFieldFormComponent({
 
             this.$watch('calendarOpen', (open) => {
                 if (open) {
-                    this.scheduleCalendarPosition()
-                    this.bindCalendarListeners()
 
                     this.$nextTick(() => {
                         requestAnimationFrame(() => {
@@ -434,7 +440,7 @@ export default function flexDateTimeFieldFormComponent({
 
                 this.calendarReady = false
                 this.yearPickerOpen = false
-                this.unbindCalendarListeners()
+                this.unbindYearGridWheelListeners()
             })
 
             this.$watch('yearPickerOpen', () => {
@@ -624,7 +630,7 @@ export default function flexDateTimeFieldFormComponent({
                 return ''
             }
 
-            let display = `${dateParts[0]}/${dateParts[1]}/${dateParts[2]}`
+            let display = formatCivilDate(formatDateValue(value), this.config.displayFormat.split(/[Hg]/)[0].trim(), this.config.locale)
 
             if ('hour' in value) {
                 const timeParts = ['hour', 'minute', 'second', 'dayPeriod']

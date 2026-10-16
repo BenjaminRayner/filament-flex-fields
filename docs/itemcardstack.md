@@ -1,6 +1,7 @@
 ---
 title: "ItemCardStack"
 description: Layout component for vertically stacking ItemCards with consistent spacing.
+icon: "layers"
 ---
 
 [← Back to Table of Contents](/docs/index)
@@ -88,7 +89,7 @@ ItemCardStack::make()
 
 ### Playground
 
-Stacked layouts: `/admin/flex-fields-playground/item-card-group`.
+Stacked layouts: `/admin/flex-fields/item-card-group`.
 
 ---
 

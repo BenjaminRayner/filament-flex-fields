@@ -16,8 +16,15 @@ use Bjanczak\FilamentFlexFields\Data\FlexFieldValueChange;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsConfig;
 use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldEncryption;
 use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldSchemaResolver;
+use Bjanczak\FilamentFlexFields\Support\Values\FieldValueCodec;
+use Bjanczak\FilamentFlexFields\Support\Values\FieldValueWriter;
+use Bjanczak\FilamentFlexFields\Support\Values\Submission\FieldValueContract;
+use Bjanczak\FilamentFlexFields\Support\Values\Submission\FieldValueSubmission;
+use Closure;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 
 trait HasFlexFields
 {
@@ -33,13 +40,25 @@ trait HasFlexFields
         });
 
         static::saving(function ($model): void {
-            if (! FlexFieldsConfig::isAuditEnabled()) {
-                return;
-            }
-
             $column = static::flexFieldsColumn();
 
             if (! $model->isDirty($column)) {
+                return;
+            }
+
+            // Eloquent mass assignment and form dehydration also reach this boundary.
+            // Prepare the entire detached payload before mutating the model or audit.
+            $values = $model->getAttribute($column) ?? [];
+
+            if (! is_array($values)) {
+                throw new InvalidArgumentException('Flex field storage values must be an array.');
+            }
+
+            $definitions = $model->flexFieldStorageDefinitions();
+            $prepared = FieldValueWriter::replacement($values, $definitions);
+            $model->setAttribute($column, $prepared);
+
+            if (! FlexFieldsConfig::isAuditEnabled()) {
                 return;
             }
 
@@ -49,6 +68,10 @@ trait HasFlexFields
             if (! is_array($before)) {
                 $before = [];
             }
+
+            // Legacy plaintext must not be copied into a new audit entry when a
+            // definition now requires encryption. Existing audit history is unchanged.
+            $before = FieldValueWriter::replacement($before, $definitions);
 
             if (! is_array($after)) {
                 $after = [];
@@ -108,10 +131,8 @@ trait HasFlexFields
 
     public function setFlexFieldValue(string $slug, mixed $value): static
     {
+        $values = FieldValueWriter::assignment($this->getFlexFieldValues(), $slug, $value, $this->flexFieldStorageDefinitions());
         $this->rememberFlexFieldValuesBeforeChange();
-
-        $values = $this->getFlexFieldValues();
-        data_set($values, $slug, $this->maybeEncryptFlexFieldValue($slug, $value));
         $this->setAttribute(static::flexFieldsColumn(), $values);
 
         return $this;
@@ -122,8 +143,70 @@ trait HasFlexFields
      */
     public function setFlexFieldValues(array $values): static
     {
+        // Storage encryption must not depend on the current user's display permissions.
+        $values = FieldValueWriter::replacement($values, $this->flexFieldStorageDefinitions());
+
         $this->rememberFlexFieldValuesBeforeChange();
         $this->setAttribute(static::flexFieldsColumn(), $values);
+
+        return $this;
+    }
+
+    /**
+     * Apply an untrusted patch only after record and field authorization and rules.
+     * Missing/denied/unavailable fields retain their stored values. The caller owns
+     * tenant-scoped retrieval, its transaction, locking and the subsequent save().
+     *
+     * @param  list<FieldValueContract>  $contracts  Trusted server declarations.
+     * @param  Closure(static): bool  $authorizeRecord  Required also for an empty patch.
+     * @param  Closure(FieldValueContract): bool  $authorizeField
+     */
+    public function applySubmittedFlexFieldValues(mixed $values, array $contracts, Closure $authorizeRecord, Closure $authorizeField): static
+    {
+        $allowed = $authorizeRecord($this);
+        if (! is_bool($allowed)) {
+            throw new InvalidArgumentException('Record write authorization must return a boolean.');
+        }
+        if (! $allowed) {
+            throw new AuthorizationException('Record is not writable.');
+        }
+        if (! array_is_list($contracts) || count($contracts) > FieldValueSubmission::MAX_FIELDS) {
+            throw new InvalidArgumentException('Submission requires a bounded list of field contracts.');
+        }
+        $definitions = $this->flexFieldStorageDefinitions();
+        $encrypted = [];
+        foreach ($definitions as $definition) {
+            if ($definition->isEncrypted) {
+                $encrypted[$definition->slug] = true;
+            }
+        }
+        $effective = [];
+        foreach ($contracts as $contract) {
+            if (! $contract instanceof FieldValueContract) {
+                throw new InvalidArgumentException('Submission contracts must be typed.');
+            }
+            foreach ($encrypted as $path => $_) {
+                if (str_starts_with($path, $contract->path.'.') || str_starts_with($contract->path, $path.'.')) {
+                    throw new InvalidArgumentException('Submitted contracts must declare encrypted storage boundaries at their exact field paths.');
+                }
+            }
+            $effective[] = isset($encrypted[$contract->path]) && ! $contract->encrypted
+                ? new FieldValueContract($contract->path, $contract->rules, encrypted: true, nestedRules: $contract->nestedRules)
+                : $contract;
+        }
+        $prepared = (new FieldValueSubmission)->prepare($values, $effective, $authorizeField);
+        if ($prepared === []) {
+            return $this;
+        }
+        $patched = FieldValueCodec::copy($this->getFlexFieldValues());
+        foreach ($effective as $contract) {
+            if (Arr::has($prepared, $contract->path)) {
+                data_set($patched, $contract->path, data_get($prepared, $contract->path));
+            }
+        }
+        $patched = FieldValueWriter::replacement($patched, $definitions);
+        $this->rememberFlexFieldValuesBeforeChange();
+        $this->setAttribute(static::flexFieldsColumn(), $patched);
 
         return $this;
     }
@@ -272,18 +355,37 @@ trait HasFlexFields
     protected function diffFlexFieldValues(array $before, array $after): array
     {
         $changes = [];
-        $keys = array_unique([...array_keys(Arr::dot($before)), ...array_keys(Arr::dot($after))]);
 
-        foreach ($keys as $slug) {
-            $oldValue = data_get($before, $slug);
-            $newValue = data_get($after, $slug);
+        $this->computeDeepDiff('', $before, $after, $changes);
+
+        return $changes;
+    }
+
+    /**
+     * @param  list<FlexFieldValueChange>  $changes
+     */
+    private function computeDeepDiff(string $prefix, array $before, array $after, array &$changes): void
+    {
+        $keys = array_unique([...array_keys($before), ...array_keys($after)]);
+
+        foreach ($keys as $key) {
+            $oldValue = $before[$key] ?? null;
+            $newValue = $after[$key] ?? null;
+
+            $path = $prefix === '' ? (string) $key : "{$prefix}.{$key}";
+
+            if (is_array($oldValue) && is_array($newValue) && array_is_list($oldValue) === array_is_list($newValue)) {
+                $this->computeDeepDiff($path, $oldValue, $newValue, $changes);
+
+                continue;
+            }
 
             if ($oldValue === $newValue) {
                 continue;
             }
 
             $changes[] = new FlexFieldValueChange(
-                slug: $slug,
+                slug: $path,
                 oldValue: $oldValue,
                 newValue: $newValue,
                 userId: $this->resolveFlexFieldAuditUserId(),
@@ -291,8 +393,6 @@ trait HasFlexFields
                 changedAt: now()->toIso8601String(),
             );
         }
-
-        return $changes;
     }
 
     protected function resolveFlexFieldAuditUserId(): ?int
@@ -321,15 +421,7 @@ trait HasFlexFields
 
     protected function maybeEncryptFlexFieldValue(string $slug, mixed $value): mixed
     {
-        if (! $this->flexFieldDefinitionIsEncrypted($slug) || $value === null) {
-            return $value;
-        }
-
-        if (FlexFieldEncryption::isEncryptedPayload($value)) {
-            return $value;
-        }
-
-        return FlexFieldEncryption::encrypt($value);
+        return FieldValueWriter::encode($value, $this->flexFieldDefinitionIsEncrypted($slug));
     }
 
     protected function maybeDecryptFlexFieldValue(string $slug, mixed $value): mixed
@@ -341,14 +433,28 @@ trait HasFlexFields
         return FlexFieldEncryption::decrypt($value);
     }
 
+    /** @var array<string, bool>|null */
+    protected ?array $flexFieldEncryptedDefinitionCache = null;
+
+    /** @return list<FlexFieldDefinition> */
+    protected function flexFieldStorageDefinitions(): array
+    {
+        return app(FlexFieldSchemaResolver::class)->storageDefinitionsForTarget(
+            static::class,
+            $this->resolveFlexFieldTenantId(),
+        );
+    }
+
     protected function flexFieldDefinitionIsEncrypted(string $slug): bool
     {
-        foreach ($this->flexFieldDefinitions() as $definition) {
-            if ($definition->slug === $slug) {
-                return $definition->isEncrypted;
-            }
+        // Models can outlive requests or change tenant context. Rebuild from the
+        // scoped registry rather than retaining user-filtered metadata on the model.
+        $this->flexFieldEncryptedDefinitionCache = [];
+
+        foreach ($this->flexFieldStorageDefinitions() as $definition) {
+            $this->flexFieldEncryptedDefinitionCache[$definition->slug] = $definition->isEncrypted;
         }
 
-        return false;
+        return $this->flexFieldEncryptedDefinitionCache[$slug] ?? false;
     }
 }

@@ -1,8 +1,8 @@
 /**
  * Blocking browser-timezone SSR paint (before Alpine x-load).
  *
- * Classic/IIFE entry (inlined in Blade): runs via document.currentScript.
- * ESM import (asset injector): exports only — no auto-run on import.
+ * Pure implementation. The blocking entry owns its compiled API; native ESM
+ * delegates to that owner rather than compiling a second copy.
  *
  * Paints the *package catalog* city label (e.g. "Warsaw"), never Intl generic
  * names ("Central European Time") — those caused a visible ~1s swap after x-load.
@@ -168,20 +168,5 @@ export function bootTimezoneBrowserSsrDefaults(scope = document) {
 
     for (const boot of roots) {
         bootTimezoneBrowserSsrElement(boot)
-    }
-}
-
-// Classic script / inlined IIFE only — ESM imports must not auto-run.
-const classicScript = typeof document !== 'undefined' ? document.currentScript : null
-
-if (classicScript) {
-    const localBoot = classicScript.previousElementSibling?.matches?.('[data-fff-timezone-boot]')
-        ? classicScript.previousElementSibling
-        : classicScript.closest?.('.fff-timezone-field')?.querySelector?.('[data-fff-timezone-boot]')
-
-    if (localBoot) {
-        bootTimezoneBrowserSsrElement(localBoot)
-    } else {
-        bootTimezoneBrowserSsrDefaults(document)
     }
 }

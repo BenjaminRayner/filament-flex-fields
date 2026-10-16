@@ -28,90 +28,90 @@ final class ToggleTagsRatingAdminSchema
     public static function components(): array
     {
         return [
-            Fieldset::make(__('filament-flex-fields::default.schema.settings.toggle'))
+            Fieldset::make(fn () => __('filament-flex-fields::default.schema.settings.toggle'))
                 ->columns(3)
                 ->schema([
                     Select::make(self::settingsPath('layout'))
-                        ->label(__('filament-flex-fields::default.schema.settings.layout'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.layout'))
                         ->options([
                             'row' => 'Row',
                             'card' => 'Card',
                         ])
                         ->native(false),
                     Select::make(self::settingsPath('label_position'))
-                        ->label(__('filament-flex-fields::default.schema.settings.label_position'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.label_position'))
                         ->options([
                             'start' => 'Start',
                             'end' => 'End',
                         ])
                         ->native(false),
                     Toggle::make(self::settingsPath('inline'))
-                        ->label(__('filament-flex-fields::default.schema.settings.inline')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.inline')),
                     Toggle::make(self::settingsPath('ripple'))
-                        ->label(__('filament-flex-fields::default.schema.settings.ripple')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.ripple')),
                     ...self::sizeVariantFields(),
                 ])
                 ->visible(fn (Get $get): bool => self::isType($get, FieldType::Toggle))
                 ->columnSpanFull(),
 
-            Fieldset::make(__('filament-flex-fields::default.schema.settings.tags'))
+            Fieldset::make(fn () => __('filament-flex-fields::default.schema.settings.tags'))
                 ->columns(3)
                 ->schema([
                     TextInput::make(self::settingsPath('max_tags'))
-                        ->label(__('filament-flex-fields::default.schema.settings.max_tags'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.max_tags'))
                         ->numeric(),
                     Toggle::make(self::settingsPath('reorderable'))
-                        ->label(__('filament-flex-fields::default.schema.settings.reorderable')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.reorderable')),
                     Toggle::make(self::settingsPath('suggestions_only'))
-                        ->label(__('filament-flex-fields::default.schema.settings.suggestions_only')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.suggestions_only')),
                     Toggle::make(self::settingsPath('trim'))
-                        ->label(__('filament-flex-fields::default.schema.settings.trim')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.trim')),
                     Toggle::make(self::settingsPath('use_spatie_tags'))
-                        ->label(__('filament-flex-fields::default.schema.settings.use_spatie_tags')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.use_spatie_tags')),
                     ...self::sizeVariantFields(),
                 ])
                 ->visible(fn (Get $get): bool => self::isType($get, FieldType::Tags))
                 ->columnSpanFull(),
 
-            Fieldset::make(__('filament-flex-fields::default.schema.settings.rating'))
+            Fieldset::make(fn () => __('filament-flex-fields::default.schema.settings.rating'))
                 ->columns(2)
                 ->schema([
                     TextInput::make(self::settingsPath('max'))
-                        ->label(__('filament-flex-fields::default.schema.settings.max'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.max'))
                         ->numeric(),
                 ])
                 ->visible(fn (Get $get): bool => self::isType($get, FieldType::Rating))
                 ->columnSpanFull(),
 
-            Fieldset::make(__('filament-flex-fields::default.schema.settings.nps'))
+            Fieldset::make(fn () => __('filament-flex-fields::default.schema.settings.nps'))
                 ->columns(3)
                 ->schema([
                     Select::make(self::settingsPath('variant'))
-                        ->label(__('filament-flex-fields::default.schema.settings.variant'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.variant'))
                         ->options([
                             'pills' => 'Pills',
                             'emoji' => 'Emoji',
                         ])
                         ->native(false),
                     Toggle::make(self::settingsPath('color_coded'))
-                        ->label(__('filament-flex-fields::default.schema.settings.color_coded')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.color_coded')),
                     TextInput::make(self::settingsPath('min_label'))
-                        ->label(__('filament-flex-fields::default.schema.settings.min_label')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.min_label')),
                     TextInput::make(self::settingsPath('max_label'))
-                        ->label(__('filament-flex-fields::default.schema.settings.max_label')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.max_label')),
                     ...self::sizeVariantFields(),
                 ])
                 ->visible(fn (Get $get): bool => self::isType($get, FieldType::Nps))
                 ->columnSpanFull(),
 
-            Fieldset::make(__('filament-flex-fields::default.schema.settings.repeater'))
+            Fieldset::make(fn () => __('filament-flex-fields::default.schema.settings.repeater'))
                 ->columns(2)
                 ->schema([
                     TextInput::make(self::settingsPath('min_items'))
-                        ->label(__('filament-flex-fields::default.schema.settings.min_items'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.min_items'))
                         ->numeric(),
                     TextInput::make(self::settingsPath('max_items'))
-                        ->label(__('filament-flex-fields::default.schema.settings.max_items'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.max_items'))
                         ->numeric(),
                 ])
                 ->visible(fn (Get $get): bool => self::isType($get, FieldType::Repeater))

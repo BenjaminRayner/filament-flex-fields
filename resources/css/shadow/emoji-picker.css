@@ -1,0 +1,230 @@
+/* Shadow-only content. Never registered as a document-wide stylesheet. */
+:host, :host(.light) {
+    --background: transparent;
+    --border-size: 0;
+    --border-radius: 0;
+    --emoji-size: 1.8rem;
+    --emoji-padding: .2rem;
+    --num-columns: 8;
+    --emoji-size: clamp(1.2rem, 5.6vw, 1.8rem);
+    --category-emoji-size: 1.125rem;
+    --indicator-color: var(--fff-emoji-primary, var(--primary-500, #3b82f6));
+    --outline-color: var(--indicator-color);
+    --button-hover-background: #f4f4f5;
+    --button-active-background: #e4e4e7;
+    --category-font-color: #71717a;
+    --input-border-color: #e4e4e7;
+    --input-border-radius: .75rem;
+    --input-font-color: #18181b;
+    --input-placeholder-color: #a1a1aa;
+    --fff-emoji-icon: #71717a;
+    --fff-emoji-icon-hover: #3f3f46;
+    --fff-emoji-surface: #fff;
+    --fff-emoji-search: #f4f4f5;
+    --fff-emoji-shadow: #0000001f;
+    --fff-emoji-tone-border: #00000014;
+    color-scheme: light;
+    font-family: inherit;
+}
+:host(.dark) {
+    --button-hover-background: #3f3f46;
+    --button-active-background: #52525b;
+    --category-font-color: #a1a1aa;
+    --input-border-color: #52525b;
+    --input-font-color: #f4f4f5;
+    --input-placeholder-color: #71717a;
+    --fff-emoji-icon: #a1a1aa;
+    --fff-emoji-icon-hover: #e4e4e7;
+    --fff-emoji-surface: #27272a;
+    --fff-emoji-search: #3f3f46;
+    --fff-emoji-shadow: #00000059;
+    --fff-emoji-tone-border: #ffffff1f;
+    color-scheme: dark;
+}
+/* The library's system-dark rule must not override the chosen panel theme. */
+:host(.light), :host(.dark) {
+    --background: transparent;
+    --border-color: transparent;
+    --indicator-color: var(--fff-emoji-primary, var(--primary-500, #3b82f6));
+    --outline-color: var(--indicator-color);
+}
+.picker {
+    contain: layout style;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+.favorites, .pad-top {
+    display: none !important;
+}
+.nav {
+    order: 1;
+    flex-shrink: 0;
+    grid-template-columns: repeat(var(--num-groups),minmax(0,1fr)) !important;
+    padding: .25rem 0 0;
+}
+.nav-button {
+    width: 1.875rem;
+    min-width: 0;
+    height: 1.875rem;
+    padding: 0;
+    justify-self: center;
+    border-radius: 50%;
+    transition: background-color .15s ease;
+}
+.nav-emoji {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0;
+    line-height: 0;
+    color: var(--fff-emoji-icon);
+    background: transparent !important;
+}
+.nav-emoji .fff-ui-icon {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+.nav-button:hover, .nav-button:active {
+    background: var(--button-hover-background);
+}
+.nav-button:hover .nav-emoji {
+    color: var(--fff-emoji-icon-hover);
+}
+.nav-button[aria-selected=true] .nav-emoji {
+    color: var(--indicator-color);
+}
+.indicator-wrapper {
+    order: 2;
+    flex-shrink: 0;
+    width: 100%;
+    border-bottom: 0;
+}
+.indicator {
+    width: calc(100% / var(--num-groups));
+    height: 2px;
+    border-radius: 999px;
+    background: var(--indicator-color);
+}
+.search-row {
+    order: 3;
+    align-items: center;
+    gap: .5rem;
+    padding: .375rem 0;
+    position: relative;
+    z-index: 3;
+    isolation: isolate;
+}
+.search-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+/* The same flex-text-input.css URL is linked into this root. Only adapt the
+   library's search positioning; FLEX owns its chrome, colors and typography. */
+input.search {
+    height: 100%;
+    padding: 0 .5rem 0 2rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--fff-flex-text-input-text);
+    font-size: var(--fff-flex-text-input-text-size);
+    line-height: 1.2;
+    outline: none;
+}
+:host([dir=rtl]) input.search:placeholder-shown { text-align:right; }
+:host([dir=rtl]) input.search {
+    padding: 0 2rem 0 .5rem;
+}
+input.search:focus, input.search:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+.tabpanel:focus {
+    outline: none;
+}
+.fff-search-icon {
+    position: absolute;
+    inset-inline-start: .75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    color: var(--input-placeholder-color);
+    pointer-events: none;
+}
+.fff-search-icon svg {
+    width: 100%;
+    height: 100%;
+}
+.message {
+    order: 4;
+}
+.tabpanel {
+    order: 5;
+    min-height: 0;
+    flex: 1;
+    scrollbar-width: none;
+    border-radius: 0 0 calc(var(--fff-select-menu-radius, 1.5rem) - .375rem) calc(var(--fff-select-menu-radius, 1.5rem) - .375rem);
+}
+.tabpanel::-webkit-scrollbar { display: none; }
+.emoji-menu {
+    grid-template-columns: repeat(var(--num-columns),minmax(0,1fr));
+}
+/* Equal square hit areas prevent the library's circular radius stretching into ovals. */
+.emoji-menu {
+    justify-items: center;
+}
+.emoji-menu > .emoji {
+    width:var(--total-emoji-size);
+    height:var(--total-emoji-size);
+    min-width:0;
+    border-radius:.5rem;
+}
+.category {
+    font-size: .8125rem;
+    font-weight: 600;
+    padding: .625rem .35rem .25rem;
+    color: var(--category-font-color);
+}
+.skintone-button-wrapper {
+    flex-shrink: 0;
+    background: transparent;
+}
+/* The selected hand occupies the trigger's exact coordinates. Fade the list
+   on the compositor without translating or animating its layout geometry. */
+.skintone-list {
+    z-index: 4;
+    top: calc(.375rem - var(--fff-skin-selected-index, 0) * var(--total-emoji-size) - 5px);
+    bottom: auto;
+    inset-inline-end: -5px;
+    width: calc(var(--total-emoji-size) + 10px);
+    padding: 4px;
+    box-sizing: border-box;
+    border: 1px solid var(--fff-emoji-tone-border);
+    border-radius: .75rem;
+    background: var(--fff-emoji-surface);
+    box-shadow: 0 3px 12px var(--fff-emoji-shadow);
+    transform: none !important;
+    will-change: opacity;
+    opacity: 1;
+    transition: opacity .16s ease-out !important;
+}
+.skintone-list[aria-hidden=true] {
+    opacity: 0;
+    pointer-events: none;
+}
+.skintone-list > .emoji { border-radius: .5rem; }
+@media(prefers-reduced-motion:reduce) {
+    .nav-button, .skintone-list {
+        transition: none !important;
+    }
+}

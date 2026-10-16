@@ -1,0 +1,111 @@
+---
+title: "Origins, integrity and asset URLs"
+description: "Configure asset delivery through application-owned transport policy."
+---
+
+Configure delivery once in `config/filament-flex-fields.php`. Embedded fields,
+table columns and infolist entries use the same application policy.
+
+```php
+// Merge this section into config/filament-flex-fields.php.
+return [
+    'assets' => [
+        'delivery' => [
+            'allowed_origins' => ['https://cdn.example.com'],
+            'crossorigin' => 'anonymous',
+            'referrer_policy' => 'no-referrer',
+            'integrity_from_manifest' => true,
+            'importmap_integrity' => true,
+            'require_integrity' => true,
+            'integrity' => [],
+        ],
+    ],
+];
+```
+
+The application's own origin is always allowed. Use an empty origin list for
+same-origin delivery; use `null` to preserve unrestricted existing HTTP(S) CDN
+configuration. Origins are exact, so include a non-default port when needed.
+Manifest integrity uses known build hashes. Supply an explicit SHA-256 SRI digest
+for a remote stylesheet not covered by a declared asset manifest:
+
+```php
+// Set this map as assets.delivery.integrity in the same configuration file.
+$integrity = [
+    'https://cdn.example.com/theme.css?edition=3' => 'sha256-BASE64_DIGEST_HERE',
+];
+```
+
+Replace the example digest with the actual canonical SHA-256 value. Query strings
+are part of resource identity. A different signed URL needs its matching entry.
+Modified resources fail to load; another independent component can remain ready.
+Integrity checks cover declared files, not the authorship of a package or every
+transitive native import. Configure your application's CSP for that wider scope.
+
+If your application generates a CSP nonce, set it before rendering:
+
+```php
+$request->attributes->set('fff.csp_nonce', $nonce);
+```
+
+Use the same nonce in your response CSP. FLEX layout/transport tags receive it;
+this does not rewrite native Filament tags or custom component inline HTML.
+Default Alpine expression evaluation has its own CSP requirements. Changing the
+policy requires a full page reload, rather than a partial form update.
+
+When `importmap_integrity` is enabled, FLEX emits an integrity import map before
+its runtime imports. Supporting browsers use this metadata to verify the admitted
+module bytes. Confirm support in your browser policy and
+render the FLEX runtime head phase before other module imports. An integrity
+preload by itself cannot retroactively verify a module already imported by another
+script. Check import-map integrity support in the browsers used by your customers
+before requiring this policy for all traffic.
+Configure Livewire's own nonce as well, using its documented script/style options
+or the application's Vite CSP nonce. FLEX does not rewrite native framework tags.
+
+`assets.delivery.require_integrity: true` rejects an undeclared exact resource URL
+before transport, including resources on the application's own origin. Pair it
+with sealed metadata and explicitly declare any remote/legacy resources. This
+also prevents a partial response from silently importing an unknown new release
+outside the initial document's approved hash set; reload that document instead.
+It is opt-in and does not claim complete strict-CSP/browser support by itself.
+
+The origin list controls the URLs admitted by FLEX. It is not a network sandbox
+for redirects, arbitrary imports inside another library or code already evaluated
+by the browser. Serve immutable asset URLs without redirects. Apply your response
+CSP to the permitted delivery hosts, retain manifest integrity and configure CORS
+on the CDN. Native module failures may be retained in the browser's module map:
+recover those failures with a document reload, keeping the same immutable URL.
+Stylesheet transport failures can retry in the current document and share one
+request between concurrent owners. See [Compatibility](/docs/requirements) for
+the verified profiles and their limits.
+
+## Delivery configuration reference
+
+Set these application-owned keys under `filament-flex-fields.assets.delivery`.
+They apply to built-in and external asset consumers; they are not form values.
+
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `allowed_origins` | `null` | Exact HTTP(S) origins allowed in addition to the application's own origin. `[]` restricts to same origin; null preserves unrestricted HTTP(S) delivery. Up to 64 origins, without paths, wildcards or credentials. |
+| `crossorigin` | `null` | Optional `anonymous`; credentialed native-module imports are not supported by this transport. |
+| `referrer_policy` | `null` | One standard referrer-policy value; use `no-referrer` when the referrer should be omitted. |
+| `integrity` | `[]` | Exact URL → canonical `sha256-...` SRI map, up to 2048 entries. Query strings are significant. |
+| `integrity_from_manifest` | `false` | Merge sealed distribution hashes. An explicit conflicting hash rejects. |
+| `importmap_integrity` | `false` | Emit initial-document integrity metadata before runtime imports; browser support remains relevant. |
+| `require_integrity` | `false` | Reject any exact resource URL without admitted integrity metadata, including same-origin resources. |
+
+`AssetDeliveryPolicy` constructor names are `allowedOrigins`, `crossorigin`,
+`referrerPolicy`, `integrity` and `requireIntegrity`. The snake-case keys above are
+for application configuration. Supported referrer policies are `no-referrer`,
+`no-referrer-when-downgrade`, `origin`, `origin-when-cross-origin`, `same-origin`,
+`strict-origin`, `strict-origin-when-cross-origin` and `unsafe-url`.
+
+A policy change needs a full document reload. For signed URLs, authorize and supply
+the replacement plan on the server; the runtime preserves exact resource identity
+rather than stripping signatures or inventing renewal credentials.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

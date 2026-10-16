@@ -1,5 +1,6 @@
 ---
 title: "Deprecated class aliases"
+icon: "history"
 ---
 
 [← Back to Table of Contents](/docs/index)

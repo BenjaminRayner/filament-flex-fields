@@ -23,7 +23,7 @@ it('stores and retrieves playground state by slug and user', function (): void {
             'signature__enterprise' => 'ffstage:signatures/demo.svg',
             '_meta' => ['sealed_at' => '2026-08-31T00:00:00+00:00'],
         ])
-        ->and($store->key('signature-field'))->toBe('flex-fields-playground.signature-field.42');
+        ->and($store->key('signature-field'))->toMatch('/^flex\.catalog\.demo\.[a-f0-9]{64}$/');
 
     $store->forget('signature-field');
 

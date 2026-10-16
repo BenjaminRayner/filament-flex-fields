@@ -57,6 +57,7 @@ class SlugFieldPlayground
                     TitleSlugField::make(
                         fieldTitle: 'slug__one_liner_title',
                         fieldSlug: 'slug__one_liner_slug',
+                        translatableLocales: [],
                         urlHost: 'https://wyachts.test',
                         urlPath: '/posts/',
                     )

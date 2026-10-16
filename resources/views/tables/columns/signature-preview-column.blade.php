@@ -1,4 +1,6 @@
 <span
+    role="img"
+    aria-label="{{ filled($svg) ? __('filament-flex-fields::default.signature.pdf_preview_title') : __('filament-flex-fields::default.signature.preview_empty') }}"
     @class([
         'fff-signature-preview-column',
         'fff-signature-preview-column--' . $size,
@@ -10,6 +12,8 @@
             {!! $svg !!}
         </span>
     @else
-        <span class="fff-signature-preview-column__empty" aria-hidden="true"></span>
+        <span class="fff-signature-preview-column__empty" aria-hidden="true">
+            <x-filament::icon icon="hugeicons-signature" class="fff-signature-preview-column__empty-icon" />
+        </span>
     @endif
 </span>

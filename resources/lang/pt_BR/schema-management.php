@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'navigation_plural' => 'Grupos de campos',
+    'model_singular' => 'Grupo de campos',
+    'group' => 'Grupo',
+    'sections' => 'Seções',
+    'sections_description' => 'Seções de layout opcionais para agrupar campos do formulário.',
+    'section_id' => 'ID da seção',
+    'fields_schema' => 'Esquema de campos',
+    'fields_description' => 'Definições de campos usadas em formulários, tabelas e listas de detalhes.',
+    'fields' => 'Campos',
+    'section' => 'Seção',
+    'required' => 'Obrigatório',
+    'encrypted' => 'Criptografar dados armazenados',
+    'help_text' => 'Texto de ajuda',
+    'tenant_id' => 'ID do locatário',
+    'tenant' => 'Locatário',
+    'tenant_help' => 'Chave opcional do locatário. Deixe em branco para um grupo global.',
+    'name' => 'Nome',
+    'slug' => 'Slug',
+    'order' => 'Ordem',
+    'label' => 'Rótulo',
+    'type' => 'Tipo',
+    'sort' => 'Ordem de classificação',
+    'description' => 'Descrição',
+    'placeholder' => 'Texto de exemplo',
+    'width' => 'Largura',
+    'updated_at' => 'Atualizado em',
+    'section_type_section' => 'Seção',
+    'section_type_fieldset' => 'Grupo de campos',
+    'section_type_headless' => 'Sem contêiner',
+];

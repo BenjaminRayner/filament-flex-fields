@@ -6,9 +6,9 @@ namespace Bjanczak\FilamentFlexFields\Support;
 
 class SignatureSvg
 {
-    public const int VIEWBOX_WIDTH = 1000;
+    public const int VIEWBOX_WIDTH = 600;
 
-    public const int VIEWBOX_HEIGHT = 320;
+    public const int VIEWBOX_HEIGHT = 260;
 
     public static function isEmpty(?string $svg): bool
     {

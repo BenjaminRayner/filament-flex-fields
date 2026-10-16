@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Tests;
 
-use Bjanczak\BladeGravityIcons\BladeGravityIconsServiceProvider;
+use Bjanczak\BladeHugeicons\BladeHugeiconsServiceProvider;
 use Bjanczak\FilamentFlexFields\FilamentFlexFieldsServiceProvider;
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
 use BladeUI\Icons\BladeIconsServiceProvider;
 use Filament\Actions\ActionsServiceProvider;
 use Filament\FilamentServiceProvider;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\FormsServiceProvider;
 use Filament\Schemas\SchemasServiceProvider;
 use Filament\Support\SupportServiceProvider;
@@ -23,7 +24,7 @@ abstract class TestCase extends Orchestra
 {
     protected function setUp(): void
     {
-        if (! class_exists(\Filament\Forms\Components\SpatieMediaLibraryFileUpload::class)) {
+        if (! class_exists(SpatieMediaLibraryFileUpload::class)) {
             require_once __DIR__.'/phpstan-bootstrap.php';
         }
 
@@ -38,7 +39,7 @@ abstract class TestCase extends Orchestra
             TranslationServiceProvider::class,
             BladeIconsServiceProvider::class,
             BladeHeroiconsServiceProvider::class,
-            BladeGravityIconsServiceProvider::class,
+            BladeHugeiconsServiceProvider::class,
             FilamentFlexFieldsServiceProvider::class,
             FilamentServiceProvider::class,
             LivewireServiceProvider::class,

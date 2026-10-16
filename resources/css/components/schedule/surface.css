@@ -1,0 +1,31 @@
+/* Only FLEX weekly editor nodes; native Filament wrappers keep their layout. */
+.fff-schedule-field {
+    display: flex; width: 100%; flex-direction: column; gap: .75rem;
+    --fff-schedule-bg: var(--fff-field-bg);
+    --fff-schedule-border: var(--fff-field-border);
+    --fff-schedule-border-width: var(--fff-field-border-width);
+    --fff-schedule-shadow: var(--fff-field-shadow);
+    --fff-schedule-text: #18181b;
+    --fff-schedule-muted: #71717a;
+    --fff-schedule-closed: #f4f4f5;
+    --fff-schedule-action-bg: #f4f4f5;
+    --fff-schedule-action-hover: #e4e4e7;
+}
+/* The inner editor adapts to its own column, including cards and nested forms. */
+.fff-schedule-field[role="group"] { container: fff-schedule / inline-size; min-width: 0; }
+.dark .fff-schedule-field { --fff-schedule-text: #fafafa; --fff-schedule-muted: #a1a1aa; --fff-schedule-closed: #18181b; --fff-schedule-action-bg: #27272a; --fff-schedule-action-hover: #3f3f46; }
+.fff-schedule-field--secondary { --fff-schedule-bg: var(--fff-field-secondary-bg); --fff-schedule-border: var(--fff-field-secondary-border); --fff-schedule-border-width: var(--fff-field-secondary-border-width); --fff-schedule-shadow: var(--fff-field-secondary-shadow); }
+.fff-schedule-field--soft { --fff-schedule-bg: var(--fff-field-soft-bg); --fff-schedule-border: var(--fff-field-soft-border); --fff-schedule-border-width: var(--fff-field-soft-border-width); --fff-schedule-shadow: var(--fff-field-soft-shadow); }
+.fff-schedule-field--flat { --fff-schedule-bg: transparent; --fff-schedule-border: transparent; --fff-schedule-shadow: none; }
+.fff-schedule-field.is-disabled { opacity: .6; }
+.fff-schedule-field__timezone { display: flex; flex-direction: column; gap: .375rem; }
+.fff-schedule-field__timezone-label { font-size: .875rem; line-height: 1.25rem; font-weight: 500; color: var(--fff-schedule-text); }
+.fff-schedule-field__days { display: flex; flex-direction: column; border-radius: 1rem; border: var(--fff-schedule-border-width) solid var(--fff-schedule-border); box-shadow: var(--fff-schedule-shadow); background: var(--fff-schedule-bg); }
+.fff-schedule-field__day:first-child { border-start-start-radius: 1rem; border-start-end-radius: 1rem; }
+.fff-schedule-field__day:last-child { border-end-start-radius: 1rem; border-end-end-radius: 1rem; }
+.fff-schedule-field__day { padding: 1rem; border: 0; background: var(--fff-schedule-closed); }
+.fff-schedule-field__day + .fff-schedule-field__day { border-block-start: var(--fff-schedule-border-width) solid var(--fff-schedule-border); }
+.fff-schedule-field__day.is-open { background: var(--fff-schedule-bg); }
+.fff-schedule-field--sm .fff-schedule-field__day { padding: .75rem; }
+.fff-schedule-field--lg .fff-schedule-field__day { padding: 1.25rem; }
+.fff-schedule-field.is-day-animated .fff-schedule-field__day { transition: background-color .25s cubic-bezier(.16,1,.3,1); }

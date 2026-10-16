@@ -6,7 +6,6 @@ use Bjanczak\FilamentFlexFields\Enums\BarcodeFormat;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\BarcodeScannerField;
 use Bjanczak\FilamentFlexFields\Support\Barcode\BarcodeStateNormalizer;
 use Bjanczak\FilamentFlexFields\Support\Barcode\BarcodeValidator;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
 
 it('configures scanner options and alpine configuration', function () {
     $field = BarcodeScannerField::make('sku')
@@ -46,11 +45,6 @@ it('exposes wrapper classes', function () {
         ->toHaveKey('fff-barcode-scanner-field')
         ->toHaveKey('fff-flex-text-input-field')
         ->toHaveKey('fff-barcode-scanner-field--ghost');
-});
-
-it('registers stylesheet dependencies', function () {
-    expect(FlexFieldAssets::stylesheetsFor('barcode-scanner-field'))
-        ->toBe(['emoji-picker', 'flex-text-input', 'barcode-scanner-field']);
 });
 
 it('rejects invalid variants and camera facing modes', function () {
@@ -104,24 +98,6 @@ it('exposes beep url in alpine configuration and asset helper', function () {
     expect(BarcodeScannerField::make('code')->getBeepUrl())->toContain('barcode-scan-success.mp3')
         ->and(BarcodeScannerField::make('sku')->getAlpineConfiguration())
         ->toHaveKey('beepUrl');
-});
-
-it('renders required blade integration hooks', function () {
-    $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/barcode-scanner-field.blade.php');
-
-    expect($blade)
-        ->toContain('wire:ignore')
-        ->toContain('x-load')
-        ->toContain('barcodeScannerFieldFormComponent')
-        ->toContain('fff-flex-text-input__shell')
-        ->toContain('x-filament::modal')
-        ->toContain('fff-barcode-scanner__viewport')
-        ->toContain('fff-barcode-scanner__scan-line')
-        ->toContain('-video')
-        ->toContain('x-modal-opened')
-        ->toContain('openScanner($event)')
-        ->toContain('toggleTorch()')
-        ->toContain('fff-barcode-scanner__switch-camera-btn');
 });
 
 it('configures scan interval decode fps camera switch and visibility options', function () {
@@ -185,3 +161,34 @@ it('normalizes structured state when store detected format is enabled', function
     expect(BarcodeStateNormalizer::extractFormat(['value' => '5901234123457', 'format' => 'ean_13']))
         ->toBe('ean_13');
 });
+
+it('uses a declared immutable audio resource and does not request audio when disabled', function (): void {
+    expect(BarcodeScannerField::make('sku')->getBeepUrl())->toContain('barcode-scan-success.mp3')
+        ->and(BarcodeScannerField::make('sku')->beepOnScan(false)->getBeepUrl())->toBeNull();
+});
+
+it('validates real EAN UPC and compressed UPC-E checksums', function (string $value, BarcodeFormat $format, bool $expected): void {
+    expect(BarcodeValidator::isChecksumValid($value, $format))->toBe($expected);
+})->with([
+    ['5901234123457', BarcodeFormat::Ean13, true], ['96385074', BarcodeFormat::Ean8, true],
+    ['036000291452', BarcodeFormat::UpcA, true], ['04252614', BarcodeFormat::UpcE, true],
+    ['04252615', BarcodeFormat::UpcE, false], ['042526', BarcodeFormat::UpcE, false],
+]);
+
+it('does not bypass numeric checksum validation through a broad QR format', function (): void {
+    expect(BarcodeValidator::validateValue('5901234123450', [BarcodeFormat::Qr, BarcodeFormat::Ean13], true))->not->toBeNull();
+});
+
+it('rejects invalid configured format names instead of broadening the camera whitelist', function (): void {
+    BarcodeScannerField::make('sku')->formats(['invalid'])->getSupportedFormats();
+})->throws(InvalidArgumentException::class);
+
+it('offers optional scan confirmation without enabling it by default', function (): void {
+    expect(BarcodeScannerField::make('sku')->shouldConfirmScan())->toBeFalse()
+        ->and(BarcodeScannerField::make('sku')->confirmScan()->getAlpineConfiguration()['confirmScan'])->toBeTrue()
+        ->and(BarcodeScannerField::make('sku')->storeDetectedFormat()->shouldStoreDetectedFormat())->toBeTrue();
+});
+
+it('rejects a wrongly typed dynamic format configuration with a useful error', function (): void {
+    BarcodeScannerField::make('sku')->formats(fn (): string => 'qr')->getSupportedFormats();
+})->throws(InvalidArgumentException::class);

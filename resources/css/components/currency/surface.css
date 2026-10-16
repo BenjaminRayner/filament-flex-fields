@@ -1,0 +1,37 @@
+.fff-currency-field {
+    --fff-currency-field-muted: #71717a;
+    --fff-currency-field-chip-bg: var(--fff-field-secondary-bg);
+    --fff-currency-field-display-scale: 1.125;
+}
+.fff-currency-field--sm { --fff-currency-field-display-scale: 1.0625; }
+.fff-currency-field--lg { --fff-currency-field-display-scale: 1.25; }
+.fff-currency-field.fff-flex-text-input--secondary { --fff-currency-field-chip-bg: #e4e4e7; }
+.fff-currency-field.fff-flex-text-input--soft { --fff-currency-field-chip-bg: var(--fff-field-soft-chip-bg); }
+.fff-currency-field [x-cloak] { display: none !important; }
+.fff-currency-field__shell { cursor: text; }
+.fff-currency-field__row { display: flex; align-items: center; gap: .5rem; inline-size: 100%; min-inline-size: 0; }
+.fff-currency-field:has(.fff-currency-field__currency) .fff-currency-field__row {
+    align-items: stretch; gap: .375rem; padding-inline: 0 var(--fff-flex-text-input-p);
+}
+.fff-currency-field__currency {
+    position: relative; display: flex; flex: none; align-self: stretch;
+    block-size: 100%; margin-inline-start: calc(-1 * var(--fff-flex-text-input-border-width, 1px));
+}
+.fff-currency-field__currency-trigger {
+    display: inline-flex; align-items: center; justify-content: center; gap: .25rem;
+    block-size: 100%; min-block-size: 100%;
+    padding-inline: calc(var(--fff-flex-text-input-p) * 1.15) calc(var(--fff-flex-text-input-p) * .85);
+    border: 0; border-radius: 0 var(--fff-global-radius, .75rem) var(--fff-global-radius, .75rem) 0;
+    background: var(--fff-currency-field-chip-bg); color: var(--fff-flex-text-input-text);
+    font-size: var(--fff-flex-text-input-text-size); font-weight: 600; cursor: pointer;
+}
+.fff-currency-field__currency-trigger:focus-visible { outline: 2px solid var(--fff-field-focus-color, currentColor); outline-offset: -3px; }
+.fff-currency-field__currency-trigger:disabled { opacity: .6; cursor: not-allowed; }
+.fff-currency-field__currency-chevron {
+    inline-size: calc(var(--fff-flex-text-input-icon-size) * .9375) !important;
+    block-size: calc(var(--fff-flex-text-input-icon-size) * .9375) !important;
+    color: var(--fff-currency-field-muted);
+}
+.fff-currency-field__shell.is-invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 3px #ef444433 !important; }
+.fff-currency-field:is(.is-disabled, .is-read-only) .fff-currency-field__shell { opacity: .65; cursor: not-allowed; }
+.dark .fff-currency-field { --fff-currency-field-muted: #a1a1aa; --fff-currency-field-chip-bg: #3f3f46; }

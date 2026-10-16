@@ -62,6 +62,7 @@ function makeDocument() {
 
             return byAttr.get(match[1]) ?? null
         },
+        querySelectorAll(selector) { const found = this.querySelector(selector); return found ? [found] : [] },
         createElement(tag) {
             const classList = new Set()
             const node = {
@@ -73,6 +74,7 @@ function makeDocument() {
                 nextSibling: null,
                 style: {
                     zIndex: '',
+                    removeProperty(name) { delete this[name] },
                     setProperty(name, value) {
                         if (name === 'z-index') {
                             this.zIndex = value
@@ -118,6 +120,25 @@ function makeDocument() {
 }
 
 describe('overlay-backdrop', () => {
+    it('keeps a modal sheet and its dimmer inside the same stacking context', () => {
+        const document = makeDocument()
+        const panel = document.createElement('div')
+        const children = [panel]
+        const modalPortal = { insertBefore(node, before) {
+            const previous = children.indexOf(node)
+            if (previous !== -1) children.splice(previous, 1)
+            children.splice(children.indexOf(before), 0, node)
+            node.parentNode = this
+            return node
+        } }
+        panel.parentNode = modalPortal
+        globalThis.requestAnimationFrame = cb => cb()
+        const backdrop = createOverlayBackdrop(document, 'modal-emoji', { beforeElement: panel })
+        assert.deepEqual(children, [backdrop, panel])
+        assert.equal(backdrop.parentNode, panel.parentNode)
+        assert.equal(document._bodyChildren.length, 0)
+    })
+
     it('inserts the dimmer before the sheet and uses sheet z-index constants', () => {
         const document = makeDocument()
         const panel = document.createElement('div')

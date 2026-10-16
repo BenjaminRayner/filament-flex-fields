@@ -42,6 +42,7 @@ describe('overlay-sheet-dismiss', () => {
     it('floors fitted height so empty states are not clipped', () => {
         const classList = new Set()
         const style = {
+            removeProperty(property) { delete this[property] },
             setProperty(property, value) {
                 this[property] = value
             },
@@ -53,6 +54,7 @@ describe('overlay-sheet-dismiss', () => {
             classList: {
                 add: (token) => classList.add(token),
                 remove: (token) => classList.delete(token),
+                contains: (token) => classList.has(token),
             },
             getBoundingClientRect: () => ({ height: 96 }),
             querySelectorAll: () => [],
@@ -69,6 +71,7 @@ describe('overlay-sheet-dismiss', () => {
     it('fits sheet height to measured content under the peek cap', () => {
         const classList = new Set()
         const style = {
+            removeProperty(property) { delete this[property] },
             setProperty(property, value) {
                 this[property] = value
             },
@@ -80,6 +83,7 @@ describe('overlay-sheet-dismiss', () => {
             classList: {
                 add: (token) => classList.add(token),
                 remove: (token) => classList.delete(token),
+                contains: (token) => classList.has(token),
             },
             getBoundingClientRect: () => ({ height: 320 }),
             querySelectorAll: () => [],
@@ -99,6 +103,7 @@ describe('overlay-sheet-dismiss', () => {
     it('uses list scrollHeight when flex layout collapses options during measure', () => {
         const classList = new Set()
         const style = {
+            removeProperty(property) { delete this[property] },
             setProperty(property, value) {
                 this[property] = value
             },
@@ -123,6 +128,7 @@ describe('overlay-sheet-dismiss', () => {
             classList: {
                 add: (token) => classList.add(token),
                 remove: (token) => classList.delete(token),
+                contains: (token) => classList.has(token),
             },
             getBoundingClientRect: () => ({ height: 70 }),
             querySelectorAll: () => [],
@@ -242,6 +248,7 @@ describe('overlay-sheet-dismiss', () => {
             classList: {
                 add: (token) => classList.add(token),
                 remove: (token) => classList.delete(token),
+                contains: (token) => classList.has(token),
                 contains: (token) => classList.has(token),
             },
             getBoundingClientRect: () => ({ height: 400 }),

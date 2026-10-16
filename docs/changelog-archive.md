@@ -1,0 +1,893 @@
+---
+title: "Release archive"
+description: "Earlier FLEX Fields releases and their original change records."
+icon: "archive"
+rss: true
+---
+
+{/* Generated from CHANGELOG.md by scripts/generate-changelog-docs.mjs. Do not edit this page directly. */}
+
+These notes describe earlier releases at their release dates. For current rights and prices, see [Licensing](/docs/licensing) and [Plans](/docs/plans).
+
+[Back to the current changelog](/docs/changelog)
+
+<Update label="v3.1.19" description="2026-09-17" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.19","description":"Changes, improvements and fixes in FLEX Fields 3.1.19.","date":"2026-09-17"}}>
+
+### Fixed
+
+- **CI PHPStan (quality)** — Playground pages use `Auth::check()`; `urlForSlug()` no longer null-coalesced; PhoneField validation messages / allow-types / state cast narrowed for level 8; Whisper install progress callback and FlexFieldAssets Livewire/env checks typed cleanly.
+
+</Update>
+
+<Update label="v3.1.18" description="2026-09-17" tags={["Fixed","Changed"]} rss={{"title":"FLEX Fields 3.1.18","description":"Changes, improvements and fixes in FLEX Fields 3.1.18.","date":"2026-09-17"}}>
+
+### Fixed
+
+- **ItemCardStack / form layout CSS uninstall** — central `FlexFieldAssets::resolveAssetConsumerLivewireKey()` + `consumerAttributesForComponent()` guarantee every emit batch has a CRG consumer (`{livewireId}.{component}` / `page.{component}` when Filament `getLivewireKey()` is null). `emit-assets` defense-in-depth never ships consumer-less markers; `ItemCardStack` / `ItemCardGroup` default keys use `isInheritable: false` so CRG ownership does not double child field paths. Consumer-less batches previously loaded then got uninstalled (~150ms), so production forms looked broken while playground bundles stayed protected.
+- **UserColumn / table lazy CSS flash** — table columns emit Livewire-scoped CRG consumers from the first cell (`{livewireId}.{component}`) with the full root URL set; `load-stylesheet` matches that ownership model; `queued-stylesheets` stays a safety net with `table-columns.{root}`. Shared `table-columns` ids previously collapsed deps and uninstalled CSS after ~150ms.
+- **Schema conditions playground FOUC** — hub now bundles `select-field` CSS (with Flex Text Input); core anti-FOUC paints Select / Flex Text Input chrome before lazy sheets so border color no longer jumps on reload.
+- **TranslatableFields / SegmentTabs `helperText()`** — schema layout now supports field-style helper copy below the tab panels (previously threw `BadMethodCallException`).
+
+### Changed
+
+- **Whisper runtime opt-in (#64)** — ~40 MB `@xenova/transformers` ONNX/WASM is **removed from the Composer package** and no longer auto-copied to `public/` by `publishStaticAssetsIfStale()`. Install with `php artisan fff:whisper:install` (SHA-256 pinned via `WhisperRuntimeManifest`); inspect with `fff:whisper:status`; CI gate with `fff:whisper:install --check`. `AudioField::transcription()` soft-disables the Transcribe UI until the runtime is present (player always works). Source maps are not installed. HTTP auto-publish of package static assets is limited to `local`/`testing` (staging no longer re-copies on every request). Upgrade: apps that use transcription should run `fff:whisper:install` once per environment after updating to 3.1.18+.
+- **PhoneField** — docs lock `national` after normalize as libphonenumber NATIONAL formatting; schema defaults/configurator triple-sync for `browser_locale_*` and `locale` (parity with CountryField); additive playground demos (`fixedLineOnly`, `exceptCountries`, `searchable(false)`, `readOnly`); PHP example national placeholders when no custom placeholder; soft client `isPossiblePhoneNumber` hint from existing `libphonenumber-js/min` (CSS/aria only, non-blocking).
+- **Phone / Country / Select overlays** — exclusive open is claimed before async country load; `forceHideForeignSelectMenus` also closes teleported phone/country menus (Alpine `closeTeleportedMenuImmediate`) so only one dropdown stays open across phone ↔ select; playground Non-searchable uses the full country list (`searchable(false)` only).
+- **PhoneField** — `allowTypes()` / `strictTypes()`, `validateForRegion()`, `nationalDigitsOnly()` (default NATIONAL stays BC), `includeFormats(['international','rfc3966'])`, `includeMetadata(['carrier','geo','timezones','type'])` via PHP libphonenumber mappers (zero phone-lib JS cost); schema + Flex Forms validator parity.
+- **Playground catalog** — new `/admin/flex-fields-playground/index` homepage lists every hub by category with GitHub `art/*.webp` previews (Gravity icon fallback when art is missing); cluster entry redirects here.
+
+</Update>
+
+<Update label="v3.1.17" description="2026-09-08" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.17","description":"Changes, improvements and fixes in FLEX Fields 3.1.17.","date":"2026-09-08"}}>
+
+### Fixed
+
+- **CI PHPStan (quality PHP 8.3)** — drop redundant `is_object()` / nullsafe calls that level 8 rejects after typed `SpatieMediaRef::media(): object` and non-nullable `getLivewire()`.
+
+</Update>
+
+<Update label="v3.1.15" description="2026-09-08" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.15","description":"Changes, improvements and fixes in FLEX Fields 3.1.15.","date":"2026-09-08"}}>
+
+### Fixed
+
+- **CI quality gates** — `VoiceNoteSpatieRecorderField` maps to shared `voice-note-recorder-field` assets in `audit:components` (false FAIL); removed orphan CSS entry `.scoped-build.test`.
+- **CI Pest flake (PHP 8.5)** — Select playground render timing budget raised for CI runners (~1s wall-clock was racey under load).
+
+</Update>
+
+<Update label="v3.1.14" description="2026-09-08" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.14","description":"Changes, improvements and fixes in FLEX Fields 3.1.14.","date":"2026-09-08"}}>
+
+### Fixed
+
+- **CI PHPStan (quality PHP 8.3)** — typed Media Ingress / registry helpers and refreshed `phpstan-baseline.neon` so Release 3.1.13’s PHPStan job no longer fails after the Media Capture OS surface landed.
+
+</Update>
+
+<Update label="v3.1.13" description="2026-09-08" tags={["Changed","Fixed"]} rss={{"title":"FLEX Fields 3.1.13","description":"Changes, improvements and fixes in FLEX Fields 3.1.13.","date":"2026-09-08"}}>
+
+### Changed
+
+- **CI / Pest speed** — Select playground stress suites (`PlaygroundSelectVariantAtomicsTest` ~8k Livewire cases, plus cascade / Livewire / config matrices) are **excluded from default Pest and CI**. Maintainer one-shot only: `FFF_SELECT_ATOMICS_FULL=1 composer test:select-atomics`. Default `quality` jobs should finish in minutes.
+- **Bundle budgets** — slightly raised `icon-picker-field.css` / `flex-fields-select-menu` caps to match current dist after Select sheet / menu work.
+
+### Fixed
+
+- **FlexTextInput `->copyable()`** — copy action lives in the external action group (outside Filament’s `.fi-input-wrp`), so the stock Alpine handler threw `Cannot read properties of null (reading 'querySelector')`. Native action-group button copies via the field shell and swaps to a check icon for ~2.5s (no Filament tooltip).
+
+</Update>
+
+<Update label="v3.1.12" description="2026-09-08" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.12","description":"Changes, improvements and fixes in FLEX Fields 3.1.12.","date":"2026-09-08"}}>
+
+### Fixed
+
+- **CI on PHP 8.3** — `composer.lock` is generated with `config.platform.php = 8.3.33` so locked deps (e.g. `symfony/clock`) stay installable on the minimum supported PHP. The previous lock pulled Symfony 8.1 (`php >=8.4.1`) on a PHP 8.5 maintainer machine and broke all PHP 8.3 Actions jobs.
+- **Faster Filament watch** — Dependabot Composer + scheduled CI run **daily** (~06:00 UTC) so new Filament 5.x tags are usually caught within ~24h (npm/Actions Dependabot stay weekly).
+
+</Update>
+
+<Update label="v3.1.11" description="2026-09-08" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.11","description":"Changes, improvements and fixes in FLEX Fields 3.1.11.","date":"2026-09-08"}}>
+
+### Fixed
+
+- **CI reproducibility** — `composer.lock` is tracked in git (removed from `.gitignore`; still `export-ignore` for Composer dist) so Actions no longer floating-resolves Filament (root cause of failed [Release 3.1.10](https://github.com/janczakb/filament-flex-fields/actions/runs/34242023026) / [Release 3.1.9](https://github.com/janczakb/filament-flex-fields/actions/runs/34229936169) Pest jobs).
+
+### Tests
+
+- World-class CI: PHP **8.3/8.4/8.5** quality matrix, Filament **5.7.8 × ^5.8** compat matrix, non-blocking **`5.x-dev` canary**, `composer audit`, Actions `checkout@v7.0.1` / `setup-node@v7.0.0`, and [SUPPORT.md](https://github.com/janczakb/filament-flex-fields/blob/main/SUPPORT.md) compatibility policy.
+- npm: `@tiptap/core` / `@tiptap/extension-youtube` 3.31.x, `@gravity-ui/icons` 2.22.0, `@playwright/test` ^1.62.1.
+
+</Update>
+
+<Update label="v3.1.10" description="2026-09-08" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.10","description":"Changes, improvements and fixes in FLEX Fields 3.1.10.","date":"2026-09-08"}}>
+
+### Fixed
+
+- **TranslatableFields + Filament ≥ 5.8** — `CustomizesTranslatableComponents::schema()` now accepts `Filament\Schemas\Schema|array|Closure`, matching `Component::schema()` after [filamentphp/filament#19867](https://github.com/filamentphp/filament/pull/19867) (fixes fatal signature incompatibility reported in [#61](https://github.com/janczakb/filament-flex-fields/issues/61)).
+- **TranslatableFields child-schema cache hygiene** — `schema()`, `locales()`, `localesLabels()`, `spatieTranslatable()`, `localeFieldUsing()`, and `storageAttributeUsing()` now call `clearCachedChildSchemas()` so Filament 5.8+ cached / deferred hierarchies rebuild when templates or locales change (we intentionally bypass `parent::schema()`).
+
+### Tests
+
+- Package test suite locked/run against **filament/schemas v5.8.1**; added `TranslatableFieldsFilament58SmokeTest` covering LSP signature, `Schema` / Closure-`Schema` templates, repeated `getChildSchema()` resolution, cache invalidation, and JSON hydration via `fillStateWithNull()`.
+- Select HTML smokes accept Filament 5.8 / Laravel 13.31+ `Js::from()` encoding (`JSON.parse('{\u0022…\u0022:…}')`) via `tests/Support/AlpineJsHtml.php`.
+- **Enterprise Filament guardrails** — `FilamentOverrideCompatibilityTest` + `FilamentOverrideSignatureGuard` assert critical overrides stay LSP-compatible; CI job `filament-compat` matrix; Dependabot groups `filament/*`; Composer script `composer test:filament-compat`.
+
+</Update>
+
+<Update label="v3.1.9" description="2026-09-08" tags={["Added","Fixed","Changed"]} rss={{"title":"FLEX Fields 3.1.9","description":"Changes, improvements and fixes in FLEX Fields 3.1.9.","date":"2026-09-08"}}>
+
+### Added
+
+- **Unified media uploads** — one shared upload path for files, images, voice notes, signatures, and rich-editor attachments. You can store on a normal disk (including S3) or with Spatie Media Library, with virus scanning, private download links, and clearer multi-tenant disk settings. See [Media Ingress](/docs/media-capture-os) and the [migration guide](/docs/media-ingress-migration).
+- **Spatie Media Library as a first-class choice** — pick Spatie per field (including voice notes), keep full image conversions on your model, and use Form Builder `storage_driver` (`disk` or `spatie`). Signatures can optionally copy into Spatie without changing how the signature is stored.
+- **Media documentation** — step-by-step examples for disk vs Spatie, S3, conversions, Form Builder, voice notes, signatures, and the rich editor.
+
+### Fixed
+
+- **Mobile select sheets (iOS Safari)** — bottom sheets stay flush with `viewport-fit=cover` and `env(safe-area-inset-bottom)` (inner padding only). Keyboard focus uses Apple’s Visual Viewport API so the sheet docks above the keyboard without a gap, async option loads refit height correctly, and page scroll stays locked while the sheet is open.
+- **Mobile sheet search** — search inputs use 16px text so Safari does not zoom the page on focus.
+- **Sheet drag-to-dismiss** — dismiss drag tracks the finger smoothly (no height thrash / jitter while pulling down).
+- **Desktop dropdown glass** — Select / User Select (and other teleported menus) keep backdrop blur on desktop panels; opaque no-blur styling stays limited to mobile sheets.
+- **Icon picker opening** — no more blank white flash when opening the picker; loading placeholders match real icon size and layout, and the panel height stays steady.
+- **Large select lists** — long option lists (including playground demos with thousands of items) scroll through the full set instead of stopping early.
+- **Select “create option”** — when creating new values is off, unknown options are rejected; when it is on, free-text values are allowed as intended.
+- **Invalid native select combinations** — native select can no longer be combined with search, multiple, or HTML options (clear error at setup).
+- **Select, Tags, and Icon picker search** — safer rate limiting and more reliable server validation for tag limits and suggestion-only mode.
+- **Currency field** — unknown currency codes are rejected instead of being quietly remapped.
+- **Select dropdowns** — menus close and clean up reliably when the page updates or the field is removed.
+- **Smoother large menus** — Select, Icon picker, phone/country/currency lists, dual listbox, todo list, and timezone menus stay responsive with big option sets.
+
+### Changed
+
+- **Timezone and currency pickers** — large built-in catalogs load more efficiently; small custom lists behave as before.
+- **User select in Studio / Form Builder** — clearer option handling when a model source and static options are both present.
+- **Select playground** — notes on configurations that are not allowed (for example native + searchable).
+
+### Docs
+
+- Clearer guides for Select (create option, search limits, pagination), User Select, Timezone, Currency, and Trusted Proxies for search.
+- Expanded Media Ingress / file upload docs for disk, Spatie, S3, and conversions.
+
+</Update>
+
+<Update label="v3.1.8" description="2026-09-07" tags={["Fixed","Security","Changed"]} rss={{"title":"FLEX Fields 3.1.8","description":"Changes, improvements and fixes in FLEX Fields 3.1.8.","date":"2026-09-07"}}>
+
+### Fixed
+
+- **FormBuilder / FlexTextInput** — skip `verificationStatusColor()` when the config value is null (avoids TypeError on formula/conditions builds).
+- **FormBuilder sizes** — when a definition omits `size`, configurators honor `filament-flex-fields.ui.*_size` instead of the hardcoded default-config `md`.
+- **FlexTextarea toolbar_select** — empty default `toolbar_selects: []` no longer blocks the legacy singular `toolbar_select` config.
+- **Hold Confirm action view** — stylesheet include tolerates missing `$getLivewireKey` outside a Livewire field context.
+- **Credit Card PCI tests / defaults** — unit coverage aligned with `never_store_pan` (last4 dehydrate + tokenization required).
+- **Mapbox geocoding rate-limit tests** — set `filament-flex-fields.geocoding.rate_limit_per_minute` (controller key), not only the legacy mapbox key.
+- **Playground registry count** — navigation tests expect 64 components.
+- **CI / asset assertion drift** — barcode `openScanner($event)`, rich-editor stylesheet include, select CSS, UserSelect `overlay-runtime`, emit-assets batch markers, Select playground render budget, and bundle budgets for select/icon-picker/select-menu.
+
+### Security
+
+- **GitHub Actions pinned to SHA** — `checkout`, `setup-php`, and `setup-node` use full commit SHAs (Plumb / supply-chain hardening).
+- **Dependabot covers GitHub Actions** — `.github/dependabot.yml` now includes the `github-actions` ecosystem with `cooldown.default-days` only (`semver-*-days` is invalid for Actions and fails GitHub’s config check).
+
+### Changed
+
+- **npm** — `@internationalized/date` ^3.12.4, `libphonenumber-js` ^1.13.12.
+
+</Update>
+
+<Update label="v3.1.7" description="2026-09-06" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.7","description":"Changes, improvements and fixes in FLEX Fields 3.1.7.","date":"2026-09-06"}}>
+
+### Fixed
+
+- **SelectField headless → Livewire sync** — first pick on an empty single select (`state === null`) no longer skips wire write, so fill/required validation receives the value (UI no longer shows a label while the server still sees empty).
+- **SelectField SSR/default hydration** — when Alpine still has empty wire state but `initialState` is set, init pushes the selection into Livewire once (programmatic write, not a user mutation).
+- **SelectField dynamic options soft-fail** — `getOptionsForJs` returning `null` or throwing no longer applies `[]` and prunes a valid selection.
+- **SelectField remote prune** — option-list prune uses set equality and marks writes as programmatic so empty Livewire echoes do not wipe a restored selection.
+
+</Update>
+
+<Update label="v3.1.6" description="2026-09-05" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.6","description":"Changes, improvements and fixes in FLEX Fields 3.1.6.","date":"2026-09-05"}}>
+
+### Fixed
+
+- **SelectField clear icon** — reset Filament panel `mask-image` / `background-color` on `.fi-select-input-value-remove-btn` so Gravity `circle-xmark` is not clipped to a plain × (same outline pair as `circle-chevron-down`).
+
+</Update>
+
+<Update label="v3.1.5" description="2026-09-05" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.5","description":"Changes, improvements and fixes in FLEX Fields 3.1.5.","date":"2026-09-05"}}>
+
+### Fixed
+
+- **Focus outline playground** — hub CSS bundle now includes Flex Text Input, Select, Textarea, Phone, and Credit Card styles (was empty), so fields no longer flash Filament’s black `fi-input-wrp` ring on reload. Core anti-FOUC also covers phone wrappers and Select.
+
+</Update>
+
+<Update label="v3.1.4" description="2026-09-05" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.4","description":"Changes, improvements and fixes in FLEX Fields 3.1.4.","date":"2026-09-05"}}>
+
+### Fixed
+
+- **VideoField playground / AirPlay+Cast icons** — default cast/AirPlay icons no longer use Remix (`ri-cast-line` / `ri-airplay-line`), which threw `SvgNotFound` when that icon set is not installed. Defaults are Gravity UI (`gravityui-tv`, `gravityui-antenna-signal`), already required with the package.
+- **ImageChoiceCards mobile lag** — playground body-type silhouettes are published WebP assets instead of megabyte-scale base64 data-URIs; selection paints from native `:checked` before Alpine `x-load` hydrates; overlay blur / image `will-change` no longer run on coarse pointers. Remote option images warm earlier on scroll (Safari lazy) and fade in once loaded.
+- **ChoiceCards / ChoiceCheckboxCards** — selected options no longer flash on reload (SSR `is-selected` + no transition before hydrate); clicking the checkmark square toggles correctly (`click.prevent` + controlled state, indicator `pointer-events: none`).
+- **FlexChecklist / FlexRadiolist** — clicking the checkbox/radio control no longer double-toggles (nested label `click.stop` removed; row handler owns selection).
+- **Playground code snippets** — auto-generated hub snippets are real Field usage PHP (fluent `::make()` from live demo components), not `FlexFieldsPlaygroundRegistry` boilerplate. Layout hubs (e.g. Segment Tabs) export `SegmentTabs` / tabs schema instead of a nested input; Segment Tabs ships a hand-written usage block.
+
+</Update>
+
+<Update label="v3.1.3" description="2026-09-05" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.3","description":"Changes, improvements and fixes in FLEX Fields 3.1.3.","date":"2026-09-05"}}>
+
+### Fixed
+
+- **Mobile overlay sheets (PhoneField, SelectField, UserSelect, and other searchable pickers)** — first open no longer paints the bottom drawer under the dimmer: backdrop uses a fixed `z-index` below the sheet and is inserted before the panel in the DOM.
+- **Sheet drag-to-dismiss** — pulling the handle down animates with `translateY` (matching CSS `transform: … !important` on `.is-open`) instead of shrinking height, so the close gesture no longer jumps or skips the exit animation.
+
+</Update>
+
+<Update label="v3.1.2" description="2026-09-05" tags={["Changed","Fixed"]} rss={{"title":"FLEX Fields 3.1.2","description":"Changes, improvements and fixes in FLEX Fields 3.1.2.","date":"2026-09-05"}}>
+
+### New
+
+- **AudioField client-side Transcribe** — optional Whisper speech-to-text in the browser (`->transcription()`), inspired by Xenova/whisper-web: model / language / task settings, multilingual + quantized toggles, and a session transcript panel (UI-only; not written to field state). Playground hub demos full and English-only presets.
+
+### Improved
+
+- **VideoField player rebuild** — playback speed menu, quality options, and hover/scrub stop-frame thumbnails on the progress bar (cached preview frames), alongside the refreshed marketing art and control dock.
+- **SelectField marketing art** — mobile bottom-sheet screenshot (`art/drawer-mobile.webp`) in README Screenshots and the SelectField Help Center page.
+
+### Changed
+
+- **JS deps** — `@tiptap/core` + `@tiptap/extension-youtube` 3.31.0; `esbuild` 0.28.2; `libphonenumber-js` 1.13.11; `@internationalized/date` 3.12.3.
+
+### Fixed
+
+- **SelectField / UserSelect mobile sheets** — smoother bottom-sheet open on phones: enter animation stays transform-only, Livewire option fetch and focus wait until after the sheet finishes opening, and the UserSelect mixin loads with the combobox factory so option paint no longer races a missing `renderUserOptionHtml`.
+- **SelectField / UserSelect resize while open** — desktop→mobile→desktop no longer leaves the dropdown pinned at `left: 0` (detached over the sidebar); live breakpoint flips the overlay between sheet and panel, re-anchors under the trigger, and syncs body scroll lock / sheet backdrop with the drawer.
+- **SelectField init with dynamic search** — `serverSideFilterFn` stub keeps engine create safe while the Livewire mixin loads in the background (no Alpine init serialization across the playground).
+- **Asset injector stale registry** — rebuilding JS refreshes `asset-registry.json` when `alpine-manifest.json` is newer, so the injector no longer modulepreloads orphaned select-field chunk hashes (duplicate loads / main-thread jank on the playground).
+- **Asset injector URL identity** — cache-bust `?v=` is ignored when deduping modulepreloads/stylesheets, so the same chunk is not injected twice under two versions.
+- **UserSelect loading skeleton** — single-container shimmer instead of per-row gradient pulses, so the sheet feels lighter while options load.
+- **Multi UserSelect trigger** — long selected-name lists truncate with an ellipsis inside the bordered control; the chevron stays in place instead of painting past the field edge.
+- **IconPickerField trigger** — selected icon and icon name share the same vertical center in the closed trigger.
+- **IconPickerField mobile sheet** — no more cell/icon size jumps while the bottom sheet opens: sheet keeps full viewport width (no 22rem pin), grid geometry waits until enter settles, and locked virtual strides ignore tiny width thrash from sheet height fits.
+- **IconPickerField loading skeleton** — rebuilt: phase-driven bones (full-cell pulse), fetch no longer waits on grid geometry, icon track is not gated on `resultsGeometryReady` (that deadlock left the panel empty forever).
+- **IconPickerField resize / breakpoint** — open panel flips panel↔sheet on window resize: width pins run after mode chrome, stuck sheet-enter no longer blocks flips, and the icon grid remasures (the old resize wrapper never rebound `window`).
+- **Overlay breakpoint** — sheet vs panel follows viewport width only (`≤768`); coarse pointer alone no longer locks sheet on wide screens, so mobile→desktop restore works.
+- **CI Pest bootstrap** — `phpunit.xml` no longer hard-codes monorepo `../../vendor/autoload.php`; `tests/bootstrap.php` loads package `vendor/` (GitHub Actions) or the app vendor when developing inside a monorepo.
+
+</Update>
+
+<Update label="v3.1.0" description="2026-09-04" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.1.0","description":"Changes, improvements and fixes in FLEX Fields 3.1.0.","date":"2026-09-04"}}>
+
+Flex Fields **3.1** ships two major interactive fields, closes the admin-to-runtime loop from 3.0, refreshes Phone/Video marketing art, speeds up heavy fields, and polishes the playground and release process.
+
+### New
+
+- **BubbleChoiceField** — pannable bubble multi-select with center magnification, fringe shrink on pan, optional icons/images, min/max selection, and scalloped selection morph (radial geometry + SVG stroke). Studio/`FieldType::BubbleChoice`, playground hub, and Help Center page.
+- **TodoListField** — enterprise animated checklist: check/strike motion, spark lines, celebrations (fireworks and custom hooks), sub-stacks, undo toast, create/edit/delete, reorder, search, virtualize, and infinite scroll. Studio/`FieldType::TodoList`, playground hub, and Help Center page.
+- **Sections end-to-end** — layout sections defined in field groups render in Filament forms via `flexFieldFormLayout()`. Import, export, publish, and rollback preserve sections and field `section_id` assignments.
+- **Section visibility at runtime** — section `visibleWhen` rules apply in forms, table column order follows section sort with section-prefixed labels, and infolist entries group by section.
+- **Visibility builder v2** — field pickers for required/disabled rules and model-attribute sources in the field-group editor; section visibility rules in admin.
+- **Formula field in admin** — save calculated expressions with cycle detection before publish.
+- **CSV value exchange** — export a values CSV template and validate imports from the field-group editor.
+- **Playground categories** — Guides, Navigation, Buttons, Pickers, Date and Time, Colors, Controls, Collections, Text Input, Data Display, Media, and Location group the hubs; related-hub cross-links between composition demos; SelectField hub demos `allowCreateOption()` (smart suggest create row).
+- **Package CI workflow** — Pest, PHPStan, component audit, and bundle budgets in GitHub Actions.
+- **Help Center pages** — field intelligence, schema conditions, and admin columns documentation; BubbleChoice and TodoList docs with screenshots.
+
+### Improved
+
+- **PhoneField & VideoField** — updated marketing screenshots (`art/phone-field.webp`, `art/videofield.webp`); README and docs point at the new WebP art (legacy `sc-23` / `sc-15` refreshed in parallel).
+- **README & art** — BubbleChoice and TodoList featured first; package art screenshots prefer WebP; component count updated to **72** (60 form + 9 layout + 3 table).
+- **SelectField and UserSelect** — lazy Alpine mount markers; **select-field.css** gzip budget met (≤12 KB); critical preload of overlay-runtime and teleported-menu when picker CSS is queued; explicit JS semantic chunks for theme-utils, combobox-engine, and search-normalize; playground CSS loads shared base + slim per-hub bundles (no duplicated toolbar chrome).
+- **Asset preloads** — transitive barcode chunk preloading; background preloads respect save-data and reduced-motion preferences.
+- **Encrypted fields** — masked display in table and infolist builders; persist/decrypt round-trip on models using `HasFlexFields`.
+- **Schema export** — full JSON file download instead of truncated notifications.
+- **Flex Field Studio** — registry publish version/state on group cards; entity-discovery empty-state hint and config cookbook.
+- **Blueprint packs** — CRM and support starters ship with layout sections.
+- **Quality gates** — `audit:components` in release checklist; plugin navigation reads `schema.navigation_*` config keys; PHPStan burn-down on RichEditor, FileUpload, Slug, and Select paths.
+
+### Fixed
+
+- **Schema import validation** — rejects unknown section IDs and circular formula dependencies.
+- **Schema export stream** — download callback echoes JSON payload correctly.
+- **Playground docs** — corrected hold-confirm, voice-note, and compliance-pack links; added focus-outline documentation; removed stale NEW badges on v3 hubs.
+- **Docs art paths** — Help Center field pages use `/art/*.webp` instead of outdated PNGs.
+
+</Update>
+
+<Update label="v3.0.0" description="2026-09-01" tags={["Fixed"]} rss={{"title":"FLEX Fields 3.0.0","description":"Changes, improvements and fixes in FLEX Fields 3.0.0.","date":"2026-09-01"}}>
+
+Flex Fields **3.0** is a major release: manage custom fields from the admin panel, a faster form experience, and enterprise-ready uploads and signatures.
+
+### New
+
+- **Field groups in Filament** — create and edit dynamic field sets for your models without hand-editing JSON. Pick the target model, field type, labels, visibility rules, and per-type options from visual controls. Optional database storage and version history when migrations are enabled ([Flex Field Groups](/docs/flex-field-groups)).
+- **Complete per-type settings** — every supported field type exposes its options in the field-group editor (toggles, selects, option lists, matrix rows and columns). No raw config JSON for everyday setup.
+- **Calculated fields** — formulas that update other fields automatically (totals, margins, progress, currency-aware math). Invalid or circular formulas are blocked before save.
+- **Conditional fields** — show, hide, or require fields based on values elsewhere in the form.
+- **Ready-made schema blueprints** — starter packs for CRM, HR, booking, inventory, support, and onboarding.
+- **Image choice cards** — users pick from image cards (single or multiple choice) with layout, sizing, and selection limits.
+- **Redesigned SelectField** — built for large lists and daily use: instant search, inline typing in the trigger, grouped options, disabled choices, paginated remote results, custom option layouts, recent and suggested values, inline create-new-option, and @-mentions for linked records. Multi-select chips wrap cleanly on small screens.
+- **Mobile-friendly pickers** — country, phone, timezone, currency, address, tags, and similar fields open as bottom sheets on phones and tablets, with consistent keyboard support.
+- **Schedule and date/time** — weekly schedules with overnight slots, copy-to-weekdays, overlap validation, locale-aware calendars, and blocked dates.
+- **Secure media and signatures** — optional virus scanning and quarantine for uploads; Spatie Media Library integration; voice-note and barcode capture metadata; credit-card fields that never store full card numbers when tokenization is required; signature fields with legal timestamp seals, audit metadata, ink validation, and optional download (SVG or WebP).
+- **Translatable fields** — improved locale tabs for many languages, correct text direction per locale on the input, and smoother RTL behaviour.
+- **Rich admin columns** — table columns for progress, status chips, signature previews, and map pins, sized to match your panel density.
+- **Upgrade guide** — [current update workflow](/docs/updating) for teams moving from Flex Fields 2.x.
+
+### Improved
+
+- **CurrencyField** — clearer amount display, stable caret while typing, and more natural decimal entry.
+- **NumberStepper and PriceRangeField** — snappier number animations; price range sliders and inputs respect your chosen corner radius and large size tokens.
+- **Formula-driven forms** — calculated values refresh reliably across related fields in the same form.
+- **Global density** — compact, comfortable, and spacious panel density scales control heights consistently across fields.
+- **Fresh installs** — v3 behaviour (modern select engine, formulas, enterprise media defaults) is enabled out of the box; run `php artisan fff:v3:upgrade` when upgrading an existing app.
+
+### Fixed
+
+- **SignatureField** — legal signature packs save correctly with timestamp metadata; validation requires visible ink before accepting a seal.
+- **SelectField** — large option lists load quickly; clearing a selection no longer restores the old value; inline search and RTL layouts behave predictably on first load and after Livewire updates.
+- **Date and time fields** — no flash of empty segments while the form loads; timezone labels appear immediately.
+- **Translatable and slug fields** — long locale tab bars scroll smoothly without breaking layout; fused title/slug locale tabs align correctly.
+- **Text inputs** — caret stays at the end of prefilled values after autofocus.
+- **PriceRangeField** — focus ring and sizing match other large inputs; histogram and inputs follow your rounding settings.
+- **Segment controls** — overflow tabs position correctly on first paint and inside modals.
+
+</Update>
+
+<Update label="v2.9.9" description="2026-08-26" tags={["Added","Changed","Fixed"]} rss={{"title":"FLEX Fields 2.9.9","description":"Changes, improvements and fixes in FLEX Fields 2.9.9.","date":"2026-08-26"}}>
+
+### Added
+
+- **COMMERCIAL.md** — public commercial plans (Single Product $169, Unlimited $299, Custom kit/OEM from $1,500), decision diagram, OEM vs in-product comparison, starter/boilerplate clarification, and Lemon Squeezy checkout.- **NumberStepper / FlexSlider / PriceRangeField `locale()`** — opt-in locale-aware display (`pt_BR` → `1.234,50`). Default `null` keeps historical plain `.` decimals with no grouping (PHP + JS). ([#47](https://github.com/janczakb/filament-flex-fields/pull/47))
+
+### Changed
+
+- **LICENSE §5** — points to `COMMERCIAL.md` for published plans/pricing; clarifies custom OEM / redistribution instruments.
+- **README** — license footer links to `LICENSE` and `COMMERCIAL.md` without embedding prices.
+- **Docs index** — Links section includes License and Commercial plans.
+- **JS deps** — `number-flow` 0.6.2; `@tiptap/core` + `@tiptap/extension-youtube` 3.28.0; `tailwindcss` + `@tailwindcss/cli` 4.3.3 ([#28](https://github.com/janczakb/filament-flex-fields/pull/28)–[#31](https://github.com/janczakb/filament-flex-fields/pull/31), [#27](https://github.com/janczakb/filament-flex-fields/pull/27)).
+
+### Fixed
+
+- **Client-side option search** — timezone, currency, dual-listbox, and tags suggestion filters now use the same accent-insensitive normalizer as the country picker (`sao paulo` matches `São Paulo`). Tag duplicate detection is unchanged. ([#46](https://github.com/janczakb/filament-flex-fields/pull/46))
+- **SelectField multiple chips** — selected badges wrap and the trigger grows in height (instead of a single clipped row). Chip spacing/contrast polished; after ~6 rows the chip area scrolls via `--fff-select-multiple-max-h`. Chips scale with field `size()` (`sm` / `md` / `lg`). ([#45](https://github.com/janczakb/filament-flex-fields/issues/45))
+- **SelectField grid trigger / checkmark** — grid trigger uses the same tighter start padding as multi chips; portaled grid selected-check badge keeps a solid circular background.
+- **SelectField `keepSelectedOptionsInDropdown()`** — checklist-style multi-select: selected options stay in the dropdown with checkmarks (menu stays open). Default multi-select still removes chosen values from the list (chip/tag pick-from-remaining). Playground adds **Multiple states (checklist)** next to the genres wrap demo.
+- **SelectField selection UX JS** — check enter/exit + checklist keep-selected extracted to a dedicated hot-path module (`select-field-selection-ux.js`): template-cloned SVG, cached reduced-motion query, cancelable RAF/transition tokens, and no `getComputedStyle` spam on every dropdown sync (token cache + one-shot glass chrome).
+- **SelectField / teleported menu runtime** — close↔reopen race guard, real patch teardown (portal restore, overlay unbind, grid resize, inline-search click, document-click restore), theme-fingerprint token/glass caches, freeze Filament scroll/resize while closing, rAF-coalesced menu reposition on scroll, `applyTeleportedMenuTheme` skip-if-unchanged, scrollbar-edge inset only when list overflows, estimated height when panel measures `0` on first paint.
+- **Teleported searchable menus (phone / country / timezone / currency)** — scrolling inside the menu no longer re-runs the open reveal animation (`reveal` only on open); capture-phase scroll events from inside the menu are ignored so the panel does not flicker/jump.
+
+### Tests
+
+- SelectField CSS coverage asserting multi-select badge wrap (`flex-wrap`) and auto-height trigger (no fixed `max-height` lock to `--fff-select-min-h`).
+- SelectField dropdown shell tokens (fixed `1.5rem` menu radius, `calc(.25rem * 1.5)` padding, list-box option sizing, near-opaque light menu bg).
+
+</Update>
+
+<Update label="v2.9.8" description="2026-08-12" tags={["Fixed","Changed"]} rss={{"title":"FLEX Fields 2.9.8","description":"Changes, improvements and fixes in FLEX Fields 2.9.8.","date":"2026-08-12"}}>
+
+### Fixed
+
+- **ProgressBar (segmented titles)** — `overflow-wrap` on `.fff-progress-bar__segment-title` / label columns changed from `anywhere` to `break-word`, so narrow multi-segment trackers no longer split words mid-token (e.g. `Anagrafic a`) or squeeze neighbouring columns via min-content. ([#44](https://github.com/janczakb/filament-flex-fields/issues/44))
+
+### Changed
+
+- **LICENSE v1.1** — clarified Permitted Free Use for private app repositories and `filament:assets` output (§1.5(iii), §2.2), application-level CSS/theme overrides (§2.3), local vendor patches kept only for your own install (§2.4), and audit confirmation by email (§10.8). Redistribution / publishing of modified copies remains restricted (§3.1 / §3.2). ([#44](https://github.com/janczakb/filament-flex-fields/issues/44))
+- **README** — added a short “What this license means for you” table for faster adoption review.
+
+### Tests
+
+- ProgressBar unit coverage asserting segmented title CSS uses `break-word` (not `anywhere`).
+
+</Update>
+
+<Update label="v2.9.7" description="2026-08-11" tags={["Fixed","Changed"]} rss={{"title":"FLEX Fields 2.9.7","description":"Changes, improvements and fixes in FLEX Fields 2.9.7.","date":"2026-08-11"}}>
+
+### Fixed
+
+- **TitleSlugField + Spatie Sluggable** — live slug preview no longer freezes on the first character while typing the title. Previously, each keystroke re-hydrated the current form `slug` onto the Spatie model; `GenerateSlugAction` then treated it as a manual customization (`hasCustomSlugBeenUsed`) and kept that first letter. Preview generation now excludes the slug attribute from form hydration so Spatie regenerates from the title source on every update. ([#43](https://github.com/janczakb/filament-flex-fields/issues/43))
+
+### Changed
+
+- **Docs (SlugField & TitleSlugField)** — finished English pass on remaining Polish copy in `docs/slugfield-and-titleslugfield.md` (layout, install, config, Spatie cookbook sections).
+
+### Tests
+
+- Enterprise regression matrix for GitHub [#43](https://github.com/janczakb/filament-flex-fields/issues/43): GenreResource `name`→`slug` + `spatieModel` live typing, multi-word titles, Polish diacritics, Playground without Spatie, renamed `fieldSlug` workaround, incorrect `generateSlugsFrom('slug')` workaround, sibling Spatie sources, Regenerate path, `preventOverwrite` / `skipGenerateWhen` with stale form slug ignored.
+
+</Update>
+
+<Update label="v2.9.6" description="2026-08-06" tags={["Fixed"]} rss={{"title":"FLEX Fields 2.9.6","description":"Changes, improvements and fixes in FLEX Fields 2.9.6.","date":"2026-08-06"}}>
+
+### Fixed
+
+- **Dark mode CSS (`core.css` / component bundles)** — `dark:*` utilities were compiling to Tailwind’s default `@media (prefers-color-scheme: dark)` variant instead of Filament’s class-based strategy. That leaked styles such as `dark:text-white` into light-mode Filament panels whenever the OS preferred dark. All Tailwind entry points (`core.css`, `playground.css`, `utilities-baseline.css`) now declare `@variant dark (&:where(.dark, .dark *));`, matching Filament. ([#41](https://github.com/janczakb/filament-flex-fields/issues/41))
+- **NumberStepper + `->live(debounce: …)`** — Filament’s `$entangle()` binding silently drops debounce and becomes live-immediate, so every +/- click fired a Livewire request and lagged the page. When a debounce is configured, the stepper now entangles non-live and commits via a debounced `$wire.set(..., true)` in Alpine so rapid clicks collapse into one request. ([#40](https://github.com/janczakb/filament-flex-fields/issues/40))
+- **VideoField (Safari)** — the dock’s masked `backdrop-filter` blur no longer cold-starts on hover (opacity-only fade + GPU layer promotion; `visibility` toggle removed). MP4 sources without a poster also paint a first frame under `preload="metadata"` instead of staying black until play.
+- **IconPickerField** — clearing the selection then reopening the panel no longer opens-and-immediately-closes. Deferred `$entangle(null)` used to ride along with the first search request, remorph the shell, and flip `lazy-alpine-mount` from eager → lazy mid-open. `wire:ignore` now wraps the mount shell so Alpine survives that round-trip. ([#36](https://github.com/janczakb/filament-flex-fields/issues/36))
+- **CoverCard height** — short `aspect-ratio` values no longer clip footer actions under `overflow: hidden`. Ratio is applied on a `::before` grid sizer; the content layer can grow the shared row taller than the preferred ratio. ([#42](https://github.com/janczakb/filament-flex-fields/issues/42))
+- **CoverCard** — `extraAttributes(['style' => …])` now merges with the card’s own aspect-ratio CSS variable / `max-width` into a single `style` attribute. Previously a second `style=""` was emitted (invalid HTML), so browsers dropped either the custom style or the aspect ratio.
+### Tests
+
+- Regression coverage for class-based dark CSS compilation, NumberStepper live-debounce binding HTML/Alpine commit path, IconPicker mount-shell stability after clear, CoverCard style merge + min-content height, and related VideoField assets.
+
+</Update>
+
+<Update label="v2.9.3" description="2026-07-28" tags={["Fixed"]} rss={{"title":"FLEX Fields 2.9.3","description":"Changes, improvements and fixes in FLEX Fields 2.9.3.","date":"2026-07-28"}}>
+
+### Fixed
+
+- **Icon Picker Field** — fixed a `__PHP_Incomplete_Class` error occurring upon cache unserialization by refactoring `IconCatalogResolver` to cache native arrays instead of class objects, bypassing Laravel's strict cache object security restrictions.
+
+</Update>
+
+<Update label="v2.9.2" description="2026-07-28" tags={["Fixed"]} rss={{"title":"FLEX Fields 2.9.2","description":"Changes, improvements and fixes in FLEX Fields 2.9.2.","date":"2026-07-28"}}>
+
+### Fixed
+
+- **Progress Circle** — fixed SVG `stroke-dasharray` rendering issue in Firefox by converting unitless `calc()` ratios to lengths (`* 1px`).
+- **Credit Card** — fixed 3D flip animation in Firefox where the front face would bleed through the back of the card due to an `overflow: hidden` + `backface-visibility` rendering bug, by applying explicit Z-translation to faces.
+- **Rating Column** — fixed issue where SVG stars were stripped by Filament's `HtmlSanitizer` when `->html()` was used; `RatingColumn` now renders using `HtmlString` to bypass sanitization correctly.
+
+</Update>
+
+<Update label="v2.9.1" description="2026-07-15" tags={["Fixed","Changed"]} rss={{"title":"FLEX Fields 2.9.1","description":"Changes, improvements and fixes in FLEX Fields 2.9.1.","date":"2026-07-15"}}>
+
+### Fixed
+
+- **ItemCard CSS bundle** — base `ItemCard` / `ItemCardGroup` / `ItemCardStack` styles (and production `fff-form-layout` helpers) lived in the lazy `switch` stylesheet, so pages that render ItemCards without a Switch looked unstyled. Those rules now ship in `flex-fields-item-card.css`.
+- **Asset injector (SPA navigation)** — lazy CSS/JS could fail to re-apply after Livewire/Filament SPA navigation (`wire:navigate`, resource sub-navigation). `dedupeDocumentAssets()` no longer treats the first injected `<link>` as a duplicate, loaded-asset caches are verified against the live DOM, and `livewire:navigated` resyncs from the document before loading only missing component assets.
+- **Asset injector (boot / navigate race)** — Livewire fires `livewire:navigated` shortly after first paint; if `boot()` had already consumed `data-fff-asset-batch` markers, page retain could stay empty and a later modal close would uninstall still-needed page CSS. The injector now restores page retain when navigation finds no remaining batch markers.
+- **Asset injector (server emit protection)** — ownership uninstall only removes injector-created `<link>` tags. Server-emitted `data-fff-stylesheet` / `data-fff-alpine-chunk` links are never torn down by modal close or retain races.
+- **Asset injector (double boot)** — the injector script is registered `loadedOnRequest` and rendered once via `SCRIPTS_AFTER`, with a runtime singleton guard so event listeners are not duplicated.
+
+### Changed
+
+- **Asset injector (page / modal ownership)** — CSS and Alpine chunks are retained per page vs per open modal. Modals load only missing assets (no duplicate `<link>` tags). Closing a modal uninstalls assets that nothing still retains, while assets still required by the page stay loaded.
+- **Asset injector (nested modals)** — stacked Filament action modals use a LIFO ownership stack so a parent modal’s assets survive while a child modal is open and are cleaned up only when that parent actually closes.
+- **Package Health** — Dependabot now sets an explicit `cooldown` (≥3 days) for Composer and npm version updates (Plumb package health requirement).
+
+### Tests
+
+- Expanded asset-injector JavaScript coverage for ownership, nested modals, SPA navigation, chunk lifecycle, and race conditions.
+
+</Update>
+
+<Update label="v2.8.7" description="2026-07-10" tags={["Fixed"]} rss={{"title":"FLEX Fields 2.8.7","description":"Changes, improvements and fixes in FLEX Fields 2.8.7.","date":"2026-07-10"}}>
+
+### Fixed
+
+- **Package Health** — removed `composer.lock` from git tracking and added `.gitattributes` `export-ignore` to improve Packagist distribution archive health.
+- **Package Health** — added `SECURITY.md` policy.
+- **Package Health** — configured `.github/dependabot.yml` for Composer and NPM to ensure dependencies are monitored.
+
+</Update>
+
+<Update label="v2.8.6" description="2026-07-10" tags={["Changed"]} rss={{"title":"FLEX Fields 2.8.6","description":"Changes, improvements and fixes in FLEX Fields 2.8.6.","date":"2026-07-10"}}>
+
+### Changed
+
+- **Documentation** — updated all documentation links in the README to point to absolute Mintlify URLs (`https://flex-fields.bjanczak.com/docs/...`).
+
+</Update>
+
+<Update label="v2.8.5" description="2026-07-10" tags={["Fixed"]} rss={{"title":"FLEX Fields 2.8.5","description":"Changes, improvements and fixes in FLEX Fields 2.8.5.","date":"2026-07-10"}}>
+
+### Fixed
+
+- **Lazy asset emission (`emit-assets`)** — fixed a regression where queued component stylesheets (e.g. `UserColumn`, `RatingColumn`, `IconColumn`) were not applied on full Filament page loads. The partial previously used `@push('styles')` for non-Livewire requests, but Filament renders `@stack('styles')` before the `STYLES_AFTER` hook, so pushed links never reached the document head and CSS relied solely on the JS asset injector.
+- **Lazy asset emission (`emit-assets`)** — queued lazy stylesheets and Alpine chunk preloads are now always emitted as inline `<link>` tags (with `data-fff-stylesheet` / `data-fff-alpine-chunk`) while preserving the existing `data-fff-asset-batch` payload for `flex-field-asset-injector.js` (Livewire morph, SPA navigation, modals). Per-component lazy loading, dependency resolution, deduplication, and `markStylesheetsEmitted()` behaviour are unchanged.
+
+</Update>
+
+<Update label="v2.8.4" description="2026-07-07" tags={["Fixed"]} rss={{"title":"FLEX Fields 2.8.4","description":"Changes, improvements and fixes in FLEX Fields 2.8.4.","date":"2026-07-07"}}>
+
+### Fixed
+
+- **FlexRichEditor** — fixed a critical bug in Native Filament's `rich-editor.js` where custom JS extensions (like the YouTube embed) triggered a `TypeError: Y[F.name] is not a function` during Livewire event dispatch due to missing references in the minified loop. `runEditorCommands` is now safely overridden directly in `flex-rich-editor.js`.
+- **FlexRichEditor** — added `try/catch` block around `setEditorSelection` to prevent `RangeError` from halting command execution when the Livewire server state syncs and trims the document, shifting the cursor out of bounds before inserting elements.
+- **FlexRichEditor** — fixed a race condition during initialization where Native Filament's formatting buttons (Bold, Italic, etc.) failed to execute because the `$getEditor` method proxy was not correctly mapped to the Alpine component instance.
+
+</Update>
+
+<Update label="v2.8.3" description="2026-07-04" tags={["Added","Changed"]} rss={{"title":"FLEX Fields 2.8.3","description":"Changes, improvements and fixes in FLEX Fields 2.8.3.","date":"2026-07-04"}}>
+
+### Added
+
+- **`CalculatorField`** — numeric input with a shared iOS-style calculator panel (one panel per page, per-field session memory).
+  - **Input:** direct typing or **Insert** from the keypad; built on FlexTextInput styling (`primary`, `secondary`, `flat`, `soft` variants; `sm` / `md` / `lg`).
+  - **Numeric API:** `minValue()`, `maxValue()`, `step()`, `integer()`, `decimalPlaces()`, `maxLength()`, `roundingMode()` (`round`, `ceil`, `floor`, `truncate` — default `truncate`).
+  - **Panel:** floating glass panel on desktop (draggable); bottom sheet on mobile; iOS keypad layout (`AC`, `±`, `%`, operators); live preview without field rounding until Insert.
+  - **JS core:** `calculator-engine`, `calculator-coordinator`, `calculator-panel-behavior`, `numeric-field-normalizer`.
+  - **Playground** slug `calculator-field`; full docs in `docs/calculator-field.md`.
+- **Tests** — `CalculatorFieldTest`, `CalculatorPanelMountTest`, `CalculatorFieldRenderTest`, JS unit tests (`calculator-engine`, `calculator-coordinator`, `calculator-keypad-icons`, `numeric-field-normalizer`), E2E `playground-calculator-field.spec.mjs`.
+
+### Changed
+
+- **README** — CalculatorField gallery entry (`art/sc-34.png`); component count **70**; Number & range table updated.
+- **Docs** — `docs/calculator-field.md` registered in `docs.json` and `docs/index.md`.
+
+</Update>
+
+<Update label="v2.8.0" description="2026-07-04" tags={["Added","Changed","Fixed"]} rss={{"title":"FLEX Fields 2.8.0","description":"Changes, improvements and fixes in FLEX Fields 2.8.0.","date":"2026-07-04"}}>
+
+### Added
+
+- **`NpsField`** — enterprise survey scale input for NPS (0–10), CSAT, Likert, and custom option sets.
+  - **Variants:** `pills` (sliding segment control), `segments` (full-width bordered bar), `emojis` (icon or image rings with labels).
+  - **API:** `options()`, `variant()`, `colorCoded()`, `colors()`, `textColors()`, `icons()`, `emojiImages()`, `disabledOptions()`, `minLabel()`, `maxLabel()`, `size()`, `rounding()`.
+  - **State:** defaults to `null` (empty initial selection on all variants); optional fields deselect when the active option is clicked again.
+  - **Assets:** bundled mood emoji webp (`resources/dist/assets/nps-field/emojis/`) published to `public/filament-flex-fields-assets/` via `php artisan filament:assets`.
+  - **Playground** slug `nps-field`; full docs in `docs/nps-field.md`.
+- **`CREDITS.md`** — third-party attributions (Microsoft [Fluent UI Emoji](https://github.com/microsoft/fluentui-emoji), [Gravity UI Icons](https://github.com/gravity-ui/icons)); linked from README.
+- **`FlexFieldStaticAssetsTest`** — coverage for static media publishing and `FlexFieldAssets::assetUrl()`.
+- **`FlexFieldAssets::publishStaticAssetsIfStale()`** — incremental sync of bundled media; shared `publishStalePackageAssets()` helper for Filament + static assets.
+
+### Changed
+
+- **Static asset pipeline** — media under `resources/dist/assets/` copies file-by-file only when the package source is newer (instead of full directory copy on every boot).
+- **README** — NpsField gallery entry (`art/sc-33.png`); component count **69**; `CREDITS.md` link in license footer.
+- **Component documentation** — expanded reference pages under `docs/` for all form fields, columns, and layout components.
+
+### Fixed
+
+- **NpsField (pills)** — sliding indicator no longer animates from `(0, 0)` on first selection from an empty state.
+- **NpsField (segments)** — improved dark mode contrast for borders and unselected labels.
+
+</Update>
+
+<Update label="v2.7.6" description="2026-07-03" tags={["Added"]} rss={{"title":"FLEX Fields 2.7.6","description":"Changes, improvements and fixes in FLEX Fields 2.7.6.","date":"2026-07-03"}}>
+
+### Added
+
+- **`FlexMatrixTable`** — new advanced grid component based on `MatrixChoiceField`. Allows defining arbitrary Filament components in the `schema()` instead of just radio/checkbox fields. You can now inject `SelectField`, `FlexTextInput`, `SwitchField`, etc., directly into matrix rows.
+- **Matrix table column widths** — added `columnWidths([])` method to dynamically control CSS grid template columns for matrix-based fields, allowing elements like inline switches to perfectly fit `max-content` and align to the right.
+- **Matrix table playground** — added `FlexMatrixTablePlayground` with `flex_matrix_table__basic` and `flex_matrix_table__specs` examples, demonstrating dynamic suffix injection, component size overrides, and column width control.
+
+</Update>
+
+<Update label="v2.7.5" description="2026-07-03" tags={["Fixed"]} rss={{"title":"FLEX Fields 2.7.5","description":"Changes, improvements and fixes in FLEX Fields 2.7.5.","date":"2026-07-03"}}>
+
+### Fixed
+
+- **SelectField** — updated the `getOptionLabels` method to maintain forward compatibility with Filament 5.x beta rendering optimizations while remaining completely backward compatible with stable releases, resolving PHPStan signature mismatch errors (#9).
+- **PhoneField** — changed national phone number formatting to properly use `libphonenumber`'s native formatter (`PhoneNumberFormat::NATIONAL`) instead of raw string casting, preserving leading zeros (e.g. for Italian numbers) and correct local spacing (#9).
+
+</Update>
+
+<Update label="v2.7.4" description="2026-07-03" tags={["Fixed"]} rss={{"title":"FLEX Fields 2.7.4","description":"Changes, improvements and fixes in FLEX Fields 2.7.4.","date":"2026-07-03"}}>
+
+### Fixed
+
+- **BarcodeScannerField** — removed `isMobileCameraDevice()` check to allow supported mobile browsers (like Chrome on Android) to use the native `BarcodeDetector` API instead of falling back to the ZXing engine (#7).
+- **Asset Build Script** — fixed an issue in `build-component-js.mjs` where the JS build script incorrectly deleted transitive chunk dependencies as "orphans", which caused the ZXing fallback engine to fail with a 404 error when attempting to load its dynamic chunks (#7).
+
+</Update>
+
+<Update label="v2.7.3" description="2026-06-22" tags={["Fixed"]} rss={{"title":"FLEX Fields 2.7.3","description":"Changes, improvements and fixes in FLEX Fields 2.7.3.","date":"2026-06-22"}}>
+
+### Fixed
+
+- **FlexFileUpload / FlexImageUpload** — fixed an issue where `optimizeImagesToWebp()` was disabled by default when called without arguments (#6).
+- **FlexFileUpload / FlexImageUpload** — added a developer warning and updated documentation to clarify that `pruneOrphanedOnSave()` should never be used with a static `directory()` to prevent accidental data loss in shared folders (#6).
+
+</Update>
+
+<Update label="v2.7.2" description="2026-06-21" tags={["Fixed","Changed","Added"]} rss={{"title":"FLEX Fields 2.7.2","description":"Changes, improvements and fixes in FLEX Fields 2.7.2.","date":"2026-06-21"}}>
+
+### Fixed
+
+- **FlexFileUpload / FlexImageUpload** — fixed an issue where uploaded files were left in the Livewire temporary directory and not moved to the final disk because Filament's `saveUploadedFiles` and `hydrateFiles` lifecycle hooks were accidentally overwritten by the package's internal file storage hooks (#5).
+
+### Fixed
+
+- **AddressAutocompleteField** — fixed hardcoded Mapbox language to properly fallback to `FLEX_FIELDS_MAPBOX_LANGUAGE` (#4).
+- **SegmentControl** — server-rendered `data-segment-selected` / `aria-checked` from `$getState()` before Alpine `x-load` hydrates; CSS pre-hydration pill on the selected segment (`:not(.is-hydrated)`) so the white indicator is visible during `x-load` instead of appearing ~0.3s later.
+- **UserSelect / SelectField** — `lazy-alpine-mount` `eager` when SSR trigger is shown; `modulepreload` for `select-field` Alpine chunk; SSR layer uses `display: none` once replaced (was `visibility: hidden`, caused double height in grid).
+- **IconPickerField** — SSR SVG preview + label before `x-load`; `lazy-alpine-mount` `eager` when a value is selected; `modulepreload` for `icon-picker-field` chunk; `is-trigger-hydrated` handoff (replaces `x-show` on preview).
+
+### Changed
+
+- **FlexFileUpload / FlexImageUpload upload source tabs** — default segment style is now `default` (filled gray track) instead of `ghost` + `primary` accent; use `uploadSourceTabsVariant('ghost')` and `uploadSourceTabsColor('primary')` for the previous look.
+- **FlexFileUpload dropzone icons** — empty-state SVG icons use `--fff-flex-file-upload-accent` (`--primary-500`) via CSS masks instead of hardcoded indigo `#6366f1`.
+- **FlexFileUpload compact file list** — remove button defaults to the right; with uploaded files, compact layout switches to stacked flow (gap below dropzone + between file cards) instead of broken absolute positioning.
+- **VoiceNoteRecorderField** — red microphone record button no longer uses box-shadow.
+- **Conditional critical preload** — `criticalPreloadStylesheets()` emits `teleported-menu` only when `FlexFieldStylesheetQueue::hasQueuedTeleportedMenu()`; empty queue on non-playground pages skips HEAD preloads.
+- **Hold confirm assets** — Alpine `modulepreload` moved to per-action `hold-confirm.blade.php` (`@push`); removed global `hold-confirm-action-preload` partial.
+- **Lazy Alpine mount** — reusable `<x-filament-flex-fields::lazy-alpine-mount>` with `x-intersect` for heavy fields (date/time, file upload, select/user-select, barcode scanner, icon picker).
+- **flex-date-time-field** — calendar grid extracted to `calendar-panel.js` with dynamic `import()` on first calendar open.
+- **select-field.js** — trigger-label helpers and patch boot logic split into `components/select-field/` modules.
+- **UserSelect** — thin Filament class (**46 lines**) + traits `ConfiguresUserSelectColumns`, `ConfiguresUserSelectModel`, `InteractsWithUserSelectPresentation`, `HasUserSelectCollaborators`; services in `UserSelect/*`.
+- **flex-file-upload `pond-bridge`** — split into `pond-component-resolver`, `pond-upload-state`, `pond-server-sync`, `pond-file-status` (entry **21 lines**).
+- **CSS entries** — all **54** lazy bundles use `utilities-baseline.css` + `base.css` (was Tailwind×54 duplicate imports).
+- **InteractsWithFlexFileUpload** — split into `FlexFileUploadSecurity`, `FlexFileUploadStorage`, `FlexFileUploadDisplay` traits; composer trait ~25 lines.
+- **flex-date-time-field.js** — further split with lazy `time-panel.js`; main entry ~476 lines.
+- **PHPStan** — `Translations::get()` for type-safe `__()`; baseline regenerated (~385 entries); `composer analyse` in CI; `scripts/prune-phpstan-baseline.mjs` for stale-entry cleanup.
+- **CI E2E** — always-on unified fixture smoke (`field-smoke`: select coordinator + file-upload + schedule).
+- **Docs** — `COMPONENTS.md`, `README.md`, `DEVELOPMENT.md` §3/§20, `docs/shared-concepts.md`, `docs/hold-confirm-action.md` synced with conditional preload, hold-confirm per-action, alpine entry-only, lazy mount.
+
+### Added
+
+- **`Support/Translations.php`** — typed translation helper for PHPStan level 8.
+- **`resources/css/utilities-baseline.css`** — shared `@theme` / `@utility` baseline; imported by all **54** lazy CSS entries.
+- **`tests/js/flex-file-upload.test.mjs`** — unit tests for file-upload module factories.
+- **`tests/e2e/field-smoke.{spec.mjs,html,harness.mjs}`** — fixture smoke without playground URL.
+- **`scripts/audit-components.mjs`** + **`npm run audit:components`** — per-component matrix (blade ↔ lazy CSS ↔ dist ↔ Alpine manifest ↔ PHP/JS line budgets); exits non-zero on critical asset gaps.
+
+- **`FlexFieldAlpineManifestArchTest`** — guards LAZY stylesheet ↔ alpine manifest ↔ dist entry alignment.
+- **`docs/COMPATIBILITY.md`** — Filament ^5.0, PHP 8.3+, CI link.
+- **`scripts/compare-bundle-metrics.mjs`** — prints gzip deltas vs committed `bundle-metrics.json`.
+
+</Update>
+
+<Update label="v2.7.0" description="2026-06-18" tags={["Added","Changed","Fixed"]} rss={{"title":"FLEX Fields 2.7.0","description":"Changes, improvements and fixes in FLEX Fields 2.7.0.","date":"2026-06-18"}}>
+
+### Added
+
+- **`IconPickerField`** — Searchable **blade-icons** picker with SelectField-style teleported dropdown, lazy SVG previews, paginated server search, set-filter pills, whitelist/exclude controls, and virtual scrolling for large catalogs. Stores the full icon name (`heroicon-o-star`, `gravityui-star`, etc.).
+- **`IconColumn`** — Read-only table column for blade-icons values stored by `IconPickerField`; optional label, color, size, and per-request render cache. Playground demo and `docs/iconcolumn.md`.
+- **Icon catalog pipeline** — `IconCatalogResolver`, `IconCatalogIndex`, and ranked search with server-side caching; optional bundled manifest via `php artisan fff:icons:manifest` for cold-start performance.
+- **Icon picker configuration** — `sets()`, `icons()`, `excludeIcons()`, `searchResultsLayout()` (`grid` / `list` / `icons`), `gridColumns()`, `closeOnSelect()`, `preload()`, `limitPerSet()`, `perPage()`, plus shared `SelectField` shell options (`variant`, `size`, `clearable`, affixes).
+- **Icon picker performance** — viewport SVG batching (`IntersectionObserver`), client search LRU cache, next-page prefetch, and a DOM virtual window for long result sets.
+- **Icon picker UX** — combobox keyboard navigation, debounced search with highlight, horizontal scroll for set pills, full-width results divider, and skeleton states while icons load.
+- **`FieldType::IconPicker`** — FlexField form-builder support via `IconPickerFieldConfigurator`.
+- **Playground** — `icon-picker-field` page with Heroicons-only, Gravity-only, multi-set pill filter, grid/whitelist, size, variant, and clearable demos.
+- **Documentation** — [docs/icon-picker-field.md](/docs/icon-picker-field) (full API, setup, config, performance); navigation entry under **Choice & Selection** in [docs.json](https://github.com/janczakb/filament-flex-fields/blob/main/docs.json) and [docs/index.md](/docs/index).
+- **Tests** — PHP unit/feature tests (`IconPickerFieldTest`, `IconCatalogResolverTest`, `IconPickerFieldRenderTest`, SVG batch limits); JS tests for virtual window, SVG loader, search cache, keyboard highlight, and panel lifecycle.
+
+### Changed
+
+- **Playground bundle dedupe** — `FlexFieldStylesheetQueue::suppressForPlaygroundBundle()` prevents duplicate lazy CSS when a per-slug playground bundle already includes component stylesheets.
+- **Critical preload scoping** — `criticalPreloadStylesheets()` skips global preloads on bundled playground slugs and filters preloads to stylesheets the active slug actually uses (fixes unused `flex-text-input` preload warnings on icon-picker pages).
+- **Icon picker panel lifecycle** — reopen/refresh no longer calls Alpine `$watch` cleanup (magic `$watch` does not return an unwatcher); pending-flag + `panelReady` watcher handles scroll/SVG resync safely.
+
+### Fixed
+
+- **Icon picker reopen** — empty or frozen results after close/reopen; scroll position preserved on pagination (`preserveScroll`); virtual window getters stay in sync during scroll.
+- **Duplicate icon-picker CSS on playground** — bundle + lazy `icon-picker-field.css` no longer both apply conflicting `.fff-icon-picker__toolbar` rules.
+- **Icon picker set pills** — symmetric spacing above/below pills; full-width separator; single-row horizontal scroll for many sets.
+
+</Update>
+
+<Update label="v2.6.1" description="2026-06-17" tags={["Added","Changed","Fixed","Security"]} rss={{"title":"FLEX Fields 2.6.1","description":"Changes, improvements and fixes in FLEX Fields 2.6.1.","date":"2026-06-17"}}>
+
+### Added
+
+- **Asset Injector V2 (SPA/Modal Asset Pipeline)** — Re-architected lazy CSS and Alpine chunk loading. Logic extracted into a dedicated, testable `flex-field-asset-injector.js` module, built to `resources/dist/` via `scripts/build-asset-injector-js.mjs`, and registered as a Filament JS asset.
+- **Shared asset queue trait** — `FlexFieldAssetQueue` centralizes `enqueued` / `emitted` / `pending()` bookkeeping for `FlexFieldStylesheetQueue` and `FlexFieldAlpineQueue`.
+- **Critical stylesheet preloads** — `critical-stylesheet-preloads` partial preloads high-priority flex-field CSS at `HEAD_END` to shorten first-paint latency.
+- **FOUC prevention in modals** — `Livewire.hook('morph.updating')` scans unattached morph fragments (`toEl`) for `data-fff-asset-batch` markers (stylesheets and Alpine chunks), then applies `fff-flex-fields-assets-pending` to the **live** DOM target (`el` or its `.fi-modal` ancestor) before morph completes. While assets load, modals show a **skeleton shimmer** over `.fi-modal-content` (shell and backdrop stay visible) instead of hiding the entire window.
+- **Background asset preloading** — `preloadBatchesIn()` warms lazy CSS/JS from hidden `data-fff-asset-batch` markers without removing them. Preload runs on `requestIdleCallback` after page load / SPA navigation and on debounced hover over action triggers (`button`, `a`, `[wire:click]`), so modal fields are often styled before the user clicks.
+- **Alpine chunk loading in morph batches** — Asset batches now carry `data-fff-chunks`; the injector loads missing `modulepreload` chunks alongside stylesheets.
+- **In-flight promise cache** — `inflightRequests` Map deduplicates concurrent downloads; parallel Livewire requests for the same asset share one network request.
+- **URL normalization** — Native `URL` constructor normalizes relative, absolute, and mismatched-protocol hrefs before deduplication and load checks.
+- **Protected asset links** — Stylesheets and chunks tagged with `data-fff-stylesheet`, `data-fff-alpine-chunk`, or `data-fff-playground-bundle` are never removed during injector dedupe.
+- **Injector optimizations** — O(1) `Map` indices for loaded stylesheets/chunks; `link.sheet` check before treating a DOM link as loaded; `Promise.allSettled` so 404s do not block remaining assets; dedupe removes duplicate injected links instead of re-appending them.
+- **Playground page stylesheets** — `playground-page-stylesheets` partial pushes per-slug playground bundles via `@push('styles')` with protected `data-fff-playground-bundle` markers.
+- **JavaScript test suite** — Unit tests in `tests/js/flex-field-asset-injector.test.mjs` cover URL normalization, in-flight dedupe, morph `el`/`toEl` pending state, conditional `prepareModal`, background preload, protected links, and failed-load recovery.
+- **Webcam & URL file import** — New auxiliary upload sources for `flex-file-upload`, opt-in via `allowWebcamUpload()` and `allowUrlUpload()`. Webcam capture supports front/back camera toggle and torch where available; URL import fetches remote images into native `File` objects injected into FilePond, preserving Filament image manipulation hooks and `multiple()` support. Playground demos and [docs/flexfileupload-and-fleximageupload.md](/docs/flexfileupload-and-fleximageupload) updated.
+- **PHP tests** — `FlexFileUploadSourcesTest` feature coverage for webcam/URL sources, staged previews, SSRF rejection, and disabled-source guards.
+
+### Changed
+
+- **`load-stylesheet` always emits** — Field registration immediately includes `emit-assets` (no longer deferred-only), so lazy CSS is not lost on full-page renders.
+- **`emit-assets` dual emit path** — Full-page requests push `<link>` tags via `@push('styles')`; Livewire partial updates emit inline `<link>` / `modulepreload` tags for the injector to process.
+- **`queued-stylesheets` injector** — Flushes `pending()` stylesheet and chunk queues at `STYLES_AFTER` and `BODY_END` hook points.
+- **Morph pending resolution** — `beginPendingMorph({ el, toEl })` scans batches on `toEl` but resolves pending targets from live `el`, keeping modal state attached to the real DOM node through morph.
+- **Modal open pending is conditional** — `prepareModal` (`x-modal-opened`) applies skeleton pending only when `rootNeedsAssetLoading()` is true; cached assets open instantly with no pending flash.
+- **Teleported menu z-index in modals** — `teleported-menu.css` raises dropdown stacking when a Filament modal is open (`:has(.fi-modal.fi-modal-open)`).
+
+### Fixed
+
+- **Global CSS regression after V2** — Lazy stylesheets load again on full-page Filament views; V2 had registered assets without emitting them until `BODY_END`.
+- **Playground missing CSS** — Playground bundle links are protected from injector dedupe; per-slug stylesheets push into the layout `styles` stack.
+- **Modal stuck hidden after morph** — Pending state now tracks the live modal (`el`) instead of detached `toEl`, so `morph.updated` reliably releases `fff-flex-fields-assets-pending`.
+- **Teleported menu behind modal** — Country/phone/timezone dropdowns render above open modals instead of underneath the overlay.
+- **Upload source panel layout gap** — Inactive webcam/URL panels are removed from document flow (`position: absolute`) so switching tabs does not leave empty vertical space above FilePond.
+- **Recursive stylesheet dependency resolution** — Depth-first traversal in `FlexFieldAssets::stylesheetsFor()` resolves deeply nested CSS dependencies in correct bottom-up cascade order (e.g. `schedule-field` → `timezone-field` → `flex-time-segments`).
+
+### Security
+
+- **URL import SSRF guard** — Remote file import rejects unsafe URLs (localhost, private IPs, metadata endpoints) before fetch, matching server-side scrape safety patterns.
+
+</Update>
+
+<Update label="v2.6.0" description="2026-06-16" tags={["Added","Changed","Fixed"]} rss={{"title":"FLEX Fields 2.6.0","description":"Changes, improvements and fixes in FLEX Fields 2.6.0.","date":"2026-06-16"}}>
+
+### Added
+
+- **`BarcodeScannerField`** — FlexTextInput shell with Filament modal scanner, manual entry fallback, multi-format support (QR, EAN, UPC, Code 128/39, ITF, PDF417, Data Matrix), torch toggle, continuous scanning, success sound, auto-submit, and EAN/UPC checksum validation.
+- **Hybrid scan engine** — native `BarcodeDetector` when supported (Chrome/Edge on desktop), automatic **ZXing** fallback elsewhere (including mobile); engine badge shown in the viewport.
+- **Barcode configuration** — chainable `formats()`, `continuous()`, `beepOnScan()` (default on), `autoSubmit()`, `cameraFacing()`, `preferredDeviceId()`, `allowCameraSwitch()`, `scanDelay()`, `scanInterval()`, `decodeFps()`, `pauseWhenHidden()`, `storeDetectedFormat()`, `allowManualInput()`, `scanButtonLabel()`, `modalHeading()`, `validateChecksum()`, and `barcodeRule()`.
+- **Barcode scanner UX** — toolbar under the preview with **switch camera** and **torch**; decode pauses while the browser tab is hidden (battery-friendly); optional structured state `{ value, format }` from camera symbology.
+- **Mobile camera pipeline** — iOS/WebKit video portal (body-mounted preview + synced overlay) so `<video srcObject>` renders inside the Filament modal; camera starts after the modal transition completes.
+- **Scan feedback** — rounded scan frame, animated scan line, success flash; bundled MP3 on desktop; **transient Web Audio beep** on mobile (no lock-screen media player).
+- **Lazy ZXing assets** — `@zxing/browser` loaded via dynamic import in a separate JS chunk; field CSS/JS lazy-loaded per instance.
+- **Playground** — `barcode-scanner-field` page (default, EAN-only, continuous, checksum, scan-only).
+- **Documentation** — [docs/barcode-scanner-field.md](/docs/barcode-scanner-field); entries in [README.md](https://github.com/janczakb/filament-flex-fields/blob/main/README.md) (Text & input), [docs/index.md](/docs/index), and [COMPONENTS.md](https://github.com/janczakb/filament-flex-fields/blob/main/COMPONENTS.md).
+- **Tests** — PHP unit/feature tests, JS unit tests for barcode validation and engine helpers, Playwright smoke test for barcode scanner playground.
+- **i18n** — English and Polish strings under `barcode_scanner.*`.
+
+### Changed
+
+- **Scanner modal** — native `<x-filament::modal>` (teleported, Filament transitions, close button); spacing below modal description before the preview.
+- **Mobile camera switch** — toggles `facingMode` (`environment` ↔ `user`) instead of cycling opaque `deviceId` values (reliable front/back on iPhone).
+- **Scan controls layout** — switch camera and torch moved from viewport overlay to a **toolbar below the video** (Filament-style buttons, always clickable).
+- **Scan overlay** — minimal Apple-style rounded frame and scan line; compact engine badge in the top-left corner.
+
+### Fixed
+
+- **iOS black camera preview** — video preview no longer stays black inside the teleported Filament modal (body portal + overlay sync).
+- **Mobile switch / torch taps** — controls no longer use `$dispatch` from a detached portal (events never reached Alpine); direct `switchCamera()` / `toggleTorch()` handlers.
+- **Layout on mobile** — portal position resyncs after layout; camera switch no longer hides the toolbar or leaves a black gap above the preview; toolbar stays below the viewport and is not covered by the fixed video layer.
+
+</Update>
+
+<Update label="v2.5.1" description="2026-06-16" tags={["Added","Changed","Fixed","Security"]} rss={{"title":"FLEX Fields 2.5.1","description":"Changes, improvements and fixes in FLEX Fields 2.5.1.","date":"2026-06-16"}}>
+
+Quality, security, accessibility, and test hardening for **LinkPreviewField** and **ScheduleField** (both introduced in 2.4.5), plus new **`SocialLinksField`**.
+
+### Added
+
+- **`SocialLinksField`** — social profile link editor with platform picker (add-from-dropdown UX), one URL row per platform, built-in brand icons, per-platform hostname validation, and optional custom platforms (`customPlatforms()` with label, hosts, icon SVG).
+- **Social links configuration** — `platforms()` whitelist, `excludePlatforms()`, `maxLinks()`, variants/sizes (`primary`, `secondary`, `soft`, `flat`, `ghost`; `sm`/`md`/`lg`), `autoFormatUrls()` (trim + prepend `https://` on blur), and opt-in `reorderable()` (default off).
+- **Social links validation** — server rules via `SocialLinkValidator`; client-side mirror blocks submit and syncs row errors to Livewire (`$wire.addError`); empty in-progress rows kept in state for validation, stripped on `dehydrate()`; legacy associative map state normalized on hydrate.
+- **Social links SSR** — server-rendered list/toolbar fallback to prevent layout jump before Alpine hydration; teleported platform menu with keyboard navigation and click-outside close.
+- **Playground** — `social-links-field` page (default, limited platforms, excluded platforms, custom platforms, reorderable, empty).
+- **Documentation** — [docs/social-links-field.md](/docs/social-links-field); entries in [README.md](https://github.com/janczakb/filament-flex-fields/blob/main/README.md) (Text & input), [docs/index.md](/docs/index), and [COMPONENTS.md](https://github.com/janczakb/filament-flex-fields/blob/main/COMPONENTS.md).
+- **Tests** — PHP unit/feature tests for `SocialLinksField`; JS unit tests for `social-link-validation` and `social-links-field`; Playwright smoke test for social links playground.
+- **Link preview & schedule tests** — comprehensive SSRF unit tests for `UrlMetaScraper`; JS unit tests for `link-preview-field`, `url-meta-scrape`, `schedule-field`, and `schedule-validation`; PHP↔JS contract fixtures for overlap/min/max validation; Livewire feature test (`ScheduleFieldRenderTest`); Playwright playground smoke tests for link preview and schedule field.
+
+### Changed
+
+- **`ScheduleField`** default control size is `sm`; timezone selector renders at `md` independent of field size.
+- **Schedule toolbar** — compact add-slot / add-break buttons; copy-to-weekdays uses a confirm dialog before overwriting weekday schedules.
+- **`flex-time-segments`** — teleported time picker menu styling; `from`/`to` pickers constrain options so start ≤ end within each slot; time options expose `role="option"` and `aria-selected`.
+- **Link preview** — image preload timeout (5s) aligned with scrape timeout constants; `@media (prefers-reduced-motion: reduce)` disables card/shimmer transitions.
+- **Documentation** — `SocialLinksField` listed under **Text & input** (with `LinkPreviewField`), not Date & time; COMPONENTS.md TOC reordered accordingly.
+
+### Fixed
+
+- **`ScheduleField::required()`** — `isEmptyState()` now treats schedules with no enabled days containing slots as empty (normalization no longer bypasses required validation).
+- **Schedule inline validation** — client overlap/range errors block form submit and sync the first error to Livewire via `$wire.addError`.
+- **Link preview client scrape** — `isScrapeCandidate()` blocks localhost, loopback, private IPs, and metadata hostnames (matching server-side SSRF rules).
+- **Prefixed URL display**, dark-mode card colors, and horizontal skeleton width (carried from 2.4.5 polish).
+- **`SocialLinksField` UI** — uniform icon sizing in picker/list, dark-mode legibility on add trigger/button, circular remove/reorder buttons with default gray background, no layout jump on reload (SSR + hydration overlay).
+
+### Security
+
+- **SSRF** — expanded `UrlMetaScraper::isScrapableUrl()` test coverage for localhost, private/link-local IPs, `.local`/`.internal` hostnames, and cloud metadata endpoints; redirect targets re-validated on each hop.
+- **Rate limit** — `link_preview.rate_limit_per_minute` default changed from `0` (disabled) to `30` per user per minute.
+- **OG images** — `normalizeImageUrl()` rejects `data:` URIs; only `http://` and `https://` images are returned.
+
+</Update>
+
+<Update label="v2.4.5" description="2026-06-16" tags={["Added","Changed","Fixed"]} rss={{"title":"FLEX Fields 2.4.5","description":"Changes, improvements and fixes in FLEX Fields 2.4.5.","date":"2026-06-16"}}>
+
+### Added
+
+- **`ScheduleField`** — weekly schedule editor with day toggles, from/to time slots, add break, copy-to-weekdays, optional timezone selector, and overlap validation.
+- **Playground** — `schedule-field` page with variants, sizes, weekdays-only, and split-shift demos.
+- **Documentation** — [docs/schedule-field.md](/docs/schedule-field) and `ScheduleField` section in [COMPONENTS.md](https://github.com/janczakb/filament-flex-fields/blob/main/COMPONENTS.md).
+- **Tests** — PHP unit tests for validation, API, and config; JS unit tests for schedule overlap validation helpers.
+
+- **`LinkPreviewField`** — URL input with live Open Graph preview cards on the FlexTextInput shell (`primary`, `secondary`, `soft`, `flat`, `ghost` variants; prefix/suffix affixes).
+- **Three preview layouts** — `horizontal` (compact row, square edge-to-edge thumb), `vertical` (narrow card), and `card` (full-width social card, max 500px).
+- **Server-side URL meta scraper** — `UrlMetaScraper` with SSRF-safe fetching (stream until `</head>`, redirect handling, server cache), `GET /flex-fields/url-meta/scrape` route, and configurable cache TTL / rate limit.
+- **Client-side preview pipeline** — debounced scrape, in-memory cache, in-flight deduplication, abort on type, skeleton shimmer, image preload, and minimum skeleton duration on page load (`previewMinSkeletonMs`, default 500ms).
+- **Optional SSR initial preview** — `resolveInitialPreviewOnServer()` (default `true`) hydrates prefilled URLs on first render; disable to avoid server scrape on mount.
+- **`showVisitLink()`** — toggles domain as link vs plain text; visit icon uses Gravity `paperclip` by default (`visitIcon()` / `visitLabel()` overridable).
+- **Playground** — `link-preview-field` page with stacked layout demos.
+- **Documentation** — [docs/link-preview-field.md](/docs/link-preview-field) and `LinkPreviewField` section in [COMPONENTS.md](https://github.com/janczakb/filament-flex-fields/blob/main/COMPONENTS.md).
+- **Tests** — PHP unit/feature coverage (`LinkPreviewFieldTest`, `UrlMetaScraperTest`, `UrlMetaScrapeControllerTest`) and JS unit tests for `url-meta-scrape.js` (prefix resolution, skeleton timing, visibility helpers).
+
+### Changed
+
+- Link preview stylesheets declare `flex-text-input` as a lazy dependency — input shell CSS is not duplicated in the preview bundle.
+- Horizontal preview cards use full available width up to 500px; thumb is 1:1 and flush to the card edge.
+
+### Fixed
+
+- Prefixed URL fields no longer show duplicate `https://` in the input (display value strips the prefix; state stores the full URL).
+- Card layout text colors in dark mode use FlexTextInput theme tokens instead of hardcoded light-mode fallbacks.
+- Preview skeleton on horizontal / soft + prefix layouts stretches to the card’s max width instead of shrinking to content.
+
+</Update>
+
+<Update label="v2.4.0" description="2026-06-16" tags={["Added","Changed"]} rss={{"title":"FLEX Fields 2.4.0","description":"Changes, improvements and fixes in FLEX Fields 2.4.0.","date":"2026-06-16"}}>
+
+### Added
+
+- **Mapbox server proxy** — Laravel routes + `MapboxGeocodingClient` keep the Mapbox token server-side; JS uses cached proxy URLs (`geocodeSearchUrl` / `geocodeReverseUrl`).
+- **Schema versioning** — `FlexFieldSchema::CURRENT_VERSION`, `version` on schemas, and `FlexFieldSchemaMigrator` (upgrades legacy `field` → `fields`, `name` → `slug`, etc.).
+- **Flex field audit trail** — `HasFlexFields` records who/when/what on value changes to configurable `flex_field_audit` JSON column.
+- **`SelectField` JS extraction** — ~1000-line inline `x-init` moved to `resources/js/components/select-field.js`, loaded via `x-load`.
+- **JS unit tests** — `theme-utils`, `geocoding-cache`, `geocoding-list-keyboard` coverage in `tests/js/`.
+- **Playwright E2E** — optional playground geo tests (`tests/e2e/playground-geo.spec.mjs`, set `FLEX_FIELDS_PLAYGROUND_URL`).
+- **`docs/tags-field.md`** — full TagsField API reference.
+- **Z-index CSS tokens** (`--fff-z-dropdown`, etc.) and `theme-utils.js` for consistent dark-mode menu styling.
+- Geocoding keyboard mixin + client-side geocoding cache shared by map and address fields.
+- **Geocoding translations** — `geocoding.failed` and `geocoding.rate_limited` in bundled `en` and `pl` language files.
+
+### Changed
+
+- `MapPickerField` / `AddressAutocompleteField` blades document `wire:ignore` + `$entangle` + `wire:key` remount strategy. Current guidance: [Tabs, modals & Livewire](/docs/assets/lifecycle).
+- README compare table, differentiation summary, geo proxy & audit bullets, country registry mention, and CI test counts updated.
+
+</Update>
+
+<Update label="v2.3.0" description="2026-06-09" tags={["Added","Changed","Fixed"]} rss={{"title":"FLEX Fields 2.3.0","description":"Changes, improvements and fixes in FLEX Fields 2.3.0.","date":"2026-06-09"}}>
+
+### Added
+
+- `searchTypes()` on `MapPickerField` and `AddressAutocompleteField` to limit Mapbox geocoding results to specific place types (`address`, `poi`, `place`, etc.) or leave unset for all types.
+- `MapboxSearchType` enum with supported Mapbox Geocoding API type values.
+- Shared exclusive-dropdown registry (`flex-dropdown-registry.js`) with a `{ isOpen(), close() }` controller contract.
+- Alpine overlay store (`Alpine.store('fffOverlays')`) and `wireExclusiveFlexDropdown()` helper that auto-wires each field's open state and closes other menus on open.
+- Dedicated overlay-coordinator JS chunk, preloaded for `SelectField` and searchable select menus.
+- JavaScript unit tests for the dropdown registry (`tests/js/flex-dropdown-registry.test.mjs`).
+
+### Changed
+
+- Unified exclusive-dropdown behavior across `PhoneField`, `CountryField`, `TimezoneField`, `CurrencyField`, `MapPickerField`, `AddressAutocompleteField`, `FlexColorPickerField`, `FlexDateTimeField`, `VideoField`, `FlexTextInput`, `FlexTextarea`, and `SelectField`.
+- `searchable-select-menu.js` now registers through the overlay coordinator instead of per-field manual hooks.
+- `SelectField` blade uses `Alpine.store('fffOverlays')` instead of an inline event bus.
+- Emoji picker panel restyled toward emoji-mart layout: category tabs with custom SVG icons on top, search field below, 9-column emoji grid.
+- Emoji picker category/search icons now use inline `@gravity-ui/icons` SVGs instead of CSS masks (fixes distorted tab icons).
+- Emoji picker category tab click no longer shows the library’s circular `:active` flash on top of the custom hover background.
+- Emoji picker skin tone menu no longer bleeds into the emoji grid after the search row was moved below category tabs.
+- Emoji picker toggle button now closes on second click instead of closing and immediately reopening.
+- Mapbox geocoding dropdown (`AddressAutocompleteField`, `MapPickerField`) is now teleported to `body` with the same glass/backdrop-blur menu styling as `SelectField`, including improved dark-mode detection and stronger contrast over map tiles.
+- Mapbox geocoding dropdown no longer floats above the Filament topbar on scroll (`z-index` lowered from 80 to 20).
+
+### Removed
+
+- Legacy `fff:flex-dropdown-open` DOM event bus and `window.__fffFlexDropdownCoordinator`.
+- Per-instance `prepareExclusiveDropdownOpen()` calls and DOM-scanning close logic.
+
+### Fixed
+
+- Multiple dropdowns opening at once on the same page (e.g. phone country picker and `CountryField` both staying open) caused by a shared unbind function reused across Alpine instances.
+- `SwitchField` track color staying primary after toggling OFF when the switch started in the ON state (Alpine `x-bind:class` string merge kept stale `fi-color-*` classes).
+- `FlexTextareaField` toolbar actions (`Attach`, `Send`, `More actions`, etc.) flashing or disabling together on any submit — each action now gets a scoped `livewireTarget` via Filament's `getLivewireClickHandler()` instead of global `wire:loading.attr`.
+- Livewire console error `Missing closing parenthesis for method "mountAction"` on flex-textarea playground caused by manually built `wire:target` strings with unescaped JSON in HTML attributes.
+- Flex Textarea emoji button icon disappearing on hover in dark mode — generic hover `color` matched the dark `bg-zinc-600` background.
+
+</Update>
+
+<Update label="v2.2.0" description="2026-06-09" tags={["Added","Changed","Fixed"]} rss={{"title":"FLEX Fields 2.2.0","description":"Changes, improvements and fixes in FLEX Fields 2.2.0.","date":"2026-06-09"}}>
+
+### Added
+
+- Shared country registry delivered once per page via `<template id="fff-country-registry-data">` with separate `iso` and `phone` pools.
+- `CountryRegistry`, `CountryRegistryQueue`, and unit tests for compact registry payloads.
+- Lazy country list loading on first menu open instead of embedding full country arrays in every field instance.
+- `createCountrySearchMixin()` with debounced search, diacritic normalization, ranking, and result caching.
+- Keyboard navigation for country menus: Arrow Up/Down, Home, End, Enter, `aria-activedescendant`, `aria-posinset`, and `aria-setsize`.
+- Focus trap inside open country/phone dropdown menus with focus restore on close.
+- Virtual list v2 for long country lists: passive scroll, `requestAnimationFrame` batching, threshold of 50 items, and top/bottom spacers.
+- Page-level deduplication of custom country filters via `countryFilterKey` in the shared registry payload.
+- **Built-in translations** — `en` and `pl` ship in `resources/lang/` (`default.php`, `countries.php`, `currencies.php`, `timezones.php`) and load automatically via the `filament-flex-fields::` namespace.
+- **Publishable translations** — `php artisan vendor:publish --tag=filament-flex-fields-translations` copies language files to `lang/vendor/filament-flex-fields/` for customization (optional; overrides merge on top of bundled strings).
+- `VERSION` file and this changelog.
+
+### Changed
+
+- `CountryField` uses the `iso` registry pool; `PhoneField` uses the `phone` registry pool.
+- Country and phone blades no longer embed `countries: @js($countries)` in Alpine `x-data`.
+- Stylesheet loader now enqueues only the pool required by each field type (`iso` for country, `phone` for phone); both pools are still combined automatically when both field types appear on the same page.
+- Playground segment CSS is loaded on `livewire:navigating` only; hover/focus preload was removed to avoid unused preload warnings in DevTools.
+- Country dropdown menu text colors in dark mode now use dedicated CSS tokens for readable contrast.
+
+### Fixed
+
+- Empty country dropdown after registry refactor (Alpine getter init order, SPA navigation cache reset, and reliable inline `<template>` delivery).
+- Virtual list total height freezing at `0` when getters ran before filtered data existed.
+
+</Update>
+
+<Update label="v2.1.0" description="2026-06-08" tags={["Added"]} rss={{"title":"FLEX Fields 2.1.0","description":"Changes, improvements and fixes in FLEX Fields 2.1.0.","date":"2026-06-08"}}>
+
+### Added
+
+- Initial public release on GitHub and Packagist in the **2.x** line — 61 Filament v5 form components, lazy CSS/JS assets, JSON flex fields (`HasFlexFields`), and the developer Playground.
+
+</Update>

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Concerns;
 
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize as HasControlSizeConcern;
+use Bjanczak\FilamentFlexFields\Support\ChoiceCards\OptionNormalizer;
+use Bjanczak\FilamentFlexFields\Support\ChoiceCards\Presentation\CardSizeStyles;
+use Bjanczak\FilamentFlexFields\Support\ChoiceCards\ResponsiveColumns;
 use Closure;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 
 trait HasChoiceCardOptions
 {
@@ -56,6 +58,7 @@ trait HasChoiceCardOptions
     public function options(array|Closure $options): static
     {
         $this->options = $options;
+        $this->normalizedOptionsCache = null;
 
         return $this;
     }
@@ -66,6 +69,7 @@ trait HasChoiceCardOptions
     public function disabledOptions(array|Closure $keys): static
     {
         $this->disabledOptions = $keys;
+        $this->normalizedOptionsCache = null;
 
         return $this;
     }
@@ -135,62 +139,22 @@ trait HasChoiceCardOptions
      */
     public function getNormalizedOptions(): array
     {
-        if ($this->normalizedOptionsCache !== null) {
-            return $this->normalizedOptionsCache;
-        }
-
-        $disabledOptions = collect($this->getDisabledOptions())->map(fn ($key): string => (string) $key);
-        $normalized = [];
-
-        foreach ($this->evaluate($this->options) as $value => $option) {
-            $key = is_int($value) ? (string) $value : (string) $value;
-
-            if (is_string($option)) {
-                $normalized[$key] = $this->normalizeOptionArray($key, [
-                    'label' => $option,
-                ], $disabledOptions);
-
-                continue;
-            }
-
-            if (is_array($option)) {
-                $normalized[$key] = $this->normalizeOptionArray($key, $option, $disabledOptions);
-            }
-        }
-
-        return $this->normalizedOptionsCache = $normalized;
+        return $this->normalizedOptionsCache ??= OptionNormalizer::card(
+            $this->evaluate($this->options), $this->getDisabledOptions(),
+        );
     }
 
-    /**
-     * @param  array<string, mixed>  $option
-     * @return array{
-     *     label: string,
-     *     description: ?string,
-     *     price: ?string,
-     *     price_suffix: ?string,
-     *     meta: ?string,
-     *     icon: ?string,
-     *     badge: ?string,
-     *     badge_color: string,
-     *     disabled: bool,
-     * }
-     */
-    protected function normalizeOptionArray(string $key, array $option, Collection $disabledOptions): array
+    /** @return list<string> */
+    public function getEnabledOptionKeys(): array
     {
-        $price = $option['price'] ?? $option['value'] ?? null;
-        $priceSuffix = $option['price_suffix'] ?? $option['suffix'] ?? null;
+        $keys = [];
+        foreach ($this->getNormalizedOptions() as $key => $option) {
+            if (! $option['disabled']) {
+                $keys[] = (string) $key;
+            }
+        }
 
-        return [
-            'label' => (string) ($option['label'] ?? $key),
-            'description' => filled($option['description'] ?? null) ? (string) $option['description'] : null,
-            'price' => filled($price) ? (string) $price : null,
-            'price_suffix' => filled($priceSuffix) ? (string) $priceSuffix : null,
-            'meta' => filled($option['meta'] ?? null) ? (string) $option['meta'] : null,
-            'icon' => filled($option['icon'] ?? null) ? (string) $option['icon'] : null,
-            'badge' => filled($option['badge'] ?? null) ? (string) $option['badge'] : null,
-            'badge_color' => (string) ($option['badge_color'] ?? 'success'),
-            'disabled' => (bool) ($option['disabled'] ?? false) || $disabledOptions->contains($key),
-        ];
+        return $keys;
     }
 
     /**
@@ -211,37 +175,10 @@ trait HasChoiceCardOptions
      */
     public function getGridColumnConfig(): array
     {
-        $columns = $this->evaluate($this->gridColumns);
+        /** @var array{default:int,sm:int,md:int,lg:int} $columns */
+        $columns = ResponsiveColumns::resolve($this->evaluate($this->gridColumns), 4, ['default', 'sm', 'md', 'lg']);
 
-        if (is_int($columns)) {
-            return [
-                'default' => $columns,
-                'sm' => $columns,
-                'md' => $columns,
-                'lg' => $columns,
-            ];
-        }
-
-        if (! is_array($columns)) {
-            return [
-                'default' => 1,
-                'sm' => 1,
-                'md' => 1,
-                'lg' => 1,
-            ];
-        }
-
-        $default = max(1, min(4, (int) ($columns['default'] ?? 1)));
-        $sm = max(1, min(4, (int) ($columns['sm'] ?? $default)));
-        $md = max(1, min(4, (int) ($columns['md'] ?? $sm)));
-        $lg = max(1, min(4, (int) ($columns['lg'] ?? $md)));
-
-        return [
-            'default' => $default,
-            'sm' => $sm,
-            'md' => $md,
-            'lg' => $lg,
-        ];
+        return $columns;
     }
 
     public function getVariant(): string
@@ -275,58 +212,6 @@ trait HasChoiceCardOptions
      */
     public function getChoiceCardSizeStyles(): array
     {
-        return match ($this->getSize()) {
-            'sm' => [
-                '--fff-choice-cards-gap' => '0.375rem',
-                '--fff-choice-cards-p' => '0.625rem',
-                '--fff-choice-cards-radius' => '0.5rem',
-                '--fff-choice-cards-indicator-inset' => '0.625rem',
-                '--fff-choice-cards-indicator-size' => '0.875rem',
-                '--fff-choice-cards-indicator-check-size' => '1rem',
-                '--fff-choice-cards-indicator-icon-size' => '0.5rem',
-                '--fff-choice-cards-content-pr' => '1rem',
-                '--fff-choice-cards-featured-content-pr' => '1.5rem',
-                '--fff-choice-cards-label-size' => '0.8125rem',
-                '--fff-choice-cards-body-size' => '0.6875rem',
-                '--fff-choice-cards-price-size' => '0.8125rem',
-                '--fff-choice-cards-featured-price-size' => '1.125rem',
-                '--fff-choice-cards-icon-box-size' => '1.375rem',
-                '--fff-choice-cards-icon-size' => '0.75rem',
-            ],
-            'lg' => [
-                '--fff-choice-cards-gap' => '1rem',
-                '--fff-choice-cards-p' => '1.5rem',
-                '--fff-choice-cards-radius' => '1rem',
-                '--fff-choice-cards-indicator-inset' => '1.5rem',
-                '--fff-choice-cards-indicator-size' => '1.25rem',
-                '--fff-choice-cards-indicator-check-size' => '1.625rem',
-                '--fff-choice-cards-indicator-icon-size' => '1rem',
-                '--fff-choice-cards-content-pr' => '2.25rem',
-                '--fff-choice-cards-featured-content-pr' => '3rem',
-                '--fff-choice-cards-label-size' => '1.125rem',
-                '--fff-choice-cards-body-size' => '0.9375rem',
-                '--fff-choice-cards-price-size' => '1.125rem',
-                '--fff-choice-cards-featured-price-size' => '2rem',
-                '--fff-choice-cards-icon-box-size' => '2.75rem',
-                '--fff-choice-cards-icon-size' => '1.25rem',
-            ],
-            default => [
-                '--fff-choice-cards-gap' => '0.75rem',
-                '--fff-choice-cards-p' => '1rem',
-                '--fff-choice-cards-radius' => '0.75rem',
-                '--fff-choice-cards-indicator-inset' => '1rem',
-                '--fff-choice-cards-indicator-size' => '1rem',
-                '--fff-choice-cards-indicator-check-size' => '1.25rem',
-                '--fff-choice-cards-indicator-icon-size' => '0.75rem',
-                '--fff-choice-cards-content-pr' => '1.5rem',
-                '--fff-choice-cards-featured-content-pr' => '2.25rem',
-                '--fff-choice-cards-label-size' => '0.9375rem',
-                '--fff-choice-cards-body-size' => '0.8125rem',
-                '--fff-choice-cards-price-size' => '0.9375rem',
-                '--fff-choice-cards-featured-price-size' => '1.5rem',
-                '--fff-choice-cards-icon-box-size' => '2rem',
-                '--fff-choice-cards-icon-size' => '1rem',
-            ],
-        };
+        return CardSizeStyles::for($this->getSize());
     }
 }

@@ -34,9 +34,20 @@ it('hydrates month segments using month display mode', function () {
         ->and(DateTimeSegmentHydrator::segmentMaxLength('month', MonthDisplay::Long, 'pl_PL'))->toBeGreaterThan(2);
 });
 
-it('exposes month display in alpine configuration', function () {
+it('uses the civil date display format and retains segmented month configuration', function () {
     $field = FlexDateField::make('starts_on')
-        ->monthDisplay(MonthDisplay::Short);
+        ->monthDisplay(MonthDisplay::Short)
+        ->default('2026-06-15');
 
-    expect($field->getAlpineConfiguration()['monthDisplay'])->toBe('short');
+    expect($field->getMonthDisplay())->toBe(MonthDisplay::Short)
+        ->and($field->getAlpineConfiguration()['displayFormat'])->toBe('M j, Y')
+        ->and($field->getAlpineConfiguration()['initialDisplay'])->toBe('Jun 15, 2026');
+
+    $field->monthDisplay(MonthDisplay::Long);
+
+    expect($field->getAlpineConfiguration()['displayFormat'])->toBe('F j, Y')
+        ->and($field->getAlpineConfiguration()['initialDisplay'])->toBe('June 15, 2026');
+
+    $field->displayFormat('d/m/Y');
+    expect($field->getAlpineConfiguration()['initialDisplay'])->toBe('15/06/2026');
 });

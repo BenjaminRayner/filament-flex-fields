@@ -1,0 +1,46 @@
+---
+title: "Share styles and behavior"
+description: "Choose CSS-only reuse, complete runtime composition or optional features."
+---
+
+| Option | Use it for |
+| --- | --- |
+| `stylesFrom` | Shared appearance without loading another component's JavaScript. |
+| `uses` | Rendering a complete component that needs its styles and JavaScript. |
+| `capabilities` | Optional features enabled for an individual rendered instance. |
+| `publications` | Local resource directories shipped by your package. |
+| `catalog` | Your component's name, description, examples and demo in the FLEX catalog. |
+
+In the rating example, the column and entry load the display stylesheet. They do not load the interactive rating editor. Keep the common CSS in one output file. Include optional editors as capabilities instead of adding them to every surface's dependencies.
+
+## An A / B / C composition
+
+If A renders B and C, declare their identities once. Render B and C through their
+actual PHP classes or child slots. Every rendered instance keeps its own state and
+consumer; a shared stylesheet or module is acquired by its identity rather than
+copied into A. Declaring an asset dependency alone does not render child HTML.
+
+```php
+new ComponentDefinition(
+    id: 'acme-order-field',
+    kind: ComponentKind::Field,
+    stylesFrom: ['acme-order-display'],
+    uses: ['flex-text-input', 'select-field'],
+    entry: 'acme-order-field',
+);
+```
+
+Import `ComponentDefinition` and `ComponentKind` from
+`Bjanczak\FilamentFlexFields\Support\Components`. Verify the registered child ID
+with `fff:assets:explain`; use a declared child slot for children which should
+remain dormant until rendered or activated.
+
+<Note>CSS sharing, JavaScript dependencies and HTML composition are separate choices.
+Use child schemas to render and configure existing controls without duplicating
+their implementation.</Note>
+
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

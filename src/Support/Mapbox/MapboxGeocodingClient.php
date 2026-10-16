@@ -30,7 +30,7 @@ class MapboxGeocodingClient
                 'autocomplete' => ($options['autocomplete'] ?? true) ? 'true' : 'false',
             ]));
 
-            return $this->normalizeResponse($response->throw()->json());
+            return $this->applyAddressPolicy($this->normalizeResponse($response->throw()->json()), $options);
         });
     }
 
@@ -53,7 +53,7 @@ class MapboxGeocodingClient
 
             $response = Http::timeout(12)->get($url, $this->queryParams($options));
 
-            $payload = $this->normalizeResponse($response->throw()->json());
+            $payload = $this->applyAddressPolicy($this->normalizeResponse($response->throw()->json()), $options);
             $feature = $payload['features'][0] ?? null;
 
             return [
@@ -81,12 +81,20 @@ class MapboxGeocodingClient
             'language' => (string) ($options['language'] ?? config('filament-flex-fields.mapbox.default_language', 'pl')),
         ];
 
-        if (filled($options['types'] ?? null)) {
+        if ($options['require_street_number'] ?? false) {
+            $params['types'] = 'address';
+        } elseif (filled($options['types'] ?? null)) {
             $params['types'] = (string) $options['types'];
         }
 
         if (is_array($options['countries'] ?? null) && $options['countries'] !== []) {
             $params['country'] = strtolower(implode(',', $options['countries']));
+        }
+
+        foreach (['bbox', 'proximity'] as $key) {
+            if (is_array($options[$key] ?? null)) {
+                $params[$key] = implode(',', $options[$key]);
+            }
         }
 
         return array_merge($params, array_map(
@@ -108,11 +116,26 @@ class MapboxGeocodingClient
     }
 
     /**
+     * @param  array{features: list<array<string, mixed>>, error: string|null}  $payload
+     * @param  array<string, mixed>  $options
+     * @return array{features: list<array<string, mixed>>, error: string|null}
+     */
+    private function applyAddressPolicy(array $payload, array $options): array
+    {
+        if ($options['require_street_number'] ?? false) {
+            $payload['features'] = array_values(array_filter($payload['features'], fn (array $feature): bool => in_array('address', $feature['place_type'] ?? [], true)
+                && preg_match('/^\d/u', (string) ($feature['address'] ?? '')) === 1));
+        }
+
+        return $payload;
+    }
+
+    /**
      * @param  array<string, mixed>  $options
      */
     protected function cacheKey(string $mode, array $options): string
     {
-        return 'fff-geocode:'.$mode.':'.sha1(json_encode($options, JSON_THROW_ON_ERROR));
+        return 'fff-geocode:v4:'.$mode.':'.hash('sha256', json_encode([$options, config('filament-flex-fields.mapbox.access_token')], JSON_THROW_ON_ERROR));
     }
 
     protected function cacheTtl(): int

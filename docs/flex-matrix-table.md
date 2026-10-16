@@ -1,7 +1,118 @@
 ---
 title: "FlexMatrixTable"
 description: High-performance matrix input for bulk data entry in a structured grid.
+icon: "table-2"
+"canonical": "https://flex-fields.bjanczak.com/docs/flex-matrix-table"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/flex-matrix-table.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "FlexMatrixTable in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/flex-matrix-table-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/flex-matrix-table-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/flex-matrix-table.webp"
+"twitter:image:alt": "FlexMatrixTable in the FLEX Fields playground"
 ---
+
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/flex-matrix-table#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/flex-matrix-table",
+      "name": "FlexMatrixTable",
+      "description": "High-performance matrix input for bulk data entry in a structured grid.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flex-matrix-table#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/flex-matrix-table#article",
+      "url": "https://flex-fields.bjanczak.com/docs/flex-matrix-table",
+      "headline": "FlexMatrixTable",
+      "description": "High-performance matrix input for bulk data entry in a structured grid.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flex-matrix-table#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/flex-matrix-table-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/flex-matrix-table-motion.mp4#video",
+      "name": "FlexMatrixTable — FLEX Fields demonstration",
+      "description": "A recorded demonstration of FlexMatrixTable in the FLEX Fields playground for Filament. High-performance matrix input for bulk data entry in a structured grid.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/flex-matrix-table.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT5.8S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/flex-matrix-table-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flex-matrix-table#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/flex-matrix-table-motion.mp4"
+  poster="/art/previews/flex-matrix-table.webp"
+  width="1920"
+  height="1080"
+  aria-label="FlexMatrixTable — FLEX Fields demonstration"
+>
+  <a href="/art/previews/flex-matrix-table-motion.mp4">Watch the FlexMatrixTable demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -58,6 +169,19 @@ FlexMatrixTable::make('pricing')
 ---
 
 ### State & validation
+
+For a compact Select Field column, keep the dropdown the same width as the field
+with `wrapOptionLabels(false)`. Longer option labels are truncated:
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
+
+SelectField::make('priority')
+    ->options(['high' => 'High', 'medium' => 'Medium', 'low' => 'Low'])
+    ->wrapOptionLabels(false)
+    ->size('sm')
+    ->hiddenLabel();
+```
 
 #### Stored value
 The state is an associative array where keys are row IDs and values are arrays of field data from the `schema()`.
@@ -123,7 +247,7 @@ FlexMatrixTable::make('features')
 
 ### Playground
 
-`/admin/flex-fields-playground/flex-matrix-table`
+`/admin/flex-fields/flex-matrix-table`
 
 See [Playground](/docs/index#playground) for setup.
 
@@ -150,3 +274,16 @@ See [Playground](/docs/index#playground) for setup.
 | `fff-matrix-choice__cell` | Data cell |
 | `fff-matrix-choice__label` | Row label wrapper |
 | `fff-matrix-choice__description` | Row description text |
+
+### Child validation and row identity
+
+Each cell renders the actual field from `schema()`, including its validation,
+configuration and independently loaded resources. Required, numeric, range and
+custom rules belong to those child fields. The table also rejects unknown row
+keys and row values that are not arrays. Disabled rows disable their child schema;
+values from those disabled child fields are excluded from saving.
+
+Row keys identify nested form paths: use nonempty keys without dots. Descriptions
+and custom row metadata remain available through `getNormalizedRows()`.
+The row and column layout uses the shared matrix stylesheet; the table adds no
+second JavaScript controller over the child fields.

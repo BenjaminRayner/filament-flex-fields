@@ -14,6 +14,10 @@ final class TranslatableAttributePath
     public static function relativeBasePath(Field $template): string
     {
         $relativePath = $template->getStatePath(isAbsolute: false);
+        $name = $template->getName();
+        if (str_contains($name, '->') && $relativePath === str_replace('>', '', $name)) {
+            return str_replace('->', '.', $name);
+        }
 
         if (filled($relativePath)) {
             return (string) $relativePath;
@@ -24,7 +28,9 @@ final class TranslatableAttributePath
 
     public static function localeStatePath(Field $template, string $locale): string
     {
-        return TranslatableTitle::sourcePath(self::relativeBasePath($template), $locale);
+        TranslatableLocales::assertLocale($locale);
+
+        return self::relativeBasePath($template).'.'.$locale;
     }
 
     public static function storageAttribute(Field $template): string

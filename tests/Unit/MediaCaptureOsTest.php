@@ -65,12 +65,12 @@ it('exposes retention policy defaults for capture fields', function () {
     ]);
 });
 
-it('boots permissive virus scan default only when scan is not required', function () {
+it('permits optional scanning without installing a fake certifying scanner', function () {
     config(['filament-flex-fields.media_capture.require_virus_scan' => false]);
     MediaCaptureOs::bootSafeDefaults();
 
     expect(MediaCaptureOs::virusScanCallback())
-        ->not->toBeNull()
+        ->toBeNull()
         ->and(MediaCaptureOs::passesVirusScan('invoice.pdf'))->toBeTrue();
 });
 

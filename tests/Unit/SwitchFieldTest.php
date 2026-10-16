@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CellSwitch;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SwitchField;
+use Bjanczak\FilamentFlexFields\StateCasts\SwitchStateCast;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
-use Filament\Schemas\Components\StateCasts\BooleanStateCast;
 
 it('exposes switch configuration via fluent api', function () {
     $field = SwitchField::make('animations')
@@ -112,12 +112,12 @@ it('supports accepted and declined validation like filament toggle', function ()
         ->and($declined->getValidationRules())->toContain('declined');
 });
 
-it('casts state to boolean like filament toggle', function () {
+it('casts supported boolean values without coercing malformed data', function () {
     $field = SwitchField::make('is_admin');
 
     $casts = collect($field->getDefaultStateCasts());
 
-    expect($casts->contains(fn ($cast): bool => $cast instanceof BooleanStateCast))->toBeTrue();
+    expect($casts->contains(fn ($cast): bool => $cast instanceof SwitchStateCast))->toBeTrue();
 });
 
 it('rejects unsupported label positions', function () {
@@ -135,43 +135,30 @@ it('keeps cell switch as a backward compatible alias', function () {
         ->and($field->getColor())->toBe('danger');
 });
 
-it('server renders switch checked state before alpine hydrates', function () {
-    $switchFieldBlade = file_get_contents(__DIR__.'/../../resources/views/forms/components/switch-field.blade.php');
-    $switchControlBlade = file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/switch-control.blade.php');
-    $cellSwitchBlade = file_get_contents(__DIR__.'/../../resources/views/forms/components/cell-switch.blade.php');
-    $switchCss = file_get_contents(__DIR__.'/../../resources/css/core/switch.css');
+it('rejects unsupported variants', function (): void {
+    SwitchField::make('flag')->variant('unknown')->getVariant();
+})->throws(InvalidArgumentException::class);
 
-    expect($switchFieldBlade)
-        ->toContain('$isChecked = (bool) $getState()')
-        ->toContain('$checkedAttribute = $isChecked ? \'true\' : \'false\'')
-        ->toContain('\'isChecked\' => $isChecked')
-        ->toContain('\'toggleColorClassBinding\' => $toggleColorClassBinding')
-        ->toContain('data-checked="{{ $checkedAttribute }}"')
-        ->toContain('aria-checked="{{ $checkedAttribute }}"');
-
-    expect($switchControlBlade)
-        ->toContain('\'isChecked\' => false')
-        ->toContain('data-checked="{{ $checkedAttribute }}"')
-        ->toContain('aria-checked="{{ $checkedAttribute }}"')
-        ->toContain('$isChecked ? $onColorClasses : $offColorClasses')
-        ->toContain('x-bind:class="{ {{ $toggleColorClassBinding }} }"');
-
-    expect($cellSwitchBlade)
-        ->toContain('$isChecked = (bool) $getState()')
-        ->toContain('data-checked="{{ $checkedAttribute }}"')
-        ->toContain('aria-checked="{{ $checkedAttribute }}"');
-
-    expect($switchCss)
-        ->toContain('.fff-switch__control.fi-color[data-checked=\'true\']')
-        ->toContain('.fff-switch__control.fi-color[data-checked=\'false\']')
-        ->not->toContain(".fff-switch__control.fi-color,\n.fff-cell-switch__control.fi-color {");
+it('keeps malformed values for authoritative validation', function (): void {
+    $cast = new SwitchStateCast;
+    foreach ([true, 1, '1'] as $value) {
+        expect($cast->set($value))->toBeTrue();
+    }
+    foreach ([false, 0, '0', null] as $value) {
+        expect($cast->set($value))->toBeFalse();
+    }
+    foreach ([[], ['admin'], 'false', 'true', 'invalid', 2, ''] as $value) {
+        expect($cast->set($value))->toBe($value);
+    }
 });
 
-it('binds switch color classes with alpine object syntax so toggles replace stale classes', function () {
-    $switchFieldBlade = file_get_contents(__DIR__.'/../../resources/views/forms/components/switch-field.blade.php');
-
-    expect($switchFieldBlade)
-        ->toContain('$toggleColorClassBinding = implode')
-        ->toContain('x-bind:class="{ {{ $toggleColorClassBinding }} }"')
-        ->not->toContain('x-bind:class="Boolean(state) ? @js($onColorClasses) : @js($offColorClasses)"');
+it('can restore row mode after configuring an inline field label', function (): void {
+    $field = SwitchField::make('flag')->inlineWithLabel()->inline(false);
+    expect($field->isInlineToggle())->toBeFalse()
+        ->and($field->showsInlineFieldLabel())->toBeFalse()
+        ->and($field->isLabelHidden())->toBeTrue()
+        ->and($field->hasInlineLabel())->toBeFalse();
+    $field->inlineWithLabel(false);
+    expect($field->isLabelHidden())->toBeTrue()
+        ->and($field->hasInlineLabel())->toBeFalse();
 });

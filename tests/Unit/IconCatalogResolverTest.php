@@ -12,7 +12,7 @@ it('resolves configured sets by set name or prefix', function () {
         ->and($resolver->resolveSetNames(['heroicon']))
         ->toBe(['heroicons'])
         ->and($resolver->resolveSetNames(['gravity-icons', 'gravityui']))
-        ->toBe(['gravity-icons']);
+        ->toBe([]); // Removed sets never reappear through legacy aliases.
 });
 
 it('builds searchable catalogs for installed icon sets', function () {

@@ -1,0 +1,29 @@
+---
+title: "Handle an unavailable extension"
+description: "Inspect stored schemas and preserve data when a package or version is missing."
+---
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaAvailability;
+
+$report = app(FamilySchemaAvailability::class)->inspect($definitions);
+
+if (! $report['ready']) {
+    // Show an appropriate application configuration message.
+    // Retain the original definitions and values until the issue is resolved.
+}
+```
+
+The bounded preflight reports missing families/adapters, required configuration
+migrations, configuration newer than the installed contract, value-version
+mismatches and malformed current configuration. It uses immutable registration
+metadata and never instantiates optional adapters. Reports contain identifiers,
+version numbers and issue codes, without values, option contents or PHP classes.
+`ready` is an installation/configuration preflight, not an authorization result
+or a promise that a custom migration callback will succeed. A save that includes
+an unavailable family fails explicitly instead of silently deleting its data.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

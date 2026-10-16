@@ -7,7 +7,6 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs\SegmentTab;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\TranslatableTab;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
 use Bjanczak\FilamentFlexFields\Support\Playground\TranslatableFieldsPlayground;
 use Bjanczak\FilamentFlexFields\Support\Translatable\TranslatableLocales;
 use Filament\Schemas\Components\Section;
@@ -111,9 +110,9 @@ it('can opt into bordered tab panels', function (): void {
     expect($component->getExtraAttributes()['class'])->toContain('fff-translatable-fields--bordered');
 });
 
-it('registers translatable fields playground variants after slug field', function (): void {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
-    $components = $builder->build();
+it('registers independent translatable fields playground variants', function (): void {
+    $builder = app(TranslatableFieldsPlayground::class);
+    $components = $builder->components();
     $state = $builder->defaultState();
 
     $sectionHeadings = collect($components)
@@ -122,12 +121,7 @@ it('registers translatable fields playground variants after slug field', functio
         ->values()
         ->all();
 
-    $slugIndex = array_search('Slug field', $sectionHeadings, true);
-    $translatableIndex = array_search('Translatable Fields', $sectionHeadings, true);
-
-    expect($slugIndex)->not->toBeFalse()
-        ->and($translatableIndex)->not->toBeFalse()
-        ->and($translatableIndex)->toBeGreaterThan($slugIndex)
+    expect($sectionHeadings)->toContain('Translatable Fields')
         ->and($state)->toHaveKeys([
             'translatable_pg__headline',
             'translatable_pg__pair_title',

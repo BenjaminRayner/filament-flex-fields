@@ -4,45 +4,44 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Schema;
 
-use Bjanczak\FilamentFlexFields\Filament\Schema\Admin\FieldTypeAdminSchemaRegistry;
+use Closure;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Support\Str;
 
 final class MatrixChoiceBuilder
 {
-    public static function rowsRepeater(string $name = 'field_matrix_rows'): \Filament\Forms\Components\Repeater
+    public static function rowsRepeater(string $name = 'field_matrix_rows'): Repeater
     {
         return self::dimensionRepeater(
             name: $name,
-            label: __('filament-flex-fields::default.schema.matrix_rows'),
-            addLabel: __('filament-flex-fields::default.schema.matrix_rows_add'),
+            label: fn () => __('filament-flex-fields::default.schema.matrix_rows'),
+            addLabel: fn () => __('filament-flex-fields::default.schema.matrix_rows_add'),
             withIcon: false,
         );
     }
 
-    public static function columnsRepeater(string $name = 'field_matrix_columns'): \Filament\Forms\Components\Repeater
+    public static function columnsRepeater(string $name = 'field_matrix_columns'): Repeater
     {
         return self::dimensionRepeater(
             name: $name,
-            label: __('filament-flex-fields::default.schema.matrix_columns'),
-            addLabel: __('filament-flex-fields::default.schema.matrix_columns_add'),
+            label: fn () => __('filament-flex-fields::default.schema.matrix_columns'),
+            addLabel: fn () => __('filament-flex-fields::default.schema.matrix_columns_add'),
             withIcon: true,
         );
     }
 
     private static function dimensionRepeater(
         string $name,
-        string $label,
-        string $addLabel,
+        string|Closure $label,
+        string|Closure $addLabel,
         bool $withIcon,
-    ): \Filament\Forms\Components\Repeater {
+    ): Repeater {
         $schema = [
             TextInput::make('label')
-                ->label(__('filament-flex-fields::default.schema.field_option_label'))
+                ->label(fn () => __('filament-flex-fields::default.schema.field_option_label'))
                 ->required()
                 ->live(onBlur: true)
                 ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
@@ -57,18 +56,18 @@ final class MatrixChoiceBuilder
                     $set('value', Str::slug($state, '_'));
                 }),
             TextInput::make('value')
-                ->label(__('filament-flex-fields::default.schema.field_option_value'))
+                ->label(fn () => __('filament-flex-fields::default.schema.field_option_value'))
                 ->alphaDash()
                 ->required(),
         ];
 
         if ($withIcon) {
             $schema[] = TextInput::make('icon')
-                ->label(__('filament-flex-fields::default.schema.field_option_icon'))
-                ->placeholder('heroicon-o-check');
+                ->label(fn () => __('filament-flex-fields::default.schema.field_option_icon'))
+                ->placeholder('hugeicons-tick-02');
         }
 
-        return \Filament\Forms\Components\Repeater::make($name)
+        return Repeater::make($name)
             ->label($label)
             ->schema($schema)
             ->defaultItems(1)

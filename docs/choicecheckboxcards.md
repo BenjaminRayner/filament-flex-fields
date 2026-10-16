@@ -1,7 +1,118 @@
 ---
 title: "ChoiceCheckboxCards"
 description: Multi-select card group with rich options, selection limits, and animated checkmark indicators.
+icon: "list-checks"
+"canonical": "https://flex-fields.bjanczak.com/docs/choicecheckboxcards"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/choice-checkbox-cards.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "ChoiceCheckboxCards in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/choice-checkbox-cards-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/choice-checkbox-cards-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/choice-checkbox-cards.webp"
+"twitter:image:alt": "ChoiceCheckboxCards in the FLEX Fields playground"
 ---
+
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/choicecheckboxcards#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/choicecheckboxcards",
+      "name": "ChoiceCheckboxCards",
+      "description": "Multi-select card group with rich options, selection limits, and animated checkmark indicators.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/choicecheckboxcards#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/choicecheckboxcards#article",
+      "url": "https://flex-fields.bjanczak.com/docs/choicecheckboxcards",
+      "headline": "ChoiceCheckboxCards",
+      "description": "Multi-select card group with rich options, selection limits, and animated checkmark indicators.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/choicecheckboxcards#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/choice-checkbox-cards-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/choice-checkbox-cards-motion.mp4#video",
+      "name": "ChoiceCheckboxCards — FLEX Fields demonstration",
+      "description": "A recorded demonstration of ChoiceCheckboxCards in the FLEX Fields playground for Filament. Multi-select card group with rich options, selection limits, and animated checkmark indicators.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/choice-checkbox-cards.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT3.867S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/choice-checkbox-cards-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/choicecheckboxcards#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/choice-checkbox-cards-motion.mp4"
+  poster="/art/previews/choice-checkbox-cards.webp"
+  width="1920"
+  height="1080"
+  aria-label="ChoiceCheckboxCards — FLEX Fields demonstration"
+>
+  <a href="/art/previews/choice-checkbox-cards-motion.mp4">Watch the ChoiceCheckboxCards demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -85,7 +196,7 @@ Shares the core card API with [ChoiceCards](/docs/choicecards).
 | `maxSelections(int\|Closure $n)` | Validation | `null` | Maximum allowed selections. |
 | `exactSelections(int\|Closure $n)` | Validation | `null` | Requires exactly `n` selections. |
 | `layout(string\|Closure $layout)` | Setup | `'stack'` | `stack`, `grid`, `media`, `featured`. |
-| `gridColumns(int\|array\|Closure $cols)` | Setup | `1` | Responsive columns (max 4). |
+| `gridColumns(int\|array\|Closure $cols)` | Setup | `1` | Responsive columns (max 4). Media layouts reduce the column count in narrow fields. Prices stay on the trailing side while descriptions wrap. |
 | `indicator(string\|Closure $type)` | Setup | `auto` | `checkbox`, `check`, `none`. |
 | `variant(string\|Closure $variant)` | Setup | `'default'` | `default`, `primary`, `secondary`. |
 | `color(string\|Closure $color)` | Setup | `'primary'` | Accent color for selection. |
@@ -118,9 +229,9 @@ ChoiceCheckboxCards::make('integrations')
     ->gridColumns(3)
     ->indicator('none')
     ->options([
-        'github' => ['label' => 'GitHub', 'icon' => 'gravityui-github'],
-        'slack' => ['label' => 'Slack', 'icon' => 'gravityui-slack'],
-        'linear' => ['label' => 'Linear', 'icon' => 'gravityui-linear'],
+        'github' => ['label' => 'GitHub', 'icon' => 'hugeicons-github'],
+        'slack' => ['label' => 'Slack', 'icon' => 'hugeicons-slack'],
+        'linear' => ['label' => 'Linear', 'icon' => 'hugeicons-dashboard-square-01'],
     ]);
 ```
 
@@ -128,7 +239,7 @@ ChoiceCheckboxCards::make('integrations')
 
 ### Playground
 
-`/admin/flex-fields-playground/choice-checkbox-cards`
+`/admin/flex-fields/choice-checkbox-cards`
 
 See [Playground](/docs/index#playground) for setup.
 
@@ -154,3 +265,27 @@ See [Playground](/docs/index#playground) for setup.
 | `fff-choice-card__indicator` | Checkbox/check marker wrapper |
 
 Uses the same BEM structure as [ChoiceCards](/docs/choicecards).
+
+### Keyboard, direction and safe values
+
+Use **Tab** to reach the control, **Space** or **Enter** to select, and arrow keys
+or **Home / End** to navigate enabled options. In a single-selection group,
+arrow navigation also changes the value. Multiple-selection groups move focus
+without changing selections. Horizontal navigation follows the text direction.
+
+Direction is inherited from the page, or can be set on this field:
+
+```php
+->extraAttributes(['dir' => 'rtl'])
+```
+
+Validation checks the submitted values on the server. Unknown or disabled option
+keys, nested values, duplicate selections and associative selection arrays are
+rejected. Numeric identifiers travel as strings to preserve leading zeros and
+large IDs; an Eloquent integer cast can still store an integer column.
+
+`exactSelections()` takes precedence over minimum and maximum settings. The
+selection cap also blocks additional choices immediately; selected choices can
+always be removed. Negative limits and a minimum above the maximum are invalid
+configuration. If a stored selection is now disabled, resolve it before saving;
+Image Choice Cards can clear disabled choices with `pruneDisabledSelection()`.

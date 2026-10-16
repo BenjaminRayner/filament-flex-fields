@@ -6,19 +6,10 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
 use Bjanczak\FilamentFlexFields\Enums\DateTimeFieldMode;
 
-class FlexYearPicker extends FlexDateTimeField
+class FlexYearPicker extends FlexPeriodPicker
 {
     public function getMode(): DateTimeFieldMode
     {
         return DateTimeFieldMode::Year;
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->showCalendar = true;
-        $this->showCalendarButton = true;
-        $this->closeOnSelect = true;
     }
 }

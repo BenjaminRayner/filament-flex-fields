@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexRichEditor;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
-use Bjanczak\FilamentFlexFields\Support\Translations;
-use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -20,20 +17,6 @@ class FlexRichEditorPlayground
     public function defaultState(): array
     {
         return [
-            'filament_rich_editor__native' => [
-                'type' => 'doc',
-                'content' => [
-                    [
-                        'type' => 'paragraph',
-                        'content' => [
-                            [
-                                'type' => 'text',
-                                'text' => 'Native Filament RichEditor — select this sentence to compare bubble menu, toolbar, and panels with FlexRichEditor below.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
             'flex_rich_editor__basic' => [
                 'type' => 'doc',
                 'content' => [
@@ -80,23 +63,9 @@ class FlexRichEditorPlayground
         }
 
         return [
-            Section::make(Translations::get('filament-flex-fields::default.rich_editor.playground.native.section'))
-                ->description(Translations::get('filament-flex-fields::default.rich_editor.playground.native.description'))
-                ->icon(GravityIcon::make('text-align-left'))
-                ->schema([
-                    RichEditor::make('filament_rich_editor__native')
-                        ->label(Translations::get('filament-flex-fields::default.rich_editor.playground.native.label'))
-                        ->json()
-                        ->tools(FlexRichEditor::getNativeExtraTools())
-                        ->toolbarButtons($flexReference->getNativeComparisonToolbarButtons())
-                        ->floatingToolbars($flexReference->getFlexDefaultFloatingToolbars())
-                        ->fileAttachmentsDirectory('rich-editor/attachments')
-                        ->fileAttachmentsDisk('public')
-                        ->columnSpanFull(),
-                ]),
             Section::make('FlexRichEditor')
                 ->description('JSON-first rich editor — image variants apply on upload/save (check disk + FlexRichContentRenderer HTML for srcset; editor preview uses temporary Livewire URL). Click an image for centered Edit/Delete overlay (editor only).')
-                ->icon(GravityIcon::FileText)
+                ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     FlexRichEditor::make('flex_rich_editor__basic')
                         ->label('Article body')
@@ -156,7 +125,7 @@ class FlexRichEditorPlayground
                 ]),
             Section::make('File attachments')
                 ->description('Upload images inline via attachFiles — stored on the public disk under rich-editor/attachments.')
-                ->icon(GravityIcon::make('picture'))
+                ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     FlexRichEditor::make('flex_rich_editor__attachments')
                         ->label('Editor with image uploads')
@@ -170,7 +139,7 @@ class FlexRichEditorPlayground
                 ]),
             Section::make('Full toolbar')
                 ->description('Grouped headings, alignment, lists, and attachFiles.')
-                ->icon(GravityIcon::LayoutCells)
+                ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     FlexRichEditor::make('flex_rich_editor__full_toolbar')
                         ->label('Full feature toolbar')

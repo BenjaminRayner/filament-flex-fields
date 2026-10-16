@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support;
 
+use Bjanczak\FilamentFlexFields\Support\Currency\CurrencyAmountNormalizer;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
+use Bjanczak\FilamentFlexFields\Support\Select\Catalog\PickerCatalogState;
 use InvalidArgumentException;
 use NumberFormatter;
 
@@ -18,16 +21,6 @@ class CurrencyCountries
      * @var array<string, mixed>|null
      */
     protected static ?array $cachedConfig = null;
-
-    /**
-     * @var array<string, string>
-     */
-    protected static array $decimalSeparators = [];
-
-    /**
-     * @var array<string, string>
-     */
-    protected static array $thousandsSeparators = [];
 
     /**
      * @var array<string, array{symbol: string, name: string, decimals: int, locale: string}>
@@ -428,14 +421,7 @@ class CurrencyCountries
 
     public static function toMinorUnits(float|int|string|null $major, string $currencyCode): ?int
     {
-        if ($major === null || $major === '') {
-            return null;
-        }
-
-        $decimals = self::decimals($currencyCode);
-        $factor = 10 ** $decimals;
-
-        return (int) round(((float) $major) * $factor);
+        return CurrencyAmountNormalizer::fromMajor($major, self::decimals($currencyCode));
     }
 
     public static function toMajorUnits(?int $minor, string $currencyCode): ?float
@@ -469,32 +455,28 @@ class CurrencyCountries
 
     public static function decimalSeparator(string $locale): string
     {
-        if (isset(self::$decimalSeparators[$locale])) {
-            return self::$decimalSeparators[$locale];
+        $cache = RequestState::resolve(PickerCatalogState::class);
+        $cache->touchLocale($locale);
+        if (isset($cache->decimalSeparators[$locale])) {
+            return $cache->decimalSeparators[$locale];
         }
 
-        $formatted = (new NumberFormatter($locale, NumberFormatter::DECIMAL))->format(1.1);
+        $symbol = (new NumberFormatter($locale, NumberFormatter::DECIMAL))->getSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
 
-        if (! is_string($formatted)) {
-            return self::$decimalSeparators[$locale] = '.';
-        }
-
-        return self::$decimalSeparators[$locale] = str_replace(['1', '0'], '', $formatted) ?: '.';
+        return $cache->decimalSeparators[$locale] = is_string($symbol) && $symbol !== '' ? $symbol : '.';
     }
 
     public static function thousandsSeparator(string $locale): string
     {
-        if (isset(self::$thousandsSeparators[$locale])) {
-            return self::$thousandsSeparators[$locale];
+        $cache = RequestState::resolve(PickerCatalogState::class);
+        $cache->touchLocale($locale);
+        if (isset($cache->thousandsSeparators[$locale])) {
+            return $cache->thousandsSeparators[$locale];
         }
 
-        $formatted = (new NumberFormatter($locale, NumberFormatter::DECIMAL))->format(1000);
+        $symbol = (new NumberFormatter($locale, NumberFormatter::DECIMAL))->getSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
 
-        if (! is_string($formatted)) {
-            return self::$thousandsSeparators[$locale] = ',';
-        }
-
-        return self::$thousandsSeparators[$locale] = str_replace(['1', '0'], '', $formatted) ?: ',';
+        return $cache->thousandsSeparators[$locale] = is_string($symbol) && $symbol !== '' ? $symbol : ',';
     }
 
     /**

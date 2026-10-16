@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\UserSelect;
 
-use BackedEnum;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\UserSelect;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionValue;
 use Illuminate\Database\Eloquent\Model;
 
 class UserSelectShapeResolver
@@ -27,8 +27,9 @@ class UserSelectShapeResolver
      */
     public function resolveOptionShapeForValue(mixed $value): ?array
     {
-        if ($value instanceof BackedEnum) {
-            $value = $value->value;
+        $value = OptionValue::normalize($value);
+        if ($value === null) {
+            return null;
         }
 
         return $this->resolveOptionShapesForValues([$value])[(string) $value] ?? null;
@@ -45,13 +46,16 @@ class UserSelectShapeResolver
      */
     public function resolveOptionShapesForValues(array $values): array
     {
+        $this->state->synchronizeContext($this->select->getUserSelectProviderContextKey());
         $shapes = [];
         $missingValues = [];
         $options = $this->select->getOptions();
+        $labels = $this->select->findOptionLabelsForStates($options, $values);
 
         foreach ($values as $value) {
-            if ($value instanceof BackedEnum) {
-                $value = $value->value;
+            $value = OptionValue::normalize($value);
+            if ($value === null) {
+                continue;
             }
 
             $key = (string) $value;
@@ -62,15 +66,11 @@ class UserSelectShapeResolver
                 continue;
             }
 
-            $label = $this->select->findOptionLabelForState($options, $value);
+            $label = $labels[$key] ?? null;
 
             if (is_array($label)) {
-                $shape = [
-                    'label' => (string) ($label['label'] ?? $value),
-                    'description' => filled($label['description'] ?? null) ? (string) $label['description'] : null,
-                    'image' => filled($label['image'] ?? null) ? (string) $label['image'] : null,
-                    'verified' => (bool) ($label['verified'] ?? false),
-                ];
+                $mapped = $this->mapper->recordToOptionArrayFromShape($value, $label);
+                $shape = array_intersect_key($mapped, array_flip(['label', 'description', 'image', 'verified']));
 
                 $shapes[$key] = $shape;
                 $this->state->resolvedOptionShapeCache[$key] = $shape;
@@ -92,7 +92,7 @@ class UserSelectShapeResolver
                 continue;
             }
 
-            $missingValues[] = $value;
+            $missingValues[$key] = $value;
         }
 
         if ($missingValues !== [] && ($this->select->hasRelationship() || $this->select->getUserModel() !== null)) {
@@ -125,15 +125,16 @@ class UserSelectShapeResolver
         $shapes = $this->resolveOptionShapesForValues($values);
 
         foreach ($values as $value) {
-            if ($value instanceof BackedEnum) {
-                $value = $value->value;
+            $value = OptionValue::normalize($value);
+            if ($value === null) {
+                continue;
             }
 
             $shape = $shapes[(string) $value] ?? null;
 
             if ($shape === null) {
-                $labels[$value] = (string) $value;
-
+                // Filament also uses this callback for membership validation.
+                // A display fallback must never certify a missing/inaccessible key.
                 continue;
             }
 

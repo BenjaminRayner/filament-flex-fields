@@ -1,0 +1,3 @@
+<x-dynamic-component :component="$getEntryWrapperView()" :entry="$entry">
+    <span class="fff-{{PREFIX}}-value">{{ $getDisplayValue() }}</span>
+</x-dynamic-component>

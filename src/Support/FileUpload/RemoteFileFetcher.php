@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\FileUpload;
 
+use Bjanczak\FilamentFlexFields\Support\Http\SafeHttpTransport;
 use Bjanczak\FilamentFlexFields\Support\Http\SafeRemoteUrlValidator;
 use Bjanczak\FilamentFlexFields\Support\UrlMeta\RedirectUrlResolver;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -31,8 +31,17 @@ final class RemoteFileFetcher
             throw new FileUploadImportException(__('filament-flex-fields::default.file_upload.sources.url_not_allowed'));
         }
 
+        $maxBytes ??= 16 * 1024 * 1024;
+
+        if ($maxBytes <= 0) {
+            throw new FileUploadImportException('Remote file byte budget must be positive.');
+        }
+
         $currentUrl = $url;
         $timeout = (int) config('filament-flex-fields.file_upload.url_fetch_timeout_seconds', 10);
+
+        $deadline = microtime(true) + max(1, $timeout);
+        $transport = new SafeHttpTransport($this->urlValidator);
 
         for ($redirects = 0; $redirects <= self::MAX_REDIRECTS; $redirects++) {
             if (! $this->urlValidator->isAllowedHttpUrl($currentUrl)) {
@@ -40,13 +49,7 @@ final class RemoteFileFetcher
             }
 
             try {
-                $response = Http::timeout($timeout)
-                    ->withUserAgent(self::USER_AGENT)
-                    ->withOptions([
-                        'stream' => true,
-                        'allow_redirects' => false,
-                    ])
-                    ->get($currentUrl);
+                $response = $transport->get($currentUrl, $deadline - microtime(true), $maxBytes, self::USER_AGENT);
             } catch (ConnectionException) {
                 throw new FileUploadImportException(__('filament-flex-fields::default.file_upload.sources.url_unreachable'));
             } catch (Throwable) {
@@ -55,6 +58,7 @@ final class RemoteFileFetcher
 
             if ($response->redirect()) {
                 $location = $response->header('Location');
+                $response->toPsrResponse()->getBody()->close();
 
                 if (! is_string($location) || $location === '') {
                     throw new FileUploadImportException(__('filament-flex-fields::default.file_upload.sources.url_fetch_failed'));
@@ -66,6 +70,7 @@ final class RemoteFileFetcher
             }
 
             if (! $response->successful()) {
+                $response->toPsrResponse()->getBody()->close();
                 throw new FileUploadImportException(__('filament-flex-fields::default.file_upload.sources.url_fetch_failed'));
             }
 
@@ -105,7 +110,7 @@ final class RemoteFileFetcher
             throw new FileUploadImportException(__('filament-flex-fields::default.file_upload.sources.url_empty'));
         }
 
-        $mimeType = $this->detectMimeType($buffer, $response->header('Content-Type'));
+        $mimeType = $this->detectMimeType($buffer);
         $filename = $this->resolveFilename($url, $response->header('Content-Disposition'), $mimeType);
 
         return new RemoteFilePayload(
@@ -116,22 +121,12 @@ final class RemoteFileFetcher
         );
     }
 
-    private function detectMimeType(string $contents, ?string $headerMimeType): string
+    private function detectMimeType(string $contents): string
     {
+        // The remote server controls Content-Type; inspect the actual bytes instead.
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $detected = $finfo->buffer($contents) ?: 'application/octet-stream';
 
-        if (! is_string($headerMimeType) || $headerMimeType === '') {
-            return $detected;
-        }
-
-        $headerMimeType = strtolower(trim(strtok($headerMimeType, ';') ?: $headerMimeType));
-
-        if ($headerMimeType === 'application/octet-stream' || $headerMimeType === 'binary/octet-stream') {
-            return $detected;
-        }
-
-        return $headerMimeType;
+        return $finfo->buffer($contents) ?: 'application/octet-stream';
     }
 
     private function resolveFilename(string $url, ?string $contentDisposition, string $mimeType): string

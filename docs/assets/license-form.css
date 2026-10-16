@@ -1,0 +1,20 @@
+.fff-docs-license-form-frame {
+    margin: 1.75rem 0 1rem;
+    padding: clamp(1rem, 3vw, 1.75rem);
+    border: 1px solid #e4e0f1;
+    border-radius: 1.5rem;
+    background: #fff;
+    color-scheme: light;
+}
+
+.dark .fff-docs-license-form-frame { border-color: #413852; }
+
+.fff-docs-license-form {
+    display: block;
+    width: 100%;
+    border: 0;
+}
+
+@media (max-width: 639px) {
+    .fff-docs-license-form-frame { padding: 1rem; border-radius: 1rem; }
+}

@@ -7,6 +7,8 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectF
 use BackedEnum;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
 use Bjanczak\FilamentFlexFields\Support\HtmlSanitizer;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionText;
+use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionTree;
 use Bjanczak\FilamentFlexFields\Support\Select\RichOptionJsTransformer;
 use Filament\Support\Enums\IconSize;
 use Illuminate\Contracts\Support\Htmlable;
@@ -34,32 +36,34 @@ trait TransformsSelectRichOptions
 
     protected ?HtmlSanitizer $htmlSanitizer = null;
 
+    protected ?bool $transformingRichOptionHtml = null;
+
     /**
      * @param  array<string | int, string | array<string, mixed>>  $options
      * @return list<array<string, mixed>>
      */
     public function transformRichOptionsForJs(array $options): array
     {
-        $this->forgetUsesRichOptionHtmlCache();
+        $previous = $this->transformingRichOptionHtml;
+        $layout = $this->getOptionLayout();
+        $this->transformingRichOptionHtml = $this->usesRichOptions === null
+            && ! $this->hasOptionView() && $layout !== 'grid' && ! $this->isHtmlAllowed()
+                ? $this->optionsContainRichShape($options) : null;
 
-        if (
-            $this->usesRichOptions === null
-            && ! $this->hasOptionView()
-            && $this->getOptionLayout() !== 'grid'
-            && ! $this->isHtmlAllowed()
-        ) {
-            $this->usesRichOptionHtmlResolved = $this->optionsContainRichShape($options);
+        try {
+            return $this->getRichOptionJsTransformer()->transform(
+                $options,
+                fn (string|int $value, array|string $label): array => $this->normalizeOption($value, $label),
+                fn (array $option, bool $compact = false): string => $this->formatOptionLabelForJs($option, $compact),
+                fn (array $option): bool => $this->isOptionGroupArray($option),
+                fn (array $option): bool => $this->isRichOptionArray($option),
+                fn (?string $html): ?string => $this->shouldSanitizeTransformerOutput($html),
+                $layout,
+            );
+        } finally {
+            // Nested transformations and failed render callbacks restore their caller's scope.
+            $this->transformingRichOptionHtml = $previous;
         }
-
-        return $this->getRichOptionJsTransformer()->transform(
-            $options,
-            fn (string|int $value, array|string $label): array => $this->normalizeOption($value, $label),
-            fn (array $option, bool $compact = false): string => $this->formatOptionLabelForJs($option, $compact),
-            fn (array $option): bool => $this->isOptionGroupArray($option),
-            fn (array $option): bool => $this->isRichOptionArray($option),
-            fn (?string $html): ?string => $this->shouldSanitizeTransformerOutput($html),
-            $this->getOptionLayout(),
-        );
     }
 
     protected function shouldSanitizeTransformerOutput(?string $html): ?string
@@ -106,35 +110,7 @@ trait TransformsSelectRichOptions
      */
     protected function transformRichOptionsForJsLegacy(array $options): array
     {
-        $transformed = collect($options)
-            ->map(function (array|string $label, string|int $value): array {
-                if (is_array($label) && $this->isOptionGroupArray($label)) {
-                    return [
-                        'label' => (string) $value,
-                        'options' => $this->transformRichOptionsForJs($label),
-                    ];
-                }
-
-                $normalized = $this->normalizeOption($value, $label);
-                $dropdownLabel = $this->formatOptionLabelForJs($normalized);
-                $triggerLabel = $this->formatOptionLabelForJs($normalized, compact: true);
-
-                $option = [
-                    'label' => $dropdownLabel,
-                    'value' => (string) $value,
-                    'isDisabled' => $normalized['disabled'],
-                ];
-
-                if ($triggerLabel !== $dropdownLabel) {
-                    $option['triggerLabel'] = $triggerLabel;
-                }
-
-                return $option;
-            })
-            ->values()
-            ->all();
-
-        return array_values($transformed);
+        return $this->transformRichOptionsForJs($options);
     }
 
     /**
@@ -142,15 +118,9 @@ trait TransformsSelectRichOptions
      */
     protected function optionsContainRichShape(array $options): bool
     {
-        foreach ($options as $label) {
+        foreach ((new OptionTree)->leaves($options, fn (array $label): bool => $this->isOptionGroupArray($label)) as [, $label]) {
             if (is_array($label) && $this->isRichOptionArray($label)) {
                 return true;
-            }
-
-            if (is_array($label) && $this->isOptionGroupArray($label)) {
-                if ($this->optionsContainRichShape($label)) {
-                    return true;
-                }
             }
         }
 
@@ -162,17 +132,9 @@ trait TransformsSelectRichOptions
      */
     protected function isOptionGroupArray(array $options): bool
     {
-        if ($this->isRichOptionArray($options)) {
-            return false;
-        }
-
-        foreach ($options as $item) {
-            if (is_string($item) || (is_array($item) && $this->isRichOptionArray($item))) {
-                return true;
-            }
-        }
-
-        return false;
+        // A rich record has a label; every other options array is a group,
+        // including an empty group or a group containing further groups.
+        return ! $this->isRichOptionArray($options);
     }
 
     /**
@@ -206,21 +168,20 @@ trait TransformsSelectRichOptions
             ];
         }
 
-        $disabled = (bool) ($label['disabled'] ?? $label['isDisabled'] ?? $this->isOptionDisabled($value, (string) ($label['label'] ?? $value)));
+        $text = OptionText::required($label['label'] ?? $value, 'label');
+        $disabled = (bool) ($label['disabled'] ?? false)
+            || (bool) ($label['isDisabled'] ?? false)
+            || $this->isOptionDisabled($value, $text);
 
         return [
             'value' => $value,
-            'label' => (string) ($label['label'] ?? $value),
-            'description' => filled($label['description'] ?? $label['desc'] ?? null)
-                ? (string) ($label['description'] ?? $label['desc'])
-                : null,
+            'label' => $text,
+            'description' => OptionText::optional($label['description'] ?? $label['desc'] ?? null, 'description'),
             'icon' => $label['icon'] ?? null,
-            'image' => filled($label['image'] ?? null) ? (string) $label['image'] : null,
-            'badge' => filled($label['badge'] ?? null) ? (string) $label['badge'] : null,
-            'badge_color' => filled($label['badge_color'] ?? null) ? (string) $label['badge_color'] : null,
-            'chip_label' => filled($label['chip_label'] ?? $label['chipLabel'] ?? null)
-                ? (string) ($label['chip_label'] ?? $label['chipLabel'])
-                : null,
+            'image' => OptionText::optional($label['image'] ?? null, 'image'),
+            'badge' => OptionText::optional($label['badge'] ?? null, 'badge'),
+            'badge_color' => OptionText::optional($label['badge_color'] ?? null, 'badge_color'),
+            'chip_label' => OptionText::optional($label['chip_label'] ?? $label['chipLabel'] ?? null, 'chip_label'),
             'disabled' => $disabled,
             'isDisabled' => $disabled,
         ];
@@ -289,7 +250,9 @@ trait TransformsSelectRichOptions
         /** @var View $view */
         $view = view('filament-flex-fields::forms.components.partials.select-rich-option', [
             'label' => $option['label'],
+            'labelHtml' => $this->isHtmlAllowed() ? $this->sanitizeUserProvidedHtml($option['label']) : null,
             'description' => $layout === 'list' ? $option['description'] : null,
+            'descriptionPosition' => $this->getOptionDescriptionPosition(),
             'icon' => $option['icon'],
             'image' => $option['image'],
             'badge' => $layout === 'list' ? $option['badge'] : null,
@@ -312,18 +275,8 @@ trait TransformsSelectRichOptions
     {
         $labels = [];
 
-        foreach ($this->getOptions() as $value => $label) {
-            if (is_array($label) && $this->isOptionGroupArray($label)) {
-                foreach ($label as $groupedValue => $groupedLabel) {
-                    $labels[(string) $groupedValue] = $this->formatOptionLabelForJs(
-                        $this->normalizeOption($groupedValue, $groupedLabel),
-                        compact: ! $this->shouldUseRichListTriggerDisplay(),
-                    );
-                }
-
-                continue;
-            }
-
+        $tree = new OptionTree;
+        foreach ($tree->leaves($this->getOptions(), fn (array $label): bool => $this->isOptionGroupArray($label)) as [$value, $label]) {
             $labels[(string) $value] = $this->formatOptionLabelForJs(
                 $this->normalizeOption($value, $label),
                 compact: ! $this->shouldUseRichListTriggerDisplay(),

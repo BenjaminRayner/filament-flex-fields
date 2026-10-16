@@ -85,9 +85,7 @@ final class IconCatalogIndex
         $page = max(1, $page);
         $term = mb_strtolower(trim((string) $query));
 
-        $pool = $set !== null
-            ? ($this->entriesBySet[$set] ?? [])
-            : $this->entries;
+        $pool = $this->poolForSet($set);
 
         if ($term !== '') {
             $tokens = preg_split('/\s+/', $term, -1, PREG_SPLIT_NO_EMPTY) ?: [];
@@ -114,7 +112,8 @@ final class IconCatalogIndex
         }
 
         $total = count($pool);
-        $offset = ($page - 1) * $perPage;
+        $offset = ($page - 1) > intdiv(PHP_INT_MAX, $perPage)
+            ? PHP_INT_MAX : ($page - 1) * $perPage;
         $slice = array_slice($pool, $offset, $perPage);
 
         return [
@@ -128,9 +127,34 @@ final class IconCatalogIndex
             'total' => $total,
             'page' => $page,
             'perPage' => $perPage,
-            'hasMore' => ($offset + count($slice)) < $total,
+            'hasMore' => $offset < $total && count($slice) < ($total - $offset),
             'sets' => $includeSetSummaries ? $this->setSummaries : [],
         ];
+    }
+
+    /** @return list<IconEntry> */
+    private function poolForSet(?string $set): array
+    {
+        if ($set === null) {
+            return $this->entries;
+        }
+        if (isset($this->entriesBySet[$set])) {
+            return $this->entriesBySet[$set];
+        }
+        $keys = [];
+        foreach ($this->setSummaries as $summary) {
+            if ($summary['prefix'] === $set) {
+                $keys[$summary['key']] = true;
+            }
+        }
+        if (count($keys) === 1) {
+            return $this->entriesBySet[array_key_first($keys)] ?? [];
+        }
+        if ($keys === []) {
+            return [];
+        }
+
+        return array_values(array_filter($this->entries, static fn (array $entry): bool => isset($keys[$entry['set']])));
     }
 
     /**

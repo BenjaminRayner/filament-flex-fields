@@ -20,7 +20,7 @@ it('builds a rate-limit key from authenticated user and field name', function ()
 
     $limiter = new SelectSearchRateLimiter($request);
 
-    expect($limiter->key('assignee'))->toBe('fff-select-search:42:assignee')
+    expect($limiter->key('assignee'))->toMatch('/^fff-select-search:[a-f0-9]{64}$/')
         ->and($limiter->maxAttempts())->toBeGreaterThanOrEqual(1);
 });
 
@@ -30,7 +30,7 @@ it('falls back to request ip when guest', function (): void {
 
     $limiter = new SelectSearchRateLimiter($request);
 
-    expect($limiter->key('status'))->toBe('fff-select-search:203.0.113.10:status');
+    expect($limiter->key('status'))->toMatch('/^fff-select-search:[a-f0-9]{64}$/');
 });
 
 it('blocks after max attempts within the window', function (): void {
@@ -88,8 +88,8 @@ it('keeps separate keys for two authenticated users behind the same load-balance
     $limiterB = new SelectSearchRateLimiter($requestB);
     $field = 'assignee';
 
-    expect($limiterA->key($field))->toBe('fff-select-search:101:assignee')
-        ->and($limiterB->key($field))->toBe('fff-select-search:202:assignee')
+    expect($limiterA->key($field))->toMatch('/^fff-select-search:[a-f0-9]{64}$/')
+        ->and($limiterB->key($field))->toMatch('/^fff-select-search:[a-f0-9]{64}$/')
         ->and($limiterA->key($field))->not->toBe($limiterB->key($field));
 });
 
@@ -104,6 +104,7 @@ it('uses Request::ip under TrustedProxies for guests and never keys on raw X-For
     $limiter = new SelectSearchRateLimiter($request);
 
     expect($request->ip())->toBe('198.51.100.77')
-        ->and($limiter->key('status'))->toBe('fff-select-search:198.51.100.77:status')
-        ->and($limiter->key('status'))->not->toContain('10.0.0.1');
+        ->and($limiter->key('status'))->toMatch('/^fff-select-search:[a-f0-9]{64}$/')
+        ->and($limiter->key('status'))->not->toContain('10.0.0.1', '198.51.100.77')
+        ->and($limiter->key('status'))->toBe($limiter->key('status'));
 });

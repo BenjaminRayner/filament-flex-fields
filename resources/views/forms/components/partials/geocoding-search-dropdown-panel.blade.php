@@ -1,11 +1,11 @@
 @php
-    use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+    use Bjanczak\FilamentFlexFields\Support\FlexIcon;
     use Filament\Support\Enums\IconSize;
 
-    $noResultsIconHtml = \Filament\Support\generate_icon_html(GravityIcon::Magnifier, size: IconSize::Large)?->toHtml() ?? '';
-    $minCharsIconHtml = \Filament\Support\generate_icon_html(GravityIcon::Magnifier, size: IconSize::Large)?->toHtml() ?? '';
-    $recentIconHtml = \Filament\Support\generate_icon_html(GravityIcon::Clock, size: IconSize::Small)?->toHtml() ?? '';
-    $sheetSearchClearIconHtml = \Filament\Support\generate_icon_html(GravityIcon::CircleXmarkFill, size: IconSize::Small)?->toHtml() ?? '';
+    $noResultsIconHtml = \Filament\Support\generate_icon_html(FlexIcon::Magnifier, size: IconSize::Large)?->toHtml() ?? '';
+    $minCharsIconHtml = \Filament\Support\generate_icon_html(FlexIcon::Magnifier, size: IconSize::Large)?->toHtml() ?? '';
+    $recentIconHtml = \Filament\Support\generate_icon_html(FlexIcon::Clock, size: IconSize::Small)?->toHtml() ?? '';
+    $sheetSearchClearIconHtml = \Filament\Support\generate_icon_html(FlexIcon::CircleXmarkFill, size: IconSize::Small)?->toHtml() ?? '';
     $sheetSearchClearLabel = __('filament-flex-fields::default.select_field.clear_search');
 @endphp
 
@@ -22,7 +22,9 @@
         'fi-width-none',
     ])
     x-ref="searchDropdown"
-    x-show="{{ $showExpression ?? 'searchable && searchOpen && ! readOnly' }}"
+    x-show.important="{{ $showExpression ?? 'searchable && searchOpen && ! readOnly' }}"
+    x-bind:aria-hidden="({{ $showExpression ?? 'searchable && searchOpen && ! readOnly' }}) ? 'false' : 'true'"
+    x-bind:inert="!({{ $showExpression ?? 'searchable && searchOpen && ! readOnly' }})"
     x-cloak
     x-bind:class="{
         'is-positioned': searchDropdownReady,

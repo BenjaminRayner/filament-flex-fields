@@ -11,6 +11,20 @@ export const SEGMENT_SELECTED_SELECTOR = '[data-segment-selected="true"]'
 
 export const SEGMENT_PREPARING_CLASS = 'fff-segment-scroll-shadow--preparing'
 
+/** A server refresh must not restart first positioning of a mounted shell. */
+export function preservePositionedSegmentOverflow(element, incoming) {
+    if (!element?.hasAttribute?.(SEGMENT_OVERFLOW_ATTR)
+        || !incoming?.hasAttribute?.(SEGMENT_OVERFLOW_ATTR)
+        || element.dataset?.ssrScrollPositioned !== 'true') return
+
+    incoming.dataset.ssrScrollPositioned = 'true'
+    incoming.classList.remove(SEGMENT_PREPARING_CLASS)
+    for (const attribute of ['data-left-scroll', 'data-right-scroll', 'data-left-right-scroll']) {
+        if (element.hasAttribute(attribute)) incoming.setAttribute(attribute, element.getAttribute(attribute))
+        else incoming.removeAttribute(attribute)
+    }
+}
+
 /**
  * @returns {{ canScrollBefore: boolean, canScrollAfter: boolean }}
  */
@@ -61,8 +75,14 @@ export function scrollSegmentItemIntoView(scrollElement, selectedElement, smooth
         return
     }
 
-    const targetLeft = selectedElement.offsetLeft - ((scrollElement.clientWidth - selectedElement.offsetWidth) / 2)
-    const left = Math.max(0, targetLeft)
+    const rtl = typeof getComputedStyle === 'function' && getComputedStyle(scrollElement).direction === 'rtl'
+    const max = Math.max(0, scrollElement.scrollWidth - scrollElement.clientWidth)
+    const scrollRect = scrollElement.getBoundingClientRect?.()
+    const selectedRect = selectedElement.getBoundingClientRect?.()
+    const target = scrollRect && selectedRect
+        ? scrollElement.scrollLeft + selectedRect.left + selectedRect.width / 2 - scrollRect.left - scrollRect.width / 2
+        : selectedElement.offsetLeft - (scrollElement.clientWidth - selectedElement.offsetWidth) / 2 - (rtl ? max : 0)
+    const left = Math.max(rtl ? -max : 0, Math.min(rtl ? 0 : max, target))
 
     if (assignDirectly) {
         scrollElement.scrollLeft = left
@@ -82,7 +102,7 @@ export function scrollSegmentItemIntoView(scrollElement, selectedElement, smooth
  * @returns {boolean} Whether positioning ran on this call.
  */
 export function positionSegmentOverflowScrollElement(scrollElement) {
-    if (! scrollElement || scrollElement.dataset.ssrScrollPositioned === 'true') {
+    if (! scrollElement || scrollElement.dataset.ssrScrollPositioned === 'true' || scrollElement.clientWidth === 0) {
         return false
     }
 
@@ -133,4 +153,22 @@ export function bootSegmentOverflowElements(root) {
     }
 
     return positioned
+}
+
+/** Preserve only a mounted segment's presentation, never its child field values. */
+export function preserveSegmentPresentation(element, incoming) {
+    if (!element?.matches || !incoming?.matches) return
+    if (element.matches('[data-segment-value]') && incoming.matches('[data-segment-value]')
+        && element.getAttribute('data-segment-value') === incoming.getAttribute('data-segment-value')) {
+        for (const attribute of ['data-segment-selected', 'aria-selected', 'aria-checked', 'tabindex']) {
+            if (element.hasAttribute(attribute)) incoming.setAttribute(attribute, element.getAttribute(attribute))
+        }
+    }
+    if (element.matches('[data-segment-separator]') && incoming.matches('[data-segment-separator]')) {
+        incoming.classList.toggle('is-hidden', element.classList.contains('is-hidden'))
+    }
+    if (element.matches('.fff-segment-tabs__panel') && incoming.matches('.fff-segment-tabs__panel')
+        && element.id === incoming.id) {
+        incoming.classList.toggle('is-active', element.classList.contains('is-active'))
+    }
 }

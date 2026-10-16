@@ -6,11 +6,12 @@ namespace Bjanczak\FilamentFlexFields\Filament\Tables\Columns;
 
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\Concerns\EmitsFlexFieldTableColumnAssets;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldStylesheetQueue;
 use Bjanczak\FilamentFlexFields\Support\StatusChipColumnRenderCache;
 use Closure;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\HtmlString;
 
 class StatusChipColumn extends TextColumn
 {
@@ -24,11 +25,9 @@ class StatusChipColumn extends TextColumn
     {
         parent::setUp();
 
-        FlexFieldStylesheetQueue::enqueueFor('status-chip-column');
-
         $this->html();
 
-        $this->formatStateUsing(fn (mixed $state, StatusChipColumn $column): string => $column->formatChipDisplay($state));
+        $this->formatStateUsing(fn (mixed $state, StatusChipColumn $column): Htmlable => new HtmlString($column->formatChipDisplay($state)));
     }
 
     public function chipSize(string|ControlSize|Closure $size): static

@@ -60,7 +60,7 @@ test('consumer graph resyncFromDom registers connected consumers', () => {
     graph.resyncFromDom(root)
 
     assert.equal(graph.getRefCount('/css/flex-fields-select-field.css'), 1)
-    assert.deepEqual(graph.getActiveConsumerIds(), ['lw-1::page'])
+    assert.deepEqual(graph.getActiveConsumerIds(), [graph.resolveConsumerInstanceId(element)])
 })
 
 test('consumer graph onRefZero fires after debounce when refs reach zero', async () => {

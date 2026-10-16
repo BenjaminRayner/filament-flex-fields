@@ -1,0 +1,98 @@
+# {{CLASS}} for FLEX
+
+This starter provides a form field, a table column and an infolist entry. The field composes the existing FlexTextInput; its input HTML, CSS, JS, validation and state belong to that child. Column and entry share the package stylesheet and do not load the field JavaScript.
+
+## Build and install
+
+1. Set the package description and license in `composer.json`.
+2. Run `composer install` with access to the FLEX Composer repository. Run `npm install`, then `npm run build`. Commit `package-lock.json`, `resources/asset-manifest.json` and the referenced `resources/dist/<release>` directory for distribution.
+3. Install this package through Composer in a Laravel application. Its service provider is auto-discovered. Run `php artisan filament:assets` in that application.
+4. Run `php artisan fff:assets:doctor` and `php artisan fff:assets:explain {{PREFIX}}-field`. The installation report explains dependencies; browser diagnostics separately show live owners and readiness.
+
+When the build tools use FLEX from a different Composer installation, set `FLEX_FIELDS_ROOT` to that package directory. The build imports the public SDK facade; it refuses bundling private FLEX JavaScript. Build outputs are content-addressed. Failed compilation leaves the previous manifest intact. Previous release directories remain available; remove an unreferenced generation only when no installed release references it. No unrelated source directory is automatically deleted.
+
+## Form
+
+```php
+use {{NAMESPACE}}\Forms\{{CLASS}}Field;
+
+{{CLASS}}Field::make('summary')->required();
+```
+
+State is `['text' => 'Example']`. Store it in a JSON column with an Eloquent `array` cast. This starter does not authorize record access: use your resource policies and form validation. The nested container rejects unknown keys; the child validates text length.
+
+## Configure the child directly
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+
+{{CLASS}}Field::make('summary')->schema([
+    FlexTextInput::make('text')
+        ->label('Summary')
+        ->required()
+        ->maxLength(80),
+]);
+```
+
+Reuse the actual public child class to configure its supported options. Additional children retain their own independent asset boundaries. A declared child slot describes composition and does not eagerly load its JavaScript.
+
+## Table and infolist
+
+```php
+use {{NAMESPACE}}\Tables\{{CLASS}}Column;
+use {{NAMESPACE}}\Infolists\{{CLASS}}Entry;
+
+{{CLASS}}Column::make('summary');
+{{CLASS}}Entry::make('summary');
+```
+
+Each cell and entry emits an independent consumer. Text is escaped by Blade. Adapt `DisplayValue` when changing your stored value shape.
+
+## Extend the family
+
+For readable development output, use `node build.mjs --development`. The default
+`node build.mjs` produces minified production output. Both use the same public SDK
+and manifest compiler. Distinct bytes produce distinct immutable release IDs;
+publish the selected build instead of editing generated artifacts.
+
+Declare additional surfaces with typed `ComponentDefinition` contracts. Use `stylesFrom` for CSS-only sharing, `uses` for full runtime composition, and `capabilities` for per-instance optional features. Keep dependencies in the Composer package that supplies them. If you add dynamic imports, esbuild and the manifest compiler capture those edges; workers, WASM and other opaque resource references need an explicit declaration. The field factory uses SDK-owned resources and disposes them in `destroy()`.
+
+
+## Inspect registration and plan removal
+
+The provider declares its registration source for every family surface. Source
+paths remain server-side and appear only with an explicit operator option:
+
+```shell
+php artisan fff:assets:explain {{PREFIX}}-field --locations --json
+php artisan fff:assets:doctor --definitions --locations --json
+php artisan fff:components:removal {{PACKAGE}} --json
+```
+
+Removal inspection never uninstalls a package or deletes values. Inventory stored
+schemas through `ComponentRemovalImpact` as well as the declared graph before
+removing a package. Optional `RegistrationMetadata` can also declare a replacement
+component, compatibility deadline and migration message using
+`ComponentDeprecation`. Notices do not disable working components automatically.
+
+
+## Appearance isolation
+
+The generated shared CSS uses `--fff-ext-{{PREFIX}}--token-color` and
+`--fff-ext-{{PREFIX}}--token-radius`, inheriting core appearance by default.
+Override them through the request-scoped theme:
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Theme\AppearanceNamespace;
+use Bjanczak\FilamentFlexFields\Support\Theme\FlexFieldsTheme;
+
+app(FlexFieldsTheme::class)->mergePackageTheme(
+    new AppearanceNamespace('{{PREFIX}}'),
+    ['color' => 'var(--fff-field-focus-border)', 'radius' => '0.75rem'],
+);
+```
+
+Use `$package->appearance()` for font/keyframe names and owner-derived SVG IDs.
+The same helpers are available through SDK ABI1 `createAppearanceNamespace()`.
+Keep CSS selectors scoped to this package and reuse child renderers and their
+asset boundaries. These helpers do not rewrite arbitrary CSS or download fonts.

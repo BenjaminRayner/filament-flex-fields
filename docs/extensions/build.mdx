@@ -1,0 +1,117 @@
+---
+title: "Build modules and resources"
+description: "Compile split modules, lazy imports, workers and static resources into a portable manifest."
+---
+
+Ship your compiled outputs and a portable manifest in your Composer package.
+Generate the manifest during your package build, before distributing it. It records
+relative output paths, artifact types, dependencies, hashes and byte sizes; do not
+put deployment URLs or installed paths in it.
+
+Register the installed package in your provider's ordinary `boot()`:
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Assets\Manifest\AssetManifestCompiler;
+use Bjanczak\FilamentFlexFields\Support\Assets\Manifest\AssetPackage;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentRegistrar;
+
+public function boot(ComponentRegistrar $registrar): void
+{
+    $manifest = (new AssetManifestCompiler)->load(
+        __DIR__.'/../resources/asset-manifest.json',
+    );
+
+    $registrar->collectPackage(
+        new AssetPackage($manifest, __DIR__.'/../resources/dist'),
+        [
+            new ComponentDefinition(
+                id: 'acme-rating-display',
+                kind: ComponentKind::Display,
+                styles: ['acme-rating-display'],
+            ),
+            new ComponentDefinition(
+                id: 'acme-rating-field',
+                kind: ComponentKind::Field,
+                entry: 'acme-rating-field',
+                stylesFrom: ['acme-rating-display'],
+            ),
+            new ComponentDefinition(
+                id: 'acme-rating-column',
+                kind: ComponentKind::Column,
+                stylesFrom: ['acme-rating-display'],
+            ),
+            new ComponentDefinition(
+                id: 'acme-rating-entry',
+                kind: ComponentKind::Entry,
+                stylesFrom: ['acme-rating-display'],
+            ),
+        ],
+    );
+}
+```
+
+The declared logical entry and stylesheet must exist in the manifest roots.
+Each manifest supports up to 4096 outputs and 32768 dependency edges. The complete
+installed registry allows 128 distinct asset packages, 16384 outputs and 131072
+edges; sharing the same package across surfaces counts it once. Use
+`uses` when a child needs its own runtime and `stylesFrom` for appearance only.
+Emit an independent consumer for each rendered surface; see [fields](/docs/extensions/fields)
+and [columns and entries](/docs/extensions/columns-and-entries). Do not
+also register manifest-backed files with `FilamentAsset`, provide legacy file
+paths, or publish the same directory through another owner.
+
+For esbuild, save the build's `metafile` and provide a declaration such as:
+
+```json
+{
+  "format": 1,
+  "package": "acme/rating",
+  "entries": { "acme-rating-field": "rating.js" },
+  "styles": { "acme-rating-display": "rating.css" },
+  "helpers": {},
+  "types": { "rating-worker.js": "worker" },
+  "resources": { "rating.js": ["rating-worker.js"] }
+}
+```
+
+Paths are relative to the compiled output directory. The worker declaration is
+needed only when your build emits that worker. The adapter reads static imports,
+dynamic imports and extracted CSS from esbuild. Declare additional opaque
+`Worker`/URL resources explicitly; unresolved external imports fail instead of
+silently producing incomplete deployment metadata.
+
+```bash
+node /path/to/installed/filament-flex-fields/scripts/assets/compile-esbuild-package.mjs \
+  metafile.json asset-declaration.json \
+  /absolute/build-directory /absolute/build-directory/dist \
+  resources/asset-manifest.json
+```
+
+The esbuild adapter, graph reader, SDK plugin and lower-level manifest compiler
+are shipped with FLEX's Composer distribution. `compile-package-manifest.php`
+also accepts an explicit complete graph for another bundler. Its autoloader can
+come from the package checkout, the Composer installation or the current build
+project; set `FLEX_FIELDS_AUTOLOAD` to a specific `vendor/autoload.php` when needed.
+Neither tool replaces your build or rewrites its imports.
+
+Deployment publishes a complete package directory named by its content fingerprint.
+The same release is reusable; changed output produces a new directory. Previously
+published directories stay available. Publication rejects changed source bytes or
+a damaged existing release. Lazy imports and workers stay lazy, while their files
+are included in the published graph. Do not publish during form rendering.
+
+Use [package and family contracts](/docs/extensions/packages-and-families) for typed
+surfaces, [child slots](/docs/extensions/child-select) for composition and the
+[family schema adapter](/docs/extensions/schema-adapter) for saved configuration.
+The [SDK build adapter](/docs/extensions/sdk) supplies SDK ABI 1 to external modules.
+
+Registration does not migrate stored values or prune deployed generations. Configure
+[value migrations](/docs/extensions/migrations) when changing saved data, and choose
+[a release retention policy](/docs/extensions/deployment) for your deployments.
+
+## Continue reading
+
+[Manifest reference](/docs/extensions/manifest-reference) · [SDK build adapter](/docs/extensions/sdk) · [Deployment](/docs/extensions/deployment)
+

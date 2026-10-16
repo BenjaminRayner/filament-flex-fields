@@ -1,0 +1,15 @@
+.fff-location__controls { position: absolute; right: .875rem; bottom: var(--fff-map-control-bottom, 24px); }
+.fff-location__search .fff-location-select .fff-flex-text-input__row { padding-inline-end: .25rem; }
+.fff-location__button { display: inline-flex; align-items: center; justify-content: center; gap: .375rem; min-height: 2rem; padding: .375rem .625rem; border: 1px solid var(--fff-location-border); border-radius: var(--fff-location-radius); font-size: .8125rem; line-height: 1.25; background: var(--fff-location-bg); color: var(--fff-location-text); cursor: pointer; }
+.fff-location__button:disabled { opacity: .45; cursor: default; }
+.fff-location__button.is-active { border-color: var(--fff-location-color); color: var(--fff-location-color); background: color-mix(in srgb, var(--fff-location-color) 10%, var(--fff-location-bg)); }
+.fff-location__tools { position: absolute; inset: .875rem auto auto .875rem; z-index: 3; display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px; max-width: calc(100% - 1.75rem); }
+.fff-location__surface.has-search.has-editor-tools { display: flex; flex-wrap: wrap; align-content: flex-start; align-items: center; gap: .5rem; padding: .875rem; }
+.fff-location__surface.has-search.has-editor-tools > .fff-location__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fff-location__surface.has-search.has-editor-tools > .fff-location__tools { position: relative; inset: auto; flex: 0 1 auto; max-width: 100%; }
+.fff-location__surface.has-search.has-editor-tools > .fff-location__tools > .fff-map-controls__capsule { flex-wrap: wrap; }
+.fff-location__surface.has-search.has-editor-tools > .fff-location__search { position: relative; inset: auto; order: 1; flex: 1 1 12rem; min-width: 0; }
+.fff-location__drawing-hint { position: absolute; left: .875rem; right: 4rem; bottom: 2.5rem; z-index: 3; width: fit-content; max-width: calc(100% - 5rem); margin: 0; padding: .5rem .75rem; border-radius: var(--fff-location-radius); background: var(--fff-location-bg); box-shadow: 0 2px 8px #0001; pointer-events: none; }
+.fff-location__coordinates { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem; margin-top: .75rem; }
+.fff-location__coordinate { display: flex; flex-direction: column; gap: .25rem; flex: 1 1 8rem; font-size: .75rem; color: var(--fff-location-muted); }
+.fff-location__coordinates input { width: 100%; }

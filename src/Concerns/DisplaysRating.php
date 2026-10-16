@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Concerns;
 
 use BackedEnum;
+use Bjanczak\FilamentFlexFields\Support\Rating\RatingValue;
 use Closure;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
-use InvalidArgumentException;
 
 trait DisplaysRating
 {
@@ -28,9 +28,7 @@ trait DisplaysRating
             return $this;
         }
 
-        if ($max < 1) {
-            throw new InvalidArgumentException('Rating max must be at least 1.');
-        }
+        RatingValue::assertMaximum($max);
 
         $this->max = $max;
 
@@ -67,9 +65,7 @@ trait DisplaysRating
     {
         $max = (int) $this->evaluate($this->max);
 
-        if ($max < 1) {
-            throw new InvalidArgumentException('Rating max must be at least 1.');
-        }
+        RatingValue::assertMaximum($max);
 
         return $max;
     }

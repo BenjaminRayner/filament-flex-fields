@@ -24,10 +24,10 @@ it('renders schedule field shell and alpine configuration', function (): void {
     expect($html)
         ->toContain('fff-schedule-field')
         ->toContain('scheduleFieldFormComponent({')
-        ->toContain('flexTimeSegmentsSrc')
-        ->toContain('dayValidationErrorMessage')
+        ->toContain('fffHeadlessSelectField')
+        ->toContain('validationMessages')
         ->toContain('fff-schedule-field__overnight-btn')
-        ->toContain('modulepreload')
+        ->toContain('data-fff-asset-consumer')
         ->toContain('aria-label')
         ->toContain('role="option"');
 });

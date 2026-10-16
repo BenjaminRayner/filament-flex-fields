@@ -1,0 +1,20 @@
+/* Location v4: one reserved canvas size; controls never affect map or form geometry. */
+.fff-location { --fff-location-radius: var(--fff-global-radius, .75rem); --fff-location-bg: #fff; --fff-location-text: #18181b; --fff-location-muted: #71717a; --fff-location-border: #e4e4e7; --fff-location-hover: #0d0d0d0d; width: 100%; color: var(--fff-location-text); }
+.dark .fff-location { --fff-location-bg: #18181b; --fff-location-text: #f4f4f5; --fff-location-muted: #a1a1aa; --fff-location-border: #3f3f46; --fff-location-hover: #ffffff0d; }
+.fff-location__surface { position: relative; height: var(--fff-location-height, 360px); overflow: hidden; border: 1px solid var(--fff-location-border); border-radius: var(--fff-map-surface-radius, 24px); background: var(--fff-location-bg); isolation: isolate; }
+.fff-location__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fff-location__canvas .is-drawing { cursor: crosshair; }
+.fff-location__search { position: absolute; inset: .875rem .875rem auto .875rem; z-index: 3; }
+.fff-location__search-backdrop { position: absolute; inset: 0 0 auto; height: 7rem; z-index: 2; pointer-events: none; background: color-mix(in srgb, var(--fff-location-bg) 55%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); mask-image: linear-gradient(#000 0%, #000 45%, transparent 100%); -webkit-mask-image: linear-gradient(#000 0%, #000 45%, transparent 100%); }
+.fff-location__search input { width: 100%; }
+.fff-location__loading, .fff-location__error { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: .75rem; background: var(--fff-location-bg); color: var(--fff-location-muted); font-size: .875rem; z-index: 10; }
+.fff-location__error { flex-direction: column; text-align: center; padding: 1rem; }
+.fff-location__spinner { width: 1.25rem; height: 1.25rem; border: 2px solid var(--fff-location-border); border-top-color: var(--fff-location-color); border-radius: 50%; animation: fff-location-spin .8s linear infinite; }
+@keyframes fff-location-spin { to { transform: rotate(360deg); } }
+.fff-location__hint, .fff-location__summary { margin-top: .625rem; font-size: .8125rem; line-height: 1.5; color: var(--fff-location-muted); }
+.fff-location__message { margin-top: .5rem; color: #dc2626; font-size: .8125rem; }
+.fff-location__dot { display: inline-block; width: .625rem; height: .625rem; border-radius: 50%; flex-shrink: 0; }
+
+.fff-location .mapboxgl-ctrl-attrib, .fff-location .maplibregl-ctrl-attrib { font-size: 10px; }
+.fff-location__surface:fullscreen { border-radius: 0; height: 100vh; }
+@media (prefers-reduced-motion: reduce) { .fff-location__spinner { animation: none; } }

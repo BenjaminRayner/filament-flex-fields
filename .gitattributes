@@ -1,7 +1,15 @@
 /art/ export-ignore
 /docs/ export-ignore
+/.internal/ export-ignore
+/.internal/** export-ignore
 /tests/ export-ignore
-/scripts/ export-ignore
+/scripts/* export-ignore
+/scripts/assets/ -export-ignore
+/scripts/assets/* export-ignore
+/scripts/assets/compile-package-manifest.php -export-ignore
+/scripts/assets/compile-esbuild-package.mjs -export-ignore
+/scripts/assets/esbuild-package-graph.mjs -export-ignore
+/scripts/assets/flex-sdk-plugin.mjs -export-ignore
 /.github/ export-ignore
 /phpunit.xml export-ignore
 /phpstan.neon export-ignore
@@ -12,8 +20,29 @@
 /package-lock.json export-ignore
 /COMPONENTS.md export-ignore
 /DEVELOPMENT.md export-ignore
+/CONTRIBUTING.md export-ignore
+/CODE_OF_CONDUCT.md export-ignore
 
 # Mintlify (docs site only — not shipped via Composer dist)
 /docs.json export-ignore
 /.mintignore export-ignore
 /composer.lock export-ignore
+
+# Repository-only maintenance and assistant instructions
+/AGENTS.md export-ignore
+/CHANGELOG.md export-ignore
+/.ai/ export-ignore
+/.agents/ export-ignore
+/.codex/ export-ignore
+/.cursor/ export-ignore
+/.claude/ export-ignore
+/CLAUDE.md export-ignore
+/.cursorrules export-ignore
+/.editorconfig export-ignore
+/pint.json export-ignore
+
+# Frontend tooling and documentation snippets
+/playwright.config.mjs export-ignore
+/update-blade-css.js export-ignore
+/components_list.txt export-ignore
+/snippets/ export-ignore

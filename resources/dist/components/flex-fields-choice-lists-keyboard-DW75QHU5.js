@@ -1,0 +1,1 @@
+function l(n,i,r,t=!1){if(!n.length)return null;let f=Math.max(0,n.indexOf(i));if(r==="Home")return n[0];if(r==="End")return n.at(-1);let o=r==="ArrowDown"?1:r==="ArrowUp"?-1:r==="ArrowRight"?t?-1:1:r==="ArrowLeft"?t?1:-1:0;return o?n[(f+o+n.length)%n.length]:null}export{l as a};

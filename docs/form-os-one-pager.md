@@ -51,5 +51,5 @@ Full pricing, examples, and purchase process: [COMMERCIAL.md](https://github.com
 ## Next steps
 
 1. Install and open the Playground (`FLEX_FIELDS_PLAYGROUND=true`).
-2. Read [Upgrade v2 → v3](/docs/upgrade-v2-to-v3) if migrating.
+2. Read [Updating FLEX Fields](/docs/updating) when upgrading.
 3. Email [barek122@gmail.com](mailto:barek122@gmail.com) with your product description to arrange scope confirmation and payment as described in [COMMERCIAL.md](https://github.com/janczakb/filament-flex-fields/blob/main/COMMERCIAL.md).

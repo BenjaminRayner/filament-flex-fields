@@ -2,6 +2,7 @@ import esbuild from 'esbuild'
 import fs from 'node:fs'
 import path from 'node:path'
 import { tiptapSharedEsbuildPlugin } from './tiptap-shared-esbuild-plugin.mjs'
+import { captureModuleBuild } from './assets/module-build-analysis.mjs'
 
 const packageRoot = path.resolve(import.meta.dirname, '..')
 const outDir = path.join(packageRoot, 'resources/dist/support')
@@ -27,7 +28,9 @@ const bundledEntries = [
 fs.mkdirSync(outDir, { recursive: true })
 
 for (const { entry, outfile } of unbundledEntries) {
-    await esbuild.build({
+    const result = await esbuild.build({
+        absWorkingDir: packageRoot,
+        metafile: true,
         entryPoints: [entry],
         outfile,
         bundle: false,
@@ -36,12 +39,16 @@ for (const { entry, outfile } of unbundledEntries) {
         target: ['es2020'],
         minify: true,
     })
+    captureModuleBuild(packageRoot, path.basename(outfile, '.js'), result.metafile)
 
     console.log(`Built ${path.relative(packageRoot, outfile)}`)
 }
 
 for (const { entry, outfile } of bundledEntries) {
-    await esbuild.build({
+    const virtualInputs = new Map()
+    const result = await esbuild.build({
+        absWorkingDir: packageRoot,
+        metafile: true,
         entryPoints: [entry],
         outfile,
         bundle: true,
@@ -49,8 +56,9 @@ for (const { entry, outfile } of bundledEntries) {
         platform: 'browser',
         target: ['es2020'],
         minify: true,
-        plugins: [tiptapSharedEsbuildPlugin()],
+        plugins: [tiptapSharedEsbuildPlugin({ virtualInputs, root: packageRoot })],
     })
+    captureModuleBuild(packageRoot, path.basename(outfile, '.js'), result.metafile, { virtualInputs })
 
     console.log(`Built ${path.relative(packageRoot, outfile)}`)
 }

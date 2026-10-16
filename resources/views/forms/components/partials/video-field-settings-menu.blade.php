@@ -1,189 +1,54 @@
 @php
-    use Filament\Support\Enums\IconSize;
+    $menus = [];
+    if ($hasQualityControl) $menus['quality'] = ['label' => __('filament-flex-fields::default.video.quality'), 'icon' => $field->getQualityIcon(), 'hint' => 'selectedQualityLabel'];
+    if ($hasPlaybackRateControl) $menus['speed'] = ['label' => __('filament-flex-fields::default.video.speed'), 'icon' => $field->getSpeedIcon(), 'hint' => 'playbackRateLabel'];
+    $small = \Filament\Support\Enums\IconSize::ExtraSmall;
 @endphp
-
-<div
-    class="fff-video-field__settings"
-    x-on:click.outside="onSettingsMenuClickOutside($event)"
->
-    <div
-        class="fff-video-field__settings-menu"
-        x-ref="settingsMenu"
-        data-side="top"
-        x-bind:hidden="! settingsOpen && settingsMenuPopoverPhase !== 'ending' ? '' : null"
-        x-bind:data-starting-style="settingsMenuPopoverPhase === 'starting' ? '' : null"
-        x-bind:data-ending-style="settingsMenuPopoverPhase === 'ending' ? '' : null"
-        x-on:wheel.stop
-        role="menu"
-        aria-label="{{ __('filament-flex-fields::default.video.settings') }}"
-    >
+<div class="fff-video-field__settings" x-on:click.outside="onSettingsMenuClickOutside($event)">
+    <div class="fff-video-field__settings-menu" x-ref="settingsMenu" data-side="top" hidden x-on:wheel.stop aria-label="{{ __('filament-flex-fields::default.video.settings') }}">
         <div class="fff-video-field__settings-viewport" data-menu-viewport>
-            <div
-                class="fff-video-field__settings-panel"
-                x-ref="settingsPanelRoot"
-                data-menu-root-view
-                data-menu-view
-                x-bind:data-menu-view-state="isSettingsRootInactive() ? 'inactive' : 'active'"
-                x-bind:data-direction="settingsViewDirection"
-                role="none"
-            >
+            <div class="fff-video-field__settings-panel" x-ref="settingsPanelRoot" data-menu-root-view data-menu-view role="menu" aria-label="{{ __('filament-flex-fields::default.video.settings') }}">
                 <div class="fff-video-field__settings-group">
-                    @if ($hasQualityControl)
-                        <button
-                            type="button"
-                            class="fff-video-field__settings-item fff-video-field__settings-item--submenu"
-                            x-on:click="openSettingsView('quality')"
-                            role="menuitem"
-                        >
-                            <span class="fff-video-field__settings-item-icon" aria-hidden="true">
-                                {{ \Filament\Support\generate_icon_html($field->getQualityIcon(), size: IconSize::ExtraSmall) }}
-                            </span>
-                            <span class="fff-video-field__settings-item-label">{{ __('filament-flex-fields::default.video.quality') }}</span>
+                    <span class="fff-video-field__settings-highlight" data-menu-highlight aria-hidden="true"></span>
+                    @foreach ($menus as $key => $menu)
+                        <button type="button" class="fff-video-field__settings-item fff-video-field__settings-item--submenu" data-menu-target="{{ $key }}" x-on:click="openSettingsView(@js($key))" role="menuitem" aria-haspopup="menu" x-bind:aria-expanded="settingsView === @js($key) ? 'true' : 'false'">
+                            <span class="fff-video-field__settings-item-icon" aria-hidden="true">{{ \Filament\Support\generate_icon_html($menu['icon'], size: $small) }}</span>
+                            <span class="fff-video-field__settings-item-label">{{ $menu['label'] }}</span>
                             <span class="fff-video-field__settings-item-hint">
-                                <span class="fff-video-field__settings-item-hint-label" x-text="selectedQualityLabel"></span>
-                                <span class="fff-video-field__settings-item-chevron" aria-hidden="true">
-                                    {{ \Filament\Support\generate_icon_html(\Bjanczak\FilamentFlexFields\Support\GravityIcon::ChevronRight, size: IconSize::ExtraSmall) }}
-                                </span>
+                                <span class="fff-video-field__settings-item-hint-label" x-text="{{ $menu['hint'] }}"></span>
+                                <span class="fff-video-field__settings-item-chevron" aria-hidden="true">{{ \Filament\Support\generate_icon_html(\Bjanczak\FilamentFlexFields\Support\Video\VideoIcon::Chevron, size: $small) }}</span>
                             </span>
                         </button>
-                    @endif
-
-                    @if ($hasPlaybackRateControl)
-                        <button
-                            type="button"
-                            class="fff-video-field__settings-item fff-video-field__settings-item--submenu"
-                            x-on:click="openSettingsView('speed')"
-                            role="menuitem"
-                        >
-                            <span class="fff-video-field__settings-item-icon" aria-hidden="true">
-                                {{ \Filament\Support\generate_icon_html($field->getSpeedIcon(), size: IconSize::ExtraSmall) }}
-                            </span>
-                            <span class="fff-video-field__settings-item-label">{{ __('filament-flex-fields::default.video.speed') }}</span>
-                            <span class="fff-video-field__settings-item-hint">
-                                <span class="fff-video-field__settings-item-hint-label" x-text="playbackRateLabel"></span>
-                                <span class="fff-video-field__settings-item-chevron" aria-hidden="true">
-                                    {{ \Filament\Support\generate_icon_html(\Bjanczak\FilamentFlexFields\Support\GravityIcon::ChevronRight, size: IconSize::ExtraSmall) }}
-                                </span>
-                            </span>
-                        </button>
-                    @endif
+                    @endforeach
                 </div>
             </div>
-
-            @if ($hasQualityControl)
-                <div
-                    class="fff-video-field__settings-panel"
-                    x-ref="settingsPanelQuality"
-                    data-submenu
-                    data-menu-view
-                        x-bind:data-open="getSettingsSubmenuPhase('quality') !== 'hidden' ? '' : null"
-                        x-bind:hidden="getSettingsSubmenuPhase('quality') === 'hidden' ? '' : null"
-                        x-bind:data-direction="settingsViewDirection"
-                    x-bind:data-starting-style="getSettingsSubmenuPhase('quality') === 'entering' ? '' : null"
-                    x-bind:data-ending-style="getSettingsSubmenuPhase('quality') === 'exiting' ? '' : null"
-                    role="none"
-                >
-                    <button
-                        type="button"
-                        class="fff-video-field__settings-back"
-                        x-on:click="openSettingsView('root')"
-                    >
-                        <span class="fff-video-field__settings-item-chevron fff-video-field__settings-item-chevron--back" aria-hidden="true">
-                            {{ \Filament\Support\generate_icon_html(\Bjanczak\FilamentFlexFields\Support\GravityIcon::ChevronLeft, size: IconSize::ExtraSmall) }}
-                        </span>
-                        <span>{{ __('filament-flex-fields::default.video.quality') }}</span>
+            @foreach ($menus as $key => $menu)
+                <div class="fff-video-field__settings-panel" x-ref="{{ $key === 'quality' ? 'settingsPanelQuality' : 'settingsPanelSpeed' }}" data-submenu data-menu-view hidden inert role="menu" aria-label="{{ $menu['label'] }}">
+                    <button type="button" class="fff-video-field__settings-back" x-on:click="openSettingsView('root')" role="menuitem">
+                        <span class="fff-video-field__settings-item-chevron fff-video-field__settings-item-chevron--back" aria-hidden="true">{{ \Filament\Support\generate_icon_html(\Bjanczak\FilamentFlexFields\Support\Video\VideoIcon::Chevron, size: $small) }}</span>
+                        <span>{{ $menu['label'] }}</span>
                     </button>
-
                     <div class="fff-video-field__settings-separator" aria-hidden="true"></div>
-
-                    <div class="fff-video-field__settings-group" role="radiogroup">
-                        <template x-for="option in qualityOptions" :key="option.key">
-                            <button
-                                type="button"
-                                class="fff-video-field__settings-item"
-                                    x-on:click="selectQuality(option)"
-                                    role="menuitemradio"
-                                x-bind:aria-checked="selectedQualityKey === option.key ? 'true' : 'false'"
-                            >
-                                <span x-text="option.label"></span>
-                                <span
-                                    class="fff-video-field__settings-item-indicator"
-                                    x-show="selectedQualityKey === option.key"
-                                    aria-hidden="true"
-                                >
-                                    {{ \Filament\Support\generate_icon_html(\Bjanczak\FilamentFlexFields\Support\GravityIcon::Check, size: IconSize::ExtraSmall) }}
-                                </span>
+                    <div class="fff-video-field__settings-group">
+                    <span class="fff-video-field__settings-highlight" data-menu-highlight aria-hidden="true"></span>
+                        @foreach ($key === 'quality' ? $options['qualityOptions'] : $options['playbackRates'] as $choice)
+                            @php
+                                $value = $key === 'quality' ? $choice['key'] : $choice;
+                                $choiceLabel = $key === 'quality' ? $choice['label'] : $choice.'×';
+                                $checked = $key === 'quality' ? 'selectedQualityKey === '.\Illuminate\Support\Js::from($value) : 'playbackRate === '.\Illuminate\Support\Js::from($value);
+                            @endphp
+                            <button type="button" class="fff-video-field__settings-item" role="menuitemradio" x-bind:aria-checked="{{ $checked }} ? 'true' : 'false'" x-on:click="{{ $key === 'quality' ? 'selectQuality({ key: '.\Illuminate\Support\Js::from($value).' })' : 'setPlaybackRate('.\Illuminate\Support\Js::from($value).')' }}">
+                                <span>{{ $choiceLabel }}</span>
+                                <span class="fff-video-field__settings-item-indicator" x-show="{{ $checked }}" aria-hidden="true">{{ \Filament\Support\generate_icon_html(\Bjanczak\FilamentFlexFields\Support\Video\VideoIcon::Check, size: $small) }}</span>
                             </button>
-                        </template>
+                        @endforeach
                     </div>
                 </div>
-            @endif
-
-            @if ($hasPlaybackRateControl)
-                <div
-                    class="fff-video-field__settings-panel"
-                    x-ref="settingsPanelSpeed"
-                    data-submenu
-                    data-menu-view
-                        x-bind:data-open="getSettingsSubmenuPhase('speed') !== 'hidden' ? '' : null"
-                        x-bind:hidden="getSettingsSubmenuPhase('speed') === 'hidden' ? '' : null"
-                        x-bind:data-direction="settingsViewDirection"
-                    x-bind:data-starting-style="getSettingsSubmenuPhase('speed') === 'entering' ? '' : null"
-                    x-bind:data-ending-style="getSettingsSubmenuPhase('speed') === 'exiting' ? '' : null"
-                    role="none"
-                >
-                    <button
-                        type="button"
-                        class="fff-video-field__settings-back"
-                        x-on:click="openSettingsView('root')"
-                    >
-                        <span class="fff-video-field__settings-item-chevron fff-video-field__settings-item-chevron--back" aria-hidden="true">
-                            {{ \Filament\Support\generate_icon_html(\Bjanczak\FilamentFlexFields\Support\GravityIcon::ChevronLeft, size: IconSize::ExtraSmall) }}
-                        </span>
-                        <span>{{ __('filament-flex-fields::default.video.speed') }}</span>
-                    </button>
-
-                    <div class="fff-video-field__settings-separator" aria-hidden="true"></div>
-
-                    <div class="fff-video-field__settings-group" role="radiogroup">
-                        <template x-for="rate in playbackRates" :key="rate">
-                            <button
-                                type="button"
-                                class="fff-video-field__settings-item"
-                                    x-on:click="setPlaybackRate(rate)"
-                                    role="menuitemradio"
-                                x-bind:aria-checked="playbackRate === rate ? 'true' : 'false'"
-                            >
-                                <span x-text="formatPlaybackRateLabel(rate)"></span>
-                                <span
-                                    class="fff-video-field__settings-item-indicator"
-                                    x-show="playbackRate === rate"
-                                    aria-hidden="true"
-                                >
-                                    {{ \Filament\Support\generate_icon_html(\Bjanczak\FilamentFlexFields\Support\GravityIcon::Check, size: IconSize::ExtraSmall) }}
-                                </span>
-                            </button>
-                        </template>
-                    </div>
-                </div>
-            @endif
+            @endforeach
         </div>
     </div>
-
-    <x-filament-flex-fields::video-field-control-tip
-        :label="__('filament-flex-fields::default.video.settings')"
-        :enabled="$showTooltips"
-    >
-        <button
-            type="button"
-            class="fff-video-field__glass-btn"
-            x-ref="settingsTrigger"
-            x-on:click="toggleSettingsMenu()"
-            x-bind:aria-label="@js(__('filament-flex-fields::default.video.settings'))"
-            x-bind:aria-expanded="settingsOpen ? 'true' : 'false'"
-            x-bind:aria-haspopup="true"
-            x-bind:class="{ 'is-active': settingsOpen }"
-        >
+    <x-filament-flex-fields::video-field-control-tip :label="__('filament-flex-fields::default.video.settings')" :enabled="$showTooltips">
+        <button type="button" class="fff-video-field__glass-btn" x-ref="settingsTrigger" x-on:click="toggleSettingsMenu()" aria-label="{{ __('filament-flex-fields::default.video.settings') }}" x-bind:aria-expanded="settingsOpen ? 'true' : 'false'" aria-haspopup="menu" x-bind:class="{ 'is-active': settingsOpen }" @disabled($options['readOnly'])>
             {{ \Filament\Support\generate_icon_html($field->getSettingsIcon(), size: $toolbarIconSize) }}
         </button>
     </x-filament-flex-fields::video-field-control-tip>

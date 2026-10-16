@@ -28,22 +28,22 @@ final class TextFieldAdminSchema
     public static function components(): array
     {
         return [
-            Fieldset::make(__('filament-flex-fields::default.schema.settings.text_input'))
+            Fieldset::make(fn () => __('filament-flex-fields::default.schema.settings.text_input'))
                 ->columns(3)
                 ->schema([
                     TextInput::make(self::settingsPath('rows'))
-                        ->label(__('filament-flex-fields::default.schema.settings.rows'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.rows'))
                         ->numeric(),
                     Toggle::make(self::settingsPath('character_counter'))
-                        ->label(__('filament-flex-fields::default.schema.settings.character_counter')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.character_counter')),
                     Toggle::make(self::settingsPath('clearable'))
-                        ->label(__('filament-flex-fields::default.schema.settings.clearable')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.clearable')),
                     Toggle::make(self::settingsPath('speech_dictation'))
-                        ->label(__('filament-flex-fields::default.schema.settings.speech_dictation')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.speech_dictation')),
                     Toggle::make(self::settingsPath('trim'))
-                        ->label(__('filament-flex-fields::default.schema.settings.trim')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.trim')),
                     Select::make(self::settingsPath('mask_preset'))
-                        ->label(__('filament-flex-fields::default.schema.settings.mask_preset'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.mask_preset'))
                         ->options([
                             '' => 'None',
                             'phone' => 'Phone',
@@ -51,36 +51,36 @@ final class TextFieldAdminSchema
                         ])
                         ->native(false),
                     TextInput::make(self::settingsPath('mask'))
-                        ->label(__('filament-flex-fields::default.schema.settings.mask')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.mask')),
                     ...self::sizeVariantFields(),
                 ])
                 ->visible(fn (Get $get): bool => self::isOneOf($get, [FieldType::FlexTextInput, FieldType::FlexTextarea]))
                 ->columnSpanFull(),
 
-            Fieldset::make(__('filament-flex-fields::default.schema.settings.slug'))
+            Fieldset::make(fn () => __('filament-flex-fields::default.schema.settings.slug'))
                 ->columns(3)
                 ->schema([
                     TextInput::make(self::settingsPath('source'))
-                        ->label(__('filament-flex-fields::default.schema.settings.source_field')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.source_field')),
                     TextInput::make(self::settingsPath('separator'))
-                        ->label(__('filament-flex-fields::default.schema.settings.separator')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.separator')),
                     Toggle::make(self::settingsPath('auto_generate'))
-                        ->label(__('filament-flex-fields::default.schema.settings.auto_generate')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.auto_generate')),
                     Toggle::make(self::settingsPath('permalink_preview'))
-                        ->label(__('filament-flex-fields::default.schema.settings.permalink_preview')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.permalink_preview')),
                     ...self::sizeVariantFields(),
                 ])
                 ->visible(fn (Get $get): bool => self::isType($get, FieldType::Slug))
                 ->columnSpanFull(),
 
-            Fieldset::make(__('filament-flex-fields::default.schema.settings.verification_code'))
+            Fieldset::make(fn () => __('filament-flex-fields::default.schema.settings.verification_code'))
                 ->columns(3)
                 ->schema([
                     TextInput::make(self::settingsPath('length'))
-                        ->label(__('filament-flex-fields::default.schema.settings.length'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.length'))
                         ->numeric(),
                     Select::make(self::settingsPath('allowed_characters'))
-                        ->label(__('filament-flex-fields::default.schema.settings.allowed_characters'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.allowed_characters'))
                         ->options([
                             'numeric' => 'Numeric',
                             'alpha' => 'Alpha',
@@ -88,7 +88,7 @@ final class TextFieldAdminSchema
                         ])
                         ->native(false),
                     Toggle::make(self::settingsPath('auto_submit'))
-                        ->label(__('filament-flex-fields::default.schema.settings.auto_submit')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.auto_submit')),
                 ])
                 ->visible(fn (Get $get): bool => self::isType($get, FieldType::VerificationCode))
                 ->columnSpanFull(),

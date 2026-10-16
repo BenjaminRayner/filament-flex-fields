@@ -13,6 +13,12 @@
     --fff-verification-code-focus-ring: color-mix(in srgb, var(--fff-verification-code-accent) 28%, transparent);
 
     @apply inline-flex items-center;
+    position: relative;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    padding: 4px;
+    margin: -4px;
 }
 
 .fff-verification-code--sm {
@@ -55,6 +61,8 @@
 
 .fff-verification-code__group {
     @apply inline-flex items-center;
+    min-width: calc(var(--fff-verification-group-count) * 1.25rem + (var(--fff-verification-group-count) - 1) * var(--fff-verification-code-group-gap));
+    flex-shrink: 1;
     gap: var(--fff-verification-code-group-gap);
 }
 
@@ -72,7 +80,11 @@
 }
 
 .fff-verification-code__input {
-    @apply inline-flex shrink-0 items-center justify-center border text-center font-semibold tabular-nums outline-none transition;
+    @apply inline-flex items-center justify-center border text-center font-semibold tabular-nums outline-none;
+    min-width: 1.25rem;
+    flex-shrink: 1;
+    padding: 0;
+    transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
     width: var(--fff-verification-code-size);
     height: var(--fff-verification-code-size);
     border-radius: var(--fff-verification-code-radius);
@@ -131,8 +143,15 @@
 }
 
 .fff-verification-code-shell {
-    @apply inline-flex items-center gap-2;
+    display: inline-grid;
+    grid-template-columns: minmax(0, max-content);
+    align-items: center;
+    gap: .5rem;
+    max-width: 100%;
+    min-width: 0;
 }
+
+.fff-verification-code-shell--loading { grid-template-columns: minmax(0, max-content) 1.25rem; }
 
 .fff-verification-code-shell.is-loading .fff-verification-code {
     @apply pointer-events-none opacity-60;
@@ -144,7 +163,7 @@
     height: 1.25rem;
 }
 
-.fff-verification-code__loading.is-visible {
+.fff-verification-code-shell.is-loading .fff-verification-code__loading {
     @apply opacity-100;
 }
 
@@ -200,6 +219,15 @@
     color: rgb(161 161 170);
 }
 
-/* -------------------------------------------------------------------------- */
-/* Flex checklist                                                             */
-/* -------------------------------------------------------------------------- */
+.fff-verification-code__submit-error { display: flex; align-items: center; gap: .5rem; grid-column: 1 / -1; color: var(--danger-600, #dc2626); font-size: .8125rem; }
+.fff-verification-code__submit-error > button { padding: .375rem .625rem; border-radius: 9999px; background: var(--fff-verification-code-filled-bg, #f4f4f5); color: inherit; font-weight: 600; }
+.fff-verification-code__submit-error > button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.dark .fff-verification-code__submit-error { color: var(--danger-400, #f87171); }
+.dark .fff-verification-code__submit-error > button { background: #27272a; }
+.fff-verification-code.fff-rounding-full { --fff-verification-code-radius: 9999px; }
+.fff-verification-code.fff-rounding-lg { --fff-verification-code-radius: 1rem; }
+.fff-verification-code.fff-rounding-xl { --fff-verification-code-radius: 1.25rem; }
+.fff-verification-code.fff-rounding-native { --fff-verification-code-radius: .5rem; }
+@media(prefers-reduced-motion: reduce) {
+    .fff-verification-code__input, .fff-verification-code__loading { transition: none; }
+}

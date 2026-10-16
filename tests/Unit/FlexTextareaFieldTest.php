@@ -106,10 +106,10 @@ it('can enable browser speech dictation', function () {
         ->and($field->getSpeechDictationLabel())->toBe('Speak');
 });
 
-it('uses gravity ui icons for emoji and microphone by default', function () {
+it('uses Hugeicons for emoji and microphone by default', function () {
     $field = FlexTextareaField::make('message');
 
-    expect($field->getEmojiIcon())->toBe(GravityIcon::FaceSmile)
+    expect($field->getEmojiIcon())->toBe('hugeicons-look-top')
         ->and($field->getMicrophoneIcon())->toBe(GravityIcon::Microphone);
 });
 
@@ -176,4 +176,15 @@ it('disables submit action when textarea value is empty', function () {
         ->and($field->isSubmitDisabled(''))->toBeTrue()
         ->and($field->isSubmitDisabled('Hello'))->toBeFalse()
         ->and($field->getSuffixActions()['send']->getExtraAttributes()['x-bind:disabled'])->toBe('!canSubmit');
+});
+
+it('rejects CSS declaration injection in maximum height', function (): void {
+    expect(fn () => FlexTextareaField::make('text')->maxHeight('24rem;position:fixed')->getMaxHeight())->toThrow(InvalidArgumentException::class)
+        ->and(FlexTextareaField::make('text')->maxHeight('calc(100vh - 4rem)')->getMaxHeight())->toBe('calc(100vh - 4rem)')
+        ->and(FlexTextareaField::make('text')->maxHeight(null)->getMaxHeight())->toBeNull();
+});
+
+it('keeps disabled and readonly suffix actions disabled even with text', function (): void {
+    expect(FlexTextareaField::make('text')->disabled()->isSubmitDisabled('Hello'))->toBeTrue()
+        ->and(FlexTextareaField::make('text')->readOnly()->isSubmitDisabled('Hello'))->toBeTrue();
 });

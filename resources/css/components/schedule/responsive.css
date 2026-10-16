@@ -1,0 +1,25 @@
+@container fff-schedule (max-width: 620px) {
+    .fff-schedule-field .fff-schedule-field__day { padding: .75rem; }
+    .fff-schedule-field__day-header, .fff-schedule-field--has-copy-column .fff-schedule-field__day-header { grid-template-columns: minmax(0,1fr) auto; gap: .25rem .5rem; }
+    .fff-schedule-field__day-label { grid-column: 1; grid-row: 1; }
+    .fff-schedule-field__day-status { grid-column: 1; grid-row: 2; min-width: 0; }
+    .fff-schedule-field__day-header-spacer { display: none; }
+    .fff-schedule-field__day-switch, .fff-schedule-field__day-lock { grid-column: 2; grid-row: 1 / span 2; align-self: center; justify-self: end; }
+    .fff-schedule-field__copy-slot { grid-column: 1 / -1; grid-row: 3; min-height: 0; justify-content: flex-start; }
+    .fff-schedule-field__copy-slot:not(.fff-schedule-field__copy-slot--active) { display: none; }
+    .fff-schedule-field__copy-btn { padding-inline: .625rem; }
+    .fff-schedule-field__copy-btn-label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .fff-schedule-field__slots { margin-block-start: .5rem; gap: .5rem; }
+    .fff-schedule-field__slot { display: grid; grid-template-columns: minmax(0,1fr) auto; grid-template-areas: 'label actions' 'times times' 'meta meta'; align-items: start; gap: .375rem .5rem; }
+    .fff-schedule-field__slot-label { grid-area: label; width: auto; min-width: 0; }
+    .fff-schedule-field__slot-actions { grid-area: actions; margin-inline-start: 0; min-width: 0; min-height: 0; align-self: start; }
+    .fff-schedule-field__time-fields { grid-area: times; display: grid; width: 100%; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: .5rem; }
+    .fff-schedule-field__time-group { flex-direction: column; align-items: stretch; gap: .25rem; min-width: 0; }
+    .fff-schedule-field__time-group > .fff-select-control { width: 100%; min-width: 0; }
+    .fff-schedule-field__slot-meta { grid-area: meta; }
+    .fff-schedule-field__slot-toolbar { margin-block-start: .5rem; gap: .375rem; }
+    .fff-schedule-field__action-btn { padding: 3px .5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .fff-schedule-field.is-day-animated .fff-schedule-field__day, .fff-schedule-field.is-day-animated .fff-schedule-field__day-collapse { transition: none; }
+}

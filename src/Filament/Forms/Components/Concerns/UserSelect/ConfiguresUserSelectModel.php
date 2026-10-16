@@ -6,8 +6,11 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\UserSel
 
 use BackedEnum;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\UserSelect;
+use Bjanczak\FilamentFlexFields\Support\Select\Configuration\PickerConfiguration;
 use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
 
 /**
  * @mixin UserSelect
@@ -19,6 +22,8 @@ trait ConfiguresUserSelectModel
     protected ?Closure $modifyQueryUsing = null;
 
     protected bool $modelBindingsConfigured = false;
+
+    protected ?Closure $defaultRelationshipRecordResolver = null;
 
     public function optionModel(string|Closure $model): static
     {
@@ -39,6 +44,7 @@ trait ConfiguresUserSelectModel
     public function relationship(string|Closure|null $name = null, string|Closure|null $titleAttribute = null, ?Closure $modifyQueryUsing = null, bool $ignoreRecord = false): static
     {
         parent::relationship($name, $titleAttribute, $modifyQueryUsing, $ignoreRecord);
+        $this->defaultRelationshipRecordResolver = $this->getSelectedRecordUsing;
 
         if ($titleAttribute !== null) {
             $this->nameColumn($titleAttribute);
@@ -68,9 +74,25 @@ trait ConfiguresUserSelectModel
         return $this;
     }
 
+    /** Native editing receives a full record under the same scope as search and labels. */
+    public function getSelectedRecord(): ?Model
+    {
+        if (! $this->hasRelationship() && $this->getUserModel() === null) {
+            return parent::getSelectedRecord();
+        }
+
+        return $this->queryEngine()->resolveRecordForValue($this->getState());
+    }
+
+    public function getCustomUserSelectSelectedRecordResolver(): ?Closure
+    {
+        return $this->getSelectedRecordUsing === $this->defaultRelationshipRecordResolver
+            ? null : $this->getSelectedRecordUsing;
+    }
+
     public function hasClientSideOptionList(): bool
     {
-        if ($this->getUserModel() !== null) {
+        if ($this->userModel !== null) {
             return false;
         }
 
@@ -79,7 +101,7 @@ trait ConfiguresUserSelectModel
 
     public function hasDynamicOptions(): bool
     {
-        if ($this->getUserModel() !== null) {
+        if ($this->userModel !== null) {
             return true;
         }
 
@@ -88,7 +110,7 @@ trait ConfiguresUserSelectModel
 
     public function hasInitialNoOptionsMessage(): bool
     {
-        if ($this->getUserModel() !== null) {
+        if ($this->userModel !== null) {
             return false;
         }
 
@@ -97,14 +119,40 @@ trait ConfiguresUserSelectModel
 
     public function getUserModel(): ?string
     {
-        $model = $this->evaluate($this->userModel);
-
-        return is_string($model) && filled($model) ? $model : null;
+        return PickerConfiguration::optionalText($this->evaluate($this->userModel), 'optionModel');
     }
 
     public function getModifyQueryUsing(): ?Closure
     {
         return $this->modifyQueryUsing;
+    }
+
+    /**
+     * Preserve the same relationship constraints for search and batched labels.
+     *
+     * @template TModel of Model
+     *
+     * @param  Builder<TModel>  $query
+     * @return Builder<TModel>
+     */
+    public function applyUserSelectRelationshipScope(Builder $query, ?string $search = null): Builder
+    {
+        $record = $this->getRecord();
+        if ($this->shouldIgnoreRelationshipRecord && $record instanceof Model) {
+            $query->where($record->getQualifiedKeyName(), '!=', $record->getKey());
+        }
+
+        if ($this->modifyRelationshipQueryUsing !== null) {
+            $modified = $this->evaluate($this->modifyRelationshipQueryUsing, [
+                'query' => $query, 'search' => $search,
+            ]);
+            if ($modified !== null && ! $modified instanceof Builder) {
+                throw new InvalidArgumentException('UserSelect relationship query modifier must return an Eloquent builder or null.');
+            }
+            $query = $modified ?? $query;
+        }
+
+        return $query;
     }
 
     /**
@@ -129,7 +177,11 @@ trait ConfiguresUserSelectModel
 
     protected function configureModelBindingsIfNeeded(): void
     {
-        if ($this->modelBindingsConfigured || $this->getUserModel() === null) {
+        if ($this->modelBindingsConfigured) {
+            return;
+        }
+
+        if ($this->userModel === null) {
             return;
         }
 

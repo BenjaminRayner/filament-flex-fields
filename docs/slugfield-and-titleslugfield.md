@@ -1,8 +1,118 @@
 ---
 title: "SlugField & TitleSlugField"
+description: "Build titles and slugs in Filament with permalink previews, configurable regeneration rules and optional Spatie Sluggable integration."
+icon: "link-2"
+"canonical": "https://flex-fields.bjanczak.com/docs/slugfield-and-titleslugfield"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/slug-field.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "SlugField & TitleSlugField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/slug-field-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/slug-field-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/slug-field.webp"
+"twitter:image:alt": "SlugField & TitleSlugField in the FLEX Fields playground"
 ---
 
-![SlugField](/art/sc-22.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/slugfield-and-titleslugfield#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/slugfield-and-titleslugfield",
+      "name": "SlugField & TitleSlugField",
+      "description": "Build titles and slugs in Filament with permalink previews, configurable regeneration rules and optional Spatie Sluggable integration.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/slugfield-and-titleslugfield#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/slugfield-and-titleslugfield#article",
+      "url": "https://flex-fields.bjanczak.com/docs/slugfield-and-titleslugfield",
+      "headline": "SlugField & TitleSlugField",
+      "description": "Build titles and slugs in Filament with permalink previews, configurable regeneration rules and optional Spatie Sluggable integration.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/slugfield-and-titleslugfield#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/slug-field-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/slug-field-motion.mp4#video",
+      "name": "SlugField & TitleSlugField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of SlugField & TitleSlugField in the FLEX Fields playground for Filament. Build titles and slugs in Filament with permalink previews, configurable regeneration rules and optional Spatie Sluggable integration.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/slug-field.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT6.95S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/slug-field-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/slugfield-and-titleslugfield#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/slug-field-motion.mp4"
+  poster="/art/previews/slug-field.webp"
+  width="1920"
+  height="1080"
+  aria-label="SlugField & TitleSlugField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/slug-field-motion.mp4">Watch the SlugField & TitleSlugField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -11,7 +121,7 @@ title: "SlugField & TitleSlugField"
 
 Permalink field for Filament: title + slug in one block, live URL preview, inline editing, Copy/Visit/Regenerate buttons, and uniqueness validation.
 
-> **Spatie `laravel-sluggable` is optional.** By default, the slug is generated from the title using `Str::slug()` in the browser and saved to the database like a regular form field. You only need to add the Spatie package if you want the same rules as on model saving (such as `-2`, `-3` suffixes, `preventOverwrite`, etc.).
+> **Spatie `laravel-sluggable` is optional.** By default, the slug is generated from the title using the shared client slugifier, with PHP `Str::slug()` for locale-sensitive or unsupported transliteration and saved to the database like a regular form field. You only need to add the Spatie package if you want the same rules as on model saving (such as `-2`, `-3` suffixes, `preventOverwrite`, etc.).
 
 | | |
 |---|---|
@@ -20,7 +130,7 @@ Permalink field for Filament: title + slug in one block, live URL preview, inlin
 | **Convenience schema** | `SlugField::withTitle()` → returns a `FusedGroup` (same as `TitleSlugField::make()`) |
 | **State type** | `string\|null` (normalized slug; homepage slug is `'/'` when enabled) |
 | **FieldType** | `slug` |
-| **Spatie** | Optional — see [Spatie `laravel-sluggable` integration](#spatie-laravel-sluggable-integration-v4x) |
+| **Spatie** | Optional — see [Spatie `laravel-sluggable` integration](#spatie-laravel-sluggable-integration-v4-x) |
 
 ---
 
@@ -32,9 +142,9 @@ Permalink field for Filament: title + slug in one block, live URL preview, inlin
 
 | What | Who does it | Do you need to write code? |
 |----|-------------|-------------------------|
-| Slug preview while typing the title | `SlugField` (Alpine + `Str::slug`) | No — works automatically |
+| Slug preview while typing the title | `SlugField` (client slugifier or PHP `Str::slug`) | No — works automatically |
 | Saving the `slug` value to the database | Filament + Eloquent | Yes — database column + `$fillable` |
-| Slug uniqueness in the form | `SlugField` (`unique` rule) | No — enabled by default |
+| Slug uniqueness in the form | `SlugField` (`unique` rule) | Enabled by default; requires a form model or an explicit unique table/model |
 | Suffix `-2` on database collision | **Only Spatie** (`HasSlug`) | No — without Spatie, the slug must be unique in the form |
 | Create vs Edit behaviour | `TitleSlugField` | No — by default, the slug does not change on edit |
 
@@ -191,7 +301,7 @@ Only add Spatie when you need **model-level hooks** that the form alone cannot h
 - `skipGenerateWhen`, `extraScope`, multiple source fields
 - using the same `SlugOptions` in form preview and on `save()`
 
-Do tego: [Spatie `laravel-sluggable` integration](#spatie-laravel-sluggable-integration).
+Do tego: [Spatie `laravel-sluggable` integration](#spatie-laravel-sluggable-integration-v4-x).
 
 #### Common issues (without Spatie)
 
@@ -203,7 +313,7 @@ Do tego: [Spatie `laravel-sluggable` integration](#spatie-laravel-sluggable-inte
 | Validation: slug already exists | Duplicate in database | Change slug or delete the old record |
 | `name` / `handle` fields instead of title/slug | Default field names | `fieldTitle:` / `fieldSlug:` or config |
 
-> **Next sections:** [Default form layout](#default-form-layout-fusedgroup) → [Installation](#installation-and-assets) → [Config](#package-configuration-configfilament-flex-fieldsphp) → [Full Example](#full-example-from-scratch-migration---model---resource) → [Spatie Integration](#spatie-laravel-sluggable-integration-v4x)
+> **Next sections:** [Default form layout](#default-form-layout-fusedgroup) → [Installation](#installation-and-assets) → [Config](#package-configuration-config/filament-flex-fields-php) → [Full Example](#full-example-from-scratch-migration->-model->-resource) → [Spatie Integration](#spatie-laravel-sluggable-integration-v4-x)
 
 ---
 
@@ -282,7 +392,7 @@ When `url_host` is `null` (no URL preview in config):
 | Slug variant | `primary` | `config('filament-flex-fields.ui.slug_variant')` |
 | Permalink host | `APP_URL` or `null` | `config('filament-flex-fields.slug.url_host')` |
 | Button labels | text + icon | `config('filament-flex-fields.slug.action_button_labels')` |
-| Icons | Gravity UI | e.g. `gravityui-pencil`, `gravityui-copy` |
+| Icons | Hugeicons | e.g. `hugeicons-pencil`, `hugeicons-copy-01` |
 | Badge | Auto / Custom | Alpine — after manual slug edit |
 
 #### The same layout — three ways to call
@@ -333,7 +443,7 @@ Install **only** if the model uses `HasSlug` / `getSlugOptions()` and you want m
 composer require spatie/laravel-sluggable
 ```
 
-Without that package `TitleSlugField::make()` still works fully — generation uses browser `Str::slug()` / client slugify.
+Without that package `TitleSlugField::make()` still works fully — generation uses the shared client slugifier, with PHP generation when required.
 
 ---
 
@@ -392,7 +502,7 @@ TitleSlugField::make(
 
 ### Full Example from scratch (migration -> model -> Resource)
 
-> Continuation of the [Start here — integration without Spatie](#start-here--integration-without-spatie-default) section. Steps 1–3 are the minimum; step 4 (Spatie) is **optional**.
+> Continuation of the [Start here — integration without Spatie](#start-here-—-integration-without-spatie-default) section. Steps 1–3 are the minimum; step 4 (Spatie) is **optional**.
 
 #### 1. Migration
 
@@ -637,7 +747,7 @@ FlexTextInput::make('subtitle')->live(),
 
 ### Quick Start — Filament Resource (create + edit)
 
-Summary of the [Start here](#start-here--integration-without-spatie-default) section — **without Spatie**:
+Summary of the [Start here](#start-here-—-integration-without-spatie-default) section — **without Spatie**:
 
 ```php
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TitleSlugField;
@@ -776,7 +886,7 @@ Optional multi-language **title** with **one shared slug**. Locale switching use
 | Spatie locale fallback in form tabs | **No** — each tab shows that locale only |
 | Deep runtime bridge like `laravel-sluggable` | **No** — compatible state shape + hydrate/save, not a full plugin adapter |
 
-> **`spatieModel` ≠ Spatie Translatable.** `spatieModel` on `TitleSlugField` is for [Spatie Sluggable](#spatie-laravel-sluggable-integration) (`HasSlug`). For translations use `translatableLocales` (+ optional `spatieTranslatable`).
+> **`spatieModel` ≠ Spatie Translatable.** `spatieModel` on `TitleSlugField` is for [Spatie Sluggable](#spatie-laravel-sluggable-integration-v4-x) (`HasSlug`). For translations use `translatableLocales` (+ optional `spatieTranslatable`).
 
 #### Basic usage
 
@@ -905,7 +1015,7 @@ TitleSlugField::make(
 
 #### Full `TranslatableFields` passthrough
 
-When `translatableLocales` is set, title tabs are built with `TranslatableFields` internally. **By default** the factory enables `directionByLocale()` (RTL/LTR on the title **input**, not the label — see [TranslatableFields / directionByLocale](/docs/translatablefields#directionbylocaletranslatabledirectionscope-scope--translatabledirectionscopeauto)) and `emptyBadgeWhenAllFieldsAreEmpty()` (warning `empty` badge on tabs where the title is blank). The active tab stays on `slugSourceLocale`, not `activeTabWithValue()`.
+When `translatableLocales` is set, title tabs are built with `TranslatableFields` internally. **By default** the factory enables `directionByLocale()` (RTL/LTR on the title **input**, not the label — see [TranslatableFields / directionByLocale](/docs/translatablefields#directionbylocale-translatabledirectionscope-$scope-=-translatabledirectionscopeauto)) and `emptyBadgeWhenAllFieldsAreEmpty()` (warning `empty` badge on tabs where the title is blank). The active tab stays on `slugSourceLocale`, not `activeTabWithValue()`.
 
 Use `translatableFieldsConfigurator` for further tweaks (`activeTabWithValue()`, bordered panels, custom tab icons, `localeFieldUsing()`, `storageAttributeUsing()`, etc.):
 
@@ -968,7 +1078,7 @@ Translatable titles always use **server-side** slug preview (`generateSlugPrevie
 
 ### Spatie `laravel-sluggable` integration (v4.x)
 
-> **Not required.** If the [default path without Spatie](#start-here--integration-without-spatie-default) is sufficient, you can skip this section entirely.
+> **Not required.** If the [default path without Spatie](#start-here-—-integration-without-spatie-default) is sufficient, you can skip this section entirely.
 
 Tested with **`spatie/laravel-sluggable` ^4.0** (currently 4.0.2). The integration uses official Spatie v4 classes:
 - `Spatie\Sluggable\Actions\GenerateSlugAction` (via `config/sluggable.php` → `actions.generate_slug`)
@@ -1054,7 +1164,7 @@ TitleSlugField::make(spatieModel: Post::class),
 | Aspect | Without Spatie | With `spatieModel` |
 |--------|------------|------------------|
 | UI Layout (`FusedGroup`) | Same | Same |
-| Preview generation | `Str::slug` in JS or `SlugGenerator` | `GenerateSlugAction` + `SlugOptions` |
+| Preview generation | Client slugifier or PHP `SlugGenerator` | `GenerateSlugAction` + `SlugOptions` |
 | Requesty Livewire | Opcjonalne | Tak (`generateSlugPreview`) |
 | Zapis do bazy | Twoja logika / Filament | Spatie `HasSlug` na modelu |
 
@@ -2044,11 +2154,11 @@ FLEX_FIELDS_PLAYGROUND=true
 
 Panel navigation: **Settings & Tools → Flex Fields Playground** — cluster with left sub-navigation (Filament `SubNavigationPosition::Start`).
 
-- Root URL: `/admin/flex-fields-playground` (redirects to first component)
-- **Slug field page:** `/admin/flex-fields-playground/slug-field`
-- Routes are registered **only** when `FLEX_FIELDS_PLAYGROUND=true` (or `filament-flex-fields.playground.enabled` is `true`).
+- Root URL: `/admin/flex-fields` (redirects to first component)
+- **Slug field page:** `/admin/flex-fields/slug-field`
+- FLEX routes are always registered behind panel authentication. The only catalog navigation setting is `filament-flex-fields.navigation.sort`.
 
-> **Spatie is optional for every recipe below.** All playground demos work with browser `Str::slug()` only. To align preview and save with `laravel-sluggable`, see [Optional Spatie upgrade (playground recipes)](#optional-spatie-upgrade-playground-recipes) at the end of this section.
+> **Spatie is optional for every recipe below.** Playground demos do not require Spatie. Translatable titles use PHP generation; ordinary Latin titles use the client slugifier. To align preview and save with `laravel-sluggable`, see [Optional Spatie upgrade (playground recipes)](#optional-spatie-upgrade-playground-recipes) at the end of this section.
 
 Source of truth: `SlugFieldPlayground` in the package (`src/Support/Playground/SlugFieldPlayground.php`). Default form state keys (`slug__title`, `slug__standalone`, …) live in `SlugFieldPlayground::defaultState()`.
 
@@ -2092,7 +2202,7 @@ SlugField::make('slug__standalone') // or SlugField::make('slug')
 | | |
 |---|---|
 | **Demonstrates** | `SlugField` + `->source()` pointing at a sibling field (not embedded `titleField()`) |
-| **Cookbook** | [Four ways to add title + slug](#four-ways-to-add-title--slug) — pattern **4** |
+| **Cookbook** | [Four ways to add title + slug](#four-ways-to-add-title-+-slug) — pattern **4** |
 | **Spatie** | Optional — `->spatieModel(Post::class)` on `SlugField` |
 
 ---
@@ -2113,7 +2223,7 @@ TitleSlugField::make(
 | | |
 |---|---|
 | **Demonstrates** | `TitleSlugField` fused group, permalink bar, default create/edit behaviour |
-| **Cookbook** | [Scenario 1](#scenario-1-blog--create--edit-default-behaviour) |
+| **Cookbook** | [Scenario 1](#scenario-1-blog-—-create-+-edit-default-behaviour) |
 | **Spatie** | Optional — `TitleSlugField::make(..., spatieModel: Post::class)` |
 
 ---
@@ -2163,7 +2273,7 @@ SlugField::make('slug__pair_slug')
 | | |
 |---|---|
 | **Demonstrates** | Embedded title via `->titleField()`, `->recordSlug()` for visit URL on edit |
-| **Cookbook** | [Four ways](#four-ways-to-add-title--slug) — pattern **3** |
+| **Cookbook** | [Four ways](#four-ways-to-add-title-+-slug) — pattern **3** |
 | **Spatie** | Optional — `->spatieModel(Post::class)` |
 
 ---
@@ -2186,7 +2296,7 @@ SlugField::make('slug__permalink')
 | | |
 |---|---|
 | **Demonstrates** | `urlHost`, `urlPath`, `visitRoute`, `generationDebounce` |
-| **Cookbook** | [Permalink preview & URL actions](#permalink-preview--url-actions) |
+| **Cookbook** | [Permalink preview & URL actions](#permalink-preview-&-url-actions) |
 | **Spatie** | Optional — visit URL still works; preview uses Spatie rules when `->spatieModel()` is set |
 
 ---
@@ -2211,7 +2321,7 @@ Preview: `wyachts.test/books/my-slug/detail/`
 | | |
 |---|---|
 | **Demonstrates** | `slugLabelPostfix`, complex `visitRoute` |
-| **Cookbook** | [Sandwich URL](#sandwich-url-prefix--slug--postfix) |
+| **Cookbook** | [Sandwich URL](#sandwich-url-prefix-+-slug-+-postfix) |
 | **Spatie** | Optional |
 
 ---
@@ -2246,7 +2356,7 @@ Grid::make(['default' => 1, 'sm' => 2, 'lg' => 3])
 |------|--------|----------|
 | Form readonly | `readOnly()` | [Scenario 10](#scenario-10-form-read-only-whole-field) |
 | Slug readonly | `slugReadOnly()` | [Scenario 3](#scenario-3-slug-read-only-on-edit) |
-| Homepage `/` | `allowHomepageSlug()` + `slugPattern()` | [Scenario 7](#scenario-7-cms-homepage-) |
+| Homepage `/` | `allowHomepageSlug()` + `slugPattern()` | [Scenario 7](#scenario-7-cms-homepage-/) |
 
 **Spatie:** optional for all three.
 
@@ -2276,7 +2386,7 @@ SlugField::make('slug')
     ->spatieModel(Post::class), // optional
 ```
 
-Full integration: [Spatie `laravel-sluggable` integration](#spatie-laravel-sluggable-integration-v4x) (install, `HasSlug`, `getSlugOptions()`, `#[Sluggable]`, translatable models).
+Full integration: [Spatie `laravel-sluggable` integration](#spatie-laravel-sluggable-integration-v4-x) (install, `HasSlug`, `getSlugOptions()`, `#[Sluggable]`, translatable models).
 
 #### Playground quick reference
 
@@ -2293,11 +2403,7 @@ Full integration: [Spatie `laravel-sluggable` integration](#spatie-laravel-slugg
 | Slug readonly | `slug__slug_readonly` | `slugReadOnly()` |
 | Homepage slug | `slug__homepage` | `allowHomepageSlug()` |
 
-```php
-// Verify playground registration in package tests
-$builder = app(\Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder::class);
-expect($builder->components())->not->toBeEmpty();
-```
+
 
 #### Translations
 
@@ -2412,7 +2518,7 @@ Slug: **`slug-field`**
 | TitleSlugField | Fused title + slug, translatable titles |
 | Spatie integration | `SlugOptions` preview and attribute slugs |
 
-`/admin/flex-fields-playground/slug-field` — see [Playground](/docs/index#playground).
+`/admin/flex-fields/slug-field` — see [Playground](/docs/index#playground).
 
 ---
 
@@ -2423,6 +2529,94 @@ Slug: **`slug-field`**
 | [TranslatableFields](/docs/translatablefields) | Generic translatable attributes without slug sync |
 | [FlexTextInput](/docs/flextextinput) | Plain text slug without permalink UI |
 | [LinkPreviewField](/docs/link-preview-field) | URL preview card, not slug generation |
-| [TitleSlugField](/docs/slugfield-and-titleslugfield#titleslugfield) | Fused title + slug factory (same doc) |
+| [TitleSlugField](/docs/slugfield-and-titleslugfield#titleslugfield-factory-parameters) | Fused title + slug factory (same doc) |
 
 ---
+
+### Editor transaction and shared rendering (2026-10 reconstruction)
+
+SlugField now renders one native input through the shared FLEX text-input
+primitive. Its Edit/OK/Cancel/Reset and permalink commands use the shared
+SegmentControl renderer in command mode. These buttons do not submit a form or
+change a selected radio/tab value. Edit and Cancel update local state and deferred
+Livewire metadata; they do not request a page render.
+
+Edit creates a draft while retaining the committed slug. OK validates configured
+slug rules and live uniqueness through a renderless schema method when required;
+a failed request leaves the draft open. Cancel restores the latest committed
+value. Reset regenerates from the current source and restores auto-sync only
+after generation succeeds. Late responses cannot overwrite a newer edit,
+source value or disposed field. Direct editing keeps the raw native input value
+while typing, then displays the normalized slug on blur.
+
+Source and metadata paths follow the mounted schema, including custom form roots
+and nested containers. Title templates are cloned instead of accumulating
+callbacks. Optional Spatie preview generation uses a cloned record so opening
+the form does not mutate its original model. Custom `slugifyUsing()` callbacks
+run in PHP automatically. Custom permalink callbacks are evaluated for the
+current committed value, including Copy after regeneration.
+
+Uniqueness settings are evaluated at validation time. Query scopes and
+`modifyRuleUsing` constraints apply to the same candidate records. For a table
+with a nonstandard primary key, set `identityColumn` in `slugUniqueParameters`
+when combining a scope with `modifyRuleUsing`; an Eloquent model supplies its
+key automatically. Keep a database unique constraint for concurrent writes.
+
+The homepage value `/` is explicitly accepted by `allowHomepageSlug()` even
+with a custom ordinary-slug pattern; other configured validation rules still
+apply. The editor displays the fixed URL slash once and an empty editable
+segment. PHP examples live in `resources/examples/slug-field/usage.php` and are
+loaded by the catalog page, not by application forms.
+
+
+## Rebuilt optional Spatie integration (Sluggable v4)
+
+SlugField supports Sluggable v4 without requiring it on pages that do not use a
+sluggable model. The shared adapter delegates native generation to Spatie;
+PHP option resolution, disposable model hydration, generation policies and
+uniqueness queries live in separate `Support/Slug/Spatie/` modules.
+
+```php
+SlugField::make('slug')
+    ->source('title')
+    ->spatieModel(Article::class)
+    ->spatieSourceField('title')
+    ->spatieSlugField('slug');
+```
+
+Configure `Article::getSlugOptions()` as usual: multiple source fields/source
+closures, language, source length, separator, scopes, suffixes, create/update
+flags, skip conditions and prevent-overwrite are preserved. A field with no
+explicit separator inherits the actual model separator. Native
+`allowDuplicateSlugs()` also controls the default validation policy; explicit
+`slugUnique()` can enforce uniqueness instead. Native source length is not the
+same as a final output-length limit (suffixes may extend the result).
+
+Automatic previews respect model policies. Explicit Reset/Regenerate invokes
+manual generation semantics and bypasses automatic create/update/skip/overwrite
+restrictions. It still preserves a slug that native Spatie considers customized.
+Generation uses a clone: previews do not persist data, alter model originals or
+change the caller's locale. Cached native options are cloned as well.
+
+For `HasTranslatableSlug` + optional `HasTranslations`, choose the source locale
+with `slugSourceLocale('pl')`; exact regional keys such as `pt_BR` are supported.
+Only the selected locale is generated/checked in the editor, without copying
+fallback values into a missing translation. Other model locales remain intact.
+Native translated customization rules and per-locale JSON collision checks are
+retained. Final validation uses the same model scope and selected locale. A field
+represents one scalar slug; it does not turn a single editor into an entire JSON
+translation map. Compose locale editors/storage with TranslatableFields when
+editing/persisting multiple slug translations.
+
+Configured/model-overridden generation actions and configured self-healing route
+key actions are used. Self-healing visit/copy URLs resolve server-side against
+the current committed slug. If a custom action changes the collision domain,
+configure matching `slugUniqueScope`/`slugUniqueParameters` for manual validation.
+The adapter targets v4; its confined translated bridge needs compatibility
+verification on dependency upgrades. A source/output contradiction (for example
+native source `slug` while the editor source is `title`) is rejected with a
+configuration error rather than producing an unrelated suffix.
+
+For domain-level integrations, `SpatieSlugIntegration::preview(...)` returns an
+immutable result (`value`, `generated`, `skipReason`); `generate(...)` retains the
+string API. Both accept optional `force` and current-form slug parameters.

@@ -163,3 +163,16 @@ it('stores and clears smart defaults per user and tenant', function (): void {
 
     SmartDefaults::reset();
 });
+
+it('isolates defaults by tenant and resets them between long-lived application scopes', function (): void {
+    for ($scope = 0; $scope < 1000; $scope++) {
+        expect(SmartDefaults::recall('same-user', 'price', 'tenant-one'))->toBeNull()
+            ->and(SmartDefaults::getTenantDefaults('tenant-one'))->toBe([]);
+        SmartDefaults::remember('same-user', 'price', $scope, 'tenant-one');
+        SmartDefaults::remember('same-user', 'price', -$scope, 'tenant-two');
+        SmartDefaults::tenantDefaults('tenant-one', ['currency' => 'EUR']);
+        expect(SmartDefaults::recall('same-user', 'price', 'tenant-one'))->toBe($scope)
+            ->and(SmartDefaults::recall('same-user', 'price', 'tenant-two'))->toBe(-$scope);
+        app()->forgetScopedInstances();
+    }
+});

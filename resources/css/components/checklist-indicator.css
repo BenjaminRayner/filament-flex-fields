@@ -1,0 +1,8 @@
+/* Checklist selection control: one source for identical shape and motion. */
+.fff-checklist-indicator { display:inline-flex; flex:none; align-items:center; justify-content:center; border-radius:.375rem; border:2px solid #d4d4d8; width:var(--fff-flex-checklist-indicator-size,1rem); height:var(--fff-flex-checklist-indicator-size,1rem); background:transparent; box-sizing:border-box; transition:border-color .22s ease,background-color .22s ease,color .22s ease,transform .28s cubic-bezier(.34,1.56,.64,1); }
+.fff-checklist-indicator[data-checked=true] { border-color:var(--fff-flex-checklist-accent,var(--primary-500,#6366f1)); background:var(--fff-flex-checklist-accent,var(--primary-500,#6366f1)); color:#fff; animation:fff-checklist-indicator-pop .34s cubic-bezier(.34,1.56,.64,1); }
+.fff-checklist-indicator__icon { width:var(--fff-flex-checklist-indicator-icon-size,.75rem); height:var(--fff-flex-checklist-indicator-icon-size,.75rem); flex:none; opacity:0; transform:scale(.35); transition:opacity .16s ease .04s,transform .3s cubic-bezier(.34,1.56,.64,1) .04s; }
+.fff-checklist-indicator[data-checked=true] .fff-checklist-indicator__icon { opacity:1; transform:scale(1); }
+.fff-checklist-indicator__icon [stroke-width] { stroke-width:2; }
+@keyframes fff-checklist-indicator-pop { 0% { transform:scale(.88); } 55% { transform:scale(1.06); } 100% { transform:scale(1); } }
+@media (prefers-reduced-motion:reduce) { .fff-checklist-indicator,.fff-checklist-indicator__icon { animation:none!important; transition:none!important; } }

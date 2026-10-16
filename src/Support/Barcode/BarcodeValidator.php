@@ -16,8 +16,9 @@ class BarcodeValidator
         mixed $value,
         array $allowedFormats,
         bool $validateChecksum = false,
+        ?BarcodeFormat $detectedFormat = null,
     ): ?string {
-        if (! is_string($value)) {
+        if (! is_string($value) || ! BarcodeStateNormalizer::isValidShape($value)) {
             return Translations::get('filament-flex-fields::default.barcode_scanner.validation.invalid');
         }
 
@@ -31,13 +32,21 @@ class BarcodeValidator
             $allowedFormats = BarcodeFormat::cases();
         }
 
-        $matched = null;
-
-        foreach ($allowedFormats as $format) {
-            if (self::matchesFormat($value, $format)) {
-                $matched = $format;
-
-                break;
+        $matched = $detectedFormat;
+        if ($matched !== null && (! in_array($matched, $allowedFormats, true) || ! self::matchesFormat($value, $matched))) {
+            return Translations::get('filament-flex-fields::default.barcode_scanner.validation.unrecognized');
+        }
+        if ($matched === null) {
+            $numeric = self::detectFormat($value);
+            if ($validateChecksum && $numeric !== null && self::supportsChecksum($numeric) && in_array($numeric, $allowedFormats, true)) {
+                $matched = $numeric;
+            } else {
+                foreach ($allowedFormats as $format) {
+                    if (self::matchesFormat($value, $format)) {
+                        $matched = $format;
+                        break;
+                    }
+                }
             }
         }
 
@@ -69,7 +78,7 @@ class BarcodeValidator
             BarcodeFormat::Code128 => preg_match('/^[\x20-\x7E]+$/', $value) === 1 && strlen($value) >= 1,
             BarcodeFormat::Code39 => preg_match('/^[0-9A-Z\-. $\/+%]+$/', $value) === 1 && strlen($value) >= 1,
             BarcodeFormat::Itf => preg_match('/^\d+$/', $value) === 1 && strlen($value) >= 4 && strlen($value) % 2 === 0,
-            BarcodeFormat::Pdf417 => strlen($value) >= 4,
+            BarcodeFormat::Pdf417 => strlen($value) >= 1,
             BarcodeFormat::DataMatrix => strlen($value) >= 1,
         };
     }
@@ -120,7 +129,7 @@ class BarcodeValidator
             BarcodeFormat::Ean13 => self::validateModulo10Checksum($digits, 13),
             BarcodeFormat::Ean8 => self::validateModulo10Checksum($digits, 8),
             BarcodeFormat::UpcA => self::validateModulo10Checksum($digits, 12),
-            BarcodeFormat::UpcE => strlen($digits) >= 6 && self::validateModulo10Checksum(str_pad($digits, 8, '0', STR_PAD_LEFT), 8),
+            BarcodeFormat::UpcE => self::validateUpcEChecksum($digits),
             default => true,
         };
     }
@@ -128,6 +137,25 @@ class BarcodeValidator
     public static function formatLabel(BarcodeFormat $format): string
     {
         return Translations::get("filament-flex-fields::default.barcode_scanner.formats.{$format->value}");
+    }
+
+    private static function validateUpcEChecksum(string $digits): bool
+    {
+        if (strlen($digits) === 7) {
+            $digits = '0'.$digits;
+        }
+        if (strlen($digits) !== 8 || ! ctype_digit($digits) || ! in_array($digits[0], ['0', '1'], true)) {
+            return false;
+        }
+        $body = substr($digits, 1, 6);
+        $expanded = match ($body[5]) {
+            '0', '1', '2' => substr($body, 0, 2).$body[5].'0000'.substr($body, 2, 3),
+            '3' => substr($body, 0, 3).'00000'.substr($body, 3, 2),
+            '4' => substr($body, 0, 4).'00000'.$body[4],
+            default => substr($body, 0, 5).'0000'.$body[5],
+        };
+
+        return self::validateModulo10Checksum($digits[0].$expanded.$digits[7], 12);
     }
 
     protected static function validateModulo10Checksum(string $digits, int $expectedLength): bool
@@ -139,7 +167,7 @@ class BarcodeValidator
         $sum = 0;
 
         for ($index = 0; $index < $expectedLength - 1; $index++) {
-            $weight = ($expectedLength - 1 - $index) % 2 === 0 ? 3 : 1;
+            $weight = ($expectedLength - 1 - $index) % 2 === 1 ? 3 : 1;
             $sum += (int) $digits[$index] * $weight;
         }
 

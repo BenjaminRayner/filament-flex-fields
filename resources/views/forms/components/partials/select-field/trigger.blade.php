@@ -14,11 +14,12 @@
             <button
                 type="button"
                 class="fi-select-input-btn"
-                x-ref="headlessTrigger"
+                x-ref="headlessTrigger" data-fff-open-trigger
                 @if (! $headlessUsesInlineSearchControl)
                     id="{{ $id }}"
                 @endif
                 x-bind:disabled="disabled"
+                @disabled($isDisabled)
                 x-bind:aria-expanded="comboboxOpen ? 'true' : 'false'"
                 aria-haspopup="listbox"
                 aria-controls="{{ $headlessListboxId }}"
@@ -27,10 +28,8 @@
                 @endif
                 x-bind:class="{ 'fi-select-input-btn--search-active': inlineSearch && searchable && comboboxOpen, 'is-loading': shouldShowHeadlessTriggerLoading() }"
                 x-on:click="onHeadlessTriggerClick($event)"
-                x-on:keydown.down.prevent="disabled ? null : (comboboxOpen ? comboboxMoveHighlight(1) : comboboxOpenMenu())"
-                x-on:keydown.up.prevent="disabled ? null : (comboboxOpen ? comboboxMoveHighlight(-1) : comboboxOpenMenu())"
-                x-on:keydown.enter.prevent="disabled ? null : (comboboxOpen ? comboboxSelectHighlighted() : comboboxOpenMenu())"
-                x-on:keydown="onHeadlessTriggerMentionKeydown($event)"
+                x-on:keydown="onHeadlessControlKeydown($event, { trigger: true })"
+                x-bind:aria-activedescendant="headlessActiveDescendant()"
             >
                 @if ($showInlineFieldLabel)
                     <span class="fff-select-inline-field-label">{{ $fieldLabel }}</span>
@@ -96,7 +95,7 @@
                                         class="fi-badge-delete-btn"
                                         x-bind:disabled="disabled"
                                         x-on:click.stop="comboboxDeselectValue(chip.value)"
-                                        x-bind:aria-label="'Remove ' + chip.label"
+                                        x-bind:aria-label="'Remove ' + plainOptionLabel(chip.value)"
                                     >
                                         {!! $chipRemoveIconHtml !!}
                                     </button>
@@ -158,11 +157,8 @@
                             x-on:input="onInlineSearchClearedIfEmpty($event)"
                             x-on:focus="onInlineSearchFocus()"
                             x-on:blur="onInlineSearchBlur()"
-                            x-on:keydown.down.prevent="comboboxMoveHighlight(1)"
-                            x-on:keydown.up.prevent="comboboxMoveHighlight(-1)"
-                            x-on:keydown.enter.prevent="comboboxSelectHighlighted()"
-                            x-on:keydown.escape.stop="comboboxCloseMenu()"
-                            x-on:keydown="onHeadlessTriggerMentionKeydown($event)"
+                            x-on:keydown="onHeadlessControlKeydown($event)"
+                            x-bind:aria-activedescendant="headlessActiveDescendant()"
                             x-bind:readonly="inlineSearchInputReadonly()"
                             x-bind:placeholder="inlineSearchInputPlaceholder()"
                             x-bind:disabled="disabled"

@@ -68,25 +68,6 @@ it('exposes selected country metadata api on both fields', function () {
         ->and(method_exists(PhoneField::make('phone'), 'getResolvedCountryCodes'))->toBeTrue();
 });
 
-it('country and phone field blades use the shared registry instead of embedding countries', function () {
-    $countryBlade = file_get_contents(__DIR__.'/../../resources/views/forms/components/country-field.blade.php');
-    $phoneBlade = file_get_contents(__DIR__.'/../../resources/views/forms/components/phone-field.blade.php');
-
-    expect($countryBlade)
-        ->toContain('countryPool:')
-        ->toContain('countryFilterKey:')
-        ->toContain('selectedCountrySeed:')
-        ->not->toContain('countries: @js($countries)')
-        ->not->toContain('allowedCountryCodes:');
-
-    expect($phoneBlade)
-        ->toContain('countryPool:')
-        ->toContain('countryFilterKey:')
-        ->toContain('selectedCountrySeed:')
-        ->not->toContain('countries: @js($countries)')
-        ->not->toContain('allowedCountryCodes:');
-});
-
 it('renders shared country registry data from the requested pools', function () {
     CountryRegistryQueue::reset();
     CountryRegistryQueue::enqueue(CountryRegistry::POOL_ISO);
@@ -123,43 +104,6 @@ it('re-renders country registry when additional pools are queued after the first
     expect($second)
         ->toContain('"iso"')
         ->toContain('"phone"');
-});
-
-it('renders registry template inline when the first country field loads assets', function () {
-    CountryRegistryQueue::reset();
-
-    $html = view('filament-flex-fields::partials.load-stylesheet', [
-        'component' => 'country-field',
-    ])->render();
-
-    expect($html)->not->toContain('fff-country-registry-data');
-
-    $fieldHtml = CountryRegistryQueue::renderScriptOnce();
-
-    expect($fieldHtml)
-        ->toContain('<template id="fff-country-registry-data"')
-        ->toContain('"iso"')
-        ->not->toContain('"phone"');
-});
-
-it('enqueues only the iso pool when a country field loads assets', function () {
-    CountryRegistryQueue::reset();
-
-    view('filament-flex-fields::partials.load-stylesheet', [
-        'component' => 'country-field',
-    ])->render();
-
-    expect(CountryRegistryQueue::pools())->toBe([CountryRegistry::POOL_ISO]);
-});
-
-it('enqueues only the phone pool when a phone field loads assets', function () {
-    CountryRegistryQueue::reset();
-
-    view('filament-flex-fields::partials.load-stylesheet', [
-        'component' => 'phone-field',
-    ])->render();
-
-    expect(CountryRegistryQueue::pools())->toBe([CountryRegistry::POOL_PHONE]);
 });
 
 it('deduplicates shared country filters in the registry payload', function () {

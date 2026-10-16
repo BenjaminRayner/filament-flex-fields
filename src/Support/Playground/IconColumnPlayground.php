@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\IconColumn;
+use Bjanczak\FilamentFlexFields\Support\Playground\Contracts\PlaygroundWithComponents;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
 
-class IconColumnPlayground
+class IconColumnPlayground implements PlaygroundWithComponents
 {
     /**
      * @return array<string, mixed>
@@ -58,15 +59,15 @@ class IconColumnPlayground
         return [
             [
                 'title' => 'Dashboard',
-                'icon' => $iconColumn->formatIconDisplay('heroicon-o-home'),
-                'labeled' => $labeledColumn->formatIconDisplay('heroicon-o-check-circle'),
-                'detailed' => $detailedColumn->formatIconDisplay('heroicon-o-bolt'),
+                'icon' => $iconColumn->formatIconDisplay('hugeicons-home-01'),
+                'labeled' => $labeledColumn->formatIconDisplay('hugeicons-checkmark-circle-02'),
+                'detailed' => $detailedColumn->formatIconDisplay('hugeicons-flash'),
             ],
             [
                 'title' => 'Settings',
-                'icon' => $iconColumn->formatIconDisplay('heroicon-o-cog-6-tooth'),
-                'labeled' => $labeledColumn->formatIconDisplay('heroicon-o-exclamation-triangle'),
-                'detailed' => $detailedColumn->formatIconDisplay('gravityui-star'),
+                'icon' => $iconColumn->formatIconDisplay('hugeicons-settings-01'),
+                'labeled' => $labeledColumn->formatIconDisplay('hugeicons-alert-02'),
+                'detailed' => $detailedColumn->formatIconDisplay('hugeicons-star'),
             ],
             [
                 'title' => 'Draft entry',

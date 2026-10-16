@@ -2,57 +2,40 @@
 
 declare(strict_types=1);
 
-use Bjanczak\FilamentFlexFields\Support\Playground\AdminColumnsPlayground;
-use Bjanczak\FilamentFlexFields\Support\Playground\CompositionRecipesPlayground;
 use Bjanczak\FilamentFlexFields\Support\Playground\FieldIntelligencePlayground;
 use Bjanczak\FilamentFlexFields\Support\Playground\HoldConfirmPlayground;
 use Bjanczak\FilamentFlexFields\Support\Playground\MapPickerPlayground;
-use Bjanczak\FilamentFlexFields\Support\Playground\SchemaConditionsPlayground;
+use Bjanczak\FilamentFlexFields\Support\Playground\StatusChipColumnPlayground;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
 
-it('smokes interactive v3 playground hubs with default state and components', function (string $class): void {
+it('smokes active playground guide pages with default state and components', function (string $class): void {
     $playground = new $class;
 
     expect($playground->defaultState())->toBeArray()
         ->and($playground->components())->not->toBeEmpty();
 })->with([
-    AdminColumnsPlayground::class,
-    SchemaConditionsPlayground::class,
+    StatusChipColumnPlayground::class,
     FieldIntelligencePlayground::class,
-    CompositionRecipesPlayground::class,
     HoldConfirmPlayground::class,
     MapPickerPlayground::class,
 ]);
 
-it('ships multiple live formula scenarios on the calculated formulas playground', function (): void {
+it('composes the new intelligence workspace from independent modules', function (): void {
     $playground = new FieldIntelligencePlayground;
     $state = $playground->defaultState();
     $components = $playground->components();
 
     expect($state)->toHaveKeys([
-        'formula__day_rate',
-        'formula__charter_fee',
-        'formula__deal_grand',
-        'formula__grand_total',
-        'formula__progress_pct',
-        'formula__margin_pct',
-        'formula__lab_expr',
-        'formula__cycle_mode',
-        'formula__reject_expr',
-    ])
-        ->and($components)->toHaveCount(8)
-        ->and(collect($components)->map(fn ($section) => $section->getHeading())->all())
-        ->toContain(
-            'Calculated formulas',
-            'Enterprise deal desk',
-            'Invoice with VAT',
-            'Completion progress',
-            'Margin',
-            'Formula lab',
-            'Cycle guard',
-            'Security wall',
-        );
+        'intelligence__invoice__price', 'intelligence__invoice__quantity',
+        'intelligence__pricing__quantity', 'intelligence__progress__target',
+        'intelligence__margin__revenue', 'intelligence__inventory__pack',
+        'intelligence__expression', 'intelligence__graph', 'intelligence__validation',
+    ])->and($components)->toHaveCount(10)
+        ->and(collect(array_slice($components, 1))->map(fn ($section) => $section->getHeading())->all())
+        ->toContain('Formula workspace', 'Invoice & tax', 'Tiered pricing', 'Progress & safe division',
+            'Profit & margin', 'Stock & replenishment', 'Calculated fields in a real form',
+            'Dependencies & incremental updates', 'Validation & tamper protection');
 });
 
 it('embeds real hold-confirm actions in the hold confirm playground', function (): void {

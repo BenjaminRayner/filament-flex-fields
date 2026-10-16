@@ -1,0 +1,6 @@
+.fff-icon-select__sets { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding: 0 8px 8px; flex-shrink: 0; }
+.fff-icon-select__sets::-webkit-scrollbar { display: none; }
+.fff-icon-select__sets button { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; padding: 5px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--fff-select-group-label, #71717a); font-size: 11px; line-height: 16px; cursor: pointer; }
+.fff-icon-select__sets button[aria-pressed=true] { background: var(--fff-select-option-hover-bg, #0000000d); color: var(--primary-600); }
+.fff-icon-select__sets button:focus-visible { outline: 2px solid var(--primary-500); outline-offset: -2px; }
+.fff-icon-select__count { opacity: .65; font-variant-numeric: tabular-nums; }

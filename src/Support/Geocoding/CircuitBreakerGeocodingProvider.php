@@ -4,104 +4,56 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Geocoding;
 
+use Bjanczak\FilamentFlexFields\Support\Runtime\CircuitBreaker;
+use Bjanczak\FilamentFlexFields\Support\Runtime\CircuitOpenException;
 use Bjanczak\FilamentFlexFields\Support\Translations;
-use Illuminate\Support\Facades\Cache;
+use Throwable;
 
+/** Geocoding result semantics over the shared upstream resilience policy. */
 final class CircuitBreakerGeocodingProvider implements GeocodingProviderContract
 {
+    private readonly CircuitBreaker $circuit;
+
     public function __construct(
         private readonly GeocodingProviderContract $provider,
-        private readonly int $failureThreshold = 5,
-        private readonly int $openSeconds = 60,
-    ) {}
+        int $failureThreshold = 5,
+        int $openSeconds = 60,
+        ?string $cacheScope = null,
+        int $probeSeconds = 60,
+    ) {
+        $this->circuit = new CircuitBreaker(
+            'geocoding:'.$provider::class.':'.($cacheScope ?? 'default'),
+            $failureThreshold, $openSeconds, $probeSeconds,
+        );
+    }
 
-    /**
-     * @param  array<string, mixed>  $options
+    /** @param array<string, mixed> $options
      * @return array{features: list<array<string, mixed>>, error: string|null}
      */
     public function search(array $options): array
     {
-        if ($this->isOpen()) {
-            return [
-                'features' => [],
-                'error' => Translations::get('filament-flex-fields::default.geocoding.circuit_open'),
-            ];
-        }
-
         try {
-            $result = $this->provider->search($options);
-            $this->recordSuccess();
-
-            return $result;
-        } catch (\Throwable $throwable) {
-            $this->recordFailure();
-
-            return [
-                'features' => [],
-                'error' => $throwable->getMessage(),
-            ];
+            return $this->circuit->run(fn (): array => $this->provider->search($options),
+                static fn (array $result): bool => $result['error'] !== null);
+        } catch (CircuitOpenException) {
+            return ['features' => [], 'error' => Translations::get('filament-flex-fields::default.geocoding.circuit_open')];
+        } catch (Throwable) {
+            return ['features' => [], 'error' => Translations::get('filament-flex-fields::default.geocoding.failed')];
         }
     }
 
-    /**
-     * @param  array<string, mixed>  $options
+    /** @param array<string, mixed> $options
      * @return array{feature: array<string, mixed>|null, error: string|null}
      */
     public function reverse(array $options): array
     {
-        if ($this->isOpen()) {
-            return [
-                'feature' => null,
-                'error' => Translations::get('filament-flex-fields::default.geocoding.circuit_open'),
-            ];
-        }
-
         try {
-            $result = $this->provider->reverse($options);
-            $this->recordSuccess();
-
-            return $result;
-        } catch (\Throwable $throwable) {
-            $this->recordFailure();
-
-            return [
-                'feature' => null,
-                'error' => $throwable->getMessage(),
-            ];
+            return $this->circuit->run(fn (): array => $this->provider->reverse($options),
+                static fn (array $result): bool => $result['error'] !== null);
+        } catch (CircuitOpenException) {
+            return ['feature' => null, 'error' => Translations::get('filament-flex-fields::default.geocoding.circuit_open')];
+        } catch (Throwable) {
+            return ['feature' => null, 'error' => Translations::get('filament-flex-fields::default.geocoding.failed')];
         }
-    }
-
-    private function isOpen(): bool
-    {
-        return (bool) Cache::get($this->openKey(), false);
-    }
-
-    private function recordFailure(): void
-    {
-        $key = $this->failureKey();
-        $failures = (int) Cache::get($key, 0) + 1;
-
-        Cache::put($key, $failures, now()->addMinutes(5));
-
-        if ($failures >= $this->failureThreshold) {
-            Cache::put($this->openKey(), true, now()->addSeconds($this->openSeconds));
-            Cache::forget($key);
-        }
-    }
-
-    private function recordSuccess(): void
-    {
-        Cache::forget($this->failureKey());
-        Cache::forget($this->openKey());
-    }
-
-    private function failureKey(): string
-    {
-        return 'fff-geocode:circuit:failures';
-    }
-
-    private function openKey(): string
-    {
-        return 'fff-geocode:circuit:open';
     }
 }

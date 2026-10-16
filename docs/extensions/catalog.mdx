@@ -1,0 +1,136 @@
+---
+title: "Catalog metadata and demos"
+description: "Configure every ComponentPresentation option, translated labels, demo pages and PHP code examples."
+---
+
+Add catalog metadata when you want users to discover your registered extension in
+FLEX. A catalog entry describes the component; it does not install a package or
+replace the registration of its field, column and infolist surfaces.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Catalog\CatalogCategory;
+use Bjanczak\FilamentFlexFields\Support\Catalog\ComponentPresentation;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+
+$definition = new ComponentDefinition(
+    id: 'acme-summary-field',
+    kind: ComponentKind::Field,
+    catalog: new ComponentPresentation(
+        label: ['en' => 'Summary', 'pl' => 'Podsumowanie'],
+        description: [
+            'en' => 'A reusable summary field with table and infolist views.',
+            'pl' => 'Pole podsumowania z widokami tabeli i infolist.',
+        ],
+        category: CatalogCategory::TextInput,
+        keywords: ['summary', 'text'],
+        icon: 'hugeicons-document-attachment',
+        author: 'Acme',
+        website: 'https://example.com/summary',
+    ),
+);
+```
+
+Register this definition with the package outputs through your provider, as in the
+[registration guide](/docs/extensions/registration). Choose an installed Hugeicons
+name available in your application when replacing the example icon.
+
+## Every ComponentPresentation option
+
+| Parameter | Default | Purpose and accepted value |
+| --- | --- | --- |
+| `label` | Required | String or locale-to-string map; nonblank, at most 120 characters per translation. |
+| `description` | Required | String or translated map, at most 600 characters per translation. |
+| `category` | Required | One official `CatalogCategory` case. |
+| `keywords` | `[]` | Up to 24 nonblank search keywords, each at most 48 characters. |
+| `icon` | `'hugeicons-grid-view'` | Hugeicons name prefixed `hugeicons-`, or null when supplying an image. |
+| `image` | `null` | Root-relative image URL or HTTPS URL. At least icon or image is required. |
+| `heroImage` | `null` | Optional larger presentation image, following the same URL rules. |
+| `author` | `'Community'` | Nonblank author text, up to 80 characters. |
+| `official` | `false` | Classification metadata. A third-party package should retain false. |
+| `demoClass` | `null` | PHP class name for your demo; declare together with `demoSlug`. |
+| `demoSlug` | `null` | Bounded lowercase demo identity; required together with `demoClass`. |
+| `documentation` | `null` | Local documentation basename ending `.md`, such as `summary.md`; not an arbitrary external URL. |
+| `sort` | `100` | Ordering metadata for your catalog presentation. |
+| `popularRank` | `null` | Optional nonnegative ranking metadata. |
+| `newAndNoteworthy` | `false` | Highlight metadata for your entry. |
+| `website` | `null` | HTTPS product/documentation URL. |
+| `privacyPolicy` | `null` | HTTPS privacy-policy URL. |
+| `termsOfService` | `null` | HTTPS terms URL. |
+| `examples` | `[]` | Up to 12 unique typed `CodeExample` references. |
+| `listed` | `true` | Whether the definition appears in the catalog. Registration still exists when false. |
+| `groupedWith` | `null` | For a column, the component ID whose demo hosts its **Table column** tab. The column keeps its own registration and assets, without a separate catalog card or playground route. |
+
+Localized maps allow up to 32 locale keys. Use language keys such as `en`, `pl` or
+`en_US`; these lightweight catalog keys have a narrower syntax than the complete
+formatting locale API. Keep metadata plain text and avoid secrets or submitted values.
+
+## Group a field and its table column
+
+Set `groupedWith: 'your-field-id'` on the column's `ComponentPresentation`.
+Declare its own `demoClass`, `demoSlug` and examples as usual. The demo class must
+implement `Bjanczak\FilamentFlexFields\Support\Playground\Contracts\PlaygroundWithComponents`
+and return its schema components from `components(): array`.
+
+The target must be a registered, ungrouped component with a demo. Grouping is one
+level; missing targets, self-references and nested groups are rejected. The main
+card matches both its own type and **Table columns**, while each renderer retains
+its own `ComponentKind`. The main page combines both sets of code examples.
+Use `?variant=table-column` to open the column tab directly. Grouping does not add
+asset dependencies: inactive tab consumers remain inactive until selected.
+
+## Categories
+
+Available cases are `Guides`, `Navigation`, `Buttons`, `Pickers`, `DateAndTime`,
+`Colors`, `Controls`, `Collections`, `TextInput`, `DataDisplay`, `Media` and `Location`.
+Choose the best existing category rather than inventing a new one in saved metadata.
+
+## Code examples
+
+Keep PHP examples in your extension package and reference their absolute installed paths:
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Catalog\Examples\CodeExample;
+
+$examples = [
+    CodeExample::php(
+        __DIR__.'/../examples/BasicSummary.php',
+        label: 'Basic summary',
+    ),
+    CodeExample::php(
+        __DIR__.'/../examples/RequiredSummary.php',
+        label: 'Required field',
+    ),
+];
+```
+
+Pass `$examples` to `ComponentPresentation(examples: $examples, ...)`. The label is
+optional and at most 80 characters. The path must be an absolute `.php` file reference;
+source examples are displayed rather than executed as application code by construction.
+
+## Demo routing
+
+Pair `demoClass` and `demoSlug` in the presentation. Your extension owns the demo class
+and its actual route/page integration; metadata alone does not implement the demo.
+Generate links through Filament page APIs. Keep demo CSS and JS scoped to the catalog
+page so installing an extension does not add demonstration assets to unrelated forms.
+
+## Recommendations and registration
+
+The catalog's component-type filter reads each registered definition's `kind`.
+A family with field, column and entry surfaces registers each surface separately;
+each card is classified by its own kind. `uses` and shared assets are dependencies,
+not additional renderer kinds. Displays such as CoverCard belong to Content & layouts.
+
+Recommendations may declare several public types with
+`RecommendedPlugin(kinds: [ComponentKind::Field, ComponentKind::Column], ...)`.
+Use unique enum cases; internal `Primitive` kinds are rejected. Without that list,
+the recommendation remains visible under All types. A recommendation's claims do
+not replace actual surface registration or package installation.
+
+`FlexCatalog::registerPlugin()` is the separate API for catalog recommendations.
+Register recommendations during provider boot; the catalog freezes after providers
+have booted. A recommendation does not replace component definitions, Composer
+installation or an installed family. Use the [FLEX catalog guide](/docs/flex-catalog)
+for discovery behavior and the [package dependency guide](/docs/extensions/package-dependencies)
+for actual installation requirements.

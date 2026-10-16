@@ -26,7 +26,13 @@ export function fffHeadlessSelectField(config = {}) {
 
 export default fffHeadlessSelectField;
 
-gate.registerAlpineData('fffHeadlessSelectField', (config) => fffHeadlessSelectField(config));
+// Import-time registration and lazy preparation must identify the same source.
+export const fffFactoryIdentity = Object.freeze({
+    package: 'janczakb/filament-flex-fields', component: 'select-field', export: 'default', abi: 1,
+});
+gate.registerAlpineData('fffHeadlessSelectField', fffHeadlessSelectField, {
+    ...fffFactoryIdentity, module: import.meta.url,
+});
 
 if (typeof window !== 'undefined') {
     window.__fffSelectFieldModuleLoaded = true;

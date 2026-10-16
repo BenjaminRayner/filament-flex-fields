@@ -1,0 +1,81 @@
+---
+title: "Migrate configuration and values"
+description: "Apply explicit forward or rollback migrations without silently reinterpreting saved data."
+---
+
+Ordinary rendering, schema exchange and client submission reject a value-version
+mismatch. They never silently convert a submitted old-format value. To convert
+values loaded from your database, your installed adapter may additionally implement
+`FamilyValueMigration`:
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyValueMigration;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyRenderContext;
+
+// Add these methods to your FamilySchemaAdapter implementation,
+// and declare that it also implements FamilyValueMigration.
+public function supportsValueMigration(
+    int $fromVersion,
+    int $toVersion,
+): bool {
+    return in_array([$fromVersion, $toVersion], [[1, 2], [2, 1]], true);
+}
+
+public function migrateStoredValue(
+    mixed $value,
+    FamilySchemaDefinition $from,
+    FamilySchemaDefinition $to,
+    FamilyRenderContext $context,
+): mixed {
+    if ($value === null) {
+        return null;
+    }
+
+    return $to->valueVersion === 2
+        ? ['text' => $value]
+        : $value['text'];
+}
+```
+
+In this example, value version 1 is text and version 2 is a map containing `text`.
+Declare matching rules in `rules()` for the installed value version. Configuration
+conversion continues to use your adapter's `migrateConfiguration()`. Implement
+each supported direction explicitly and throw for unsupported version pairs.
+Migration callbacks must be pure transformations: do not save records, send
+messages or perform external actions inside them.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaMigration;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyValueSnapshotCodec;
+
+// Load this snapshot from authorized application storage, never request data.
+$before = FamilyValueSnapshotCodec::decode($record->family_snapshot);
+
+$result = app(FamilySchemaMigration::class)->prepare(
+    snapshot: $before,
+    context: $context,
+    authorizeMigration: fn ($field, $context): bool =>
+        $fieldPolicy->canMigrate($actor, $record, $field->family),
+);
+
+$afterJson = FamilyValueSnapshotCodec::encode($result->after);
+$rollbackJson = FamilyValueSnapshotCodec::encode($result->before);
+
+// Persist the new snapshot and your rollback copy atomically,
+// using your application's transaction and revision/locking policy.
+```
+
+The installed family's declared versions determine the target. Source and target
+authorization, typed configuration, migration support and target value rules are
+checked. A missing family, unknown version pair, thrown callback, excessive data,
+invalid configuration/value or rule that discards the migrated field rejects the
+operation. No database write is performed. `before` remains unchanged;
+`after` is a detached snapshot. `changed()` tells you whether their canonical
+serialized data differs. Repeating an already-current migration validates it
+without calling configuration/value converters again.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

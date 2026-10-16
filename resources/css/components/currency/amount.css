@@ -1,0 +1,31 @@
+.fff-currency-field__control { position: relative; display: flex; align-items: center; flex: 1 1 auto; min-inline-size: 0; block-size: 100%; }
+.fff-currency-field__hidden-input { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; opacity: 0; cursor: text; z-index: 2; }
+.fff-currency-field__display {
+    display: flex; align-items: center; inline-size: 100%; block-size: var(--fff-flex-text-input-group-h);
+    min-block-size: var(--fff-flex-text-input-group-h); padding-inline-end: calc(var(--fff-flex-text-input-p) * .85);
+    font-size: calc(var(--fff-flex-text-input-text-size) * var(--fff-currency-field-display-scale));
+    font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1;
+    color: var(--fff-flex-text-input-text); white-space: nowrap; pointer-events: none; user-select: none;
+}
+.fff-currency-field:has(.fff-currency-field__currency) .fff-currency-field__display { padding-inline-start: calc(var(--fff-flex-text-input-p) * .35); }
+.fff-currency-field__digits { position: relative; display: inline-flex; align-items: center; max-inline-size: 100%; block-size: 100%; }
+.fff-currency-field__ssr-display, .fff-currency-field__live-display { align-items: center; flex-wrap: nowrap; min-inline-size: 0; line-height: 1; font-variant-numeric: tabular-nums; }
+.fff-currency-field__ssr-display { display: inline-flex; }
+.fff-currency-field__live-display, .fff-currency-field__ssr-display.is-replaced { display: none; }
+.fff-currency-field__live-display.is-ready { display: inline-flex; }
+.fff-currency-field__display-item { display: contents; }
+.fff-currency-field__digit, .fff-currency-field__separator, .fff-currency-field__sign { display: inline-flex; align-items: center; justify-content: center; overflow: hidden; line-height: 1; }
+.fff-currency-field__digit { inline-size: 1ch; min-inline-size: 1ch; }
+.fff-currency-field__digit-inner { display: block; inline-size: 100%; text-align: center; line-height: 1; }
+.fff-currency-field__digit.is-animating .fff-currency-field__digit-inner { animation: fff-currency-digit-roll 180ms ease; }
+.fff-currency-field__digit.is-ghost { opacity: .35; }
+.fff-currency-field__symbol { flex: none; margin-inline-start: .375rem; font-size: calc(var(--fff-flex-text-input-text-size) * 1.0625); font-weight: 600; line-height: 1; }
+.fff-currency-field__caret { position: relative; flex: none; inline-size: 0; block-size: 1em; }
+.fff-currency-field__caret::after {
+    content: ''; position: absolute; inset-block-start: 50%; inset-inline-start: -1px;
+    inline-size: 2px; block-size: 1em; border-radius: 1px; background: var(--primary-500, currentColor);
+    transform: translateY(-50%); animation: fff-currency-caret-blink 1s step-end infinite;
+}
+@keyframes fff-currency-caret-blink { 50% { opacity: 0; } }
+@keyframes fff-currency-digit-roll { from { opacity: 0; transform: translateY(.45em); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .fff-currency-field__digit.is-animating .fff-currency-field__digit-inner { animation: none; } }

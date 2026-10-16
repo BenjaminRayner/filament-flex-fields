@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Console;
 
 use Bjanczak\FilamentFlexFields\Support\Media\CaptureRetentionAuditor;
-use Bjanczak\FilamentFlexFields\Support\Media\MediaCaptureTenantDiskResolver;
 use Bjanczak\FilamentFlexFields\Support\Media\MediaCaptureOs;
+use Bjanczak\FilamentFlexFields\Support\Media\MediaCaptureTenantDiskResolver;
 use Bjanczak\FilamentFlexFields\Support\Media\SpatieMediaCaptureAdapter;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'flex-fields:prune-capture-media')]
 class PruneCaptureMediaCommand extends Command
 {
     protected $signature = 'flex-fields:prune-capture-media

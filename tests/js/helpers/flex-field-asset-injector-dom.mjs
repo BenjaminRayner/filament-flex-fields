@@ -17,6 +17,11 @@ export function createClassList() {
             }
         },
         contains: (name) => classes.has(name),
+        toggle(name, force = !classes.has(name)) {
+            if (force) classes.add(name)
+            else classes.delete(name)
+            return force
+        },
     }
 }
 
@@ -28,6 +33,8 @@ export function createLink({ href, rel = 'stylesheet', attributes = {} }) {
         rel,
         href,
         parentElement: null,
+        get parentNode() { return this.parentElement },
+        get isConnected() { return this.parentElement?.isConnected === true },
         dataset: {},
         classList,
         setAttribute(name, value) {
@@ -41,6 +48,9 @@ export function createLink({ href, rel = 'stylesheet', attributes = {} }) {
         },
         addEventListener(type, listener, options = {}) {
             listeners.set(type, { listener, options })
+        },
+        removeEventListener(type, listener) {
+            if (listeners.get(type)?.listener === listener) listeners.delete(type)
         },
         remove() {
             if (link.parentElement?.children) {
@@ -68,6 +78,7 @@ export function createLink({ href, rel = 'stylesheet', attributes = {} }) {
                 return
             }
 
+            if (entry.options.once) listeners.delete(type)
             entry.listener()
         },
     }
@@ -81,7 +92,9 @@ export function createElement(tagName) {
     }
 
     const element = {
-        tagName,
+        tagName: tagName.toUpperCase(),
+        nodeType: 1,
+        get parentNode() { return this.parentElement },
         children: [],
         attributes: {},
         classList: createClassList(),
@@ -90,7 +103,7 @@ export function createElement(tagName) {
         style: {},
         id: '',
         get isConnected() {
-            return this.parentElement !== null
+            return this.parentElement?.isConnected === true
         },
         appendChild(child) {
             child.parentElement = element
@@ -146,11 +159,12 @@ export function createElement(tagName) {
                 }
             }
 
-            walk(this)
+            for (const child of this.children) walk(child)
 
             return matches
         },
         matches(selector) {
+            if (selector === '[data-fff-asset-batch][data-fff-asset-consumer]') return this.hasAttribute('data-fff-asset-batch') && this.hasAttribute('data-fff-asset-consumer')
             if (selector === '[data-fff-asset-batch]') {
                 return this.hasAttribute?.('data-fff-asset-batch') ?? false
             }
@@ -222,8 +236,11 @@ export function createElement(tagName) {
 
             this.parentElement = null
         },
+        addEventListener() {},
+        removeEventListener() {},
         dispatchEvent() {},
         contains(node) {
+            if (node === this) return true
             const walk = (parent) => {
                 for (const child of parent.children ?? []) {
                     if (child === node) {
@@ -251,6 +268,7 @@ export function createAssetBatch(stylesheets, chunks = [], { consumerComponent =
         'data-fff-asset-batch': '',
         'data-fff-stylesheets': JSON.stringify(stylesheets),
         'data-fff-chunks': JSON.stringify(chunks),
+        'data-fff-asset-sizes': JSON.stringify(Object.fromEntries([...stylesheets, ...chunks].map(url => [url, 1024]))),
     }
 
     const resolvedComponent = consumerComponent ?? (() => {
@@ -299,12 +317,16 @@ export function chunkHrefs(head) {
 }
 
 export async function flushAssetLoads(head) {
-    for (const child of [...head.children]) {
-        if (
-            (child.rel === 'stylesheet' || child.rel === 'modulepreload')
-            && typeof child.dispatchEvent === 'function'
-        ) {
-            child.dispatchEvent('load')
+    // Resolve transport after async activation schedules its links and frames.
+    for (let turn = 0; turn < 4; turn += 1) {
+        await new Promise(resolve => globalThis.setTimeout(resolve, 0))
+        for (const child of [...head.children]) {
+            if (
+                (child.rel === 'stylesheet' || child.rel === 'modulepreload')
+                && typeof child.dispatchEvent === 'function'
+            ) {
+                child.dispatchEvent('load')
+            }
         }
     }
 }
@@ -351,6 +373,7 @@ export function createDom() {
 
     const head = {
         children: [],
+        isConnected: true,
         appendChild(child) {
             child.parentElement = head
             head.children.push(child)
@@ -361,6 +384,7 @@ export function createDom() {
     }
     const body = {
         children: [],
+        isConnected: true,
         appendChild(child) {
             child.parentElement = body
             body.children.push(child)
@@ -374,6 +398,10 @@ export function createDom() {
     const byId = new Map()
 
     const document = {
+        contains(node) {
+            const walk = root => root === node || (root.children ?? []).some(walk)
+            return walk(head) || walk(body)
+        },
         baseURI: 'https://panel.test/admin',
         readyState: 'complete',
         head,
@@ -410,6 +438,7 @@ export function createDom() {
 
             return element
         },
+        querySelector(selector) { return this.querySelectorAll(selector)[0] ?? null },
         querySelectorAll(selector) {
             const matches = []
             const seen = new Set()
@@ -477,24 +506,26 @@ export function createDom() {
                 }
             }
 
-            for (const node of nodes) {
-                walk(node)
-            }
-
             walk(head)
             walk(body)
 
             return matches
         },
         getElementById(id) {
-            return byId.get(id) ?? null
+            const node = byId.get(id)
+            return node?.isConnected ? node : null
         },
         addEventListener() {},
+        removeEventListener() {},
     }
 
     const window = {
         Livewire: null,
+        dispatchEvent() {},
+        requestAnimationFrame(fn) { return globalThis.setTimeout(() => fn(performance.now()), 0) },
+        cancelAnimationFrame(id) { globalThis.clearTimeout(id) },
         addEventListener() {},
+        removeEventListener() {},
         setTimeout(fn, ms) {
             return globalThis.setTimeout(fn, ms)
         },
@@ -540,6 +571,7 @@ export async function openModal(injector, head, modal, id) {
 export async function closeModal(injector, modal, id) {
     modal.classList.remove('fi-modal-open')
     await injector.cleanupClosedModalPendingState({ detail: { id } })
+    await new Promise(resolve => globalThis.setTimeout(resolve, 0))
 }
 
 export function headHas(head, snippet) {

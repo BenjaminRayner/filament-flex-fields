@@ -6,7 +6,6 @@ use Bjanczak\FilamentFlexFields\Data\FlexFieldSchema;
 use Bjanczak\FilamentFlexFields\Filament\Resources\FlexFieldGroupResource;
 use Bjanczak\FilamentFlexFields\Filament\Resources\FlexFieldGroupResource\Pages\CreateFlexFieldGroup;
 use Bjanczak\FilamentFlexFields\Filament\Resources\FlexFieldGroupResource\Pages\EditFlexFieldGroup;
-use Bjanczak\FilamentFlexFields\Filament\Resources\FlexFieldGroupResource\Pages\ListFlexFieldGroups;
 use Bjanczak\FilamentFlexFields\Models\FlexFieldGroup;
 use Bjanczak\FilamentFlexFields\Models\FlexFieldSchemaVersion;
 use Bjanczak\FilamentFlexFields\Support\Enterprise\SchemaRegistry;
@@ -139,6 +138,7 @@ describe('registry sync edge cases', function (): void {
 
     it('does not sync when sync_on_save is disabled', function (): void {
         config()->set('filament-flex-fields.schema.sync_on_save', false);
+        config()->set('filament-flex-fields.schema.sync_from_database', false);
 
         FlexFieldGroup::factory()->create(['slug' => 'no-sync']);
 

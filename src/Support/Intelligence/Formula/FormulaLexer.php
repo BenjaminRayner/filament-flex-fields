@@ -19,6 +19,10 @@ final class FormulaLexer
 {
     public static function assertAllowedExpression(string $expression): void
     {
+        if (strlen($expression) > 8192) {
+            throw new InvalidArgumentException('Formula exceeds the 8192-byte limit.');
+        }
+
         $expression = trim($expression);
 
         if ($expression === '') {
@@ -65,6 +69,13 @@ final class FormulaLexer
         for ($i = 0; $i < $length; $i++) {
             $char = $expression[$i];
             $next = $expression[$i + 1] ?? '';
+
+            if ($char === '{' && preg_match('/\G\{([a-zA-Z_][a-zA-Z0-9_]*)\}/', $expression, $match, 0, $i) === 1) {
+                $tokens[] = $match[0];
+                $i += strlen($match[0]) - 1;
+
+                continue;
+            }
 
             if (ctype_digit($char) || ($char === '.' && $next !== '' && ctype_digit($next))) {
                 $start = $i;

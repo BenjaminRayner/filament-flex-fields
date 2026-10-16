@@ -1,0 +1,387 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'field_variant' => 'Campo',
+    'display_variant' => 'Visualizzazione',
+    'column_variant' => 'Colonna della tabella',
+    'recording' => [
+        'title' => 'Visualizzazione della registrazione',
+        'choose_hint' => 'Fare clic su un esempio per visualizzarne l\'anteprima. Fai clic tenendo premuto il tasto Maiusc per selezionarne fino a tre.',
+        'preview' => 'Anteprima della selezione',
+        'cancel' => 'Annulla',
+        'close' => 'Chiudi la visualizzazione della registrazione',
+        'zoom' => 'Zoom',
+        'vertical' => 'Posizione verticale',
+        'helpers' => 'Mostra il testo di aiuto',
+        'width' => 'Larghezza componente',
+        'shortcuts' => '16:9 · Alt+H nasconde i controlli · Escape / Alt+R esce',
+    ],
+    'developer_tools' => 'Strumenti per sviluppatori',
+    'developer_tools_description' => 'Testa il modo in cui le risorse condivise vengono caricate e ritirate in moduli, tabelle e modali nidificati reali di Filament.',
+    'included' => 'Incluso',
+    'dark_mode' => 'Modalità oscura',
+    'light_mode' => 'Modalità chiara',
+    'sponsors' => 'Sponsor',
+    'top_sponsors' => 'I migliori sponsor',
+    'become_sponsor' => 'Diventa sponsor su GitHub',
+    'sponsors_scroll' => 'Scorri gli sponsor utilizzando le frecce o swipe',
+    'previous_sponsors' => 'Sponsor precedenti',
+    'next_sponsors' => 'Altri sponsor',
+    'sponsor_ranks' => [
+        'bronze' => 'Bronzo',
+        'silver' => 'Argento',
+        'gold' => 'Oro',
+    ],
+    'form_state' => 'Stato del modulo',
+    'form_state_hint' => 'Un\'istantanea dei valori demo attuali.',
+    'close' => 'Chiudi',
+    'demo_reset' => 'Reset demo',
+    'loading_examples' => 'Caricamento esempi di codice...',
+    'no_examples' => 'Nessun esempio di codice è stato ancora pubblicato per questo componente.',
+    'example_files' => 'File di esempio',
+    'copy_code' => 'Copia',
+    'code_copied' => 'Copiato',
+    'copy_failed' => 'Copia fallita',
+    'example_unavailable' => 'Questo file di esempio non è al momento disponibile.',
+    'example_hint' => 'Pronto per adattarlo al tuo modulo.',
+    'live_demo' => 'Anteprima dal vivo',
+    'demo_actions' => 'Azioni dimostrative',
+    'pause_banners' => 'Metti in pausa le diapositive automatiche',
+    'resume_banners' => 'Riprendi diapositive automatiche',
+    'footer_tagline' => 'Costruito con cura. Pronto per comporre.',
+    'footer_project' => 'Progetto su GitHub',
+    'loading_banner' => 'Caricamento contenuto in primo piano...',
+    'loading_promotions' => 'Aggiornamento banner in primo piano…',
+    'banner_slide' => 'Mostra banner :number',
+    'banner_slides' => 'Scegli il banner',
+    'information' => 'Informazioni',
+    'developer' => 'Sviluppatore',
+    'category' => 'Categoria',
+    'version' => 'Versione',
+    'website' => 'Sito web',
+    'privacy_policy' => 'Informativa sulla privacy',
+    'terms_of_service' => 'Termini di servizio',
+    'install_short' => 'Installa',
+    'breadcrumb' => 'Percorso di navigazione',
+    'validate' => 'Convalida',
+    'dump_json' => 'Mostra JSON',
+    'reset_defaults' => 'Ripristina impostazioni predefinite',
+    'count' => ':count componenti ed estensioni',
+    'search' => 'Cerca componenti…',
+    'collection' => 'Sfoglia la collezione',
+    'all' => 'Tutti',
+    'installed' => 'Installati',
+    'community' => 'Comunità',
+    'component_type' => 'Tipologia componente',
+    'component_types' => [
+        'all' => 'Tutti i tipi',
+        'field' => 'Campi del modulo',
+        'column' => 'Colonne della tabella',
+        'display' => 'Contenuti e layout',
+        'entry' => 'Voci dell\'infolist',
+        'action' => 'Azioni',
+    ],
+    'results' => 'Risultati',
+    'categories' => 'Categorie',
+    'all_categories' => 'Tutte le categorie',
+    'popular' => 'Popolare',
+    'noteworthy' => 'Nuovo e degno di nota',
+    'all_components' => 'Esplora FLEX',
+    'empty' => 'Nessun componente corrisponde alla tua ricerca.',
+    'clear_filters' => 'Cancella filtri',
+    'install_named' => 'Installa :name',
+    'explore_named' => 'Esplora :name',
+    'official' => 'Componente FLEX ufficiale',
+    'carousel' => 'Carosello',
+    'promotion' => 'In evidenza',
+    'previous_banner' => 'Banner precedente',
+    'next_banner' => 'Banner successivo',
+    'verified' => 'Componente FLEX ufficiale',
+    'install' => 'Installa il plugin',
+    'github' => 'Visualizza su GitHub',
+    'demo' => 'Dimostrazione',
+    'code_example' => 'Esempio di codice',
+    'extension_notice' => 'Questo è un plugin esterno consigliato. L\'installazione e la documentazione sono fornite dal suo autore su GitHub.',
+    'component_notice' => 'Questo componente è registrato in FLEX e disponibile per l\'uso. Il suo autore non ha fornito una demo interattiva.',
+    'previous' => 'Banner precedente',
+    'next' => 'Banner successivo',
+    'navigation_group' => 'Impostazioni e strumenti',
+    'category_labels' => [
+        'buttons' => 'Azioni',
+        'collections' => 'Collezioni',
+        'colors' => 'Colori',
+        'controls' => 'Controlli',
+        'data-display' => 'Visualizzazione dati',
+        'date-and-time' => 'Data e ora',
+        'guides' => 'Guide',
+        'location' => 'Posizione',
+        'media' => 'Media',
+        'navigation' => 'Navigazione',
+        'pickers' => 'Selettori',
+        'text-input' => 'Inserimento di testo',
+    ],
+    'components' => [
+        'font-select' => [
+            'label' => 'Seleziona carattere',
+            'description' => 'Cerca caratteri con anteprime live, filtri di categoria e scorrimento infinito virtualizzato.',
+        ],
+        'address-autocomplete' => [
+            'label' => 'Completamento automatico dell\'indirizzo',
+            'description' => 'Trova indirizzi con ricerca condivisa, risultati strutturati e geocodifica configurabile.',
+        ],
+        'admin-columns' => [
+            'label' => 'Colonne di amministrazione',
+            'description' => 'Presentazioni tabellari per stati, progresso, icone e altri dati compatti.',
+        ],
+        'audio-field' => [
+            'label' => 'Lettore audio',
+            'description' => 'Lettore audio compatto con forma d’onda, comandi di riproduzione e pausa, ripetizione e trascrizione Whisper locale facoltative.',
+        ],
+        'barcode-scanner-field' => [
+            'label' => 'Lettore di codici a barre',
+            'description' => 'Esplora lo scanner di codici a barre con comportamento configurabile, stile ed esempi dal vivo.',
+        ],
+        'bubble-choice' => [
+            'label' => 'Scelta della bolla',
+            'description' => 'Selezione multipla a bolle con ingrandimento centrale, riduzione ai bordi durante lo spostamento e selezione sagomata facoltativa.',
+        ],
+        'calculator-field' => [
+            'label' => 'Campo calcolatrice',
+            'description' => 'Inserimento numerico con pannello calcolatore condiviso in stile iOS, memoria di sessione per campo e vincoli numerici completi.',
+        ],
+        'choice-cards' => [
+            'label' => 'Schede di scelta',
+            'description' => 'Presenta carte selezionabili con icone, etichette, descrizioni e stati controllati.',
+        ],
+        'choice-checkbox-cards' => [
+            'label' => 'Schede a scelta multipla',
+            'description' => 'Carte a scelta multipla che utilizzano l\'indicatore di selezione animato condiviso.',
+        ],
+        'color-swatch' => [
+            'label' => 'Campione di colore',
+            'description' => 'Selettore colori preimpostato: pillole di campioni orizzontali con intestazione di sezione e suggerimenti opzionali.',
+        ],
+        'country-field' => [
+            'label' => 'Campo Paese',
+            'description' => 'Cerca paesi e territori con bandiere locali; memorizzare un codice paese di due lettere.',
+        ],
+        'country-map-field' => [
+            'label' => 'Mappa del paese',
+            'description' => 'Scegli i paesi su una mappa mondiale interattiva con selezione e ricerca della regione.',
+        ],
+        'cover-card' => [
+            'label' => 'Copertina',
+            'description' => 'Presenta un\'immagine di copertina, titolo e descrizione in una scheda statica.',
+        ],
+        'credit-card' => [
+            'label' => 'Carta di credito',
+            'description' => 'Inserimento carta di credito con rilevamento del marchio in tempo reale, anteprima interattiva e convalida Luhn lato server.',
+        ],
+        'currency-field' => [
+            'label' => 'Campo valuta',
+            'description' => 'Inserimento di valuta in stile Revolut con formattazione locale, animazioni di cifre, selettore di valuta opzionale e archiviazione di unità minori.',
+        ],
+        'date-time-fields' => [
+            'label' => 'Campi data e ora',
+            'description' => 'Selezione di data, ora e intervallo con una superficie di calendario condivisa e supporto per tastiera.',
+        ],
+        'dual-listbox' => [
+            'label' => 'Doppia casella di riepilogo',
+            'description' => 'Strumento di selezione a doppio riquadro con ricerca, riordino e scorrimento virtuale.',
+        ],
+        'field-intelligence' => [
+            'label' => 'Formule calcolate',
+            'description' => 'Calcoli convalidati, formule sensibili alle dipendenze e valori del modulo calcolati dal server.',
+        ],
+        'file-upload' => [
+            'label' => 'Caricamento file',
+            'description' => 'Carica file e immagini con anteprime, vincoli e configurazione dei media.',
+        ],
+        'flex-checklist' => [
+            'label' => 'Lista di controllo Flex',
+            'description' => 'Scelte singole o multiple accessibili con presentazioni di elenchi configurabili.',
+        ],
+        'flex-color-picker' => [
+            'label' => 'Selettore colore Flex',
+            'description' => 'Scegli i colori con un\'area HSV, cursori dei canali, formati e campioni.',
+        ],
+        'flex-matrix-table' => [
+            'label' => 'Tabella Flex Matrix',
+            'description' => 'Modifica scelte strutturate in righe e colonne con controlli del modulo condiviso.',
+        ],
+        'flex-radiolist' => [
+            'label' => 'Flex Radiolist',
+            'description' => 'Elenco radio migliorato con icone, descrizioni e dimensioni personalizzate.',
+        ],
+        'flex-rich-editor' => [
+            'label' => 'Flex Rich Editor',
+            'description' => 'Ricca modifica di documenti, formattazione, blocchi di contenuti multimediali ed estensibili.',
+        ],
+        'flex-slider' => [
+            'label' => 'Cursore Flex',
+            'description' => 'Cursori a pillola e circolari con movimento elastico, numeri rotanti, segni magnetici e range validati.',
+        ],
+        'flex-text-input' => [
+            'label' => 'Campo di testo Flex',
+            'description' => 'Inserimento di testo versatile con stili, validazioni, dimensioni e varianti visive condivise.',
+        ],
+        'flex-textarea' => [
+            'label' => 'Area di testo Flex',
+            'description' => 'Area di testo con ridimensionamento automatico intelligente con contatori di caratteri, dettatura vocale e supporto emoji.',
+        ],
+        'hold-confirm' => [
+            'label' => 'Tieni premuto per confermare',
+            'description' => 'Conferma azioni importanti con pressione prolungata, domanda integrata, conto alla rovescia, avanzamento del server e annullamento facoltativo.',
+        ],
+        'icon-column' => [
+            'label' => 'Colonna di icone',
+            'description' => 'Colonna di sola lettura per mostrare icone Blade con etichette, colori e dimensioni facoltativi.',
+        ],
+        'icon-picker-field' => [
+            'label' => 'Selettore di icone',
+            'description' => 'Sfoglia le icone con ricerca, layout a elenco o griglia, rendering virtuale e impaginazione.',
+        ],
+        'image-choice-cards' => [
+            'label' => 'Carte Scelta Immagine',
+            'description' => 'Seleziona le opzioni visive con schede immagine, didascalie e stati controllati coerenti.',
+        ],
+        'item-card-group' => [
+            'label' => 'ItemCardGroup',
+            'description' => 'Raggruppa contenuti e azioni in layout di carte configurabili.',
+        ],
+        'link-preview-field' => [
+            'label' => 'Anteprima del collegamento',
+            'description' => 'Esplora l\'anteprima del collegamento con comportamento configurabile, stile ed esempi dal vivo.',
+        ],
+        'map-picker' => [
+            'label' => 'Selettore mappa',
+            'description' => 'Cerca indirizzi e scegli una posizione con coordinate strutturate.',
+        ],
+        'matrix-choice' => [
+            'label' => 'Scelta della matrice',
+            'description' => 'Esplora la scelta della matrice con comportamento configurabile, stile ed esempi dal vivo.',
+        ],
+        'nps-field' => [
+            'label' => 'Campo NPS',
+            'description' => 'Input in scala NPS, CSAT e Likert con tre varianti visive.',
+        ],
+        'number-stepper' => [
+            'label' => 'Campo numerico a incrementi',
+            'description' => 'Controllo numerico a forma di pillola con pulsanti − / + e display animato NumberFlow.',
+        ],
+        'phone-field' => [
+            'label' => 'Campo telefono',
+            'description' => 'Numeri di telefono internazionali con codici paese ricercabili e convalida.',
+        ],
+        'price-range' => [
+            'label' => 'Fascia di prezzo',
+            'description' => 'Cursore della fascia di prezzo a doppia maniglia con sfondo dell\'istogramma, input numerici min/max e prefisso valuta.',
+        ],
+        'progress-bar' => [
+            'label' => 'Barra di avanzamento',
+            'description' => 'Presenta progressi, obiettivi e traguardi con stati visivi configurabili.',
+        ],
+        'progress-circle' => [
+            'label' => 'Cerchio di progresso',
+            'description' => 'Indicatori circolari di avanzamento con etichette, colori e dimensioni.',
+        ],
+        'rating-column' => [
+            'label' => 'Colonna Valutazione',
+            'description' => 'Mostra le valutazioni in tabelle con simboli e valori numerici configurabili.',
+        ],
+        'rating' => [
+            'label' => 'Valutazione',
+            'description' => 'Cattura valutazioni con simboli, precisione, etichette e dimensioni personalizzate.',
+        ],
+        'schedule-field' => [
+            'label' => 'Campo orario',
+            'description' => 'Disponibilità settimanale, fasce orarie, pause e configurazione del fuso orario.',
+        ],
+        'segment-control' => [
+            'label' => 'Controllo segmento',
+            'description' => 'Controllo segmentato a selezione singola in stile IOS con indicatori scorrevoli, icone ed espansione di etichette animate.',
+        ],
+        'segment-tabs' => [
+            'label' => 'Schede Segmento',
+            'description' => 'Componi sezioni del modulo con schede animate, schemi nidificati e selezione persistente.',
+        ],
+        'select-field' => [
+            'label' => 'Campo di selezione',
+            'description' => 'Ricca selezione con ricerca, opzioni raggruppate, liste virtuali e impaginazione remota.',
+        ],
+        'signature-field' => [
+            'label' => 'Firma',
+            'description' => 'Esplora la firma con comportamento configurabile, stile ed esempi dal vivo.',
+        ],
+        'slug-field' => [
+            'label' => 'Campo slug',
+            'description' => 'Esplora il campo degli slug con comportamento configurabile, stile ed esempi dal vivo.',
+        ],
+        'social-links-field' => [
+            'label' => 'Collegamenti sociali',
+            'description' => 'Crea una serie di collegamenti social con icone della piattaforma e convalida URL.',
+        ],
+        'switch' => [
+            'label' => 'Interruttore',
+            'description' => 'Interruttore booleano con layout in riga o a scheda, badge ed effetti a onda.',
+        ],
+        'tags-field' => [
+            'label' => 'Campo tag',
+            'description' => 'Cerca, scegli e crea tag con chip compatti e un menu a discesa condiviso.',
+        ],
+        'timezone-field' => [
+            'label' => 'Campo fuso orario',
+            'description' => 'Cerca i fusi orari mondiali con offset locali e impostazioni predefinite del browser.',
+        ],
+        'todo-list-field' => [
+            'label' => 'Lista delle cose da fare',
+            'description' => 'Elenchi di attività interattivi con completamento, ordinamento e feedback configurabile.',
+        ],
+        'track-slider' => [
+            'label' => 'Dispositivo di scorrimento della traccia',
+            'description' => 'Cursore di portata minimalista basato su traccia con uscita valore live opzionale.',
+        ],
+        'traffic-split' => [
+            'label' => 'Ripartizione del traffico',
+            'description' => 'Distributore interattivo di peso su base percentuale per test A/B e allocazione del traffico.',
+        ],
+        'translatable-fields' => [
+            'label' => 'Campi traducibili',
+            'description' => 'Crea campi localizzati e passa da uno stato del modulo specifico della lingua all\'altro.',
+        ],
+        'user-column' => [
+            'label' => 'Colonna Utente',
+            'description' => 'Presenta utenti, avatar e informazioni aggiuntive sull\'identità nelle colonne della tabella.',
+        ],
+        'user-select' => [
+            'label' => 'Selezione utente',
+            'description' => 'Scegli le persone con avatar, nomi, dettagli secondari e selezione multipla.',
+        ],
+        'verification-code' => [
+            'label' => 'Codice di verifica',
+            'description' => 'Inserimento di codici OTP con caselle raggruppate, incolla e controlli facoltativi di verifica dell’account.',
+        ],
+        'video-field' => [
+            'label' => 'Campo video',
+            'description' => 'Lettore video personalizzato con incorporamento YouTube opzionale, controlli di salto, PiP, schermo intero e layout di controllo compatto.',
+        ],
+        'voice-note-recorder-field' => [
+            'label' => 'Registratore di note vocali',
+            'description' => 'Registratore vocale nel browser con visualizzazione in tempo reale, riproduzione integrata e archiviazione Filament.',
+        ],
+    ],
+    'promotions' => [
+        'discover-flex' => [
+            'title' => 'Piccoli dettagli. Esperienze migliori.',
+            'description' => 'Esplora i componenti FLEX, prova le demo e trova gli elementi costitutivi giusti per la tua prossima idea.',
+            'action' => 'Ti presentiamo FLEX',
+        ],
+        'compose-with-flex' => [
+            'title' => 'La tua prossima idea inizia qui.',
+            'description' => 'Costruisci con componenti condivisi, esplora la loro configurazione e rendili tuoi.',
+            'action' => 'Esplora il progetto',
+        ],
+    ],
+];

@@ -13,19 +13,15 @@ export function normalizeLocale(locale) {
     return locale.trim().replace(/_/g, '-')
 }
 
-/**
- * @param {number} numeric
- * @param {{ locale?: string|null, decimalPlaces?: number|null }} [options]
- */
-export function formatDecimal(numeric, { locale = null, decimalPlaces = null } = {}) {
-    if (! Number.isFinite(numeric)) {
-        return ''
-    }
+function plainDecimal(numeric, decimalPlaces) {
+    return decimalPlaces === null ? String(numeric) : numeric.toFixed(decimalPlaces)
+}
 
+function createLocaleFormatter(locale, decimalPlaces) {
     const hasLocale = typeof locale === 'string' && locale.trim() !== ''
 
     if (! hasLocale) {
-        return decimalPlaces === null ? String(numeric) : numeric.toFixed(decimalPlaces)
+        return null
     }
 
     try {
@@ -33,9 +29,26 @@ export function formatDecimal(numeric, { locale = null, decimalPlaces = null } =
             minimumFractionDigits: decimalPlaces ?? 0,
             // Intl caps fraction digits at 20, which matches `String(number)`.
             maximumFractionDigits: decimalPlaces ?? 20,
-        }).format(numeric)
+        })
     } catch {
         // An unsupported locale tag must never break the field.
-        return decimalPlaces === null ? String(numeric) : numeric.toFixed(decimalPlaces)
+        return null
     }
+}
+
+/**
+ * Compile once for frequently updated controls; retain no numeric values.
+ * @param {{ locale?: string|null, decimalPlaces?: number|null }} [options]
+ * @returns {(numeric: number) => string}
+ */
+export function createDecimalFormatter({ locale = null, decimalPlaces = null } = {}) {
+    const formatter = createLocaleFormatter(locale, decimalPlaces)
+    return numeric => !Number.isFinite(numeric) ? '' : formatter ? formatter.format(numeric) : plainDecimal(numeric, decimalPlaces)
+}
+
+/** @param {number} numeric @param {{ locale?: string|null, decimalPlaces?: number|null }} [options] */
+export function formatDecimal(numeric, { locale = null, decimalPlaces = null } = {}) {
+    if (!Number.isFinite(numeric)) return ''
+    const formatter = createLocaleFormatter(locale, decimalPlaces)
+    return formatter ? formatter.format(numeric) : plainDecimal(numeric, decimalPlaces)
 }

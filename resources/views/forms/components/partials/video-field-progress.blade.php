@@ -2,10 +2,12 @@
     class="fff-video-field__progress-wrap"
     x-ref="progressWrap"
     role="slider"
+    tabindex="0"
+    aria-label="{{ __('filament-flex-fields::default.video.progress') }}"
     x-bind:aria-valuemin="0"
     x-bind:aria-valuemax="1000"
     x-bind:aria-valuenow="progressInputValue"
-    x-bind:aria-valuetext="previewTimeLabel"
+    x-bind:aria-valuetext="currentLabel"
     x-bind:aria-disabled="! canScrub ? 'true' : 'false'"
     x-bind:class="{
         'is-disabled': ! canScrub,
@@ -16,6 +18,8 @@
     x-on:pointerdown="onProgressPointerDown($event)"
     x-on:pointermove="onProgressPointerMove($event)"
     x-on:pointerup="onProgressPointerUp($event)"
+    x-on:pointercancel="onProgressPointerCancel($event)"
+    x-on:keydown="onSliderKeydown($event, false)"
     x-on:pointerleave="onProgressPointerLeave()"
     x-on:lostpointercapture="onProgressLostPointerCapture($event)"
 >
@@ -32,6 +36,7 @@
 
     <div
         class="fff-video-field__progress-thumbnail"
+        x-bind:class="{ 'is-loading': previewFrameLoading && ! previewFrameReady }"
         x-ref="progressThumbnail"
         x-bind:style="progressThumbnailStyle"
         aria-hidden="true"

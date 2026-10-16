@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
-use Bjanczak\FilamentFlexFields\Enums\DateTimeGranularity;
-use Bjanczak\FilamentFlexFields\Enums\MonthDisplay;
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexDateField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexDatePicker;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexDateRangeField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexDateTimePicker;
@@ -14,283 +11,58 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexDurationField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexMonthPicker;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTimeField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTimeRangeField;
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTimeSegmentsField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexYearPicker;
-use Carbon\Carbon;
-use Filament\Schemas\Components\Component;
-use Filament\Schemas\Components\Section;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ScheduleField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TimezoneField;
+use Bjanczak\FilamentFlexFields\Support\Playground\DateTime\DateTimePlayground;
+use Bjanczak\FilamentFlexFields\Support\Playground\DateTime\ExampleGroup;
+use Bjanczak\FilamentFlexFields\Support\Playground\DateTime\ValidationExample;
 
-class DateTimeFieldPlayground
+final class DateTimeFieldPlayground extends DateTimePlayground
 {
-    /**
-     * @return array<string, mixed>
-     */
-    public function defaultState(): array
+    protected function slug(): string
     {
-        return [
-            'date_time__date_field' => '2026-06-15',
-            'date_time__date_picker' => '2026-07-04',
-            'date_time__date_range' => [
-                'start' => '2026-06-10T09:30:00',
-                'end' => '2026-06-14T17:00:00',
-            ],
-            'date_time__date_range_day' => [
-                'start' => '2026-06-10',
-                'end' => '2026-06-14',
-            ],
-            'date_time__time_field' => '14:30',
-            'date_time__time_field_24h' => '14:30',
-            'date_time__time_segments' => '09:30',
-            'date_time__time_segments_step' => '14:07',
-            'date_time__date_time_field' => '2026-06-15T14:30:00',
-            'date_time__hour_granularity' => '2026-02-03T08:00:00',
-            'date_time__second_granularity' => '2026-02-03T08:45:00',
-            'date_time__12h' => '2026-02-03T08:45:00',
-            'date_time__with_timezone' => '2026-02-03T08:45:00',
-            'date_time__display_format' => '2026-06-15',
-            'date_time__storage_format' => '2026-06-15',
-            'date_time__bounded' => '2026-06-15',
-            'date_time__duration' => '02:30:00',
-            'date_time__time_range' => [
-                'start' => '09:00',
-                'end' => '17:00',
-            ],
-            'date_time__month' => '2026-06',
-            'date_time__month_only' => '2026-06',
-            'date_time__month_text' => '2026-06',
-            'date_time__date_long_month' => '2026-06-15',
-            'date_time__date_short_month' => '2026-03-15',
-            'date_time__datetime_long_month' => '2026-06-15T14:30:00',
-            'date_time__year' => '2026',
-            'date_time__picker_validation' => null,
-            'date_time__range_validation' => null,
-            'date_time__picker_format_options' => '2026-02-03T08:45:00',
-            'date_time__range_format_options' => [
-                'start' => '2026-02-03T08:45:00',
-                'end' => '2026-02-10T18:45:00',
-            ],
-            'date_time__indian_calendar' => null,
-        ];
+        return 'date-time-fields';
     }
 
-    /**
-     * @return list<Component>
-     */
-    public function components(): array
+    /** @return list<ExampleGroup> */
+    protected function groups(): array
     {
         return [
-            Section::make('Date & time fields')
-                ->description('Spectrum-style segmented date/time inputs powered by @internationalized/date.')
-                ->extraAttributes(['class' => 'fff-playground-section'])
-                ->schema([
-                    FlexDateField::make('date_time__date_field')
-                        ->label('Date field')
-                        ->required()
-                        ->minValue(Carbon::today())
-                        ->helperText('Segmented date input without calendar popover.')
-                        ->withRecommendedDefaults(),
-                    FlexDatePicker::make('date_time__date_picker')
-                        ->label('Date picker')
-                        ->withRecommendedDefaults()
-                        ->default(Carbon::parse('2026-07-04'))
-                        ->helperText('Segmented input with calendar popover. Use default() for initial value.'),
-                    FlexDateRangeField::make('date_time__date_range')
-                        ->label('Date range (with time)')
-                        ->withRecommendedDefaults()
-                        ->granularity(DateTimeGranularity::Minute)
-                        ->helperText('Open the calendar — start/end time rows appear under the grid. Call withRecommendedDefaults() first, then granularity(Minute); defaults last would reset to Day.'),
-                    FlexDateRangeField::make('date_time__date_range_day')
-                        ->label('Date range (day only)')
-                        ->withRecommendedDefaults()
-                        ->helperText('Date-only range preset from withRecommendedDefaults() (granularity Day — no time rows).'),
-                    FlexTimeField::make('date_time__time_field')
-                        ->label('Time field (12h)')
-                        ->hourCycle(12)
-                        ->minValue('09:00')
-                        ->maxValue('18:00')
-                        ->withRecommendedDefaults()
-                        ->helperText('12-hour segmented time with min/max constraints.'),
-                    FlexTimeField::make('date_time__time_field_24h')
-                        ->label('Time field (24h)')
-                        ->hourCycle(24)
-                        ->minValue('09:00')
-                        ->maxValue('18:00')
-                        ->hideTimeZone()
-                        ->granularity(DateTimeGranularity::Minute)
-                        ->helperText('24-hour segmented time with min/max constraints.'),
-                    FlexTimeSegmentsField::make('date_time__time_segments')
-                        ->label('Time segments (dropdown)')
-                        ->minuteStep(15)
-                        ->withRecommendedDefaults()
-                        ->helperText('Dropdown hour/minute picker in flex-text-input shell. Stores HH:MM (24h). Reused by ScheduleField.'),
-                    FlexTimeSegmentsField::make('date_time__time_segments_step')
-                        ->label('Time segments · 5 min step')
-                        ->minuteStep(5)
-                        ->variant('soft')
-                        ->size('sm')
-                        ->helperText('minuteStep(5) snaps minutes to 00, 05, 10, … 55.'),
-                    FlexDateTimePicker::make('date_time__date_time_field')
-                        ->label('Date & time')
-                        ->hourCycle(24)
-                        ->hideTimeZone()
-                        ->withRecommendedDefaults()
-                        ->helperText('Combined date and time in one segmented input with calendar.'),
-                    FlexDurationField::make('date_time__duration')
-                        ->label('Duration')
-                        ->showSeconds()
-                        ->withRecommendedDefaults()
-                        ->helperText('Segmented HH:MM:SS duration without date.'),
-                    FlexTimeRangeField::make('date_time__time_range')
-                        ->label('Time range')
-                        ->minValue('08:00')
-                        ->maxValue('20:00')
-                        ->withRecommendedDefaults()
-                        ->helperText('Dual segmented time groups with range separator.'),
-                    FlexMonthPicker::make('date_time__month')
-                        ->label('Month picker')
-                        ->locale('pl_PL')
-                        ->withRecommendedDefaults()
-                        ->helperText('Month + year segments: calendar opens on year grid, then month grid.'),
-                    FlexYearPicker::make('date_time__year')
-                        ->label('Year picker')
-                        ->withRecommendedDefaults()
-                        ->helperText('Year segment with year grid calendar.'),
-                ]),
-            Section::make('Month display')
-                ->description('monthDisplay(): numeric (06), short (cze), long (czerwiec). Works in any field with a month segment.')
-                ->extraAttributes(['class' => 'fff-playground-section'])
-                ->schema([
-                    FlexMonthPicker::make('date_time__month_only')
-                        ->label('Month only · long')
-                        ->showYearSegment(false)
-                        ->monthDisplay(MonthDisplay::Long)
-                        ->locale('pl_PL')
-                        ->withRecommendedDefaults()
-                        ->helperText('Tylko miesiąc jako tekst (czerwiec).'),
-                    FlexMonthPicker::make('date_time__month_text')
-                        ->label('Month + year · long')
-                        ->monthDisplay(MonthDisplay::Long)
-                        ->locale('pl_PL')
-                        ->withRecommendedDefaults()
-                        ->helperText('czerwiec + 2026 — segment miesiąca dopasowuje szerokość do tekstu.'),
-                    FlexDatePicker::make('date_time__date_long_month')
-                        ->label('dd · miesiąc · yyyy')
-                        ->locale('pl_PL')
-                        ->monthDisplay(MonthDisplay::Long)
-                        ->withRecommendedDefaults()
-                        ->default('2026-06-15')
-                        ->helperText('15 · czerwiec · 2026 — kolejność segmentów z locale (pl_PL → dzień pierwszy).'),
-                    FlexDateField::make('date_time__date_short_month')
-                        ->label('dd · miesiąc · yyyy (short)')
-                        ->locale('pl_PL')
-                        ->monthDisplay(MonthDisplay::Short)
-                        ->withRecommendedDefaults()
-                        ->default('2026-03-15')
-                        ->helperText('15 · mar · 2026 — skrót miesiąca w segmencie.'),
-                    FlexDateTimePicker::make('date_time__datetime_long_month')
-                        ->label('dd · miesiąc · yyyy · HH:MM')
-                        ->locale('pl_PL')
-                        ->monthDisplay(MonthDisplay::Long)
-                        ->hourCycle(24)
-                        ->hideTimeZone()
-                        ->withRecommendedDefaults()
-                        ->helperText('Data z tekstowym miesiącem i czasem w jednym inpucie.'),
-                ]),
-            Section::make('Date & time configuration')
-                ->description('Spectrum-style options: granularity(), hourCycle(), hideTimeZone(), forceLeadingZeros(), hideTimeSection().')
-                ->extraAttributes(['class' => 'fff-playground-section'])
-                ->schema([
-                    FlexDateTimePicker::make('date_time__hour_granularity')
-                        ->label('Date and time')
-                        ->granularity(DateTimeGranularity::Hour)
-                        ->hourCycle(24)
-                        ->hideTimeZone()
-                        ->forceLeadingZeros()
-                        ->helperText('granularity(Hour), hourCycle(24), hideTimeZone(), forceLeadingZeros()'),
-                    FlexDateTimePicker::make('date_time__second_granularity')
-                        ->label('Date and time')
-                        ->granularity(DateTimeGranularity::Second)
-                        ->showSeconds()
-                        ->hourCycle(24)
-                        ->helperText('granularity(Second), showSeconds(), hourCycle(24)'),
-                    FlexDateTimePicker::make('date_time__12h')
-                        ->label('Date and time')
-                        ->hourCycle(12)
-                        ->granularity(DateTimeGranularity::Minute)
-                        ->helperText('hourCycle(12) adds an AM/PM segment'),
-                    FlexDateTimePicker::make('date_time__with_timezone')
-                        ->label('Date and time')
-                        ->hourCycle(24)
-                        ->granularity(DateTimeGranularity::Minute)
-                        ->helperText('Timezone label is visible by default; use hideTimeZone() to hide it.'),
-                ]),
-            Section::make('Validation & format demos')
-                ->description('Segment validation, minValue, format options, international calendar, and calendar popover UX.')
-                ->extraAttributes(['class' => 'fff-playground-section'])
-                ->schema([
-                    FlexDatePicker::make('date_time__picker_validation')
-                        ->label('Appointment date')
-                        ->required()
-                        ->minValue(Carbon::today())
-                        ->segmentInvalidMessage('Date must be today or in the future.')
-                        ->withRecommendedDefaults()
-                        ->helperText('minValue = today with a custom segment error on blur when the value is in the past.'),
-                    FlexDateRangeField::make('date_time__range_validation')
-                        ->label('Booking period')
-                        ->required()
-                        ->minValue(Carbon::today())
-                        ->segmentInvalidMessage('Select a valid range starting today or later.')
-                        ->withRecommendedDefaults()
-                        ->helperText('minValue on both ends; end must be after start.'),
-                    FlexDateTimePicker::make('date_time__picker_format_options')
-                        ->label('Date and time')
-                        ->granularity(DateTimeGranularity::Minute)
-                        ->hourCycle(12)
-                        ->forceLeadingZeros()
-                        ->withRecommendedDefaults()
-                        ->default('2026-02-03T08:45:00')
-                        ->helperText('Minute granularity, 12-hour cycle, forced leading zeros, time row under the calendar.'),
-                    FlexDateRangeField::make('date_time__range_format_options')
-                        ->label('Date range with time')
-                        ->granularity(DateTimeGranularity::Minute)
-                        ->hourCycle(12)
-                        ->forceLeadingZeros()
-                        ->withRecommendedDefaults()
-                        ->default([
-                            'start' => '2026-02-03T08:45:00',
-                            'end' => '2026-02-10T18:45:00',
-                        ])
-                        ->helperText('Separate start/end time rows under the range calendar.'),
-                    FlexDatePicker::make('date_time__indian_calendar')
-                        ->label('Event date (Indian calendar)')
-                        ->locale('hi-IN-u-ca-indian')
-                        ->withRecommendedDefaults()
-                        ->helperText('BCP 47 locale with -u-ca-indian uses the Indian national calendar in segments and the popover grid.'),
-                ]),
-            Section::make('Date & time bounds and formats')
-                ->description('minValue(), maxValue(), default(), displayFormat(), storageFormat().')
-                ->extraAttributes(['class' => 'fff-playground-section'])
-                ->schema([
-                    FlexDatePicker::make('date_time__bounded')
-                        ->label('Bounded date')
-                        ->minValue('2026-06-01')
-                        ->maxValue('2026-06-30')
-                        ->default('2026-06-15')
-                        ->withRecommendedDefaults()
-                        ->helperText('minValue("2026-06-01"), maxValue("2026-06-30"), default("2026-06-15"). Calendar disables out-of-range days.'),
-                    FlexDatePicker::make('date_time__display_format')
-                        ->label('European display format')
-                        ->displayFormat('d/m/Y')
-                        ->locale('pl_PL')
-                        ->withRecommendedDefaults()
-                        ->helperText('displayFormat("d/m/Y") affects server-side initialDisplay. Segmented input order follows locale (e.g. pl_PL → dd/mm/yyyy).'),
-                    FlexDateField::make('date_time__storage_format')
-                        ->label('Custom storage format')
-                        ->storageFormat('d.m.Y')
-                        ->default('2026-06-15')
-                        ->withRecommendedDefaults()
-                        ->helperText('storageFormat("d.m.Y") — persisted value uses dots instead of Y-m-d.'),
-                ]),
+            new ExampleGroup('Choose the right control', 'Compare a date, a date range and a clock. Open any input to try its keyboard and calendar controls.', [
+                FlexDatePicker::make('date_time__date')->label('Date picker')->clearable()->default('2026-10-15')->helperText('Calendar selection; clear the value with ×.'),
+                FlexDateRangeField::make('date_time__range')->label('Date range picker')->default(['start' => '2026-10-10', 'end' => '2026-10-15'])->helperText('Choose endpoints; Apply commits, Cancel keeps the previous value.'),
+                FlexTimeField::make('date_time__time')->label('Time picker')->hourCycle(24)->hideTimeZone()->default('14:30')->helperText('24-hour display; stored as HH:mm.'),
+            ], columns: 3),
+            new ExampleGroup('Date and time together', 'Select both a day and a time, including seconds or a list of allowed appointment times.', [
+                FlexDateTimePicker::make('date_time__datetime')->label('Date and time · 12h')->hourCycle(12)->default('2026-10-15T14:30:00')->helperText('A calendar with its own time column.'),
+                FlexDateTimePicker::make('date_time__datetime_seconds')->label('Date and time with seconds')->hourCycle(24)->hideTimeZone()->showSeconds()->secondStep(5)->default('2026-10-15T14:30:15')->helperText('Second precision in both display and stored value.'),
+                FlexDateTimePicker::make('date_time__appointment')->label('Appointment slots')->hourCycle(24)->hideTimeZone()->allowedTimes(['09:15', '11:40', '15:10'])->defaultTime('09:15')->default('2026-10-15T11:40:00')->helperText('Only 09:15, 11:40 and 15:10 can be accepted.'),
+            ], columns: 3),
+            new ExampleGroup('Periods and elapsed time', 'A month, a year and an elapsed duration have different storage formats and selection controls.', [
+                FlexMonthPicker::make('date_time__month')->label('Month')->displayFormat('F Y')->default('2026-10')->helperText('Stores YYYY-MM, without inventing a selected day.'),
+                FlexYearPicker::make('date_time__year')->label('Year')->minValue('2020')->maxValue('2030')->default('2026')->helperText('Only 2020–2030.'),
+                FlexDurationField::make('date_time__duration')->label('Elapsed duration')->minValue('00:15')->maxValue('100:00')->durationStep(900)->default('26:30')->helperText('More than 24 hours; 15-minute step buttons.'),
+            ], columns: 3),
+            new ExampleGroup('Ranges and regional formats', 'Compare a timed period, opening hours and a localized date. See the dedicated galleries for more combinations.', [
+                FlexDateRangeField::make('date_time__timed_range')->label('Range with time')->granularity('minute')->hourCycle(12)->rangePresets([])->default(['start' => '2026-10-10T08:45:00', 'end' => '2026-10-15T18:45:00'])->helperText('No shortcuts; independent start and end time.'),
+                FlexTimeRangeField::make('date_time__time_range')->label('Opening hours')->hourCycle(24)->hideTimeZone()->minValue('08:00')->maxValue('20:00')->default(['start' => '09:00', 'end' => '17:00'])->helperText('Both endpoints must fit within 08:00–20:00.'),
+                FlexDatePicker::make('date_time__localized')->label('Localized date')->locale('pl')->displayFormat('d F Y')->weekStartsOn(1)->default('2026-10-15')->helperText('Polish labels; Monday is the first day of the week.'),
+            ], columns: 3),
+            new ExampleGroup('Try real validation', 'These buttons run the actual server-side field rules. Show error loads a rejected example; Use valid value fixes only that field.', [
+                new ValidationExample(FlexDatePicker::make('date_time__required')->label('Required date')->required()->validationMessages(['required' => 'Choose an appointment date.']), invalid: null, valid: '2026-10-15', description: 'An empty value is rejected. Choose a date or use the valid example.'),
+                new ValidationExample(FlexDatePicker::make('date_time__bounded')->label('Working-day appointment')->minDate('2026-10-01')->maxDate('2026-10-31')->disabledWeekdays([0, 6])->disabledDates(['2026-10-16'])->default('2026-10-15'), invalid: '2026-10-16', valid: '2026-10-15', description: 'October only; weekends and October 16 are blocked.'),
+                new ValidationExample(FlexTimeField::make('date_time__allowed')->label('Restricted time')->hourCycle(24)->hideTimeZone()->allowedTimes(['09:15', '11:40', '15:10'])->default('11:40'), invalid: '12:00', valid: '11:40', description: '12:00 is rejected even if supplied outside the menu.'),
+            ], columns: 3),
+            new ExampleGroup('Presentation and field states', 'Compare the same input at three sizes. The detailed galleries also include read-only, disabled, empty and invalid states.', [
+                FlexDatePicker::make('date_time__small')->label('Small · primary')->size('sm')->default('2026-10-15'),
+                FlexDatePicker::make('date_time__secondary')->label('Medium · secondary')->size('md')->variant('secondary')->default('2026-10-15'),
+                FlexDatePicker::make('date_time__flat')->label('Large · flat')->size('lg')->variant('flat')->default('2026-10-15'),
+            ], columns: 3),
+            new ExampleGroup('Timezones and recurring availability', 'Timezone selection and recurring opening hours are part of the collection too. Their galleries cover browser defaults, restrictions, breaks and overnight shifts.', [
+                TimezoneField::make('date_time__timezone')->label('Timezone')->defaultTimezone('Europe/Warsaw')->default('Europe/Warsaw')->helperText('Search IANA timezone identifiers using FLEX Select.'),
+                ScheduleField::make('date_time__schedule')->label('Recurring availability')->days(['mon', 'tue', 'wed'])->timeStep(15)->default(ScheduleField::defaultSchedule('UTC', ['mon', 'tue', 'wed']))->helperText('Enable days, add slots and choose their timezone.'),
+            ], columns: 2),
         ];
     }
 }

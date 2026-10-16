@@ -31,6 +31,7 @@ final class TodoListFieldConfigurator implements FieldConfigurator
             ->doneSettleMs((int) ($config['done_settle_ms'] ?? 500))
             ->allowCreate((bool) ($config['allow_create'] ?? false))
             ->allowDelete((bool) ($config['allow_delete'] ?? false))
+            ->deleteConfirmation((bool) ($config['delete_confirmation'] ?? false))
             ->deletable((string) ($config['deletable'] ?? 'created'))
             ->searchable((bool) ($config['searchable'] ?? false))
             ->virtualizing((bool) ($config['virtualizing'] ?? false))

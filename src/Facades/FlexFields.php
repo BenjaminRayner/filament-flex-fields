@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array<string, mixed> theme()
  * @method static FlexFieldsTheme setTheme(array<string, mixed> $theme)
  * @method static FlexFieldsTheme mergeTheme(array<string, mixed> $theme)
+ * @method static FlexFieldsTheme mergePackageTheme(\Bjanczak\FilamentFlexFields\Support\Theme\AppearanceNamespace $appearance, array<string, mixed> $tokens)
  * @method static array<string, string> toHtmlAttributes()
  * @method static array<string, string> toCssVariables()
  *
@@ -27,6 +28,9 @@ use Illuminate\Support\Facades\Facade;
  */
 class FlexFields extends Facade
 {
+    /** The container owns the request scope; do not retain its theme in a static facade cache. */
+    protected static $cached = false;
+
     protected static function getFacadeAccessor(): string
     {
         return FlexFieldsTheme::class;

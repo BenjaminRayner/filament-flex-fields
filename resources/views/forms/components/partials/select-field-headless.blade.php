@@ -1,10 +1,10 @@
 @php
-    use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+    use Bjanczak\FilamentFlexFields\Support\FlexIcon;
     use Filament\Support\Enums\IconSize;
     use Illuminate\Support\Js;
 
-    $headlessSearchClearIconHtml = \Filament\Support\generate_icon_html(GravityIcon::CircleXmarkFill, size: IconSize::Small)?->toHtml() ?? '';
-    $headlessSmartCreateIconHtml = \Filament\Support\generate_icon_html(GravityIcon::Plus, size: IconSize::Small)?->toHtml() ?? '';
+    $headlessSearchClearIconHtml = \Filament\Support\generate_icon_html(FlexIcon::CircleXmarkFill, size: IconSize::Small)?->toHtml() ?? '';
+    $headlessSmartCreateIconHtml = \Filament\Support\generate_icon_html(FlexIcon::Plus, size: IconSize::Small)?->toHtml() ?? '';
     $headlessComponentKey = $getKey();
     $headlessTriggerDir = $getExtraAttributeBag()->get('dir');
     $headlessInlineSearchSsrValue = ($isInlineSearch && $isSearchable && ! $isMultiple)
@@ -52,15 +52,14 @@
     @endif
 
         <div
-            x-load
-            x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('select-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+            x-fff-load
+            x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('select-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
             x-data="fffHeadlessSelectField({
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
             ...{{ Js::from($headlessAlpineConfig) }},
         })"
-            x-init="init()"
-            x-on:keydown.escape.stop="comboboxOpen && comboboxCloseMenu()"
-            x-on:click.outside="if (isEventInsideHeadlessMenu($event)) { return }; comboboxCloseMenu({ immediate: true })"
+            x-on:keydown="onHeadlessMenuKeydown($event)"
+            x-on:click.outside="if (isEventInsideHeadlessMenu($event)) { return }; comboboxCloseMenu({ immediate: true, reason: 'outside' })"
             @class([
                 'fff-select-field__interactive',
             ])

@@ -2,140 +2,113 @@
 
 declare(strict_types=1);
 
-/**
- * @author Bartłomiej Janczak <barek122@gmail.com>
- * @copyright Copyright (c) 2026 Bartłomiej Janczak. All rights reserved.
- * @license Proprietary
- */
-
 namespace Bjanczak\FilamentFlexFields\Support\Intelligence\Formula;
 
 use InvalidArgumentException;
 
-/**
- * Dependency cycle detection and topological evaluation order.
- *
- * @internal
- */
+/** Bounded dependency graph. Diagnostic cycles include every member of a cycle. */
 final class FormulaGraph
 {
-    /**
-     * @param  array<string, string>  $formulas  field key => expression
-     * @return list<string> cycle keys, or empty when acyclic
+    /** @param array<string, string> $formulas
+     * @return list<string>
      */
     public static function detectCycle(array $formulas): array
     {
-        $dependencies = [];
-
-        foreach ($formulas as $fieldKey => $expression) {
-            if (! is_string($fieldKey) || ! is_string($expression)) {
-                throw new InvalidArgumentException('Formula map keys and values must be strings.');
-            }
-
-            $dependencies[$fieldKey] = FormulaLexer::fieldReferences($expression);
-        }
-
-        $visited = [];
-        $stack = [];
-        $cycleKeys = [];
-
+        $dependencies = self::dependencies($formulas);
+        $indices = $low = $stack = $onStack = $cyclic = [];
         foreach (array_keys($dependencies) as $node) {
-            if (! isset($visited[$node])) {
-                self::visit($node, $dependencies, $visited, $stack, $cycleKeys);
+            if (! isset($indices[$node])) {
+                self::visit($node, $dependencies, $indices, $low, $stack, $onStack, $cyclic);
             }
         }
+        $result = array_keys($cyclic);
+        sort($result);
 
-        sort($cycleKeys);
-
-        return array_values(array_unique($cycleKeys));
+        return $result;
     }
 
-    /**
-     * @param  array<string, string>  $formulas
+    /** @param array<string, string> $formulas
      * @return list<string>
      */
     public static function topologicalOrder(array $formulas): array
     {
-        $dependencies = [];
-        $remaining = [];
-
-        foreach ($formulas as $fieldKey => $expression) {
-            $refs = array_values(array_filter(
-                FormulaLexer::fieldReferences($expression),
-                static fn (string $ref): bool => array_key_exists($ref, $formulas),
-            ));
-            $dependencies[$fieldKey] = $refs;
-            $remaining[$fieldKey] = count($refs);
-        }
-
-        $queue = [];
-
-        foreach ($remaining as $fieldKey => $count) {
-            if ($count === 0) {
-                $queue[] = $fieldKey;
+        $dependencies = self::dependencies($formulas);
+        $dependents = $remaining = [];
+        foreach ($dependencies as $key => $refs) {
+            $remaining[$key] = count($refs);
+            foreach ($refs as $ref) {
+                $dependents[$ref][] = $key;
             }
         }
-
-        $order = [];
-
-        while ($queue !== []) {
-            $current = array_shift($queue);
-            $order[] = $current;
-
-            foreach ($dependencies as $fieldKey => $refs) {
-                if (! in_array($current, $refs, true) || ! array_key_exists($fieldKey, $remaining)) {
-                    continue;
-                }
-
-                $remaining[$fieldKey]--;
-
-                if ($remaining[$fieldKey] === 0) {
-                    $queue[] = $fieldKey;
-                    unset($remaining[$fieldKey]);
+        $queue = array_keys(array_filter($remaining, static fn (int $count): bool => $count === 0));
+        for ($cursor = 0; $cursor < count($queue); $cursor++) {
+            foreach ($dependents[$queue[$cursor]] ?? [] as $dependent) {
+                if (--$remaining[$dependent] === 0) {
+                    $queue[] = $dependent;
                 }
             }
         }
-
-        if (count($order) !== count($formulas)) {
+        if (count($queue) !== count($formulas)) {
             throw new InvalidArgumentException('Cannot evaluate formula map with dependency cycles.');
         }
 
-        return $order;
+        return $queue;
     }
 
-    /**
-     * @param  array<string, list<string>>  $dependencies
-     * @param  array<string, bool>  $visited
-     * @param  array<string, bool>  $stack
-     * @param  list<string>  $cycleKeys
+    /** @param array<string, string> $formulas
+     * @return array<string, list<string>>
      */
-    private static function visit(
-        string $node,
-        array $dependencies,
-        array &$visited,
-        array &$stack,
-        array &$cycleKeys,
-    ): void {
-        $visited[$node] = true;
-        $stack[$node] = true;
-
-        foreach ($dependencies[$node] ?? [] as $dependency) {
-            if (! array_key_exists($dependency, $dependencies)) {
-                continue;
+    private static function dependencies(array $formulas): array
+    {
+        if (count($formulas) > 512) {
+            throw new InvalidArgumentException('Formula map exceeds its 512-field budget.');
+        }
+        $dependencies = [];
+        foreach ($formulas as $key => $expression) {
+            if (! is_string($key) || strlen($key) > 128 || ! preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $key) || ! is_string($expression)) {
+                throw new InvalidArgumentException('Formula maps require valid field names and string expressions.');
             }
-
-            if (isset($stack[$dependency])) {
-                $cycleKeys[] = $node;
-                $cycleKeys[] = $dependency;
-
-                continue;
-            }
-
-            if (! isset($visited[$dependency])) {
-                self::visit($dependency, $dependencies, $visited, $stack, $cycleKeys);
-            }
+            FormulaProgram::compile($expression);
+            $dependencies[$key] = array_values(array_filter(FormulaLexer::fieldReferences($expression),
+                static fn (string $reference): bool => array_key_exists($reference, $formulas)));
         }
 
-        unset($stack[$node]);
+        return $dependencies;
+    }
+
+    /** @param array<string, list<string>> $dependencies
+     * @param  array<string, int>  $indices
+     * @param  array<string, int>  $low
+     * @param  list<string>  $stack
+     * @param  array<string, true>  $onStack
+     * @param  array<string, true>  $cyclic
+     */
+    private static function visit(string $node, array $dependencies, array &$indices, array &$low, array &$stack, array &$onStack, array &$cyclic): void
+    {
+        $indices[$node] = $low[$node] = count($indices);
+        $stack[] = $node;
+        $onStack[$node] = true;
+        foreach ($dependencies[$node] as $dependency) {
+            if (! isset($indices[$dependency])) {
+                self::visit($dependency, $dependencies, $indices, $low, $stack, $onStack, $cyclic);
+                $low[$node] = min($low[$node], $low[$dependency]);
+            } elseif (isset($onStack[$dependency])) {
+                $low[$node] = min($low[$node], $indices[$dependency]);
+            }
+        }
+        if ($low[$node] !== $indices[$node]) {
+            return;
+        }
+        $members = [];
+        do {
+            $member = array_pop($stack);
+            unset($onStack[$member]);
+            $members[] = $member;
+        } while ($member !== $node);
+        if (count($members) > 1 || in_array($node, $dependencies[$node], true)) {
+            foreach ($members as $member) {
+                $cyclic[$member] = true;
+            }
+        }
     }
 }

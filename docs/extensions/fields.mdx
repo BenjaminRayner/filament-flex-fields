@@ -1,0 +1,43 @@
+---
+title: "Build a form field"
+description: "Use the Filament field lifecycle with your own view and a FLEX consumer boundary."
+---
+
+Build the PHP class using Filament's field lifecycle. Keep validation and saved values in PHP, and use your view for the interaction. Emit the consumer boundary in that view:
+
+```blade
+<x-filament-flex-fields::assets
+    component="acme-rating-field"
+    :consumer="$getLivewireKey()"
+/>
+```
+
+Each instance needs its own stable consumer key, including fields repeated inside nested forms. Render existing FLEX controls through their public components or a child schema rather than copying their input or dropdown markup. Your JavaScript factory must clean up listeners, timers and subscriptions when its instance is destroyed.
+
+## Start with the generated composite field
+
+The generated `SummaryField` already wraps a real `FlexTextInput`. Replace or extend
+its child schema rather than reproducing the input styling in a new template.
+
+```php
+use Acme\Summary\Forms\SummaryField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+
+SummaryField::make('summary')
+    ->schema([
+        FlexTextInput::make('text')
+            ->label('Summary')
+            ->required()
+            ->maxLength(80),
+    ]);
+```
+
+The resulting field value is an object with a `text` key. Store it in a JSON column
+with an `array` cast; a plain scalar database column does not match this starter's
+value shape. Validate additional child keys on the server when extending the shape.
+
+
+## Continue reading
+
+[Columns and entries](/docs/extensions/columns-and-entries) · [Validate submitted values](/docs/extensions/validation)
+

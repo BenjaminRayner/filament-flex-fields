@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Schemas\Components;
 
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
+use Bjanczak\FilamentFlexFields\Concerns\Segments\HasSegmentAppearance;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs\SegmentTab;
 use Bjanczak\FilamentFlexFields\Support\Composition\SegmentTabsV2;
+use Bjanczak\FilamentFlexFields\Support\Segments\SegmentItem;
 use Closure;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Concerns\CanPersistTab;
@@ -19,24 +21,13 @@ class SegmentTabs extends Component
     use CanPersistTab;
     use HasControlSize;
     use HasLabel;
+    use HasSegmentAppearance;
 
     protected string $view = 'filament-flex-fields::schemas.components.segment-tabs';
 
     protected int|Closure $activeTab = 1;
 
     protected string|Closure|null $tabQueryStringKey = null;
-
-    protected string|Closure $variant = 'default';
-
-    protected string|Closure|null $color = null;
-
-    protected bool|Closure $hasSeparators = true;
-
-    protected bool|Closure $isFullWidth = false;
-
-    protected bool|Closure $isIconOnly = false;
-
-    protected bool|Closure $expandSelectedLabel = false;
 
     protected string|Htmlable|Closure|null $helperText = null;
 
@@ -47,32 +38,27 @@ class SegmentTabs extends Component
 
     public static function make(string|Htmlable|Closure|null $label = null): static
     {
-        $static = app(static::class, ['label' => $label]);
-        $static->configure();
+        $component = app(static::class, ['label' => $label]);
+        $component->configure();
 
-        return $static;
+        return $component;
     }
 
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->key(function (SegmentTabs $component): ?string {
             $label = $component->getLabel();
-
             if (blank($label)) {
                 return null;
             }
-
             $statePath = $component->getStatePath();
 
             return Str::slug(Str::transliterate($label, strict: true)).'::'.(filled($statePath) ? "{$statePath}::segment-tabs" : 'segment-tabs');
-        }, isInheritable: false);
+        }, isInheritable: true);
     }
 
-    /**
-     * @param  array<SegmentTab> | Closure  $tabs
-     */
+    /** @param array<SegmentTab>|Closure $tabs */
     public function tabs(array|Closure $tabs): static
     {
         $this->components($tabs);
@@ -94,33 +80,6 @@ class SegmentTabs extends Component
         return $this;
     }
 
-    public function getActiveTab(): int
-    {
-        if ($this->isTabPersistedInQueryString()) {
-            $rawQueryTab = request()->query($this->getTabQueryStringKey());
-            $queryStringTab = SegmentTabsV2::parsePersisted(
-                is_string($rawQueryTab) ? $rawQueryTab : null,
-            );
-
-            if ($queryStringTab !== null) {
-                foreach ($this->getChildSchema()->getComponents() as $index => $tab) {
-                    if ($tab->getId() !== $queryStringTab) {
-                        continue;
-                    }
-
-                    return $index + 1;
-                }
-            }
-        }
-
-        return $this->evaluate($this->activeTab);
-    }
-
-    public function getTabPersistKey(): string
-    {
-        return SegmentTabsV2::persistKey((string) ($this->getId() ?? ''));
-    }
-
     public function getTabQueryStringKey(): ?string
     {
         return $this->evaluate($this->tabQueryStringKey);
@@ -131,52 +90,46 @@ class SegmentTabs extends Component
         return filled($this->getTabQueryStringKey());
     }
 
-    public function variant(string|Closure $variant): static
+    public function getTabPersistKey(): string
     {
-        $this->variant = $variant;
-
-        return $this;
+        return SegmentTabsV2::persistKey((string) ($this->getId() ?? ''));
     }
 
-    public function color(string|Closure|null $color): static
+    /** @return list<SegmentTab> */
+    public function getVisibleTabs(): array
     {
-        $this->color = $color;
-
-        return $this;
+        return array_values(array_filter($this->getChildSchema()?->getComponents() ?? [],
+            static fn (mixed $tab): bool => $tab instanceof SegmentTab && $tab->isVisible()));
     }
 
-    public function separators(bool|Closure $condition = true): static
+    public function getActiveTab(): int
     {
-        $this->hasSeparators = $condition;
+        $tabs = $this->getVisibleTabs();
+        if ($this->isTabPersistedInQueryString()) {
+            $raw = request()->query($this->getTabQueryStringKey());
+            $query = SegmentTabsV2::parsePersisted(is_string($raw) ? $raw : null);
+            foreach ($tabs as $index => $tab) {
+                // Browser writes relative keys; accept old absolute IDs as well.
+                if ($query !== null && ($tab->getKey(isAbsolute: false) === $query || $tab->getId() === $query)) {
+                    return $index + 1;
+                }
+            }
+        }
+        $index = (int) $this->evaluate($this->activeTab);
 
-        return $this;
+        return isset($tabs[$index - 1]) ? $index : 1;
     }
 
-    public function fullWidth(bool|Closure $condition = true): static
+    public function getActiveTabKey(): ?string
     {
-        $this->isFullWidth = $condition;
-
-        return $this;
+        return ($this->getVisibleTabs()[$this->getActiveTab() - 1] ?? null)?->getKey(isAbsolute: false);
     }
 
-    public function iconOnly(bool|Closure $condition = true): static
+    public function isTabActive(SegmentTab $tab): bool
     {
-        $this->isIconOnly = $condition;
-
-        return $this;
+        return $tab->getKey(isAbsolute: false) === $this->getActiveTabKey();
     }
 
-    public function expandSelectedLabel(bool|Closure $condition = true): static
-    {
-        $this->expandSelectedLabel = $condition;
-
-        return $this;
-    }
-
-    /**
-     * Field-style helper copy below the tab panels (TranslatableFields / SegmentTabs).
-     * Schema layout components do not use Filament Forms HasHelperText (that requires belowContent).
-     */
     public function helperText(string|Htmlable|Closure|null $text): static
     {
         $this->helperText = $text;
@@ -188,92 +141,40 @@ class SegmentTabs extends Component
     {
         $text = $this->evaluate($this->helperText);
 
-        if ($text instanceof Htmlable) {
-            return $text;
+        return ($text instanceof Htmlable || (is_string($text) && filled($text))) ? $text : null;
+    }
+
+    public function getSegmentAssetComponent(): string
+    {
+        return 'segment-tabs';
+    }
+
+    public static function tabVisibilityExpression(SegmentTab $tab): ?string
+    {
+        $conditions = [];
+        if (filled($hidden = $tab->getHiddenJs())) {
+            $conditions[] = "! ({$hidden})";
+        }
+        if (filled($visible = $tab->getVisibleJs())) {
+            $conditions[] = "({$visible})";
         }
 
-        if (! is_string($text) || blank($text)) {
-            return null;
-        }
-
-        return $text;
+        return $conditions === [] ? null : implode(' && ', $conditions);
     }
 
-    public function getVariant(): string
+    /** @return list<SegmentItem> */
+    public function getSegmentItems(): array
     {
-        return $this->evaluate($this->variant);
-    }
+        return array_map(static function (SegmentTab $tab): SegmentItem {
+            $badge = $tab->getBadge();
 
-    public function getColor(): ?string
-    {
-        $color = $this->evaluate($this->color);
-
-        if (filled($color)) {
-            return (string) $color;
-        }
-
-        return $this->getVariant() === 'ghost' ? 'primary' : null;
-    }
-
-    public function hasSeparators(): bool
-    {
-        return (bool) $this->evaluate($this->hasSeparators);
-    }
-
-    public function isFullWidth(): bool
-    {
-        return (bool) $this->evaluate($this->isFullWidth);
-    }
-
-    public function isIconOnly(): bool
-    {
-        return (bool) $this->evaluate($this->isIconOnly);
-    }
-
-    public function shouldExpandSelectedLabel(): bool
-    {
-        return (bool) $this->evaluate($this->expandSelectedLabel);
-    }
-
-    /**
-     * @return list<SegmentTab>
-     */
-    public function getVisibleTabs(): array
-    {
-        return array_values(array_filter(
-            $this->getChildSchema()->getComponents(),
-            fn (Component $tab): bool => $tab instanceof SegmentTab && $tab->isVisible(),
-        ));
-    }
-
-    public function getActiveTabKey(): ?string
-    {
-        $activeTabIndex = $this->getActiveTab();
-        $visibleCounter = 0;
-
-        foreach ($this->getChildSchema()->getComponents() as $tab) {
-            if (! $tab instanceof SegmentTab || ! $tab->isVisible()) {
-                continue;
-            }
-
-            $visibleCounter++;
-
-            if ($visibleCounter === $activeTabIndex) {
-                return $tab->getKey(isAbsolute: false);
-            }
-        }
-
-        return $this->getVisibleTabs()[0]?->getKey(isAbsolute: false);
-    }
-
-    public function isTabActive(SegmentTab $tab): bool
-    {
-        $activeTabKey = $this->getActiveTabKey();
-
-        if (blank($activeTabKey)) {
-            return false;
-        }
-
-        return $tab->getKey(isAbsolute: false) === $activeTabKey;
+            return new SegmentItem(
+                key: (string) $tab->getKey(isAbsolute: false), label: $tab->getLabel(), icon: $tab->getIcon(),
+                tooltip: $tab->getTooltip(), panelId: $tab->getId(),
+                visibilityJs: self::tabVisibilityExpression($tab), badge: $badge,
+                badgeColor: filled($badge) ? $tab->getBadgeColor($badge) : null,
+                badgeTooltip: filled($badge) ? $tab->getBadgeTooltip($badge) : null,
+            );
+        }, $this->getVisibleTabs());
     }
 }

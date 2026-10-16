@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SignatureField;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
+use Bjanczak\FilamentFlexFields\Support\Playground\SignatureFieldPlayground;
+use Bjanczak\FilamentFlexFields\Support\Playground\SignaturePlaygroundFixture;
 use Bjanczak\FilamentFlexFields\Support\SignatureSvg;
 
 it('validates compact svg signatures', function () {
@@ -46,7 +47,7 @@ it('exposes configurable max svg size', function () {
 });
 
 it('registers signature playground defaults', function () {
-    $state = app(FlexFieldsPlaygroundBuilder::class)->defaultState();
+    $state = app(SignatureFieldPlayground::class)->defaultState();
 
     expect($state)->toHaveKeys([
         'signature__contract',
@@ -55,6 +56,16 @@ it('registers signature playground defaults', function () {
         'signature__webp',
         'signature__readonly',
     ]);
+    $fixture = SignaturePlaygroundFixture::svg();
+    expect(SignatureSvg::isValid($fixture))->toBeTrue()
+        ->and(SignatureSvg::isEmpty($fixture))->toBeFalse()
+        ->and(strlen($fixture))->toBeLessThan(48 * 1024)
+        ->and($fixture)->toContain('fill-rule="evenodd"')->not->toContain('<?xml', '<g', '<metadata', 'transform=')
+        ->and($state['signature__readonly'])->toBe($fixture)
+        ->and($state['signature__webp'])->toBe(SignaturePlaygroundFixture::replaySvg())
+        ->and($state['signature__webp'])->toContain('data-fff-ink=')
+        ->and(SignatureSvg::isValid($state['signature__webp']))->toBeTrue()
+        ->and(strlen($state['signature__webp']))->toBeLessThan(48 * 1024);
 });
 
 it('exposes smoothing and download configuration', function () {
@@ -85,15 +96,15 @@ it('rejects invalid trackpad glide shortcut keys', function () {
     SignatureField::make('signature')->trackpadGlideKey('draw')->getTrackpadGlideKey();
 })->throws(InvalidArgumentException::class);
 
-it('exposes gravity control icons', function () {
+it('exposes Hugeicons defaults for signature controls', function () {
     $field = SignatureField::make('signature');
 
-    expect($field->getUndoIcon())->toBe(GravityIcon::ArrowRotateLeft)
-        ->and($field->getClearIcon())->toBe(GravityIcon::ArrowsRotateRight)
-        ->and($field->getDownloadIcon())->toBe(GravityIcon::ArrowDownToSquare)
-        ->and($field->getFullscreenIcon())->toBe(GravityIcon::ChevronsExpandUpRight)
-        ->and($field->getPdfPreviewIcon())->toBe(GravityIcon::FileText)
-        ->and($field->getCloseIcon())->toBe(GravityIcon::Xmark);
+    expect($field->getUndoIcon())->toBe(FlexIcon::ArrowRotateLeft)
+        ->and($field->getClearIcon())->toBe(FlexIcon::ArrowsRotateRight)
+        ->and($field->getDownloadIcon())->toBe(FlexIcon::ArrowDownToSquare)
+        ->and($field->getFullscreenIcon())->toBe(FlexIcon::ChevronsExpandUpRight)
+        ->and($field->getPdfPreviewIcon())->toBe(FlexIcon::FileText)
+        ->and($field->getCloseIcon())->toBe(FlexIcon::Xmark);
 });
 
 it('exposes notebook guidelines configuration', function () {

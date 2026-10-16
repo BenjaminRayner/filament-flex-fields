@@ -6,18 +6,19 @@ namespace Bjanczak\FilamentFlexFields\Filament\Tables\Columns;
 
 use Bjanczak\FilamentFlexFields\Concerns\ResolvesUserDisplay;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\Concerns\EmitsFlexFieldTableColumnAssets;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldStylesheetQueue;
 use Bjanczak\FilamentFlexFields\Support\UserColumnRenderCache;
 use Bjanczak\FilamentFlexFields\Support\UserColumnSharedStackCache;
 use Bjanczak\FilamentFlexFields\Support\UserColumnStackState;
 use Closure;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 
 class UserColumn extends TextColumn
 {
@@ -41,11 +42,9 @@ class UserColumn extends TextColumn
     {
         parent::setUp();
 
-        FlexFieldStylesheetQueue::enqueueFor('user-column');
-
         $this->html();
 
-        $this->formatStateUsing(fn (mixed $state, UserColumn $column): string => $column->formatUserDisplay($state));
+        $this->formatStateUsing(fn (mixed $state, UserColumn $column): Htmlable => new HtmlString($column->formatUserDisplay($state)));
     }
 
     public function getState(): mixed

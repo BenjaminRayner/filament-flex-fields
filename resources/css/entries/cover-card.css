@@ -1,7 +1,8 @@
 @import "../utilities-baseline.css";
 @import "../base.css";
 
-@source "../../src/Filament/Schemas/Components/CoverCard.php";
-@source "../views/schemas/components/cover-card.blade.php";
+@source "../../../src/Filament/Schemas/Components/CoverCard.php";
+@source "../../views/schemas/components/cover-card.blade.php";
+@source "../../views/schemas/components/cover-card/**/*.blade.php";
 
 @import "../components/cover-card.css";

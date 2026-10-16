@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CountryField;
 use Bjanczak\FilamentFlexFields\Support\Countries;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
+use Bjanczak\FilamentFlexFields\Support\Playground\CountryFieldPlayground;
+use Illuminate\Support\Facades\Validator;
 
 it('exposes country field configuration api', function () {
     $field = CountryField::make('country')
@@ -92,24 +93,19 @@ it('sorts preferred country first when browser locale sort is enabled', function
     expect($field->getCountriesMetadata()[0]['code'])->toBe($preferred);
 });
 
-it('does not use laravel required rule on nullable state', function () {
+it('uses native required validation', function () {
     $field = CountryField::make('country')->required();
-
-    expect($field->getRequiredValidationRule())->toBe('nullable')
-        ->and($field->getValidationRules())->not->toContain('required');
+    expect($field->getRequiredValidationRule())->toBe('required')
+        ->and($field->getValidationRules())->toContain('required');
 });
 
 it('requires a country when the field is required', function () {
-    $field = CountryField::make('country')->required()->label('Country');
-
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
-
-    $message = null;
-    $rule('country', null, function (string $failMessage) use (&$message): void {
-        $message = $failMessage;
-    });
-
-    expect($message)->toBe(__('validation.required', ['attribute' => 'Country']));
+    $field = CountryField::make('country')->required();
+    $validator = Validator::make(
+        ['country' => null], ['country' => $field->getValidationRules()],
+    );
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->failed()['country'])->toHaveKey('Required');
 });
 
 it('rejects countries outside the allowed list', function () {
@@ -128,29 +124,13 @@ it('rejects countries outside the allowed list', function () {
 });
 
 it('registers country field playground variants', function () {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
+    $builder = app(CountryFieldPlayground::class);
     $state = $builder->defaultState();
 
     expect($state)->toHaveKeys([
         'country__basic',
         'country__limited',
         'country__browser_locale',
-    ]);
-});
-
-it('includes wrapper classes for size and variant', function () {
-    $field = CountryField::make('country')
-        ->size('sm')
-        ->variant('secondary');
-
-    expect($field->getWrapperClasses())->toBe([
-        'fff-country-field',
-        'fff-flex-text-input-field',
-        'fff-country-field--sm',
-        'fff-rounding-md',
-        'fff-flex-text-input-field--sm',
-        'fff-country-field--secondary',
-        'fff-flex-text-input-field--secondary',
     ]);
 });
 

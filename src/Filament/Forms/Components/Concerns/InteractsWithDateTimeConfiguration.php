@@ -209,6 +209,12 @@ trait InteractsWithDateTimeConfiguration
         return $this;
     }
 
+    /** Sunday is 0; Monday is 1. Delegates to the shared first-day configuration. */
+    public function weekStartsOn(int|Closure $day): static
+    {
+        return $this->firstDayOfWeek($day);
+    }
+
     public function hideTimeZone(bool|Closure $condition = true): static
     {
         $this->hideTimeZone = $condition;
@@ -454,9 +460,12 @@ trait InteractsWithDateTimeConfiguration
             return DateTimeOs::firstDayOfWeekForLocale($this->getLocale());
         }
 
-        $day = (int) $this->evaluate($this->firstDayOfWeek);
+        $day = $this->evaluate($this->firstDayOfWeek);
+        if (! is_int($day) || $day < 0 || $day > 6) {
+            throw new InvalidArgumentException('First day of week must be an integer from 0 (Sunday) to 6.');
+        }
 
-        return max(0, min(6, $day));
+        return $day;
     }
 
     public function shouldHideTimeZone(): bool

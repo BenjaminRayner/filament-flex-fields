@@ -1,0 +1,387 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'field_variant' => 'Feld',
+    'display_variant' => 'Anzeige',
+    'column_variant' => 'Tabellenspalte',
+    'recording' => [
+        'title' => 'Aufnahmeansicht',
+        'choose_hint' => 'Klicken Sie auf ein Beispiel, um eine Vorschau anzuzeigen. Klicken Sie bei gedrückter Umschalttaste, um bis zu drei auszuwählen.',
+        'preview' => 'Vorschauauswahl',
+        'cancel' => 'Abbrechen',
+        'close' => 'Aufnahmeansicht schließen',
+        'zoom' => 'Zoom',
+        'vertical' => 'Vertikale Position',
+        'helpers' => 'Hilfstext anzeigen',
+        'width' => 'Komponentenbreite',
+        'shortcuts' => '16:9 · Alt+H blendet Steuerelemente aus · Escape / Alt+R beendet',
+    ],
+    'developer_tools' => 'Entwicklertools',
+    'developer_tools_description' => 'Testen Sie, wie gemeinsam genutzte Assets in echten Filament-Formularen, Tabellen und verschachtelten Dialogen geladen und freigegeben werden.',
+    'included' => 'Im Lieferumfang enthalten',
+    'dark_mode' => 'Dunkler Modus',
+    'light_mode' => 'Heller Modus',
+    'sponsors' => 'Sponsoren',
+    'top_sponsors' => 'Top-Sponsoren',
+    'become_sponsor' => 'Werden Sie Sponsor auf GitHub',
+    'sponsors_scroll' => 'Scrollen Sie mit den Pfeiltasten oder Wischen durch die Sponsoren',
+    'previous_sponsors' => 'Frühere Sponsoren',
+    'next_sponsors' => 'Weitere Sponsoren',
+    'sponsor_ranks' => [
+        'bronze' => 'Bronze',
+        'silver' => 'Silber',
+        'gold' => 'Gold',
+    ],
+    'form_state' => 'Formularstatus',
+    'form_state_hint' => 'Eine Momentaufnahme der aktuellen Demowerte.',
+    'close' => 'Schließen',
+    'demo_reset' => 'Demo-Reset',
+    'loading_examples' => 'Codebeispiele werden geladen…',
+    'no_examples' => 'Für diese Komponente wurden noch keine Codebeispiele veröffentlicht.',
+    'example_files' => 'Beispieldateien',
+    'copy_code' => 'Kopieren',
+    'code_copied' => 'Kopiert',
+    'copy_failed' => 'Kopieren fehlgeschlagen',
+    'example_unavailable' => 'Diese Beispieldatei ist derzeit nicht verfügbar.',
+    'example_hint' => 'Bereit zur Anpassung an Ihr eigenes Formular.',
+    'live_demo' => 'Live-Vorschau',
+    'demo_actions' => 'Demo-Aktionen',
+    'pause_banners' => 'Automatische Folien anhalten',
+    'resume_banners' => 'Automatische Folien fortsetzen',
+    'footer_tagline' => 'Durchdacht gebaut. Bereit zum Komponieren.',
+    'footer_project' => 'Projekt auf GitHub',
+    'loading_banner' => 'Empfohlener Inhalt wird geladen…',
+    'loading_promotions' => 'Empfohlene Banner werden aktualisiert…',
+    'banner_slide' => 'Banner anzeigen :number',
+    'banner_slides' => 'Banner auswählen',
+    'information' => 'Informationen',
+    'developer' => 'Entwickler',
+    'category' => 'Kategorie',
+    'version' => 'Version',
+    'website' => 'Website',
+    'privacy_policy' => 'Datenschutzrichtlinie',
+    'terms_of_service' => 'Nutzungsbedingungen',
+    'install_short' => 'Installieren',
+    'breadcrumb' => 'Brotkrümelnavigation',
+    'validate' => 'Validieren',
+    'dump_json' => 'JSON-Dump',
+    'reset_defaults' => 'Standardeinstellungen zurücksetzen',
+    'count' => ':count Komponenten und Erweiterungen',
+    'search' => 'Komponenten durchsuchen…',
+    'collection' => 'Sammlung durchsuchen',
+    'all' => 'Alle',
+    'installed' => 'Installiert',
+    'community' => 'Gemeinschaft',
+    'component_type' => 'Komponententyp',
+    'component_types' => [
+        'all' => 'Alle Typen',
+        'field' => 'Formularfelder',
+        'column' => 'Tabellenspalten',
+        'display' => 'Inhalt und Layouts',
+        'entry' => 'Infolisteneinträge',
+        'action' => 'Aktionen',
+    ],
+    'results' => 'Ergebnisse',
+    'categories' => 'Kategorien',
+    'all_categories' => 'Alle Kategorien',
+    'popular' => 'Beliebt',
+    'noteworthy' => 'Neu und bemerkenswert',
+    'all_components' => 'Entdecken Sie FLEX',
+    'empty' => 'Keine Komponenten entsprechen Ihrer Suche.',
+    'clear_filters' => 'Filter löschen',
+    'install_named' => 'Installieren Sie :name',
+    'explore_named' => 'Entdecken Sie :name',
+    'official' => 'Offizielle FLEX-Komponente',
+    'carousel' => 'Karussell',
+    'promotion' => 'Hervorgehoben',
+    'previous_banner' => 'Vorheriges Banner',
+    'next_banner' => 'Nächstes Banner',
+    'verified' => 'Offizielle FLEX-Komponente',
+    'install' => 'Plugin installieren',
+    'github' => 'Auf GitHub ansehen',
+    'demo' => 'Demo',
+    'code_example' => 'Codebeispiel',
+    'extension_notice' => 'Dies ist ein empfohlenes externes Plugin. Installation und Dokumentation werden vom Autor auf GitHub bereitgestellt.',
+    'component_notice' => 'Diese Komponente ist in FLEX registriert und kann verwendet werden. Der Autor hat keine interaktive Demo bereitgestellt.',
+    'previous' => 'Vorheriges Banner',
+    'next' => 'Nächstes Banner',
+    'navigation_group' => 'Einstellungen und Tools',
+    'category_labels' => [
+        'buttons' => 'Aktionen',
+        'collections' => 'Sammlungen',
+        'colors' => 'Farben',
+        'controls' => 'Steuerelemente',
+        'data-display' => 'Datenanzeige',
+        'date-and-time' => 'Datum und Uhrzeit',
+        'guides' => 'Anleitungen',
+        'location' => 'Standort',
+        'media' => 'Medien',
+        'navigation' => 'Navigation',
+        'pickers' => 'Auswahlfelder',
+        'text-input' => 'Texteingaben',
+    ],
+    'components' => [
+        'font-select' => [
+            'label' => 'Schriftart auswählen',
+            'description' => 'Suchen Sie nach Schriftarten mit Live-Vorschau, Kategoriefiltern und virtualisiertem unendlichem Scrollen.',
+        ],
+        'address-autocomplete' => [
+            'label' => 'Automatische Vervollständigung der Adresse',
+            'description' => 'Finden Sie Adressen mit gemeinsamer Suche, strukturierten Ergebnissen und konfigurierbarer Geokodierung.',
+        ],
+        'admin-columns' => [
+            'label' => 'Admin-Spalten',
+            'description' => 'Tabellendarstellungen für Status, Fortschritt, Symbole und andere kompakte Daten.',
+        ],
+        'audio-field' => [
+            'label' => 'Audioplayer',
+            'description' => 'Kompakter Audioplayer mit Wellenformvisualisierung, Wiedergabe-/Pause-Steuerung, optionaler Schleife und optionalem clientseitigen Whisper Speech-to-Text.',
+        ],
+        'barcode-scanner-field' => [
+            'label' => 'Barcode-Scanner',
+            'description' => 'Entdecken Sie Barcode-Scanner mit konfigurierbarem Verhalten, Stil und Live-Beispielen.',
+        ],
+        'bubble-choice' => [
+            'label' => 'Blasenauswahl',
+            'description' => 'Blasen-Mehrfachauswahl mit mittlerer Vergrößerung, Randverkleinerung beim Schwenken und optionaler gewellter Auswahl.',
+        ],
+        'calculator-field' => [
+            'label' => 'Rechnerfeld',
+            'description' => 'Numerische Eingabe mit einem gemeinsamen Rechnerfeld im iOS-Stil, Sitzungsspeicher pro Feld und vollständigen numerischen Einschränkungen.',
+        ],
+        'choice-cards' => [
+            'label' => 'Auswahlkarten',
+            'description' => 'Präsentieren Sie auswählbare Karten mit Symbolen, Beschriftungen, Beschreibungen und aktivierten Status.',
+        ],
+        'choice-checkbox-cards' => [
+            'label' => 'Auswahl-Checkbox-Karten',
+            'description' => 'Multiple-Choice-Karten mithilfe der gemeinsamen animierten Auswahlanzeige.',
+        ],
+        'color-swatch' => [
+            'label' => 'Farbmuster',
+            'description' => 'Voreingestellte Farbauswahl: horizontale Farbfeldpillen mit optionaler Abschnittsüberschrift und Tooltips.',
+        ],
+        'country-field' => [
+            'label' => 'Länderfeld',
+            'description' => 'Suchen Sie nach Ländern und Gebieten mit lokalen Flaggen; Speichern Sie einen aus zwei Buchstaben bestehenden Ländercode.',
+        ],
+        'country-map-field' => [
+            'label' => 'Länderkarte',
+            'description' => 'Wählen Sie Länder auf einer interaktiven Weltkarte mit Regionsauswahl und -suche aus.',
+        ],
+        'cover-card' => [
+            'label' => 'Deckkarte',
+            'description' => 'Präsentieren Sie ein Titelbild, einen Titel und eine Beschreibung in einer statischen Karte.',
+        ],
+        'credit-card' => [
+            'label' => 'Kreditkarte',
+            'description' => 'Kreditkarteneingabe mit Live-Markenerkennung, interaktiver Vorschau und serverseitiger Luhn-Validierung.',
+        ],
+        'currency-field' => [
+            'label' => 'Währungsfeld',
+            'description' => 'Währungseingabe im Revolut-Stil mit länderspezifischer Formatierung, Ziffernanimationen, optionaler Währungsauswahl und Speicherung kleinerer Einheiten.',
+        ],
+        'date-time-fields' => [
+            'label' => 'Datums- und Uhrzeitfelder',
+            'description' => 'Datums-, Uhrzeit- und Bereichsauswahl mit gemeinsamer Kalenderoberfläche und Tastaturunterstützung.',
+        ],
+        'dual-listbox' => [
+            'label' => 'Doppelte Listbox',
+            'description' => 'Dual-Panel-Auswahltool mit Suche, Neuordnung und virtuellem Scrollen.',
+        ],
+        'field-intelligence' => [
+            'label' => 'Berechnete Formeln',
+            'description' => 'Validierte Berechnungen, abhängigkeitsbewusste Formeln und vom Server berechnete Formularwerte.',
+        ],
+        'file-upload' => [
+            'label' => 'Datei-Upload',
+            'description' => 'Laden Sie Dateien und Bilder mit Vorschauen, Einschränkungen und Medienkonfiguration hoch.',
+        ],
+        'flex-checklist' => [
+            'label' => 'Flex-Checkliste',
+            'description' => 'Barrierefreie Einzel- oder Mehrfachauswahl mit konfigurierbaren Listendarstellungen.',
+        ],
+        'flex-color-picker' => [
+            'label' => 'Flex-Farbwähler',
+            'description' => 'Wählen Sie Farben mit einem HSV-Bereich, Kanalschiebereglern, Formaten und Farbfeldern.',
+        ],
+        'flex-matrix-table' => [
+            'label' => 'Flex-Matrix-Tabelle',
+            'description' => 'Bearbeiten Sie strukturierte Auswahlmöglichkeiten in Zeilen und Spalten mit gemeinsamen Formularsteuerelementen.',
+        ],
+        'flex-radiolist' => [
+            'label' => 'Flex-Radioliste',
+            'description' => 'Erweiterte Radioliste mit Symbolen, Beschreibungen und benutzerdefinierten Größen.',
+        ],
+        'flex-rich-editor' => [
+            'label' => 'Flex Rich Editor',
+            'description' => 'Umfangreiche Dokumentenbearbeitung, Formatierung, Medien und erweiterbare Inhaltsblöcke.',
+        ],
+        'flex-slider' => [
+            'label' => 'Flex-Schieberegler',
+            'description' => 'Pillen- und Kreisschieber mit elastischer Bewegung, rollenden Zahlen, magnetischen Markierungen und validierten Bereichen.',
+        ],
+        'flex-text-input' => [
+            'label' => 'Flex-Texteingabe',
+            'description' => 'Vielseitige Texteingaben mit gemeinsamen Stilen, Validierungen, Größen und visuellen Varianten.',
+        ],
+        'flex-textarea' => [
+            'label' => 'Flex-Textbereich',
+            'description' => 'Intelligente automatische Größenanpassung des Textbereichs mit Zeichenzählern, Sprachdiktat und Emoji-Unterstützung.',
+        ],
+        'hold-confirm' => [
+            'label' => 'Halten Sie die Taste gedrückt',
+            'description' => 'Bestätigen Sie absichtliche Aktionen mit Halten, Inline-Fragen, Countdown, Serverfortschritt und optionalem Rückgängigmachen.',
+        ],
+        'icon-column' => [
+            'label' => 'IconColumn',
+            'description' => 'Schreibgeschützte Tabellenspalte zur Anzeige von Blade-Symbolen mit optionalen Beschriftungen, Farben und Größen.',
+        ],
+        'icon-picker-field' => [
+            'label' => 'Symbolauswahl',
+            'description' => 'Durchsuchen Sie Symbole mit Suche, Listen- oder Rasterlayouts, virtuellem Rendering und Paginierung.',
+        ],
+        'image-choice-cards' => [
+            'label' => 'Bildauswahlkarten',
+            'description' => 'Wählen Sie visuelle Optionen mit Bildkarten, Bildunterschriften und konsistenten Häkchenzuständen aus.',
+        ],
+        'item-card-group' => [
+            'label' => 'ItemCardGroup',
+            'description' => 'Gruppieren Sie Inhalte und Aktionen in konfigurierbaren Kartenlayouts.',
+        ],
+        'link-preview-field' => [
+            'label' => 'Linkvorschau',
+            'description' => 'Entdecken Sie die Linkvorschau mit konfigurierbarem Verhalten, Stil und Live-Beispielen.',
+        ],
+        'map-picker' => [
+            'label' => 'Kartenauswahl',
+            'description' => 'Suchen Sie nach Adressen und wählen Sie einen Ort mit strukturierten Koordinaten.',
+        ],
+        'matrix-choice' => [
+            'label' => 'Matrixauswahl',
+            'description' => 'Entdecken Sie die Matrixauswahl mit konfigurierbarem Verhalten, Stil und Live-Beispielen.',
+        ],
+        'nps-field' => [
+            'label' => 'NPS-Feld',
+            'description' => 'NPS-, CSAT- und Likert-Skaleneingaben mit drei visuellen Varianten.',
+        ],
+        'number-stepper' => [
+            'label' => 'Zahleneingabe mit Schritttasten',
+            'description' => 'Pillenförmige numerische Steuerung mit − / + Tasten und animierter NumberFlow-Anzeige.',
+        ],
+        'phone-field' => [
+            'label' => 'Telefonfeld',
+            'description' => 'Internationale Telefonnummern mit durchsuchbaren Ländervorwahlen und Validierung.',
+        ],
+        'price-range' => [
+            'label' => 'Preisspanne',
+            'description' => 'Preisspannen-Schieberegler mit zwei Griffen, Histogramm-Hintergrund, minimalen/maximalen numerischen Eingaben und Währungspräfix.',
+        ],
+        'progress-bar' => [
+            'label' => 'Fortschrittsbalken',
+            'description' => 'Präsentieren Sie Fortschritte, Ziele und Meilensteine mit konfigurierbaren visuellen Zuständen.',
+        ],
+        'progress-circle' => [
+            'label' => 'Fortschrittskreis',
+            'description' => 'Kreisförmige Fortschrittsanzeigen mit Beschriftungen, Farben und Größen.',
+        ],
+        'rating-column' => [
+            'label' => 'RatingColumn',
+            'description' => 'Bewertungen in Tabellen mit konfigurierbaren Symbolen und numerischen Werten anzeigen.',
+        ],
+        'rating' => [
+            'label' => 'Bewertung',
+            'description' => 'Erfassen Sie Bewertungen mit benutzerdefinierten Symbolen, Präzision, Beschriftungen und Größen.',
+        ],
+        'schedule-field' => [
+            'label' => 'Feld Zeitplan',
+            'description' => 'Wöchentliche Verfügbarkeit, Zeitbereiche, Pausen und zeitzonenbezogene Konfiguration.',
+        ],
+        'segment-control' => [
+            'label' => 'Segmentsteuerung',
+            'description' => 'Segmentierte Einzelauswahlsteuerung im IOS-Stil mit Schiebeanzeigen, Symbolen und animierter Beschriftungserweiterung.',
+        ],
+        'segment-tabs' => [
+            'label' => 'Segmentregisterkarten',
+            'description' => 'Erstellen Sie Formularabschnitte mit animierten Registerkarten, verschachtelten Schemata und dauerhafter Auswahl.',
+        ],
+        'select-field' => [
+            'label' => 'Auswahlfeld',
+            'description' => 'Umfangreiche Auswahl mit Suche, gruppierten Optionen, virtuellen Listen und Remote-Paginierung.',
+        ],
+        'signature-field' => [
+            'label' => 'Unterschrift',
+            'description' => 'Entdecken Sie die Signatur mit konfigurierbarem Verhalten, Stil und Live-Beispielen.',
+        ],
+        'slug-field' => [
+            'label' => 'Slug-Feld',
+            'description' => 'Entdecken Sie das Slug-Feld mit konfigurierbarem Verhalten, Stil und Live-Beispielen.',
+        ],
+        'social-links-field' => [
+            'label' => 'Soziale Links',
+            'description' => 'Erstellen Sie eine Reihe sozialer Links mit Plattformsymbolen und URL-Validierung.',
+        ],
+        'switch' => [
+            'label' => 'Schalter',
+            'description' => 'Boolescher Schalter mit Zeilen- und Kartenlayouts, Abzeichen und Welleneffekten.',
+        ],
+        'tags-field' => [
+            'label' => 'Tag-Feld',
+            'description' => 'Suchen, wählen und erstellen Sie Tags mit kompakten Chips und einem gemeinsamen Dropdown.',
+        ],
+        'timezone-field' => [
+            'label' => 'Zeitzonenfeld',
+            'description' => 'Durchsuchen Sie Weltzeitzonen mit lokalen Offsets und Browser-Standardeinstellungen.',
+        ],
+        'todo-list-field' => [
+            'label' => 'Todo-Liste',
+            'description' => 'Interaktive Aufgabenlisten mit Erledigungsstatus, Sortierung und konfigurierbarem Feedback.',
+        ],
+        'track-slider' => [
+            'label' => 'Spurschieberegler',
+            'description' => 'Minimalistischer spurbasierter Bereichsschieberegler mit optionaler Live-Wertausgabe.',
+        ],
+        'traffic-split' => [
+            'label' => 'Verkehrsaufteilung',
+            'description' => 'Interaktiver prozentualer Gewichtsverteiler für A/B-Tests und Traffic-Zuweisung.',
+        ],
+        'translatable-fields' => [
+            'label' => 'Übersetzbare Felder',
+            'description' => 'Erstellen Sie lokalisierte Felder und wechseln Sie zwischen sprachspezifischen Formularzuständen.',
+        ],
+        'user-column' => [
+            'label' => 'Benutzerspalte',
+            'description' => 'Präsentieren Sie Benutzer, Avatare und zusätzliche Identitätsinformationen in Tabellenspalten.',
+        ],
+        'user-select' => [
+            'label' => 'Benutzerauswahl',
+            'description' => 'Wählen Sie Personen mit Avataren, Namen, sekundären Details und Mehrfachauswahl aus.',
+        ],
+        'verification-code' => [
+            'label' => 'Bestätigungscode',
+            'description' => 'OTP-Eingabe mit gruppierten Zeichenfeldern, Einfügefunktion und optionalen Bedienelementen zur Kontobestätigung.',
+        ],
+        'video-field' => [
+            'label' => 'Videofeld',
+            'description' => 'Benutzerdefinierter Videoplayer mit optionaler YouTube-Einbettung, Steuerelementen zum Überspringen, PiP, Vollbild und kompaktem Steuerelementlayout.',
+        ],
+        'voice-note-recorder-field' => [
+            'label' => 'Sprachnotizen-Recorder',
+            'description' => 'In-Browser-Diktiergerät mit Echtzeitvisualisierung, Inline-Wiedergabe und Filament-Speicherintegration.',
+        ],
+    ],
+    'promotions' => [
+        'discover-flex' => [
+            'title' => 'Kleine Details. Bessere Erfahrungen.',
+            'description' => 'Entdecken Sie FLEX-Komponenten, probieren Sie die Demos aus und finden Sie die richtigen Bausteine für Ihre nächste Idee.',
+            'action' => 'Lernen Sie FLEX kennen',
+        ],
+        'compose-with-flex' => [
+            'title' => 'Ihre nächste Idee beginnt hier.',
+            'description' => 'Erstellen Sie mit gemeinsam genutzten Komponenten, erkunden Sie deren Konfiguration und machen Sie sie zu Ihren eigenen.',
+            'action' => 'Entdecken Sie das Projekt',
+        ],
+    ],
+];

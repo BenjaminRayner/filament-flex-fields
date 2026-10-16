@@ -6,17 +6,18 @@ namespace Bjanczak\FilamentFlexFields\Support\FormBuilder\Configurators;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\NpsField;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Contracts\FieldConfigurator;
+use Bjanczak\FilamentFlexFields\Support\Translations;
 use Filament\Schemas\Components\Component;
 
 final class NpsFieldConfigurator implements FieldConfigurator
 {
     /** @var array<int, string> */
     private const EMOJI_OPTIONS = [
-        0 => 'Awful',
-        1 => 'Poor',
-        2 => 'Neutral',
-        3 => 'Good',
-        4 => 'Excellent',
+        0 => 'awful',
+        1 => 'poor',
+        2 => 'neutral',
+        3 => 'good',
+        4 => 'excellent',
     ];
 
     public function configure(Component $field, array $config): Component
@@ -29,22 +30,24 @@ final class NpsFieldConfigurator implements FieldConfigurator
     public function configureNpsField(NpsField $field, array $config): NpsField
     {
         $variant = (string) ($config['variant'] ?? 'pills');
-        $options = $variant === 'emojis'
-            ? $this->resolveEmojiOptions($config)
-            : $this->resolveNumericOptions($config);
-
         $field = $field
-            ->options($options)
+            ->options($variant === 'emojis'
+                ? fn (): array => $this->resolveEmojiOptions($config)
+                : $this->resolveNumericOptions($config))
             ->variant($variant)
             ->colorCoded((bool) ($config['color_coded'] ?? false))
             ->size((string) ($config['size'] ?? 'md'));
 
         if ($variant !== 'emojis') {
-            if (array_key_exists('min_label', $config) && $config['min_label'] !== null && $config['min_label'] !== '') {
+            if (! array_key_exists('min_label', $config)) {
+                $field->minLabel(fn (): string => Translations::get('filament-flex-fields::default.nps.min'));
+            } elseif ($config['min_label'] !== null && $config['min_label'] !== '') {
                 $field->minLabel((string) $config['min_label']);
             }
 
-            if (array_key_exists('max_label', $config) && $config['max_label'] !== null && $config['max_label'] !== '') {
+            if (! array_key_exists('max_label', $config)) {
+                $field->maxLabel(fn (): string => Translations::get('filament-flex-fields::default.nps.max'));
+            } elseif ($config['max_label'] !== null && $config['max_label'] !== '') {
                 $field->maxLabel((string) $config['max_label']);
             }
         }
@@ -75,12 +78,11 @@ final class NpsFieldConfigurator implements FieldConfigurator
         $normalized = $this->normalizeOptions($config['options'] ?? null);
         $options = self::EMOJI_OPTIONS;
 
-        foreach ($options as $key => $defaultLabel) {
+        foreach ($options as $key => $translation) {
             $label = $normalized[$key] ?? $normalized[(string) $key] ?? null;
-
-            if (is_string($label) && trim($label) !== '') {
-                $options[$key] = trim($label);
-            }
+            $options[$key] = is_string($label) && trim($label) !== ''
+                ? trim($label)
+                : Translations::get('filament-flex-fields::default.nps.'.$translation);
         }
 
         return $options;

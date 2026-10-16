@@ -844,3 +844,5 @@
 .dark .fff-audio-field__transcript-text {
     color: rgb(244 244 245);
 }
+
+.fff-audio-field__play svg, .fff-audio-field__settings-trigger svg, .fff-audio-field__settings-item-chevron svg { stroke-width: 2; }

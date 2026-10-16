@@ -4,29 +4,24 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support;
 
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
+use Bjanczak\FilamentFlexFields\Support\Select\Catalog\PickerCatalogState;
 use libphonenumber\PhoneNumberUtil;
 
 class Countries
 {
+    /** Reserved or user-assigned regions, explicitly enabled rather than presented as ISO entries. */
+    public const ADDITIONAL_REGION_CODES = ['AC', 'DG', 'EA', 'IC', 'TA', 'XK'];
+
     /**
      * @var list<string>|null
      */
     private static ?array $allCodesCache = null;
 
     /**
-     * @var array<string, array<string, string>>
-     */
-    private static array $nameCache = [];
-
-    /**
      * @var array<string, int>|null
      */
     private static ?array $phoneRegionsCache = null;
-
-    /**
-     * @var array<string, array<string, array{code: string, name: string, dial_code: string|null, flag_url: string}>>
-     */
-    private static array $metadataCache = [];
 
     /**
      * @var array<string, string>
@@ -70,32 +65,36 @@ class Countries
 
     public static function flagUrl(string $countryCode): string
     {
-        return PhoneCountries::flagUrl($countryCode);
+        return CountryFlags::url($countryCode);
     }
 
     public static function name(string $countryCode, ?string $locale = null): string
     {
         $code = strtoupper($countryCode);
         $locale ??= app()->getLocale();
+        $cache = RequestState::resolve(PickerCatalogState::class);
+        $cache->touchLocale($locale);
 
-        if (isset(self::$nameCache[$locale][$code])) {
-            return self::$nameCache[$locale][$code];
+        if (isset($cache->countryNames[$locale][$code])) {
+            return $cache->countryNames[$locale][$code];
         }
 
         $translationKey = "filament-flex-fields::countries.{$code}";
-        $translated = trans($translationKey, [], $locale);
+        $translated = app('translator')->get($translationKey, [], $locale, false);
 
         if (is_string($translated) && $translated !== $translationKey) {
-            return self::$nameCache[$locale][$code] = $translated;
+            return $cache->countryNames[$locale][$code] = $translated;
         }
 
-        $fallback = locale_get_display_region('-'.$code, $locale);
+        $fallback = function_exists('locale_get_display_region') ? locale_get_display_region('-'.$code, $locale) : null;
 
         if (is_string($fallback) && $fallback !== '' && $fallback !== $code) {
-            return self::$nameCache[$locale][$code] = $fallback;
+            return $cache->countryNames[$locale][$code] = $fallback;
         }
 
-        return self::$nameCache[$locale][$code] = $code;
+        $english = app('translator')->get($translationKey, [], 'en', false);
+
+        return $cache->countryNames[$locale][$code] = is_string($english) && $english !== $translationKey ? $english : $code;
     }
 
     public static function dialCode(string $countryCode): ?string
@@ -171,11 +170,14 @@ class Countries
     /**
      * @param  list<string>|null  $only
      * @param  list<string>  $except
+     * @param  list<string>  $additional
      * @return list<string>
      */
-    public static function resolve(?array $only = null, array $except = []): array
+    public static function resolve(?array $only = null, array $except = [], array $additional = []): array
     {
-        $supported = array_flip(self::allCodes());
+        $additional = array_values(array_intersect(self::ADDITIONAL_REGION_CODES, array_map(strtoupper(...), $additional)));
+        $catalog = [...self::allCodes(), ...$additional];
+        $supported = array_flip($catalog);
         $except = array_map(strtoupper(...), $except);
 
         if ($only !== null) {
@@ -201,7 +203,7 @@ class Countries
         }
 
         $codes = array_values(array_filter(
-            self::allCodes(),
+            $catalog,
             fn (string $code): bool => ! in_array($code, $except, true),
         ));
 
@@ -244,22 +246,25 @@ class Countries
     /**
      * @param  list<string>|null  $only
      * @param  list<string>  $except
+     * @param  list<string>  $additional
      * @return list<array{code: string, name: string, dial_code: string|null, flag_url: string}>
      */
-    public static function metadata(?array $only = null, array $except = [], ?string $locale = null): array
+    public static function metadata(?array $only = null, array $except = [], ?string $locale = null, array $additional = []): array
     {
         $locale ??= app()->getLocale();
+        $cache = RequestState::resolve(PickerCatalogState::class);
+        $cache->touchLocale($locale);
 
-        if (! isset(self::$metadataCache[$locale])) {
-            self::$metadataCache[$locale] = [];
+        if (! isset($cache->countryMetadata[$locale])) {
+            $cache->countryMetadata[$locale] = [];
         }
 
-        $resolved = self::resolve($only, $except);
+        $resolved = self::resolve($only, $except, $additional);
         $results = [];
 
         foreach ($resolved as $code) {
-            if (! isset(self::$metadataCache[$locale][$code])) {
-                self::$metadataCache[$locale][$code] = [
+            if (! isset($cache->countryMetadata[$locale][$code])) {
+                $cache->countryMetadata[$locale][$code] = [
                     'code' => $code,
                     'name' => self::name($code, $locale),
                     'dial_code' => self::dialCode($code),
@@ -267,7 +272,7 @@ class Countries
                 ];
             }
 
-            $results[] = self::$metadataCache[$locale][$code];
+            $results[] = $cache->countryMetadata[$locale][$code];
         }
 
         return $results;
@@ -276,13 +281,14 @@ class Countries
     /**
      * @param  list<string>|null  $only
      * @param  list<string>  $except
+     * @param  list<string>  $additional
      * @return array<string, array{label: string, image: string, description: string}>
      */
-    public static function selectOptions(?array $only = null, array $except = [], ?string $locale = null): array
+    public static function selectOptions(?array $only = null, array $except = [], ?string $locale = null, array $additional = []): array
     {
         $options = [];
 
-        foreach (self::metadata($only, $except, $locale) as $country) {
+        foreach (self::metadata($only, $except, $locale, $additional) as $country) {
             $options[$country['code']] = [
                 'label' => $country['name'],
                 'image' => $country['flag_url'],
@@ -298,7 +304,7 @@ class Countries
      */
     protected static function matchLocaleToCountry(string $locale, ?array $allowed = null): ?string
     {
-        $allowedSet = array_flip(self::resolve($allowed));
+        $allowedSet = array_flip(self::resolve($allowed, additional: $allowed === null ? [] : self::ADDITIONAL_REGION_CODES));
 
         if (preg_match('/[-_](?<region>[A-Za-z]{2})$/', $locale, $matches)) {
             $region = strtoupper($matches['region']);

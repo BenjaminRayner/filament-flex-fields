@@ -6,7 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexChecklist;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -56,11 +56,11 @@ class FlexChecklistPlayground
                         'old_backup' => 'Old backup.zip',
                     ])
                     ->icons([
-                        'documents' => GravityIcon::Folder,
-                        'budget' => GravityIcon::LayoutCells,
-                        'reports' => GravityIcon::FileText,
-                        'archived' => GravityIcon::Archive,
-                        'old_backup' => GravityIcon::Server,
+                        'documents' => FlexIcon::Folder,
+                        'budget' => FlexIcon::LayoutCells,
+                        'reports' => FlexIcon::FileText,
+                        'archived' => FlexIcon::Archive,
+                        'old_backup' => FlexIcon::Server,
                     ])
                     ->descriptions([
                         'documents' => 'Shared project folder',
@@ -158,10 +158,10 @@ class FlexChecklistPlayground
     protected function fileIcons(): array
     {
         return [
-            'documents' => GravityIcon::Folder,
-            'budget' => GravityIcon::LayoutCells,
-            'reports' => GravityIcon::FileText,
-            'archived' => GravityIcon::Archive,
+            'documents' => FlexIcon::Folder,
+            'budget' => FlexIcon::LayoutCells,
+            'reports' => FlexIcon::FileText,
+            'archived' => FlexIcon::Archive,
         ];
     }
 

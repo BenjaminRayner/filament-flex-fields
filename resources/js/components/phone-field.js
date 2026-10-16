@@ -1,458 +1,104 @@
-import { createSearchableSelectMenuMixin, forceHideForeignSelectMenus } from '../core/searchable-select-menu.js'
-import { createVirtualizedListMixin } from '../core/virtualized-list.js'
-import { resolveCountriesFromRegistry, resetCountryRegistryCache } from '../core/country-registry.js'
-import { createCountrySearchMixin } from '../core/country-search.js'
-import { createCountryListKeyboardMixin } from '../core/country-list-keyboard.js'
-import { openExclusiveFlexDropdown, resolveDropdownOwnerId } from '../core/flex-dropdown-coordinator.js'
+import { createResourceScope } from '../runtime/lifecycle/resource-scope.js'
+import { createRequestCoordinator } from '../select/async/request-coordinator.js'
+import { loadLibPhoneNumber, formatNationalDisplay, syncPhoneState } from '../select/adapters/phone/phone-number-service.js'
 
-let libPhoneNumberModule = null
-let libPhoneNumberPromise = null
+export { formatNationalDisplay, formatPhoneInput, syncPhoneState } from '../select/adapters/phone/phone-number-service.js'
 
-async function loadLibPhoneNumber() {
-    if (libPhoneNumberModule) {
-        return libPhoneNumberModule
-    }
-
-    if (! libPhoneNumberPromise) {
-        libPhoneNumberPromise = import('libphonenumber-js/min').then((module) => {
-            libPhoneNumberModule = module
-
-            return module
-        })
-    }
-
-    return libPhoneNumberPromise
-}
-
-export async function formatNationalDisplay(national, country) {
-    const { parsePhoneNumberFromString, AsYouType } = await loadLibPhoneNumber()
-    const digits = String(national ?? '').replace(/\D/g, '')
-
-    if (digits === '') {
-        return ''
-    }
-
-    const parsed = parsePhoneNumberFromString(digits, country)
-
-    if (parsed) {
-        return parsed.formatNational()
-    }
-
-    return new AsYouType(country).input(digits)
-}
-
-export async function formatPhoneInput(value, country) {
-    const { AsYouType } = await loadLibPhoneNumber()
-    const formatter = new AsYouType(country)
-
-    return formatter.input(String(value ?? ''))
-}
-
-export async function syncPhoneState(rawInput, country) {
-    const { AsYouType, parsePhoneNumberFromString } = await loadLibPhoneNumber()
-    const digits = String(rawInput ?? '').replace(/\D/g, '')
-
-    if (digits === '') {
-        return {
-            national: '',
-            e164: '',
-            formatted: '',
-        }
-    }
-
-    const formatter = new AsYouType(country)
-    const formatted = formatter.input(rawInput)
-    const parsed = formatter.getNumber() ?? parsePhoneNumberFromString(rawInput, country)
-
+/** Phone owns formatting only. Its nested country control is the standard Select factory. */
+export default function phoneFieldFormComponent(config = {}) {
+    const records = new Map((config.countries ?? []).map(country => [country.code, country]))
+    const scope = createResourceScope()
+    const requests = createRequestCoordinator()
+    let initialized = false
+    let disposed = false
+    let published = null
+    let hintTimer = null
+    const signature = state => JSON.stringify([state?.country, state?.national])
+    scope.defer(() => { requests.dispose(); clearTimeout(hintTimer); records.clear() })
     return {
-        national: parsed?.nationalNumber ?? digits,
-        e164: parsed?.number ?? '',
-        formatted,
-    }
-}
-
-const selectMenu = createSearchableSelectMenuMixin({
-    openKey: 'countryOpen',
-    readyKey: 'countryMenuReady',
-    scrollHandlerKey: 'countryMenuScrollHandler',
-    resizeHandlerKey: 'countryMenuResizeHandler',
-    triggerRef: 'countryTrigger',
-    menuRef: 'countryMenu',
-    minMenuWidth: 288,
-    matchTriggerWidth: false,
-    menuGap: 12,
-    closeMethod: 'closeCountryMenu',
-    ownerIdPrefix: 'fff-phone-country',
-    onMenuClose() {
-        this.countrySearch = ''
-        this.countrySearchDebounced = ''
-    },
-})
-
-const virtualList = createVirtualizedListMixin({
-    itemsKey: 'filteredCountries',
-    scrollRef: 'countryListScroll',
-    itemHeight: 40,
-})
-
-const countrySearch = createCountrySearchMixin()
-const countryKeyboard = createCountryListKeyboardMixin({
-    openKey: 'countryOpen',
-    optionIdPrefix: 'fff-phone-field-option',
-})
-
-export default function phoneFieldFormComponent({
-    state,
-    statePath,
-    countryPool,
-    countryFilterKey,
-    sortPreferredFirst,
-    preferredCountryCode,
-    selectedCountrySeed,
-    defaultCountry,
-    initialInputValue = '',
-    disabled,
-    readOnly,
-    showInternationalPrefix,
-    searchable,
-    searchPlaceholder,
-    countryLabel,
-    locale = null,
-}) {
-    return {
-        state,
-        statePath,
-        countryPool,
-        countryFilterKey,
-        sortPreferredFirst,
-        preferredCountryCode,
-        selectedCountrySeed,
-        defaultCountry,
-        disabled,
-        readOnly,
-        showInternationalPrefix,
-        searchable,
-        searchPlaceholder,
-        countryLabel,
-        locale,
-        countries: [],
-        countriesLoaded: false,
-        countriesLoading: false,
-        countryOpen: false,
-        countrySearch: '',
-        inputValue: initialInputValue ?? '',
-        countryMenuReady: false,
-        countryMenuScrollHandler: null,
-        countryMenuResizeHandler: null,
-        phoneLibReady: false,
-        resolvedDialPrefix: null,
-        possibleInvalid: false,
-        possibleCheckTimer: null,
-        ...selectMenu,
-        ...virtualList,
-        ...countrySearch,
-        ...countryKeyboard,
-
-        get isLocked() {
-            return this.disabled || this.readOnly
-        },
-
+        phoneState: config.phoneState,
+        disabled: Boolean(config.disabled), readOnly: Boolean(config.readOnly),
+        inputValue: config.initialInputValue ?? '',
+        possibleInvalid: false, phoneFormatError: null,
+        get isLocked() { return this.disabled || this.readOnly },
+        get selectedCountry() { return records.get(this.phoneState?.country) ?? config.selectedCountrySeed ?? { name: '', flag_url: '', dial_code: '' } },
+        get dialPrefix() { return this.selectedCountry.dial_code ?? '' },
         init() {
-            this.initCountrySearch()
-            this.initCountryListKeyboard()
-            this.ensurePhoneState()
-            this.syncInputFromState()
-            this.preloadSelectedCountryFlag()
-            this.bindSelectMenuLifecycle()
-
-            // Warm the country registry so the first open does not wait on network
-            // before Alpine can paint a full-height list for positioning.
-            this.ensureCountriesLoaded()
-            this.ensurePhoneLibLoaded()
-
-            this.$watch('state.country', () => {
-                this.ensurePhoneState()
-                this.syncInputFromState()
-                this.preloadSelectedCountryFlag()
-                this.refreshDialPrefix()
-
-                if (this.state.national) {
-                    this.syncCurrentInput()
-                }
-
-                this.schedulePossibleCheck()
-            })
-
-            document.addEventListener('livewire:navigated', () => {
-                resetCountryRegistryCache()
-                this.countries = []
-                this.countriesLoaded = false
-            })
-        },
-
-        getActiveCountryCode() {
-            return this.state?.country ?? this.defaultCountry
-        },
-
-        async ensureCountriesLoaded() {
-            if (this.countriesLoaded) {
-                return
+            if (initialized || disposed) return
+            initialized = true
+            if (!this.phoneState || typeof this.phoneState !== 'object' || Array.isArray(this.phoneState)) {
+                this.phoneState = { country: config.defaultCountry, national: '', e164: '' }
             }
-
-            if (this.countriesLoading) {
-                while (this.countriesLoading) {
-                    await new Promise((resolve) => setTimeout(resolve, 16))
-                }
-
-                return
-            }
-
-            this.countriesLoading = true
-
+            published = signature(this.phoneState)
+            this.$watch('phoneState', () => {
+                if (!disposed && signature(this.phoneState) !== published) void this.restoreDisplay()
+            })
+            // The server already formatted this exact initial state. The number
+            // library belongs to editing, not to readiness of the country Select.
+            // External state changes still go through the revision-checked watcher.
+            if (config.initialInputValue === undefined) return this.restoreDisplay()
+        },
+        async restoreDisplay() {
+            if (disposed) return
+            const lease = requests.begin('format')
+            if (!lease) return
+            const revision = signature(this.phoneState)
+            const { country, national } = this.phoneState
             try {
-                resetCountryRegistryCache()
-
-                this.countries = await resolveCountriesFromRegistry({
-                    pool: this.countryPool,
-                    countryFilterKey: this.countryFilterKey,
-                    preferredCountryCode: this.preferredCountryCode,
-                    sortPreferredFirst: this.sortPreferredFirst,
-                    locale: this.locale,
-                })
-
-                if (this.countries.length === 0) {
-                    resetCountryRegistryCache()
-
-                    this.countries = await resolveCountriesFromRegistry({
-                        pool: this.countryPool,
-                        countryFilterKey: this.countryFilterKey,
-                        preferredCountryCode: this.preferredCountryCode,
-                        sortPreferredFirst: this.sortPreferredFirst,
-                        locale: this.locale,
-                    })
+                const formatted = national ? await formatNationalDisplay(national, country) : ''
+                if (lease.current() && revision === signature(this.phoneState)) {
+                    this.inputValue = formatted
+                    published = revision
+                    this.phoneFormatError = null
                 }
-
-                this.countriesLoaded = true
-            } finally {
-                this.countriesLoading = false
-            }
+            } catch { if (lease.current()) this.phoneFormatError = 'formatter-unavailable' }
+            finally { lease.finish() }
         },
-
-        async ensurePhoneLibLoaded() {
-            if (this.phoneLibReady) {
-                return
-            }
-
-            await loadLibPhoneNumber()
-            this.phoneLibReady = true
+        async formatInput(value) {
+            if (disposed || this.isLocked) return
+            const lease = requests.begin('format')
+            if (!lease) return
+            const country = this.phoneState.country
+            const owner = this.phoneState
+            try {
+                const next = await syncPhoneState(value, country)
+                if (!lease.current() || disposed || this.isLocked || country !== this.phoneState.country || owner !== this.phoneState) return
+                published = JSON.stringify([country, next.national])
+                this.phoneState.national = next.national
+                this.phoneState.e164 = next.e164
+                this.inputValue = next.formatted
+                this.phoneFormatError = null
+                clearTimeout(hintTimer)
+                hintTimer = setTimeout(() => void this.checkPossible(), 180)
+            } catch { if (lease.current()) this.phoneFormatError = 'formatter-unavailable' }
+            finally { lease.finish() }
         },
-
-        schedulePossibleCheck() {
-            if (this.possibleCheckTimer) {
-                clearTimeout(this.possibleCheckTimer)
-            }
-
-            this.possibleCheckTimer = setTimeout(() => {
-                this.refreshPossibleHint()
-            }, 180)
-        },
-
-        async refreshPossibleHint() {
-            const digits = String(this.inputValue ?? '').replace(/\D/g, '')
-
-            if (digits === '') {
-                this.possibleInvalid = false
-
-                return
-            }
-
-            await this.ensurePhoneLibLoaded()
-
+        async checkPossible() {
+            if (disposed) return
+            const lease = requests.begin('hint')
+            if (!lease) return
+            const revision = signature(this.phoneState)
             try {
                 const { isPossiblePhoneNumber } = await loadLibPhoneNumber()
-                const country = this.state?.country ?? this.defaultCountry
-
-                this.possibleInvalid = ! isPossiblePhoneNumber(digits, country)
-            } catch (error) {
-                this.possibleInvalid = false
-            }
-        },
-
-        async syncCurrentInput() {
-            await this.ensurePhoneLibLoaded()
-
-            const synced = await syncPhoneState(this.inputValue, this.state.country)
-
-            this.inputValue = synced.formatted
-            this.state.national = synced.national
-            this.state.e164 = synced.e164
-            this.schedulePossibleCheck()
-        },
-
-        get dialPrefix() {
-            return this.resolvedDialPrefix ?? this.selectedCountry?.dial_code ?? ''
-        },
-
-        async refreshDialPrefix() {
-            await this.ensurePhoneLibLoaded()
-
-            const country = this.state?.country ?? this.defaultCountry
-
-            try {
-                const { getCountryCallingCode } = await loadLibPhoneNumber()
-
-                this.resolvedDialPrefix = `+${getCountryCallingCode(country)}`
-            } catch (error) {
-                this.resolvedDialPrefix = this.selectedCountry?.dial_code ?? ''
-            }
-        },
-
-        ensurePhoneState() {
-            if (! this.state || typeof this.state !== 'object') {
-                return
-            }
-
-            if (! this.state.country) {
-                this.state.country = this.defaultCountry
-            }
-
-            if (this.state.national === undefined || this.state.national === null) {
-                this.state.national = ''
-            }
-
-            if (this.state.e164 === undefined || this.state.e164 === null) {
-                this.state.e164 = ''
-            }
-        },
-
-        get selectedCountry() {
-            const countryCode = this.state?.country ?? this.defaultCountry
-
-            return this.countries.find((country) => country.code === countryCode)
-                ?? (this.selectedCountrySeed?.code === countryCode ? this.selectedCountrySeed : null)
-                ?? {
-                    code: this.defaultCountry,
-                    name: this.defaultCountry,
-                    dial_code: '',
-                    flag_url: '',
+                if (lease.current() && revision === signature(this.phoneState)) {
+                    this.possibleInvalid = Boolean(this.phoneState.national) && !isPossiblePhoneNumber(String(this.phoneState.national), this.phoneState.country)
                 }
+            } catch { if (lease.current()) this.possibleInvalid = false }
+            finally { lease.finish() }
         },
-
-        async getDialPrefix() {
-            await this.refreshDialPrefix()
-
-            return this.dialPrefix
+        onInput(event) {
+            if (this.isLocked || disposed) return
+            this.inputValue = String(event.target.value ?? '')
+            return this.formatInput(this.inputValue)
         },
-
-        async syncInputFromState() {
-            if (! this.state?.national) {
-                if (! this.inputValue) {
-                    this.inputValue = ''
-                }
-
-                return
-            }
-
-            await this.ensurePhoneLibLoaded()
-
-            const country = this.state.country ?? this.defaultCountry
-
-            this.inputValue = await formatNationalDisplay(this.state.national, country)
-        },
-
-        async onInput(event) {
-            if (this.isLocked) {
-                return
-            }
-
-            await this.ensurePhoneLibLoaded()
-
-            const country = this.state.country ?? this.defaultCountry
-            const synced = await syncPhoneState(event.target.value, country)
-
-            this.inputValue = synced.formatted
-            this.state.national = synced.national
-            this.state.e164 = synced.e164
-            this.schedulePossibleCheck()
-        },
-
-        async onPhoneFocus() {
-            await this.ensurePhoneLibLoaded()
-        },
-
+        onPhoneFocus() { void loadLibPhoneNumber().catch(() => {}) },
         async selectCountry(code) {
-            if (this.isLocked) {
-                return
-            }
-
-            await this.ensurePhoneLibLoaded()
-
-            this.state.country = code
-            this.closeCountryMenu()
-
-            if (this.state.national) {
-                const synced = await syncPhoneState(this.inputValue, code)
-
-                this.inputValue = synced.formatted
-                this.state.national = synced.national
-                this.state.e164 = synced.e164
-            }
-
-            this.schedulePossibleCheck()
-
-            this.$nextTick(() => {
-                this.$refs.phoneInput?.focus()
-            })
+            if (disposed || this.isLocked || !records.has(code) || code === this.phoneState.country) return
+            requests.invalidate()
+            this.phoneState.country = code
+            await this.formatInput(this.inputValue)
+            if (!disposed && !this.isLocked && this.phoneState.country === code) this.$refs.phoneInput?.focus({ preventScroll: true })
         },
-
-        async toggleCountryMenu() {
-            if (this.isLocked) {
-                return
-            }
-
-            if (this.countryOpen) {
-                this.closeTeleportedMenu()
-
-                return
-            }
-
-            // Close sibling phone/select overlays before async country/lib load
-            // so only one dropdown stays open while this field warms up.
-            forceHideForeignSelectMenus(this.resolveMenuElement?.() ?? null)
-
-            const ownerId = resolveDropdownOwnerId(this.$el, 'fff-phone-country')
-
-            if (ownerId) {
-                openExclusiveFlexDropdown(ownerId)
-            }
-
-            await Promise.all([
-                this.ensureCountriesLoaded(),
-                this.ensurePhoneLibLoaded(),
-            ])
-
-            this.countryOpen = true
-
-            if (this.searchable) {
-                this.$nextTick(() => {
-                    this.$refs.countrySearch?.focus()
-                })
-            }
-        },
-
-        closeCountryMenu() {
-            this.closeTeleportedMenu()
-        },
-
-        preloadSelectedCountryFlag() {
-            const url = this.selectedCountry?.flag_url
-
-            if (! url) {
-                return
-            }
-
-            const image = new Image()
-            image.src = url
-        },
+        destroy() { if (!disposed) { disposed = true; scope.dispose() } },
     }
 }

@@ -4,7 +4,7 @@ import test from 'node:test'
 import {
     clampHorizontalCenter,
     positionTopPopup,
-} from '../../resources/js/core/video-field-popup-position.js'
+} from '../../resources/js/video/ui/position.js'
 
 test('clampHorizontalCenter keeps popup inside boundary', () => {
     const triggerRect = { left: 300, top: 200, width: 40, height: 40, right: 340, bottom: 240 }
@@ -31,7 +31,7 @@ test('clampHorizontalCenter centers tooltip on trigger when there is room', () =
     assert.equal(result.top, 264)
 })
 
-test('positionTopPopup writes coordinates relative to offset parent', () => {
+test('positionTopPopup writes fixed coordinates in viewport space', () => {
     const boundary = {
         getBoundingClientRect: () => ({
             left: 0,
@@ -67,7 +67,7 @@ test('positionTopPopup writes coordinates relative to offset parent', () => {
 
     const popup = {
         offsetParent,
-        style: {},
+        style: { setProperty(name, value) { this[name] = value } },
         getBoundingClientRect: () => ({
             left: 0,
             top: 0,
@@ -80,8 +80,8 @@ test('positionTopPopup writes coordinates relative to offset parent', () => {
 
     positionTopPopup(popup, trigger, boundary)
 
-    assert.equal(popup.style.left, '238px')
-    assert.equal(popup.style.top, '140px')
+    assert.equal(popup.style.left, '258px')
+    assert.equal(popup.style.top, '180px')
     assert.equal(popup.style.right, 'auto')
-    assert.equal(popup.style.transform, 'none')
+    assert.equal(popup.style.bottom, 'auto')
 })

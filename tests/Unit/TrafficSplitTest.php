@@ -158,3 +158,15 @@ it('applies playground settings from the traffic split configurator', function (
         ->and($field->getValueThreshold())->toBe(20)
         ->and($field->isDisabled())->toBeTrue();
 });
+
+it('rejects infeasible bounds instead of constructing an invalid default', function (): void {
+    expect(fn () => TrafficSplit::make('split')->segmentCount(5)->minWeight(21)->equalSplit())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => TrafficSplit::make('split')->variant('unknown')->getVariant())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => TrafficSplit::make('split')->linkedToRepeater('items', minimumItems: 6))->toThrow(InvalidArgumentException::class);
+});
+
+it('does not coerce malformed nested values into seemingly valid allocations', function (): void {
+    $field = TrafficSplit::make('split');
+    expect($field->normalizeWeights([[50], 25, 25]))->toBe([34, 33, 33])
+        ->and($field->weightsMatchState([34, 33, 33], ['34x', 33, 33]))->toBeFalse();
+});

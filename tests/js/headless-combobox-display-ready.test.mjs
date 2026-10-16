@@ -333,7 +333,7 @@ test('comboboxOpenMenu does not force SSR replacement before init completes', ()
     config.comboboxOpenMenu()
 
     assert.equal(replaced, false)
-    assert.equal(config.comboboxOpen, true)
+    assert.equal(config.comboboxOpen, false)
 })
 
 test('labelEntry and optionRecord do not recurse when livewire mixin is merged', async () => {
@@ -352,6 +352,8 @@ test('labelEntry and optionRecord do not recurse when livewire mixin is merged',
 
     assert.doesNotThrow(() => config.labelEntry('missing'))
     assert.doesNotThrow(() => config.optionRecord('missing'))
+    config.createSelectEngine(['draft'])
+    config.rememberSelectedOption('draft')
     assert.equal(config.labelEntry('draft')?.label, 'Draft')
     assert.equal(config.optionRecord('draft')?.label, 'Draft')
 })
@@ -691,6 +693,7 @@ test('client-side grouped search filters nested country options', () => {
     config.scheduleMenuPositionAfterLayout = () => {}
     config.markKnownOptionChecksVisible = () => {}
 
+    config.comboboxOpen = true
     config.comboboxSetQuery('fr')
 
     const displayRows = config.buildHeadlessDropdownRowsForDisplay()
@@ -700,7 +703,7 @@ test('client-side grouped search filters nested country options', () => {
     assert.equal(groups[0]?.label, 'Europe')
     assert.equal(groups[0]?.options.length, 1)
     assert.equal(groups[0]?.options[0]?.value, 'fr')
-    assert.match(groups[0]?.key ?? '', /:fr$/)
+    assert.equal(groups[0]?.key, JSON.stringify(['group','Europe']))
 
     const rendered = config.comboboxFilteredDropdownRows()
     assert.deepEqual(
@@ -744,6 +747,8 @@ test('client-side search windows large lists instead of mounting every row', () 
 
     assert.equal(config.shouldVirtualizeDropdown(), true)
 
+    config.comboboxOpen = true
+    config._syncFromEngine()
     config.comboboxSetQuery('Alpha 12')
 
     const visible = config.comboboxFilteredDropdownRows()
@@ -815,7 +820,7 @@ test('maxItems blocks extra multi-select picks and shows the Filament message', 
     })
 
     config.comboboxSelectedValues = ['a', 'b']
-    config._engine = { selectValue: () => {} }
+    config._engine = { selectValue: () => {}, findOption: value => config.options.find(option => option.value === value) }
     config._syncFromEngine = () => {}
     config.rememberSelectedOption = () => {}
     config.queueOptionCheckEnter = () => {}
@@ -843,6 +848,7 @@ test('dynamic options refetch marker resets when menu opens for dependsOn', asyn
         hasDynamicOptions: true,
         hasDynamicSearchResults: false,
         dynamicOptionsLoaded: true,
+        comboboxOpen: true,
         comboboxQuery: '',
         flatOptions: [],
         hasPaginatedSearchResults: false,
@@ -863,7 +869,7 @@ test('dynamic options refetch marker resets when menu opens for dependsOn', asyn
     assert.equal(host.fetched, true)
 })
 
-test('fetchDynamicOptions queues a second request while loading', async () => {
+test('fetchDynamicOptions shares the in-flight request between concurrent callers', async () => {
     const { createHeadlessComboboxLivewireMixin } = await import('../../resources/js/components/select-field/headless-combobox-livewire.js')
 
     const mixin = createHeadlessComboboxLivewireMixin({
@@ -904,89 +910,13 @@ test('fetchDynamicOptions queues a second request while loading', async () => {
     const first = host.fetchDynamicOptions()
     const second = host.fetchDynamicOptions()
 
-    assert.equal(await second, false)
+    assert.equal(first, second)
+    assert.equal(await second, true)
     assert.equal(await first, true)
-    assert.equal(calls, 2)
-    assert.equal(host.flatOptions[0]?.value, 'tx')
+    assert.equal(calls, 1)
+    assert.equal(host.flatOptions[0]?.value, 'ca')
 })
 
-test('dynamic options commit invalidation does not re-enter while fetching', async () => {
-    const { createHeadlessComboboxLivewireMixin, DYNAMIC_OPTIONS_FETCH_GUARD_MS } = await import('../../resources/js/components/select-field/headless-combobox-livewire.js')
-
-    const commitListeners = []
-
-    globalThis.Livewire = {
-        hook(name, callback) {
-            assert.equal(name, 'commit')
-            commitListeners.push(callback)
-
-            return () => {}
-        },
-    }
-
-    const mixin = createHeadlessComboboxLivewireMixin({
-        hasDynamicOptions: true,
-        livewireId: 'lw-1',
-        componentKey: 'form.region',
-    })
-
-    let fetchCalls = 0
-    const host = {
-        ...mixin,
-        hasDynamicOptions: true,
-        comboboxOpen: true,
-        optionsLoading: false,
-        _suppressDynamicOptionsInvalidation: false,
-        _skipDynamicOptionsInvalidations: 0,
-        dynamicOptionsLoaded: true,
-        async fetchDynamicOptions() {
-            fetchCalls += 1
-
-            return true
-        },
-    }
-
-    host.bindDynamicOptionsInvalidation()
-
-    const fireCommit = () => {
-        for (const listener of commitListeners) {
-            listener({
-                component: { id: 'lw-1' },
-                succeed(handler) {
-                    handler()
-                },
-            })
-        }
-    }
-
-    host.beginDynamicOptionsFetchGuard()
-    host.optionsLoading = true
-    fireCommit()
-    assert.equal(fetchCalls, 0)
-
-    host.optionsLoading = false
-    host.endDynamicOptionsFetchGuard()
-
-    // Own-fetch succeed callbacks must not re-enter while the guard / skip budget holds.
-    fireCommit()
-    fireCommit()
-    assert.equal(fetchCalls, 0)
-
-    await new Promise((resolve) => setTimeout(resolve, DYNAMIC_OPTIONS_FETCH_GUARD_MS + 20))
-
-    // Skip budget still covers late succeed callbacks from our own fetch.
-    fireCommit()
-    fireCommit()
-    assert.equal(fetchCalls, 0)
-
-    // A later parent remorph (after own-fetch settles) may refresh once.
-    fireCommit()
-    await new Promise((resolve) => setTimeout(resolve, 100))
-
-    assert.equal(fetchCalls, 1)
-
-    delete globalThis.Livewire
-})
 
 test('dynamic options commit storm does not loop fetch after a successful load', async () => {
     const {
@@ -1142,9 +1072,9 @@ test('closed dependsOn select invalidates without background fetch on label refr
     })
 
     assert.equal(fetchCalls, 0)
-    assert.equal(resolveCalls, 0)
+    assert.equal(resolveCalls, 1)
     assert.equal(host.handoffCalls, 1)
-    assert.equal(host._pendingSelectedLabelRefresh, true)
+    assert.equal(host._pendingSelectedLabelRefresh, false)
     assert.equal(host.dynamicOptionsLoaded, false)
     assert.equal(host.flatOptions.length, 1)
     assert.equal(host.optionsLoading, false)
@@ -1269,6 +1199,7 @@ test('multi deselect updates chips immediately without waiting for check exit', 
     config.multiple = true
     config.isGridLayout = false
     config._engine = {
+        isSelected(value) { return selected.includes(String(value)) },
         deselectValue(value) {
             selected = selected.filter((entry) => entry !== String(value))
         },

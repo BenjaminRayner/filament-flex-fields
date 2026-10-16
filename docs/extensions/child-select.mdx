@@ -1,0 +1,117 @@
+---
+title: "Compose a Select inside your field"
+description: "Reuse Select with typed child options and independent state and assets."
+---
+
+A child slot creates an actual existing renderer. It does not copy its view,
+validation or JavaScript. `children` validates the edge at registration but does
+not make it an eager `uses` dependency. Each rendered child emits its own normal
+asset consumer; inactive children retain their normal lazy activation.
+
+## Configure Select without a parent-specific factory
+
+Select publishes its reusable configuration contract. A parent only declares the
+slots it renders; it does not repeat Select's options or factory:
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildSlot;
+
+$parent = new ComponentDefinition(
+    id: 'acme-location-field',
+    kind: ComponentKind::Field,
+    stylesFrom: ['composite-field'],
+    children: [
+        'country' => new ChildSlot('country', 'select-field', ComponentKind::Field),
+        'city' => new ChildSlot('city', 'select-field', ComponentKind::Field),
+        'author' => new ChildSlot('author', 'select-field', ComponentKind::Field),
+        'results' => new ChildSlot(
+            'results',
+            'select-field',
+            ComponentKind::Field,
+            configurationMap: ['pageSize' => 'searchResultsPageSize'],
+        ),
+    ],
+);
+```
+
+Register the parent during provider boot. Configure each rendered instance with
+data, PHP, or both:
+
+```php
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CompositeField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentRegistry;
+use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildRenderContext;
+use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildRenderer;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyRenderContext;
+
+$children = new ChildRenderer(
+    registry: app(ComponentRegistry::class),
+    parentComponent: 'acme-location-field',
+    context: new FamilyRenderContext('location-card:'.$stableKey),
+    parentConfiguration: ['pageSize' => 25],
+);
+
+$field = CompositeField::make('location')
+    ->assetComponent('acme-location-field')
+    ->schema([
+        $children->render(
+            'country',
+            'main',
+            [
+                'label' => 'Country',
+                'options' => ['PL' => 'Poland', 'US' => 'United States'],
+            ],
+            configure: fn (SelectField $select) => $select->live(),
+        ),
+        $children->render(
+            'city',
+            'main',
+            ['label' => 'City', 'required' => true],
+            configure: function (
+                SelectField $select,
+                ChildRenderContext $context,
+            ): void {
+                $select->dependsOn(
+                    $context->pathTo('country', 'main'),
+                    fn ($country) => $country === 'PL'
+                        ? ['warsaw' => 'Warsaw']
+                        : ['new-york' => 'New York'],
+                );
+            },
+        ),
+    ]);
+```
+
+`pathTo()` resolves a declared field slot and its stable key within the native
+parent container, including a repeater row. It rejects undeclared slots. A
+`shareState` slot returns `./`, referring to the current container's root. The
+source field must synchronize its state, for example with `live()`.
+
+The built-in Select data contract accepts these options. Omitted non-nullable
+options retain the actual renderer's defaults; a nullable `placeholder` defaults
+to `null`.
+
+| Options | Accepted values |
+| --- | --- |
+| `label`, `placeholder` | Text up to 1024 characters; placeholder also accepts `null`. |
+| `size` | `sm`, `md`, `lg`. |
+| `options` | A map with up to 1000 options, within the shared data budget. |
+| `searchDebounce` | Integer, 0–60000 milliseconds. |
+| `searchResultsPageSize` | Integer, 1–1000 results. |
+| `optionsLimit`, `virtualizeThreshold` | Integer, 1–100000. |
+| `virtualRowHeight` | Integer, 1–512 pixels. |
+| `virtualWindowSize` | Integer, 1–500 rows. |
+| `dropdownMinWidth` | Integer, 120–600 pixels. |
+| `menuMaxHeight` | Integer, 80–1200 pixels. |
+| `minItems`, `maxItems` | Integer, 0–100000. |
+| `multiple`, `searchable`, `preload`, `clearable`, `required`, `disabled` | Boolean. |
+| `paginatedSearchResults`, `optionGroupSeparators`, `selectionIndicator`, `plainTrigger` | Boolean. |
+| `richListTriggerDisplay`, `keepSelectedOptionsInDropdown`, `richOptions`, `allowHtml` | Boolean. |
+
+## Continue reading
+
+[Full child PHP API](/docs/extensions/child-php-api) · [Child slot reference](/docs/extensions/child-reference)
+

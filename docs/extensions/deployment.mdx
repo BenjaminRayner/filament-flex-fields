@@ -1,0 +1,54 @@
+---
+title: "Deploy and retain releases"
+description: "Publish a complete release before traffic and retain generations needed by open documents."
+---
+
+FLEX now keeps its builtin assets in complete immutable release directories, using
+the same atomic publication protocol as typed extension packages. Keep old public
+releases available while existing browser tabs or deployment nodes still use them.
+
+```bash
+# Run from the new, staged application checkout.
+php artisan fff:assets:publish --public-root=/srv/shared/public
+php artisan fff:assets:doctor --published --public-root=/srv/shared/public --json
+```
+
+Activate your application checkout only after those commands succeed. Rollback
+uses the previous checkout's PHP, build seal and package manifests together with
+its retained public directories. Avoid updating a live vendor tree in place.
+
+```bash
+# Preview core history; this does not remove release artifacts.
+php artisan fff:assets:releases --public-root=/srv/shared/public --json
+
+# Explicitly prune only eligible old core releases.
+php artisan fff:assets:releases --public-root=/srv/shared/public \
+    --prune --keep=3 --min-age-days=30 \
+    --protect=RELEASE_HASH_STILL_SERVED_BY_ANOTHER_NODE
+
+# Preview one installed extension's history independently.
+php artisan fff:assets:releases --package=vendor/package \
+    --public-root=/srv/shared/public --json
+
+# Apply the same protections to that selected extension.
+php artisan fff:assets:releases --package=vendor/package \
+    --public-root=/srv/shared/public --prune \
+    --keep=3 --min-age-days=30 \
+    --protect=PACKAGE_RELEASE_STILL_SERVED_BY_ANOTHER_NODE
+```
+
+The installed release, the newest retained releases and every `--protect` identity
+are preserved. Choose a grace period long enough for your clients. Publishing
+never deletes previous releases. Package selection uses its current registry
+manifest and affects only that package. The command verifies all retained markers
+and artifact bytes before the first deletion; corruption rejects the operation.
+Old source checkouts are unnecessary. Unknown or uninstalled package selection
+fails; legacy pre-migration files remain untouched. Publication and retention share
+a bounded lock; a busy publisher fails with a clear timeout instead of waiting
+indefinitely. This is a local filesystem deployment contract, not automatic
+application activation or a claim of compatibility with every CDN/NFS deployment.
+
+## Continue reading
+
+[Deployment diagnostics](/docs/extensions/diagnostics) · [Upgrade a package](/docs/extensions/upgrading)
+

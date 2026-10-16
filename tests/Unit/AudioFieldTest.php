@@ -5,11 +5,13 @@ declare(strict_types=1);
 use Bjanczak\FilamentFlexFields\Data\FlexFieldDefinition;
 use Bjanczak\FilamentFlexFields\Enums\FieldType;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\AudioField;
+use Bjanczak\FilamentFlexFields\Support\Audio\AudioSourceRule;
 use Bjanczak\FilamentFlexFields\Support\AudioWaveformGenerator;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldFormBuilder;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
+use Bjanczak\FilamentFlexFields\Support\Playground\AudioFieldPlayground;
 use Bjanczak\FilamentFlexFields\Support\WhisperRuntime;
+use Bjanczak\FilamentFlexFields\Support\WhisperRuntimeManifest;
 use Filament\Support\Icons\Heroicon;
 
 it('exposes audio field configuration api', function () {
@@ -48,10 +50,10 @@ it('sanitizes unsafe audio urls', function () {
 it('rejects unsafe audio state during validation', function () {
     $field = AudioField::make('voice');
 
-    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
+    $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof AudioSourceRule);
 
     $message = null;
-    $rule('voice', 'vbscript:msgbox(1)', function (string $failMessage) use (&$message): void {
+    $rule->validate('voice', 'vbscript:msgbox(1)', function (string $failMessage) use (&$message): void {
         $message = $failMessage;
     });
 
@@ -125,7 +127,7 @@ it('builds audio field from flex field definition', function () {
 });
 
 it('registers audio field playground variants', function () {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
+    $builder = app(AudioFieldPlayground::class);
     $state = $builder->defaultState();
 
     expect($state)->toHaveKeys([
@@ -164,7 +166,7 @@ it('exposes whisper transcription configuration on audio field', function () {
         ->and($config['available'])->toBeTrue()
         ->and($config['model'])->toBe('Xenova/whisper-small')
         ->and($config['language'])->toBe('pl')
-        ->and($config['runtimeModuleUrl'])->toContain('whisper/transformers.min.js')
+        ->and($config['runtimeModuleUrl'])->toContain('whisper/'.WhisperRuntimeManifest::VERSION.'/transformers.min.js')
         ->and($config['runtimeWasmBaseUrl'])->toContain('whisper/');
 });
 
@@ -188,11 +190,11 @@ it('rejects invalid whisper task', function () {
     AudioField::make('voice')->transcription()->whisperTask('invalid')->getWhisperTask();
 })->throws(InvalidArgumentException::class);
 
-it('uses gravity ui icons for audio controls by default', function () {
+it('uses Hugeicons for audio controls by default', function () {
     $field = AudioField::make('voice');
 
-    expect($field->getPlayIcon())->toBe(GravityIcon::PlayFill)
-        ->and($field->getPauseIcon())->toBe(GravityIcon::PauseFill);
+    expect($field->getPlayIcon())->toBe(FlexIcon::PlayFill)
+        ->and($field->getPauseIcon())->toBe(FlexIcon::PauseFill);
 });
 
 it('allows overriding audio control icons', function () {
@@ -203,3 +205,9 @@ it('allows overriding audio control icons', function () {
     expect($field->getPlayIcon())->toBe(Heroicon::OutlinedPlay)
         ->and($field->getPauseIcon())->toBe(Heroicon::OutlinedPause);
 });
+
+it('rejects unbounded, associative and non-finite waveform data', function (array $peaks) {
+    AudioField::make('voice')->waveform($peaks)->getWaveform();
+})->with([
+    [[INF]], [[NAN]], [['unsafe' => 20]], [array_fill(0, 2049, 20)],
+])->throws(InvalidArgumentException::class);

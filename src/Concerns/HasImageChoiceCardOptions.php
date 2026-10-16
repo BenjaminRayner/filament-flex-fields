@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Concerns;
 
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize as HasControlSizeConcern;
+use Bjanczak\FilamentFlexFields\Support\ChoiceCards\OptionNormalizer;
+use Bjanczak\FilamentFlexFields\Support\ChoiceCards\Presentation\ImageSizeStyles;
+use Bjanczak\FilamentFlexFields\Support\ChoiceCards\ResponsiveColumns;
 use Closure;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 
 trait HasImageChoiceCardOptions
 {
@@ -137,53 +139,22 @@ trait HasImageChoiceCardOptions
      */
     public function getNormalizedOptions(): array
     {
-        if ($this->normalizedOptionsCache !== null) {
-            return $this->normalizedOptionsCache;
-        }
-
-        $disabledOptions = collect($this->getDisabledOptions())->map(fn ($key): string => (string) $key);
-        $normalized = [];
-
-        foreach ($this->evaluate($this->options) as $value => $option) {
-            $key = (string) $value;
-
-            if (is_string($option)) {
-                $normalized[$key] = $this->normalizeOptionArray($key, [
-                    'label' => $option,
-                ], $disabledOptions);
-
-                continue;
-            }
-
-            if (is_array($option)) {
-                $normalized[$key] = $this->normalizeOptionArray($key, $option, $disabledOptions);
-            }
-        }
-
-        return $this->normalizedOptionsCache = $normalized;
+        return $this->normalizedOptionsCache ??= OptionNormalizer::image(
+            $this->evaluate($this->options), $this->getDisabledOptions(),
+        );
     }
 
-    /**
-     * @param  array<string, mixed>  $option
-     * @return array{
-     *     label: string,
-     *     image: ?string,
-     *     alt: string,
-     *     disabled: bool,
-     * }
-     */
-    protected function normalizeOptionArray(string $key, array $option, Collection $disabledOptions): array
+    /** @return list<string> */
+    public function getEnabledOptionKeys(): array
     {
-        $label = (string) ($option['label'] ?? $key);
-        $image = filled($option['image'] ?? null) ? (string) $option['image'] : null;
-        $alt = filled($option['alt'] ?? null) ? (string) $option['alt'] : $label;
+        $keys = [];
+        foreach ($this->getNormalizedOptions() as $key => $option) {
+            if (! $option['disabled']) {
+                $keys[] = (string) $key;
+            }
+        }
 
-        return [
-            'label' => $label,
-            'image' => $image,
-            'alt' => $alt,
-            'disabled' => (bool) ($option['disabled'] ?? false) || $disabledOptions->contains($key),
-        ];
+        return $keys;
     }
 
     /**
@@ -199,43 +170,10 @@ trait HasImageChoiceCardOptions
      */
     public function getGridColumnConfig(): array
     {
-        $columns = $this->evaluate($this->gridColumns);
+        /** @var array{default:int,sm:int,md:int,lg:int,xl:int} $columns */
+        $columns = ResponsiveColumns::resolve($this->evaluate($this->gridColumns), 6, ['default', 'sm', 'md', 'lg', 'xl']);
 
-        if (is_int($columns)) {
-            $columns = max(1, min(6, $columns));
-
-            return [
-                'default' => $columns,
-                'sm' => $columns,
-                'md' => $columns,
-                'lg' => $columns,
-                'xl' => $columns,
-            ];
-        }
-
-        if (! is_array($columns)) {
-            return [
-                'default' => 1,
-                'sm' => 1,
-                'md' => 1,
-                'lg' => 1,
-                'xl' => 1,
-            ];
-        }
-
-        $default = max(1, min(6, (int) ($columns['default'] ?? 1)));
-        $sm = max(1, min(6, (int) ($columns['sm'] ?? $default)));
-        $md = max(1, min(6, (int) ($columns['md'] ?? $sm)));
-        $lg = max(1, min(6, (int) ($columns['lg'] ?? $md)));
-        $xl = max(1, min(6, (int) ($columns['xl'] ?? $lg)));
-
-        return [
-            'default' => $default,
-            'sm' => $sm,
-            'md' => $md,
-            'lg' => $lg,
-            'xl' => $xl,
-        ];
+        return $columns;
     }
 
     public function getVariant(): string
@@ -285,31 +223,6 @@ trait HasImageChoiceCardOptions
      */
     public function getImageChoiceCardSizeStyles(): array
     {
-        return match ($this->getSize()) {
-            'sm' => [
-                '--fff-image-choice-cards-gap' => '0.5rem',
-                '--fff-image-choice-cards-footer-p' => '0.5rem 0.625rem',
-                '--fff-image-choice-cards-footer-band' => '2.25rem',
-                '--fff-image-choice-cards-label-size' => '0.75rem',
-                '--fff-image-choice-cards-indicator-size' => '1rem',
-                '--fff-image-choice-cards-indicator-icon-size' => '0.625rem',
-            ],
-            'lg' => [
-                '--fff-image-choice-cards-gap' => '1rem',
-                '--fff-image-choice-cards-footer-p' => '0.875rem 1rem',
-                '--fff-image-choice-cards-footer-band' => '3.25rem',
-                '--fff-image-choice-cards-label-size' => '1rem',
-                '--fff-image-choice-cards-indicator-size' => '1.375rem',
-                '--fff-image-choice-cards-indicator-icon-size' => '0.875rem',
-            ],
-            default => [
-                '--fff-image-choice-cards-gap' => '0.75rem',
-                '--fff-image-choice-cards-footer-p' => '0.625rem 0.75rem',
-                '--fff-image-choice-cards-footer-band' => '2.75rem',
-                '--fff-image-choice-cards-label-size' => '0.875rem',
-                '--fff-image-choice-cards-indicator-size' => '1.125rem',
-                '--fff-image-choice-cards-indicator-icon-size' => '0.75rem',
-            ],
-        };
+        return ImageSizeStyles::for($this->getSize());
     }
 }

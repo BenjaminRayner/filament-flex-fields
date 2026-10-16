@@ -1,0 +1,60 @@
+---
+title: "Generate a package"
+description: "Create a Composer-ready field, table column and infolist entry with one command."
+---
+
+Start a family with one command in a Laravel application that has FLEX installed.
+The destination must be a new directory with an existing parent:
+
+```bash
+php artisan make:flex-component-package acme/summary ./packages/summary \
+  --prefix=acme-summary \
+  --namespace='Acme\Summary' \
+  --class=Summary
+```
+
+Add `--dry-run --json` to inspect the 15 planned files without writing them.
+Existing directories, files and symbolic links are never overwritten. The command
+creates source files; it does not install dependencies or modify your application.
+
+The starter includes a field, table column and infolist entry; typed family
+registration; Composer discovery; escaped display views; one stylesheet owner;
+and a build using the public SDK. Its field nests `FlexTextInput` through a child
+schema. You can configure that actual child with its public PHP API without
+copying its input template, CSS or JavaScript. The field stores a JSON object such
+as `['text' => 'Summary']`; use an Eloquent `array` cast for that attribute.
+
+Follow the generated README to build and install the package. `npm run build`
+creates a content-addressed artifact directory and manifest. Failed compilation
+preserves the previous manifest, and repeated identical output keeps the same
+release. Old generations remain available; the build does not delete unrelated
+files or decide when installed applications may stop using a generation.
+
+## Arguments and options
+
+| Argument / option | Default | Meaning |
+| --- | --- | --- |
+| `package` | Required | Composer `vendor/package` identity, for example `acme/summary`. |
+| `path` | Required | New destination; its parent must exist. Existing files, directories and symlinks are not overwritten. |
+| `--prefix` | Package name with `/` replaced by `-` | Unique namespace for family/asset IDs, for example `acme-summary`. |
+| `--namespace` | Studly vendor and package segments | PHP namespace such as `Acme\Summary`; use single quotes in the shell. |
+| `--class` | Studly package segment | Base class name, for example `Summary`; generated surfaces add Field, Column and Entry suffixes. |
+| `--dry-run` | Off | Print the planned files without writing. |
+| `--json` | Off | Print a machine-readable command result. Works with dry run or generation. |
+
+```shell
+php artisan make:flex-component-package acme/summary ./packages/summary \
+  --prefix=acme-summary \
+  --namespace='Acme\Summary' \
+  --class=Summary \
+  --dry-run --json
+```
+
+The generator validates identities and destination safety. It creates source files,
+not an installed Composer dependency. Continue with the
+[quickstart](/docs/extensions/quickstart) to build before provider discovery.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

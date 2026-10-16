@@ -1,8 +1,118 @@
 ---
 title: "SignatureField"
+description: "Capture handwritten signatures in Filament with drawing tools, undo and redo, document previews and configurable image or media storage."
+icon: "signature"
+"canonical": "https://flex-fields.bjanczak.com/docs/signaturefield"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/signature-field.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "SignatureField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/signature-field-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/signature-field-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/signature-field.webp"
+"twitter:image:alt": "SignatureField in the FLEX Fields playground"
 ---
 
-![SignatureField](/art/sc-1.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/signaturefield#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/signaturefield",
+      "name": "SignatureField",
+      "description": "Capture handwritten signatures in Filament with drawing tools, undo and redo, document previews and configurable image or media storage.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/signaturefield#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/signaturefield#article",
+      "url": "https://flex-fields.bjanczak.com/docs/signaturefield",
+      "headline": "SignatureField",
+      "description": "Capture handwritten signatures in Filament with drawing tools, undo and redo, document previews and configurable image or media storage.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/signaturefield#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/signature-field-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/signature-field-motion.mp4#video",
+      "name": "SignatureField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of SignatureField in the FLEX Fields playground for Filament. Capture handwritten signatures in Filament with drawing tools, undo and redo, document previews and configurable image or media storage.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/signature-field.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT4.433S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/signature-field-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/signaturefield#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/signature-field-motion.mp4"
+  poster="/art/previews/signature-field.webp"
+  width="1920"
+  height="1080"
+  aria-label="SignatureField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/signature-field-motion.mp4">Watch the SignatureField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -26,13 +136,13 @@ SignatureField uses the **Pointer Events** API — one code path for mouse, fing
 | Input | Support |
 |-------|---------|
 | **Mobile / tablet (finger)** | Yes — draw directly on the pad; `touch-action: none` prevents page scroll while signing |
-| **Apple Pencil / active stylus** | Yes — `pointerType: pen` with **pressure-sensitive** stroke width |
+| **Apple Pencil / active stylus** | Yes — Pointer Events with hardware pressure and the selected pen size |
 | **Mouse / trackpad** | Yes — optional `trackpadGlide()` for Mac trackpad drawing without click-drag |
 | **Retina / HiDPI** | Canvas scales with `devicePixelRatio` for sharp output on iPad and phones |
 
 Toolbar icon buttons expose **Filament tooltips** (same copy as `aria-label`) and use larger hit targets on coarse pointers (`@media (pointer: coarse)`).
 
-**Note:** passive capacitive styluses (no pressure, reported as touch) behave like finger input. Palm rejection is handled by single-pointer capture — only one active stroke at a time.
+**Note:** passive capacitive styluses (no pressure, reported as touch) behave like finger input. Only one pointer draws a stroke at a time. Hardware palm rejection depends on the device and browser.
 
 ### Basic usage
 
@@ -119,7 +229,7 @@ SignatureField::make('field_name')
 #### `penWidth(float|Closure $width)`
 
 
-Stroke width in SVG units. Clamped to `0.5`–`12`. Default: `2.5`.
+Stroke width in SVG units. Clamped to `0.5`–`12`. Default: `5.6`.
 
 ```php
 SignatureField::make('field_name')
@@ -175,7 +285,7 @@ SignatureField::make('field_name')
 #### `viewBox(int|Closure $width, int|Closure $height)`
 
 
-SVG viewBox dimensions. Defaults from `SignatureSvg::VIEWBOX_WIDTH` / `VIEWBOX_HEIGHT`.
+SVG viewBox dimensions. The default is `600 × 260`. Existing SVG signatures are fitted proportionally when displayed in a different pad size.
 
 ```php
 SignatureField::make('field_name')
@@ -184,7 +294,7 @@ SignatureField::make('field_name')
 #### `smoothing(bool|Closure $condition = true)`
 
 
-Bezier smoothing on strokes. Default: `true`.
+Streamlined, variable-width ink with rounded joins and tapered ends. Pen pressure controls active stylus width; mouse and finger input use simulated pressure. Default: `true`.
 
 ```php
 SignatureField::make('field_name')
@@ -331,7 +441,7 @@ Slug: **`signature-field`**
 | Fullscreen | Fullscreen modal + guidelines |
 | Download | SVG / WebP export options |
 
-`/admin/flex-fields-playground/signature-field` — see [Playground](/docs/index#playground).
+`/admin/flex-fields/signature-field` — see [Playground](/docs/index#playground).
 
 ---
 
@@ -344,3 +454,23 @@ Slug: **`signature-field`**
 | [BarcodeScannerField](/docs/barcode-scanner-field) | Capture IDs or document barcodes |
 
 ---
+
+## Ink controls, redo and replay
+
+Choose the colors and stroke widths available in the pad:
+
+```php
+SignatureField::make('signature')
+    ->penColor('#18181b')
+    ->penWidth(2.5)
+    ->penColors(['#18181b', '#2563eb', '#7c3aed'])
+    ->penWidths([1.5, 2.5, 4])
+    ->replayable();
+```
+
+Color and width changes affect new strokes. Undo and redo preserve each stroke's settings. Replay animates the existing signature without changing the saved value. Use `replayable(false)` to hide replay. The history retains up to 60 changes. Clearing the pad animates the ink away and can be undone; reduced-motion preferences disable this effect.
+
+Replay follows the pen points preserved in signatures exported by the field.
+Imported filled SVG images without pen-point history can still be displayed,
+edited and downloaded, but their original drawing order cannot be recovered;
+the replay control is disabled for those images.

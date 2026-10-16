@@ -17,7 +17,17 @@ final class RichEditorImageVariant
         public readonly bool $webp = false,
         public readonly bool $master = false,
         public readonly bool $optimize = true,
-    ) {}
+    ) {
+        if (! preg_match('/\A[a-zA-Z][a-zA-Z0-9_-]{0,63}\z/', $name)) {
+            throw new InvalidArgumentException('Image variant names must contain only letters, numbers, underscores and hyphens.');
+        }
+
+        foreach ([$maxLongEdge, $maxWidth, $maxHeight] as $dimension) {
+            if ($dimension !== null && ($dimension < 1 || $dimension > 32768)) {
+                throw new InvalidArgumentException('Image variant dimensions must be between 1 and 32768 pixels.');
+            }
+        }
+    }
 
     public static function make(string $name): self
     {
@@ -147,6 +157,14 @@ final class RichEditorImageVariant
     {
         if ($variants === []) {
             return [];
+        }
+
+        if (count($variants) > 12 || count(array_unique(array_map(fn (self $variant): string => strtolower($variant->name), $variants))) !== count($variants)) {
+            throw new InvalidArgumentException('Configure at most 12 image variants with unique names.');
+        }
+
+        if (count(array_filter($variants, fn (self $variant): bool => $variant->master)) > 1) {
+            throw new InvalidArgumentException('Only one image variant may be the master.');
         }
 
         $hasMaster = collect($variants)->contains(fn (self $variant): bool => $variant->master);

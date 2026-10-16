@@ -153,14 +153,7 @@
     color: var(--fff-phone-field-menu-text, rgb(24 24 27));
 }
 
-.fff-flex-time-segments__option:hover {
-    background: var(--fff-select-menu-hover);
-}
-
-.fff-flex-time-segments__option.is-selected {
-    background: var(--fff-select-menu-selected);
-    font-weight: 600;
-}
+.fff-flex-time-segments__option.is-selected { font-weight: 600; }
 
 .fff-flex-time-segments__option:disabled {
     @apply cursor-not-allowed;

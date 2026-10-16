@@ -61,7 +61,7 @@ describe('resolveTeleportedMenuVerticalPlacement', () => {
         assert.equal(result.top, 400 - 200 - 6)
     })
 
-    it('forces below when position is bottom', () => {
+    it('preserves bottom orientation while clamping the panel to the viewport', () => {
         const result = resolveTeleportedMenuVerticalPlacement({
             triggerRect: { top: 700, bottom: 740 },
             panelHeight: 200,
@@ -71,7 +71,7 @@ describe('resolveTeleportedMenuVerticalPlacement', () => {
         })
 
         assert.equal(result.opensAbove, false)
-        assert.equal(result.top, 740 + 6)
+        assert.equal(result.top, 800 - 16 - 200)
     })
 
     it('flips above when the panel would overflow the viewport', () => {

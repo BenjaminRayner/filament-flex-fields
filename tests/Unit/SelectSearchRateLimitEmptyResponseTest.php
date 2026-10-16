@@ -7,8 +7,9 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\TagsField;
 use Bjanczak\FilamentFlexFields\Support\Select\SelectSearchRateLimiter;
 use Illuminate\Support\Facades\RateLimiter;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
-it('returns controlled empty search results when the select rate limiter blocks', function (): void {
+it('rejects select transport with HTTP 429 when rate limited', function (): void {
     config()->set('filament-flex-fields.select.search_rate_limit_per_minute', 1);
 
     $limiter = app(SelectSearchRateLimiter::class);
@@ -20,16 +21,15 @@ it('returns controlled empty search results when the select rate limiter blocks'
         ->searchable()
         ->getSearchResultsUsing(fn (): array => ['pl' => 'Poland']);
 
-    expect($field->getSearchResultsForJs('pol'))->toBe([])
-        ->and($field->getSearchResultsPageForJs('pol'))->toMatchArray([
-            'items' => [],
-            'hasMore' => false,
-        ]);
+    expect(fn () => $field->getSearchResultsForJs('pol'))
+        ->toThrow(TooManyRequestsHttpException::class);
+    expect(fn () => $field->getSearchResultsPageForJs('pol'))
+        ->toThrow(TooManyRequestsHttpException::class);
 
     RateLimiter::clear($limiter->key('country'));
 });
 
-it('returns controlled empty tag search results when the rate limiter blocks', function (): void {
+it('rejects tag transport with HTTP 429 when rate limited', function (): void {
     config()->set('filament-flex-fields.select.search_rate_limit_per_minute', 1);
 
     $limiter = app(SelectSearchRateLimiter::class);
@@ -40,12 +40,13 @@ it('returns controlled empty tag search results when the rate limiter blocks', f
         ->suggestions(['laravel', 'php'])
         ->getSearchResultsUsing(fn (): array => ['laravel']);
 
-    expect($field->getTagSearchResults('la'))->toBe([]);
+    expect(fn () => $field->getTagSearchResults('la'))
+        ->toThrow(TooManyRequestsHttpException::class);
 
     RateLimiter::clear($limiter->key('tags'));
 });
 
-it('returns controlled empty icon search and svg previews when the rate limiter blocks', function (): void {
+it('rejects icon transport with HTTP 429 when rate limited', function (): void {
     config()->set('filament-flex-fields.select.search_rate_limit_per_minute', 1);
 
     $limiter = app(SelectSearchRateLimiter::class);
@@ -54,12 +55,10 @@ it('returns controlled empty icon search and svg previews when the rate limiter 
 
     $field = IconPickerField::make('icon');
 
-    expect($field->getIconPickerSearchResults('star', 'heroicons', 2))->toMatchArray([
-        'icons' => [],
-        'page' => 2,
-        'hasMore' => false,
-        'sets' => [],
-    ])->and($field->getIconPickerSvgPreviews(['heroicon-o-star']))->toBe([]);
+    expect(fn () => $field->getIconPickerSearchResults('star', 'heroicons', 2))
+        ->toThrow(TooManyRequestsHttpException::class);
+    expect(fn () => $field->getIconPickerSvgPreviews(['heroicon-o-star']))
+        ->toThrow(TooManyRequestsHttpException::class);
 
     RateLimiter::clear($limiter->key('icon'));
 });

@@ -8,202 +8,32 @@ use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldFocusOutline;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\InteractsWithTagSearch;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectField\ConfiguresSelectSurface;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Tags\ConfiguresTags;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Tags\NormalizesTagsState;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Tags\PresentsTags;
+use Bjanczak\FilamentFlexFields\Support\Tags\TagValidator;
 use Closure;
 use Filament\Forms\Components\TagsInput;
-use InvalidArgumentException;
 
+/** Native storage/affixes/validation API with the shared FLEX Select runtime. */
 class TagsField extends TagsInput
 {
+    use ConfiguresSelectSurface;
+    use ConfiguresTags;
     use HasControlSize;
     use HasFieldFocusOutline;
     use HasFieldRounding;
     use InteractsWithTagSearch;
+    use NormalizesTagsState;
+    use PresentsTags;
 
     protected string $view = 'filament-flex-fields::forms.components.tags-field';
-
-    protected string|Closure $variant = 'primary';
-
-    protected int|Closure|null $maxTags = null;
-
-    protected bool|Closure $suggestionsOnly = false;
-
-    protected bool|Closure $duplicateInsensitive = false;
-
-    protected bool|Closure $showTagCount = false;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->size('md');
-        $this->splitKeys(['Tab']);
-
-        $this->rule(function (TagsField $component): Closure {
-            return function (string $attribute, mixed $value, Closure $fail) use ($component): void {
-                $tags = $component->normalizeTagsState($value);
-                $max = $component->getMaxTags();
-
-                if ($max !== null && count($tags) > $max) {
-                    $fail(__('filament-flex-fields::default.validation.tags.max', ['max' => $max]));
-
-                    return;
-                }
-
-                if (! $component->isSuggestionsOnly()) {
-                    return;
-                }
-
-                $allowed = array_map('strval', $component->getSuggestions());
-
-                if ($component->isDuplicateInsensitive()) {
-                    $allowedLookup = array_map(static fn (string $tag): string => mb_strtolower($tag), $allowed);
-                } else {
-                    $allowedLookup = $allowed;
-                }
-
-                foreach ($tags as $tag) {
-                    $needle = $component->isDuplicateInsensitive() ? mb_strtolower($tag) : $tag;
-
-                    if (! in_array($needle, $allowedLookup, true)) {
-                        $fail(__('filament-flex-fields::default.validation.tags.suggestions_only'));
-
-                        return;
-                    }
-                }
-            };
-        });
-    }
-
-    /**
-     * @return list<string>
-     */
-    public function normalizeTagsState(mixed $state): array
-    {
-        if (is_array($state)) {
-            return array_values(array_filter(
-                array_map(static fn (mixed $tag): string => trim((string) $tag), $state),
-                static fn (string $tag): bool => $tag !== '',
-            ));
-        }
-
-        if (is_string($state) && filled($state) && ($separator = $this->getSeparator())) {
-            return array_values(array_filter(
-                array_map(static fn (string $tag): string => trim($tag), explode($separator, $state)),
-                static fn (string $tag): bool => $tag !== '',
-            ));
-        }
-
-        return [];
-    }
-
-    public function variant(string|Closure $variant): static
-    {
-        $this->variant = $variant;
-
-        return $this;
-    }
-
-    public function maxTags(int|Closure|null $max): static
-    {
-        $this->maxTags = $max;
-
-        return $this;
-    }
-
-    public function suggestionsOnly(bool|Closure $condition = true): static
-    {
-        $this->suggestionsOnly = $condition;
-
-        return $this;
-    }
-
-    public function duplicateInsensitive(bool|Closure $condition = true): static
-    {
-        $this->duplicateInsensitive = $condition;
-
-        return $this;
-    }
-
-    public function showTagCount(bool|Closure $condition = true): static
-    {
-        $this->showTagCount = $condition;
-
-        return $this;
-    }
-
-    public function getVariant(): string
-    {
-        $variant = (string) $this->evaluate($this->variant);
-
-        if (! in_array($variant, ['primary', 'secondary', 'flat', 'soft'], true)) {
-            throw new InvalidArgumentException("Tags field variant [{$variant}] is not supported.");
-        }
-
-        return $variant;
-    }
-
-    public function getMaxTags(): ?int
-    {
-        $max = $this->evaluate($this->maxTags);
-
-        return is_int($max) ? $max : null;
-    }
-
-    public function isSuggestionsOnly(): bool
-    {
-        return (bool) $this->evaluate($this->suggestionsOnly);
-    }
-
-    public function isDuplicateInsensitive(): bool
-    {
-        return (bool) $this->evaluate($this->duplicateInsensitive);
-    }
-
-    public function shouldShowTagCount(): bool
-    {
-        return (bool) $this->evaluate($this->showTagCount);
-    }
-
-    /**
-     * @return list<string>
-     */
-    public function getWrapperClasses(): array
-    {
-        return [
-            'fff-tags-field',
-            'fff-flex-text-input',
-            'fff-tags-field--'.$this->getSize(),
-            'fff-flex-text-input--'.$this->getSize(),
-            'fff-tags-field--'.$this->getVariant(),
-            'fff-flex-text-input--'.$this->getVariant(),
-            'fff-rounding-'.$this->getRounding(),
-            'fi-color-'.($this->getColor() ?? 'primary'),
-        ];
-    }
-
-    public function getTagDisplayLabel(string $tag): string
-    {
-        return ($this->getTagPrefix() ?? '').$tag.($this->getTagSuffix() ?? '');
-    }
-
-    /**
-     * @return list<string>
-     */
-    public function getInitialTagsForSsr(): array
-    {
-        $state = $this->getState();
-
-        if (is_array($state)) {
-            return array_values(array_filter($state, fn (mixed $tag): bool => filled($tag)));
-        }
-
-        if (is_string($state) && filled($state) && ($separator = $this->getSeparator())) {
-            return array_values(array_filter(
-                explode($separator, $state),
-                fn (string $tag): bool => filled(trim($tag)),
-            ));
-        }
-
-        return [];
+        $this->size('md')->splitKeys(['Tab']);
+        $this->rule(static fn (TagsField $component): Closure => TagValidator::rule($component));
     }
 }

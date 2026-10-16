@@ -1,439 +1,136 @@
-import esbuild from 'esbuild';
-import fs from 'node:fs';
-import path from 'node:path';
-import { collectJsMetrics, writeBundleMetrics } from './bundle-metrics.mjs';
+import esbuild from 'esbuild'
+import { firstPaintEsbuildPlugin, firstPaintVirtualInputs, compileFirstPaintOwners } from './assets/first-paint-esbuild-plugin.mjs'
+import fs from 'node:fs'
+import path from 'node:path'
+import { collectJsMetrics, writeBundleMetrics } from './bundle-metrics.mjs'
+import { exportPortableRegistry } from './assets/export-portable-registry.mjs'
+import { SEMANTIC_CHUNK_RULES } from './assets/semantic-chunks.mjs'
+import { createComponentManifest } from './assets/component-manifest.mjs'
+import { analyseModuleBuilds, captureModuleBuild } from './assets/module-build-analysis.mjs'
+import { pruneComponentOutput } from './assets/prune-component-output.mjs'
+import { withComponentOutputLock } from './assets/component-output-lock.mjs'
 
-const packageRoot = path.resolve(import.meta.dirname, '..');
-const componentsRoot = path.join(packageRoot, 'resources/js/components');
-const jsRoot = path.join(packageRoot, 'resources/js');
-const distRoot = path.join(packageRoot, 'resources/dist/components');
-
-const SEMANTIC_CHUNK_RULES = [
-    {
-        slug: 'flex-fields-theme-utils',
-        matches: (modules) => modules.includes('core/theme-utils.js'),
-    },
-    {
-        slug: 'flex-fields-search-normalize',
-        matches: (modules) => modules.includes('core/search-normalize.js'),
-    },
-    {
-        slug: 'flex-fields-combobox-engine',
-        matches: (modules) => modules.includes('core/combobox-engine.js'),
-    },
-    {
-        slug: 'flex-fields-emoji',
-        matches: (modules) => modules.includes('core/shared-emoji-picker.js'),
-    },
-    {
-        slug: 'flex-fields-audio',
-        matches: (modules) => modules.some((modulePath) => (
-            modulePath === 'core/format-time.js'
-            || modulePath === 'core/waveform-bars.js'
-            || modulePath === 'core/audio-waveform.js'
-            || modulePath === 'core/audio-playback.js'
-        )),
-    },
-    {
-        slug: 'flex-fields-dynamic-bars',
-        matches: (modules) => modules.includes('core/dynamic-bars.js'),
-    },
-    {
-        slug: 'flex-fields-mapbox',
-        matches: (modules) => modules.includes('support/mapbox-geocoding.js'),
-    },
-    {
-        slug: 'flex-fields-select-trigger',
-        matches: (modules) => modules.some((modulePath) => (
-            modulePath.includes('select-field/headless-select-state.js')
-            || modulePath.includes('select-field/headless-inline-search.js')
-            || modulePath.includes('select-field/select-field-trigger-labels.js')
-            || modulePath.includes('select-field/headless-combobox-ssr-handoff.js')
-        )),
-    },
-    {
-        slug: 'flex-fields-select-keyboard',
-        matches: (modules) => modules.includes('select-field/headless-combobox-keyboard.js'),
-    },
-    {
-        slug: 'flex-fields-select-scroll-virt',
-        matches: (modules) => modules.includes('select-field/headless-combobox-scroll-virt.js'),
-    },
-    {
-        slug: 'flex-fields-entity-mention',
-        matches: (modules) => modules.includes('core/entity-mention.js'),
-    },
-    {
-        slug: 'flex-fields-headless-user-select',
-        matches: (modules) => modules.includes('select-field/headless-user-select.js'),
-    },
-    {
-        slug: 'flex-fields-headless-livewire',
-        matches: (modules) => modules.includes('select-field/headless-combobox-livewire.js'),
-    },
-    {
-        slug: 'flex-fields-select-menu',
-        matches: (modules) => modules.includes('core/searchable-select-menu.js'),
-    },
-    {
-        slug: 'flex-fields-overlay-virtual-list',
-        matches: (modules) => modules.includes('core/overlay-virtual-list.js'),
-    },
-    {
-        slug: 'flex-fields-fff-virtual-adapter',
-        matches: (modules) => modules.includes('core/fff-virtual-adapter.js')
-            || modules.some((modulePath) => modulePath.includes('@tanstack/virtual-core')),
-    },
-    {
-        slug: 'flex-fields-virtualized-list',
-        matches: (modules) => modules.includes('core/virtualized-list.js'),
-    },
-    {
-        slug: 'flex-fields-overlay-scrollbar',
-        matches: (modules) => modules.includes('core/overlay-scrollbar.js'),
-    },
-    {
-        slug: 'flex-fields-country-registry',
-        matches: (modules) => modules.includes('core/country-registry.js'),
-    },
-    {
-        slug: 'flex-fields-timezone-registry',
-        matches: (modules) => modules.includes('core/timezone-registry.js'),
-    },
-    {
-        slug: 'flex-fields-currency-registry',
-        matches: (modules) => modules.includes('core/currency-registry.js'),
-    },
-    {
-        slug: 'flex-fields-country-search',
-        matches: (modules) => modules.includes('core/country-search.js'),
-    },
-    {
-        slug: 'flex-fields-country-keyboard',
-        matches: (modules) => modules.includes('core/country-list-keyboard.js'),
-    },
-    {
-        slug: 'flex-fields-barcode-scanner',
-        matches: (_modules, inputs) => inputs.some((input) => input.includes('@zxing/')),
-    },
-    {
-        slug: 'flex-fields-whisper',
-        matches: (_modules, inputs) => inputs.some((input) => input.includes('@xenova/transformers')),
-    },
-    {
-        slug: 'flex-fields-time-panel',
-        matches: (modules) => modules.includes('core/date-time/time-panel.js'),
-    },
-    {
-        slug: 'flex-fields-calendar-interactions',
-        matches: (modules) => modules.includes('core/date-time/calendar-interactions.js'),
-    },
-    {
-        slug: 'flex-fields-segment-editing',
-        matches: (modules) => modules.includes('core/date-time/segment-editing.js'),
-    },
-    {
-        slug: 'flex-fields-calendar-panel',
-        matches: (modules) => modules.includes('core/date-time/calendar-panel.js'),
-    },
-    {
-        slug: 'flex-fields-phone-lib',
-        matches: (_modules, inputs) => inputs.some((input) => input.includes('libphonenumber-js')),
-    },
-];
-
-fs.mkdirSync(distRoot, { recursive: true });
-
-const entryFiles = fs.readdirSync(componentsRoot).filter((file) => (
-    file.endsWith('.js') && file !== 'flex-rich-editor.js'
-));
-const entryNames = entryFiles.map((file) => file.replace(/\.js$/, ''));
-
-for (const file of fs.readdirSync(distRoot)) {
-    if (file === 'alpine-manifest.json') {
-        continue;
+const packageRoot = path.resolve(import.meta.dirname, '..')
+await withComponentOutputLock(packageRoot, async lease => {
+    const jsRoot = path.join(packageRoot, 'resources/js')
+    const componentsRoot = path.join(jsRoot, 'components')
+    const distRoot = path.join(packageRoot, 'resources/dist/components')
+    const entryPoints = Object.fromEntries(fs.readdirSync(componentsRoot).filter(file => file.endsWith('.js')).sort()
+        .map(file => [file.slice(0, -3), path.join(componentsRoot, file)]))
+    entryPoints['flex-core-runtime'] = path.join(jsRoot, 'entries/flex-core-runtime.js')
+    entryPoints['flex-runtime-sdk'] = path.join(jsRoot, 'entries/flex-runtime-sdk.js')
+    const entries = Object.keys(entryPoints).sort()
+    const owners = await compileFirstPaintOwners(packageRoot)
+    const virtualInputs = new Map()
+    const sharedOptions = {
+        plugins: [firstPaintEsbuildPlugin(packageRoot, virtualInputs, owners)],
+        absWorkingDir: packageRoot,
+        outdir: distRoot,
+        bundle: true,
+        splitting: true,
+        format: 'esm',
+        minify: true,
+        entryNames: '[name]',
+        chunkNames: 'chunk-[hash]',
+        metafile: true,
+        write: false,
+        loader: { '.svg': 'text' },
     }
 
-    const target = path.join(distRoot, file);
-
-    if (file.endsWith('.js')) {
-        fs.unlinkSync(target);
+    // Entry ownership and dynamic imports provide isolation. Separate compilations
+    // would duplicate shared lifecycle code even when the browser shares its state.
+    const result = await esbuild.build({ ...sharedOptions, entryPoints })
+    for (const owner of owners) {
+        Object.assign(result.metafile.inputs, owner.metafile.inputs)
+        Object.assign(result.metafile.outputs, owner.metafile.outputs)
+        result.outputFiles.push(...owner.outputFiles)
     }
-}
-
-const result = await esbuild.build({
-    entryPoints: entryFiles.map((file) => path.join(componentsRoot, file)),
-    outdir: distRoot,
-    bundle: true,
-    splitting: true,
-    format: 'esm',
-    minify: true,
-    entryNames: '[name]',
-    chunkNames: 'chunk-[hash]',
-    metafile: true,
-    loader: {
-        '.svg': 'text',
-    },
-});
-
-const flexRichEditorResult = await esbuild.build({
-    entryPoints: [path.join(componentsRoot, 'flex-rich-editor.js')],
-    outdir: distRoot,
-    entryNames: '[name]',
-    bundle: true,
-    splitting: true,
-    format: 'esm',
-    minify: true,
-    chunkNames: 'chunk-[hash]',
-    metafile: true,
-    loader: {
-        '.svg': 'text',
-    },
-});
-
-const combinedMetafile = {
-    outputs: {
-        ...result.metafile.outputs,
-        ...flexRichEditorResult.metafile.outputs,
-    },
-};
-
-function resolveSemanticChunkSlug(modules, inputs = []) {
-    for (const rule of SEMANTIC_CHUNK_RULES) {
-        if (rule.matches(modules, inputs)) {
-            return rule.slug;
+    // The separately compiled synchronous owners belong to this one verified graph.
+    // Rewrite external facade edges to owned graph edges before closure projection.
+    for (const output of Object.values(result.metafile.outputs)) {
+        for (const edge of output.imports) {
+            // Facades import their synchronous owner from the same directory.
+            // Normalize only its graph key; do not encode the source output
+            // directory in emitted browser URLs and shorten attribution later.
+            if (edge.external && /^\.\/chunk-first-paint-(segment|timezone)-[a-f0-9]{64}\.js$/.test(edge.path)) {
+                edge.path = `resources/dist/components/${edge.path.slice(2)}`
+            }
+            if (!Object.hasOwn(result.metafile.outputs, edge.path)) continue
+            edge.external = false
         }
     }
-
-    const primaryModule = modules[0] ?? 'shared';
-
-    return `flex-fields-${primaryModule
-        .replace(/^core\//, '')
-        .replace(/^support\//, '')
-        .replace(/\.js$/, '')
-        .replace(/[^a-z0-9]+/gi, '-')}`;
-}
-
-function buildChunkModules(metafile) {
-    const chunkModules = {};
+    const metafile = result.metafile
+    const outputs = new Map(result.outputFiles.map((file) => [path.basename(file.path), file.text]))
+    const chunkModules = {}
+    const renameMap = {}
 
     for (const [outputPath, output] of Object.entries(metafile.outputs)) {
-        const fileName = path.basename(outputPath);
-
-        if (! fileName.startsWith('chunk-') || ! fileName.endsWith('.js')) {
-            continue;
+        const name = path.basename(outputPath)
+        if (!name.startsWith('chunk-')) continue
+        const inputs = Object.keys(output.inputs)
+        const modules = inputs.map((input) => virtualInputs.get(input)?.identity ?? path.relative(jsRoot, path.resolve(packageRoot, input)))
+            .filter((relative) => !relative.startsWith('..')).sort()
+        chunkModules[name] = { modules, inputs }
+        const firstPaint = name.match(/^chunk-first-paint-(segment|timezone)-([a-f0-9]{64})\.js$/)
+        if (firstPaint) {
+            renameMap[name] = `flex-fields-first-paint-${firstPaint[1]}-${firstPaint[2]}.js`
+            continue
         }
-
-        chunkModules[fileName] = {
-            modules: Object.keys(output.inputs)
-                .map((inputPath) => path.relative(jsRoot, inputPath))
-                .filter((relativePath) => ! relativePath.startsWith('..'))
-                .sort(),
-            inputs: Object.keys(output.inputs),
-        };
+        const rule = SEMANTIC_CHUNK_RULES.find((candidate) => candidate.matches(modules, inputs))
+        const fallback = `flex-fields-${(modules[0] ?? 'shared').replace(/^core\//, '').replace(/^support\//, '').replace(/\.js$/, '').replace(/[^a-z0-9]+/gi, '-')}`
+        renameMap[name] = `${rule?.slug ?? fallback}-${name.slice('chunk-'.length)}`
     }
 
-    return chunkModules;
-}
-
-function renameChunksToSemanticNames(chunkModules) {
-    const renameMap = {};
-
-    for (const [originalName, chunk] of Object.entries(chunkModules)) {
-        const hash = originalName.replace(/^chunk-/, '').replace(/\.js$/, '');
-        const slug = resolveSemanticChunkSlug(chunk.modules, chunk.inputs);
-        const semanticName = `${slug}-${hash}.js`;
-
-        renameMap[originalName] = semanticName;
+    const manifest = createComponentManifest(metafile, renameMap, entries, chunkModules)
+    const stagedOutputs = new Map()
+    for (const [name, source] of outputs) {
+        let rewritten = source
+        for (const [before, after] of Object.entries(renameMap)) {
+            rewritten = rewritten.replaceAll(`./${before}`, `./${after}`).replaceAll(`resources/dist/components/${before}`, `./${after}`)
+        }
+        stagedOutputs.set(renameMap[name] ?? name, rewritten)
     }
 
-    for (const [originalName, semanticName] of Object.entries(renameMap)) {
-        const originalPath = path.join(distRoot, originalName);
-        const semanticPath = path.join(distRoot, semanticName);
-
-        if (! fs.existsSync(originalPath)) {
-            continue;
-        }
-
-        fs.renameSync(originalPath, semanticPath);
-    }
-
-    for (const file of fs.readdirSync(distRoot)) {
-        if (! file.endsWith('.js')) {
-            continue;
-        }
-
-        const outputPath = path.join(distRoot, file);
-        let source = fs.readFileSync(outputPath, 'utf8');
-        let updated = false;
-
-        for (const [originalName, semanticName] of Object.entries(renameMap)) {
-            const nextSource = source.replaceAll(`./${originalName}`, `./${semanticName}`);
-
-            if (nextSource !== source) {
-                source = nextSource;
-                updated = true;
-            }
-        }
-
-        if (updated) {
-            fs.writeFileSync(outputPath, source);
+    // Complete compilation before touching usable output. Publish chunks before
+    // entrypoints and the manifest last. Published hosts own their release retention;
+    // the Composer distribution contains only the newly verified build graph.
+    fs.mkdirSync(distRoot, { recursive: true })
+    const writeOutput = (name, contents) => {
+        const target = path.join(distRoot, name)
+        const temporary = `${target}.${process.pid}.tmp`
+        try {
+            fs.writeFileSync(temporary, contents)
+            fs.renameSync(temporary, target)
+        } finally {
+            if (fs.existsSync(temporary)) fs.unlinkSync(temporary)
         }
     }
-
-    const semanticChunkModules = {};
-
-    for (const [originalName, chunk] of Object.entries(chunkModules)) {
-        semanticChunkModules[renameMap[originalName] ?? originalName] = chunk.modules;
+    for (const name of manifest.__shared_chunks__) writeOutput(name, stagedOutputs.get(name))
+    for (const entry of manifest.__entries__) writeOutput(`${entry}.js`, stagedOutputs.get(`${entry}.js`))
+    writeOutput('alpine-manifest.json', `${JSON.stringify(manifest, null, 2)}\n`)
+    const build = captureModuleBuild(packageRoot, 'components', metafile, {
+        virtualInputs,
+        outputName: original => `resources/dist/components/${renameMap[path.basename(original)] ?? path.basename(original)}`,
+    })
+    if (analyseModuleBuilds([build]).sameSourceRepeated) throw new Error('Component build copied a shared source module into multiple outputs.')
+    const cleanup = pruneComponentOutput(packageRoot, lease, { virtualInputs: await firstPaintVirtualInputs(packageRoot, owners) })
+    const retainedSnapshot = path.join(packageRoot, 'build/asset-analysis/legacy-retained.json')
+    if (fs.existsSync(retainedSnapshot)) fs.unlinkSync(retainedSnapshot)
+    for (const id of ['segment-ssr', 'timezone-ssr']) {
+        const retired = path.join(packageRoot, `build/asset-analysis/${id}.json`)
+        if (fs.existsSync(retired)) fs.unlinkSync(retired)
     }
+    exportPortableRegistry(packageRoot)
+    writeBundleMetrics(packageRoot, { js: collectJsMetrics(distRoot) })
 
-    return { renameMap, semanticChunkModules };
-}
-
-function extractChunkImports(source) {
-    return [
-        ...source.matchAll(/from"\.\/(flex-fields-[^"]+\.js)"/g),
-        ...source.matchAll(/import"\.\/(flex-fields-[^"]+\.js)"/g),
-        ...source.matchAll(/import\("\.\/(flex-fields-[^"]+\.js)"\)/g),
-    ].map((match) => match[1]);
-}
-
-function expandTransitiveChunkImports(chunks) {
-    const expanded = new Set(chunks);
-    let foundNewImports = true;
-
-    while (foundNewImports) {
-        foundNewImports = false;
-
-        for (const chunk of [...expanded]) {
-            const chunkPath = path.join(distRoot, chunk);
-
-            if (! fs.existsSync(chunkPath)) {
-                continue;
-            }
-
-            const imports = extractChunkImports(fs.readFileSync(chunkPath, 'utf8'));
-
-            for (const importedChunk of imports) {
-                if (! expanded.has(importedChunk)) {
-                    expanded.add(importedChunk);
-                    foundNewImports = true;
-                }
-            }
-        }
+    const audioSource = path.join(packageRoot, 'resources/audio/barcode-scan-success.mp3')
+    if (fs.existsSync(audioSource)) {
+        const audioDist = path.join(packageRoot, 'resources/dist/assets/barcode-scanner-field')
+        fs.mkdirSync(audioDist, { recursive: true })
+        fs.copyFileSync(audioSource, path.join(audioDist, 'barcode-scan-success.mp3'))
+        const retiredAudio = path.join(packageRoot, 'resources/dist/audio/barcode-scan-success.mp3')
+        if (fs.existsSync(retiredAudio)) fs.unlinkSync(retiredAudio)
     }
-
-    return [...expanded];
-}
-
-function buildChunkImportGraph() {
-    const graph = {};
-
-    for (const file of fs.readdirSync(distRoot)) {
-        if (! file.endsWith('.js') || file === 'alpine-manifest.json') {
-            continue;
-        }
-
-        const imports = extractChunkImports(fs.readFileSync(path.join(distRoot, file), 'utf8'));
-
-        if (imports.length > 0) {
-            graph[file] = [...new Set(imports)].sort();
-        }
-    }
-
-    return graph;
-}
-
-const chunkModules = buildChunkModules(combinedMetafile);
-const { semanticChunkModules } = renameChunksToSemanticNames(chunkModules);
-
-const allEntryNames = [...entryNames, 'flex-rich-editor'];
-
-const manifest = {};
-
-for (const entry of allEntryNames) {
-    const outputPath = path.join(distRoot, `${entry}.js`);
-
-    if (! fs.existsSync(outputPath)) {
-        continue;
-    }
-
-    const source = fs.readFileSync(outputPath, 'utf8');
-
-    manifest[entry] = [...expandTransitiveChunkImports(extractChunkImports(source))].sort();
-}
-
-const sharedChunks = new Set();
-
-for (const chunks of Object.values(manifest)) {
-    if (! Array.isArray(chunks)) {
-        continue;
-    }
-
-    for (const chunk of chunks) {
-        sharedChunks.add(chunk);
-    }
-}
-
-let newChunksFound = true;
-while (newChunksFound) {
-    newChunksFound = false;
-    for (const chunk of [...sharedChunks]) {
-        const chunkPath = path.join(distRoot, chunk);
-        if (fs.existsSync(chunkPath)) {
-            const source = fs.readFileSync(chunkPath, 'utf8');
-            const imports = extractChunkImports(source);
-            for (const imp of imports) {
-                if (!sharedChunks.has(imp)) {
-                    sharedChunks.add(imp);
-                    newChunksFound = true;
-                }
-            }
-        }
-    }
-}
-
-manifest.__entries__ = allEntryNames
-    .filter((entry) => fs.existsSync(path.join(distRoot, `${entry}.js`)))
-    .sort()
-manifest.__shared_chunks__ = [...sharedChunks].sort();
-manifest.__chunk_imports__ = buildChunkImportGraph();
-manifest.__chunk_modules__ = semanticChunkModules;
-
-const referencedOutputs = new Set([
-    ...allEntryNames.map((entry) => `${entry}.js`),
-    ...manifest.__shared_chunks__,
-]);
-
-for (const file of fs.readdirSync(distRoot)) {
-    if (! file.endsWith('.js')) {
-        continue;
-    }
-
-    if (referencedOutputs.has(file)) {
-        continue;
-    }
-
-    fs.unlinkSync(path.join(distRoot, file));
-    console.warn(`Removed orphan chunk: ${file}`);
-}
-
-fs.writeFileSync(
-    path.join(distRoot, 'alpine-manifest.json'),
-    `${JSON.stringify(manifest, null, 2)}\n`,
-);
-
-writeBundleMetrics(packageRoot, { js: collectJsMetrics(distRoot) });
-
-const audioSource = path.join(packageRoot, 'resources/audio/barcode-scan-success.mp3');
-const audioDistDir = path.join(packageRoot, 'resources/dist/audio');
-const audioDist = path.join(audioDistDir, 'barcode-scan-success.mp3');
-
-if (fs.existsSync(audioSource)) {
-    fs.mkdirSync(audioDistDir, { recursive: true });
-    fs.copyFileSync(audioSource, audioDist);
-}
-
-console.log(
-    `Successfully built ${allEntryNames.length} Javascript components (${Object.keys(combinedMetafile.outputs).length} output files, ${sharedChunks.size} shared chunks).`,
-);
+    console.log(`Built ${entries.length} components; ${manifest.__shared_chunks__.length} shared/dynamic chunks; eager and dynamic edges separated.`)
+    console.log(`Removed ${cleanup.removed.length} obsolete generated JS outputs; public host releases untouched.`)
+})

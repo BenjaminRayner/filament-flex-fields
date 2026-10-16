@@ -1,9 +1,10 @@
 ---
 title: "ProgressBar"
 description: Linear progress indicator with determinate, indeterminate, segmented delivery tracker, and pill-style variants.
+icon: "chart-no-axes-gantt"
 ---
 
-![ProgressBar](/art/sc-4.webp)
+![ProgressBar](/art/old/sc-4.webp)
 
 [← Back to Table of Contents](/docs/index)
 
@@ -72,10 +73,10 @@ All methods accept `Closure` unless noted.
 | `displayValue(string\|Closure\|null $value)` | Setup | `null` | Custom formatted value string (e.g., "3 of 5 files"). |
 | `showValue(bool\|Closure $condition = true)` | Setup | `true` | Show percentage or display value in the header. |
 | `valueBadge(bool\|Closure $condition = true)` | Setup | `false` | Render the value as a pill badge in the header. |
-| `color(string\|Closure\|null $color)` | Setup | `primary` | Semantic color: `primary`, `success`, `warning`, `danger`. |
+| `color(string\|Closure\|null $color)` | Setup | `primary` | Semantic token (`primary`, `success`, `warning`, `danger`) or hex/rgb/hsl color. |
 | `indeterminate(bool\|Closure $condition = true)` | Setup | `false` | Animated loading bar for unknown progress. |
 | `variant(string\|Closure $variant)` | Setup | `'track'` | `track` (continuous) or `pills` (segmented). |
-| `pillCount(int\|Closure $count)` | Setup | `null` | Number of segments in `pills` variant. |
+| `pillCount(int\|Closure $count)` | Setup | `null` | Fixed capsule count (1–100); omit for width-adaptive capsules painted entirely by CSS. |
 | `gradientFrom(string\|Closure\|null $color)` | Setup | `null` | Start color for gradient fill. |
 | `gradientTo(string\|Closure\|null $color)` | Setup | `null` | End color for gradient fill. |
 | `segments(array\|Closure\|null $segments)` | Setup | `null` | Array of step metadata for delivery-tracker mode. |
@@ -86,18 +87,18 @@ All methods accept `Closure` unless noted.
 | `currentMarker(mixed $icon)` | Setup | `null` | Icon at the current progress position. |
 | `endMarker(mixed $icon)` | Setup | `null` | Icon at the end of the track. |
 | `remainingTrackStyle(string $style)` | Setup | `'solid'` | Style of unfilled track: `solid` or `dashed`. |
-| `shell(bool\|Closure $condition = true)` | Setup | `false` | Wrap in an elevated card container. |
+| `shell(bool\|Closure $condition = true)` | Setup | `false` | Wrap in a static card container. |
 | `description(string\|Closure $text)` | Setup | `null` | Subtitle text (requires `shell()`). |
 | `footer(string\|Closure $text)` | Setup | `null` | Footer text (requires `shell()`). |
 | `size(string\|Closure $size)` | Setup | `'md'` | Track height: `sm`, `md`, `lg`. |
 | `animated(bool\|Closure $condition = true)` | Setup | `true` | Animate fill transitions. |
-| `animationDuration(int\|Closure $ms)` | Setup | `400` | Transition duration in milliseconds. |
+| `animationDuration(int\|Closure $ms)` | Setup | `240` | Transition duration in milliseconds. |
 
 ---
 
 ### Real-world examples
 
-#### Animated file upload (Livewire)
+#### Progress supplied by your application (Livewire)
 
 ```php
 ProgressBar::make()
@@ -114,9 +115,9 @@ ProgressBar::make()
 ProgressBar::make()
     ->label('Delivery Status')
     ->value(45)
-    ->startMarker('heroicon-o-map-pin')
-    ->currentMarker('heroicon-o-truck')
-    ->endMarker('heroicon-o-home')
+    ->startMarker('hugeicons-location-01')
+    ->currentMarker('hugeicons-truck')
+    ->endMarker('hugeicons-home-01')
     ->remainingTrackStyle('dashed')
     ->color('success');
 ```
@@ -125,7 +126,7 @@ ProgressBar::make()
 
 ### Playground
 
-`/admin/flex-fields-playground/progress-bar`
+`/admin/flex-fields/progress-bar`
 
 See [Playground](/docs/index#playground) for setup.
 
@@ -147,11 +148,29 @@ See [Playground](/docs/index#playground) for setup.
 |-------|------|
 | `fff-progress-bar` | Root container |
 | `fff-progress-bar--{sm\|md\|lg}` | Size variant |
-| `fff-progress-bar--indeterminate` | Indeterminate animation state |
-| `fff-progress-bar--pills` | Pill variant modifier |
-| `fff-progress-bar--segments` | Stepped tracker modifier |
-| `fff-progress-bar--has-shell` | Card shell wrapper active |
+| `is-indeterminate` | Indeterminate animation state |
+| `is-pills` | Pill variant modifier |
+| `has-segments` | Stepped tracker modifier |
+| `has-shell` | Card shell wrapper active |
 | `fff-progress-bar__track` | Main track background |
 | `fff-progress-bar__fill` | Animated fill element |
 | `fff-progress-bar__marker` | Icon marker wrapper |
 | `fff-progress-bar__segment` | Individual step in tracker mode |
+
+
+### Static rendering and accessibility
+
+This component does not accept user input, persist form state or create an Alpine
+factory. Responsive auto pills are painted by CSS, with no ResizeObserver or
+per-pill JavaScript. Their gradient can fill a capsule partially; fixed pillCount
+uses discrete active capsules. Both adapt to container width, including RTL.
+For segmented displays, the rendered value and accessible current amount follow
+the actual completed and partially filled segments. Segment fills are calculated once per render rather than re-normalizing all
+segments for each item. Footer copy is static text, not an action button.
+
+Each instance exposes one labeled progressbar with its original numeric maximum
+and clamped current value. Indeterminate progress omits aria-valuenow and declares
+aria-busy. Fill transitions and indeterminate animations respect reduced motion.
+Numbers must be finite and max positive. Values below zero/above max display as
+0%/100%. Segment state is complete, active or pending; malformed metadata is
+rejected. CSS colors cannot contain additional declarations.

@@ -1,9 +1,118 @@
 ---
 title: "NpsField"
 description: NPS, CSAT, and Likert scale inputs with three visual variants.
+icon: "gauge"
+"canonical": "https://flex-fields.bjanczak.com/docs/nps-field"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/nps-field.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "NpsField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/nps-field-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/nps-field-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/nps-field.webp"
+"twitter:image:alt": "NpsField in the FLEX Fields playground"
 ---
 
-![NpsField](/art/sc-33.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/nps-field#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/nps-field",
+      "name": "NpsField",
+      "description": "NPS, CSAT, and Likert scale inputs with three visual variants.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/nps-field#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/nps-field#article",
+      "url": "https://flex-fields.bjanczak.com/docs/nps-field",
+      "headline": "NpsField",
+      "description": "NPS, CSAT, and Likert scale inputs with three visual variants.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/nps-field#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/nps-field-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/nps-field-motion.mp4#video",
+      "name": "NpsField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of NpsField in the FLEX Fields playground for Filament. NPS, CSAT, and Likert scale inputs with three visual variants.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/nps-field.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT3.733S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/nps-field-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/nps-field#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/nps-field-motion.mp4"
+  poster="/art/previews/nps-field.webp"
+  width="1920"
+  height="1080"
+  aria-label="NpsField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/nps-field-motion.mp4">Watch the NpsField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -16,7 +125,7 @@ Single-select **survey scale** for Net Promoter Score (0–10), CSAT, satisfacti
 | **Class** | `Bjanczak\FilamentFlexFields\Filament\Forms\Components\NpsField` |
 | **State type** | `string\|int\|null` — one option key, or `null` when unset |
 | **Model cast** | `'nps_score' => 'integer'` · `'feedback_agreement' => 'string'` |
-| **FieldType** | *(no dedicated FieldType mapping yet — use the class directly)* |
+| **FieldType** | `FieldType::Nps` (`nps`) for saved field schemas |
 | **Playground** | `nps-field` slug in Flex Fields playground |
 | **Default variant** | `pills` |
 | **Default scale** | `0` through `10` (numeric keys and labels) |
@@ -59,12 +168,12 @@ NpsField::make('nps_score')
 #### Filament resource form
 
 ```php
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\NpsField;
 
-public static function form(Form $form): Form
+public static function form(Schema $schema): Schema
 {
-    return $form->schema([
+    return $schema->components([
         NpsField::make('nps_score')
             ->label('Recommendation score')
             ->minLabel('Unlikely')
@@ -118,7 +227,7 @@ NpsField::make('nps_score')
     // default is null — no ->default() needed
 ```
 
-Pre-fill when editing:
+Set the initial value for a new form. Editing reads the saved model value:
 
 ```php
 NpsField::make('nps_score')
@@ -130,7 +239,8 @@ NpsField::make('nps_score')
 | Rule | When |
 |------|------|
 | `nullable` | Always (unless `required()`) |
-| `Rule::in(...)` | Value must match a configured option key |
+| Enabled option membership | Value must match a configured, enabled option key |
+| Value shape | Rejects booleans, arrays, fractional scores and unknown keys |
 | `required` | When `->required()` |
 
 ```php
@@ -229,7 +339,7 @@ NpsField::make('nps_score')->size('sm'); // default: md
 NpsField::make('nps_score')->size('lg');
 ```
 
-See [Control size](/docs/shared-concepts) (`sm`, `md`, `lg`).
+See [Control size](/docs/configuration) (`sm`, `md`, `lg`).
 
 #### Rounding
 
@@ -275,7 +385,7 @@ NpsField::make('experience_lg')
 
 Circular rings with a visual inside each option and a text label below. Three ways to supply visuals (priority order):
 
-1. **`icons()`** — Filament icon strings (Heroicon, Gravity, Blade Icons, …)
+1. **`icons()`** — registered Blade icon names (Hugeicons and other installed sets)
 2. **`emojiImages()`** — custom image URLs
 3. **Bundled webp** — for numeric keys `0`–`4` when neither of the above is set
 
@@ -295,12 +405,12 @@ NpsField::make('mood')
     ->required();
 ```
 
-Bundled assets ship in the package (`resources/dist/assets/nps-field/emojis/0.webp` … `4.webp`) and are published to `public/filament-flex-fields-assets/` via `php artisan filament:assets`.
+All five emoji images ship with the package and are published by `php artisan filament:assets`. Their URLs are resolved automatically from the current asset release and respect your `filament.assets_path` setting. You do not need to configure image paths.
 
-#### Custom Gravity / Heroicon icons
+#### Custom Hugeicons
 
 ```php
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 
 NpsField::make('mood')
     ->variant('emojis')
@@ -312,11 +422,11 @@ NpsField::make('mood')
         4 => 'Excellent',
     ])
     ->icons([
-        0 => GravityIcon::CircleXmark,
-        1 => GravityIcon::Hand,
-        2 => GravityIcon::FaceSmile,
-        3 => GravityIcon::Heart,
-        4 => GravityIcon::Star,
+        0 => FlexIcon::CircleXmark,
+        1 => FlexIcon::Hand,
+        2 => FlexIcon::FaceSmile,
+        3 => FlexIcon::Heart,
+        4 => FlexIcon::Star,
     ]);
 ```
 
@@ -407,18 +517,17 @@ NpsField::make('nps_score')
     ->options(array_combine(range(0, 10), range(0, 10)))
     ->colors(['danger' => range(0, 6), 'success' => range(9, 10)])
     ->textColors([
-        '#ffffff' => range(0, 6),
-        '#ffffff' => range(9, 10),
+        '#ffffff' => [...range(0, 6), ...range(9, 10)],
     ]);
 ```
 
-When `colorCoded()` is enabled, built-in detractor/passive/promoter colors apply unless you override with `colors()` / `textColors()`.
+With `colorCoded()` enabled, the built-in NPS palette takes priority. Leave it disabled when using your own `colors()` and `textColors()` mappings. Built-in tones apply only to exact scores from 0 through 10; textual scales remain neutral.
 
 ---
 
 ### Disabled options
 
-Disable individual keys without disabling the whole field:
+Disable individual keys without disabling the whole field. These keys are also rejected during server-side form validation, including direct submissions:
 
 ```php
 NpsField::make('nps_score')
@@ -483,8 +592,9 @@ All methods accept `Closure` unless noted.
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `getOptions()` | `array<string\|int, string>` | Resolved options |
-| `getOptionKeys()` | `list<string\|int>` | Option keys for validation |
+| `getOptions()` | `array<string\|int, string\|int>` | Resolved options |
+| `getOptionKeys()` | `list<string\|int>` | All configured keys |
+| `getEnabledOptionKeys()` | `list<string\|int>` | Configured keys accepted by validation |
 | `getVariant()` | `string` | Current variant |
 | `isColorCoded()` | `bool` | Whether color coding is active |
 | `getOptionIcon(mixed $value)` | `?string` | Icon string for emoji variant key |
@@ -499,6 +609,8 @@ All methods accept `Closure` unless noted.
 
 ### Real-world examples
 
+Resource examples use `Filament\Schemas\Schema` and `Filament\Schemas\Components\Section`. The textarea example uses `Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextareaField`. Reactive callbacks use `Filament\Schemas\Components\Utilities\Get` and `Set`.
+
 #### Post-purchase survey (CreateRecord)
 
 ```php
@@ -511,9 +623,9 @@ protected function mutateFormDataBeforeCreate(array $data): array
     return $data;
 }
 
-public static function form(Form $form): Form
+public static function form(Schema $schema): Schema
 {
-    return $form->schema([
+    return $schema->components([
         Section::make('Feedback')->schema([
             NpsField::make('nps_score')
                 ->label('How likely are you to recommend us?')
@@ -566,7 +678,7 @@ NpsField::make('nps_score')
         }
     }),
 
-Textarea::make('follow_up_reason')
+FlexTextareaField::make('follow_up_reason')
     ->visible(fn (Get $get): bool => filled($get('nps_score')) && (int) $get('nps_score') <= 6)
     ->required();
 ```
@@ -633,21 +745,24 @@ class SurveyResponse extends Model
 | Asset type | Location after publish | How |
 |------------|------------------------|-----|
 | CSS / JS / Alpine | Filament public paths | `php artisan filament:assets` |
-| Emoji webp (bundled) | `public/filament-flex-fields-assets/nps-field/emojis/` | Same command |
+| Emoji webp (bundled) | Versioned asset release, under your configured Filament asset path | Same command |
 
-Fields resolve bundled emoji URLs via `FlexFieldAssets::assetUrl()` with automatic `?v=filemtime` cache busting.
+Bundled emoji URLs include the asset release identifier, so updated images receive new URLs without manual cache busting. Publication updates the ready-to-use assets; no frontend build is required in your application. URLs provided through `emojiImages()` remain exactly as configured.
 
-On upgrade, run `php artisan filament:assets` (or use a Composer `post-autoload-dump` hook). See the main README [Upgrading](https://github.com/janczakb/filament-flex-fields#upgrading) section.
+On upgrade, run `php artisan filament:assets`, or include it in your deployment workflow. See [Updating FLEX Fields](/docs/updating).
 
 ---
 
 ### Accessibility
 
 - Root element uses `role="radiogroup"` with `aria-label` from the field label.
-- Each option is a `<label role="radio">` with `aria-checked` and keyboard support (`Enter` / `Space`).
-- Hidden native `<input type="radio">` elements preserve form semantics.
+- Each option is one accessible radio button with `aria-checked`; there are no duplicate hidden radios.
+- `Tab` enters the selected option, or the first enabled option when empty. Arrow keys move selection, while `Home` and `End` select the first and last enabled options.
+- `Enter` and `Space` activate the focused option. Horizontal arrow direction follows RTL layouts.
 - Focus visible outline on keyboard navigation.
-- Disabled options expose `aria-disabled="true"`.
+- Disabled options expose `aria-disabled="true"` and are skipped by keyboard navigation.
+- Reduced-motion preferences disable the sliding and hover transitions.
+- On narrow screens, long pill scales scroll inside the field; keyboard selection keeps the active choice visible.
 
 ---
 
@@ -656,16 +771,18 @@ On upgrade, run `php artisan filament:assets` (or use a Composer `post-autoload-
 | Mechanism | What it does |
 |-----------|--------------|
 | **Lazy CSS** | Loads `segment-control` + `nps-field` bundles only when the field renders |
-| **Lazy Alpine** | `nps-field.js` loaded on demand via Filament `x-load` |
+| **Lazy JavaScript** | The field runtime activates through the shared FLEX asset manager |
 | **SSR pre-selection** | `data-segment-selected` on pills prevents layout flash before Alpine hydrates |
 
-Stylesheet dependency graph: `nps-field` → `segment-control` (pills variant only).
+The NPS field reuses shared `segment-control` styles through its declared asset dependency. Shared styles are loaded once. Inactive tabs and closed modals wait for activation; each mounted field owns and releases its own interaction resources.
+
+Option nodes are collected once. Resize updates share one pending animation frame; segments and emoji variants do not allocate an indicator resize observer.
 
 ---
 
 ### Playground
 
-`/admin/flex-fields-playground/nps-field`
+`/admin/flex-fields/nps-field`
 
 See [Playground](/docs/index#playground) for setup.
 

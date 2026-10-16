@@ -71,6 +71,29 @@ final class FlexFieldSchemaResolver
         ));
     }
 
+    /** Storage policy is independent of presentation, RBAC and field activation.
+     * @return list<FlexFieldDefinition>
+     */
+    public function storageDefinitionsForTarget(string $targetType, ?string $tenantId = null): array
+    {
+        $definitions = [];
+
+        foreach ($this->registry->forTarget($targetType, includeInactive: true) as $schema) {
+            if (! $this->schemaMatchesTenant($schema->key, $tenantId)) {
+                continue;
+            }
+
+            foreach ($schema->getStorageFields() as $definition) {
+                // Overlapping schemas cannot downgrade another schema's encryption.
+                if (! isset($definitions[$definition->slug]) || $definition->isEncrypted) {
+                    $definitions[$definition->slug] = $definition;
+                }
+            }
+        }
+
+        return array_values($definitions);
+    }
+
     /**
      * @return list<FlexFieldDefinition>
      */
@@ -89,7 +112,7 @@ final class FlexFieldSchemaResolver
                     continue;
                 }
 
-                if (! $this->fieldAllowedForUser($definition, $rbacUserKey, $rbacAbility)) {
+                if (! $this->fieldAllowedForUser($definition, $rbacUserKey, $rbacAbility, $tenantId)) {
                     continue;
                 }
 
@@ -169,24 +192,23 @@ final class FlexFieldSchemaResolver
             return true;
         }
 
-        $pack = TenantFieldPacks::packFor($tenantId);
-
-        if ($pack === []) {
+        if (! TenantFieldPacks::hasPack($tenantId)) {
             return true;
         }
 
-        return in_array($definition->type->value, $pack, true);
+        return in_array($definition->type->value, TenantFieldPacks::packFor($tenantId), true);
     }
 
     public function fieldAllowedForUser(
         FlexFieldDefinition $definition,
         ?string $userKey,
         string $ability = FieldRbacMatrix::ABILITY_VIEW,
+        ?string $tenantId = null,
     ): bool {
         if ($userKey === null || $userKey === '') {
-            return true;
+            return FieldRbacMatrix::can('', $ability, $definition->type->value, $tenantId ?? '');
         }
 
-        return FieldRbacMatrix::can($userKey, $ability, $definition->type->value);
+        return FieldRbacMatrix::can($userKey, $ability, $definition->type->value, $tenantId ?? '');
     }
 }

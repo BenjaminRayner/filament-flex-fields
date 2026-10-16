@@ -10,7 +10,7 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\FlexRichEdi
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\TipTapExtensions\Youtube;
 use Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
-use Bjanczak\FilamentFlexFields\Support\RichEditorGravityIcons;
+use Bjanczak\FilamentFlexFields\Support\RichEditorFlexIcons;
 use Bjanczak\FilamentFlexFields\Support\Translations;
 use Filament\Actions\Action;
 use Filament\Forms\Components\RichEditor\Plugins\Contracts\HasToolbarButtons;
@@ -44,12 +44,12 @@ class FlexRichEditorYoutubePlugin implements HasToolbarButtons, RichContentPlugi
      */
     public function getTipTapJsExtensions(): array
     {
-        return [
-            FilamentAsset::getScriptSrc(
-                FlexFieldAssets::FLEX_RICH_EDITOR_YOUTUBE_EXTENSION_SCRIPT_ID,
-                FilamentFlexFieldsPlugin::PACKAGE_NAME,
-            ),
-        ];
+        $source = FilamentAsset::getScriptSrc(
+            FlexFieldAssets::FLEX_RICH_EDITOR_YOUTUBE_EXTENSION_SCRIPT_ID,
+            FilamentFlexFieldsPlugin::PACKAGE_NAME,
+        );
+
+        return [$source.(str_contains($source, '?') ? '&' : '?').'fff-options='.rawurlencode(json_encode($this->field->getYoutubeExtensionOptions(), JSON_THROW_ON_ERROR))];
     }
 
     /**
@@ -59,10 +59,10 @@ class FlexRichEditorYoutubePlugin implements HasToolbarButtons, RichContentPlugi
     {
         return [
             FlexRichEditorTool::make('youtube')
-                ->label(Translations::get('filament-flex-fields::default.rich_editor.youtube.tool'))
+                ->label(fn () => Translations::get('filament-flex-fields::default.rich_editor.youtube.tool'))
                 ->action(arguments: '{}')
                 ->activeKey('youtube')
-                ->icon(RichEditorGravityIcons::icon('youtube'))
+                ->icon(RichEditorFlexIcons::icon('youtube'))
                 ->iconAlias('filament-flex-fields::flex-rich-editor.toolbar.youtube'),
         ];
     }

@@ -6,7 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
 use Bjanczak\FilamentFlexFields\Enums\DateTimeFieldMode;
 
-class FlexDatePicker extends FlexDateTimeField
+class FlexDatePicker extends FlexCivilDateField
 {
     public function getMode(): DateTimeFieldMode
     {
@@ -17,6 +17,8 @@ class FlexDatePicker extends FlexDateTimeField
     {
         parent::setUp();
 
+        $this->dateEditable = false;
+        $this->dateClearable = true;
         $this->showCalendar = true;
         $this->showCalendarButton = true;
     }

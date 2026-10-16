@@ -1,0 +1,96 @@
+---
+title: "Package and family reference"
+description: "All ComponentPackage, ComponentFamily and ComponentSurface parameters and version boundaries."
+---
+
+Import these classes from
+`Bjanczak\FilamentFlexFields\Support\Components\Contracts`.
+
+## ComponentPackage
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `assets` | Required | An installed `AssetPackage`: portable manifest and local source root. |
+| `namespace` | Required | Unique package prefix, up to 48 characters. Every component/family/root identity starts with this prefix and a hyphen. |
+| `version` | Required | Bounded semantic version such as `1.2.0` or `1.2.0-beta.1`. |
+| `phpAbi` | Current PHP ABI, `1` | Required FLEX PHP protocol version. This is not your Composer version. |
+| `jsAbi` | Current JS ABI, `1` | Required FLEX JS protocol version. Incompatible ABI fails registration. |
+
+`appearance()` returns the corresponding appearance namespace. `export()` exposes
+value-free package metadata. `sameContractAs()` compares the exact semantic
+installation contract rather than assuming two installed packages are equivalent.
+
+## ComponentFamily
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `package` | Required | Your typed `ComponentPackage`. |
+| `id` | Required | Logical family identity inside that package namespace. |
+| `surfaces` | Required | Kind-to-component-ID map for 1–5 surfaces. IDs must be distinct. |
+| `configurationVersion` | `1` | Version of accepted saved configuration, integer 1–65535. |
+| `valueVersion` | `1` | Independent version of stored values, integer 1–65535. |
+| `schema` | `null` | Optional `FamilySchemaContract` enabling dynamic schema building. |
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Contracts\ComponentFamily;
+
+$family = new ComponentFamily(
+    package: $package,
+    id: 'acme-rating-family',
+    surfaces: [
+        'field' => 'acme-rating-field',
+        'column' => 'acme-rating-column',
+        'entry' => 'acme-rating-entry',
+    ],
+    configurationVersion: 1,
+    valueVersion: 1,
+);
+```
+
+`$package` is the installed typed package constructed in your provider. A family
+may omit a column or entry, but collection must include every surface it declares.
+Changing a visual style does not necessarily change stored values. Advance each
+version only for changes in its corresponding contract and provide explicit migrations.
+
+## ComponentSurface
+
+| Parameter | Meaning |
+| --- | --- |
+| `family` | The family which declares this kind and component identity. |
+| `kind` | A supported Field, Column, Entry, Display or Action kind. |
+| `class` | Existing instantiable PHP renderer class extending the matching Filament base. |
+
+```php
+use Acme\Rating\Forms\RatingField;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\Contracts\ComponentSurface;
+
+$surface = new ComponentSurface(
+    family: $family,
+    kind: ComponentKind::Field,
+    class: RatingField::class,
+);
+```
+
+`RatingField` is your implementation. `componentId()` returns the ID declared by
+its family; registration validates the class without constructing a record or
+field. A Primitive cannot declare a family renderer.
+
+<Note>
+  The dynamic `FamilySchemaAdapter` form/table/infolist path configures Field,
+  Column and Entry. Display and Action are valid registered family surfaces but
+  require their own rendering path; do not assume the three dynamic builders render them.
+</Note>
+
+## Version choices
+
+| Version | Changes when |
+| --- | --- |
+| Composer package version | You publish a new release of your extension. |
+| PHP/JS ABI | Your extension requires a different supported FLEX protocol. |
+| Configuration version | Persisted option names or meaning change. |
+| Value version | The shape or meaning of stored values changes. |
+| Asset release hash | The complete built artifact graph changes. |
+
+Read [package contracts](/docs/extensions/packages-and-families) for complete
+provider registration and [migrations](/docs/extensions/migrations) for stored data.

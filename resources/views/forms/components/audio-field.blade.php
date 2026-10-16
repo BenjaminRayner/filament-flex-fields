@@ -1,176 +1,27 @@
 @php
-    use Filament\Support\Enums\IconSize;
-
+    $render = \Bjanczak\FilamentFlexFields\Support\Audio\AudioRenderState::from($field);
     $statePath = $getStatePath();
-    $isDisabled = $isDisabled();
-    $isReadOnly = $isReadOnly();
-    $wrapperClasses = $getWrapperClasses();
-    $audioSrc = $field->resolveAudioSrc($getState());
-    $waveform = $field->resolveWaveform($getState());
-    $waveformIsCustom = $field->hasCustomWaveform();
-    $transcriptionConfig = $field->getTranscriptionAlpineConfig();
-    $livewireKey = $getLivewireKey();
 @endphp
-
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
-    :attributes="
-        \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
-            ->class($wrapperClasses)
-    "
->
-    <div
-        wire:ignore
-        wire:key="{{ $livewireKey }}.{{ substr(md5(serialize([$isDisabled, $isReadOnly, $getSize(), $getSrc(), $audioSrc, $waveformIsCustom, $field->wantsTranscription(), $field->isTranscriptionEnabled()])), 0, 64) }}"
-        @class([
-            'fff-audio-field',
-            'fff-audio-field--'.$getSize(),
-            'is-full-width' => $isFullWidth(),
-            'is-disabled' => $isDisabled,
-            'is-read-only' => $isReadOnly,
-            'is-empty' => blank($audioSrc),
-            'has-transcription' => $field->isTranscriptionEnabled(),
-            'has-transcription-cta' => $field->isTranscriptionRuntimeMissing(),
-        ])
-        role="group"
-        aria-label="{{ $getLabel() }}"
-    >
-    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'audio-field',
-        'livewireKey' => $getLivewireKey(),
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field"
+    :attributes="\Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())->class($getWrapperClasses())">
+    @include('filament-flex-fields::partials.load-stylesheet', [
+        'component'=>'audio-field', 'livewireKey'=>$getLivewireKey(), 'assetSchemaComponent'=>$field,
+        'capabilities'=>$field->isTranscriptionEnabled() && $field->isTranscriptionSettingsVisible() ? ['transcription'] : [],
     ])
-        <div
-            x-load
-            x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('audio-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-            x-data="audioFieldFormComponent({
-                state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
-                staticSrc: @js($getSrc()),
-                waveform: @js($waveform),
-                waveformIsCustom: @js($waveformIsCustom),
-                loop: @js($shouldLoop()),
-                readOnly: @js($isDisabled || $isReadOnly),
-                labels: {
-                    play: @js(__('filament-flex-fields::default.audio.play')),
-                    pause: @js(__('filament-flex-fields::default.audio.pause')),
-                    transcription: @js([
-                        'settings_title' => __('filament-flex-fields::default.audio.transcription_settings'),
-                        'settings_close' => __('filament-flex-fields::default.audio.transcription_settings_close'),
-                        'model_hint' => __('filament-flex-fields::default.audio.transcription_model_hint'),
-                        'language_hint' => __('filament-flex-fields::default.audio.transcription_language_hint'),
-                        'task_hint' => __('filament-flex-fields::default.audio.transcription_task_hint'),
-                        'multilingual' => __('filament-flex-fields::default.audio.transcription_multilingual'),
-                        'quantized' => __('filament-flex-fields::default.audio.transcription_quantized'),
-                        'transcribe' => __('filament-flex-fields::default.audio.transcribe'),
-                        'transcribing' => __('filament-flex-fields::default.audio.transcribing'),
-                        'empty' => __('filament-flex-fields::default.audio.transcription_empty'),
-                        'loading_audio' => __('filament-flex-fields::default.audio.transcription_loading_audio'),
-                        'loading_model' => __('filament-flex-fields::default.audio.transcription_loading_model'),
-                        'transcribing_phase' => __('filament-flex-fields::default.audio.transcription_running'),
-                        'task_transcribe' => __('filament-flex-fields::default.audio.transcription_task_transcribe'),
-                        'task_translate' => __('filament-flex-fields::default.audio.transcription_task_translate'),
-                        'language_auto' => __('filament-flex-fields::default.audio.language_auto'),
-                        'errors' => [
-                            'audio_fetch_failed' => __('filament-flex-fields::default.audio.transcription_error_fetch'),
-                            'audio_context_unavailable' => __('filament-flex-fields::default.audio.transcription_error_context'),
-                            'transcription_failed' => __('filament-flex-fields::default.audio.transcription_error_failed'),
-                            'transcription_model_timeout' => __('filament-flex-fields::default.audio.transcription_error_model_timeout'),
-                            'transcription_runtime_unconfigured' => __('filament-flex-fields::default.audio.transcription_error_runtime_unconfigured'),
-                        ],
-                    ]),
-                },
-                transcription: @js(filled($transcriptionConfig) ? $transcriptionConfig : null),
-            })"
-            x-init="init()"
-            class="fff-audio-field__shell"
-        >
-            <div class="fff-audio-field__player">
-            <div class="fff-audio-field__pill">
-                <button
-                    type="button"
-                    class="fff-audio-field__play"
-                    x-on:click="togglePlay()"
-                    x-bind:aria-label="playing ? labels.pause : labels.play"
-                    x-bind:disabled="! canInteract"
-                >
-                    <span class="fff-audio-field__icon-play" x-show="! playing" aria-hidden="true">
-                        {{ \Filament\Support\generate_icon_html($field->getPlayIcon(), size: IconSize::ExtraSmall) }}
-                    </span>
-                    <span class="fff-audio-field__icon-pause" x-show="playing" x-cloak aria-hidden="true">
-                        {{ \Filament\Support\generate_icon_html($field->getPauseIcon(), size: IconSize::ExtraSmall) }}
-                    </span>
-                </button>
-
-                <div
-                    class="fff-audio-field__waveform"
-                    x-ref="waveform"
-                    x-on:pointerdown="onWaveformPointerDown($event)"
-                    x-bind:class="{ 'is-disabled': ! canInteract }"
-                    role="slider"
-                    x-bind:aria-valuenow="Math.round(progressRatio * 100)"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                    aria-label="{{ __('filament-flex-fields::default.audio.progress') }}"
-                    style="--fff-audio-progress: 0"
-                >
-                    <div class="fff-audio-field__waveform-skeleton" aria-hidden="true">
-                        @for ($skeletonIndex = 0; $skeletonIndex < 40; $skeletonIndex++)
-                            <span
-                                class="fff-audio-field__skeleton-bar"
-                                style="--fff-audio-skeleton-i: {{ $skeletonIndex }}"
-                            ></span>
-                        @endfor
-                        <span class="fff-audio-field__waveform-skeleton-shimmer"></span>
-                    </div>
-
-                    <div class="fff-audio-field__bars" aria-hidden="true">
-                        <template x-for="(peak, index) in displayWaveform" :key="'base-' + index">
-                            <span
-                                class="fff-audio-field__bar"
-                                x-bind:style="'height: ' + peak + '%; --fff-audio-bar-i: ' + index"
-                            ></span>
-                        </template>
-                    </div>
-
-                    <div class="fff-audio-field__bars fff-audio-field__bars--played" aria-hidden="true">
-                        <template x-for="(peak, index) in displayWaveform" :key="'played-' + index">
-                            <span
-                                class="fff-audio-field__bar fff-audio-field__bar--accent"
-                                x-bind:style="'height: ' + peak + '%; --fff-audio-bar-i: ' + index"
-                            ></span>
-                        </template>
-                    </div>
-
-                    <span
-                        class="fff-audio-field__playhead"
-                        aria-hidden="true"
-                        x-bind:class="{ 'is-visible': playheadVisible }"
-                    ></span>
-                </div>
-
-                <span class="fff-audio-field__time" x-text="timeLabel">0:00</span>
-            </div>
-
-            @if (filled($audioSrc))
-                <audio
-                    x-ref="audio"
-                    class="fff-audio-field__audio"
-                    src="{{ e($audioSrc) }}"
-                    x-bind:src="audioSrc"
-                    preload="metadata"
-                    @if ($shouldLoop()) loop @endif
-                ></audio>
-            @endif
-            </div>
-
+    <div wire:ignore wire:key="{{ $render->key }}"
+        @class(['fff-audio-field','fff-audio-field--'.$getSize(),'is-full-width'=>$isFullWidth(),
+            'is-disabled'=>$isDisabled(),'is-read-only'=>$isReadOnly(),'is-empty'=>$render->source===null,
+            'has-transcription'=>$field->isTranscriptionEnabled(),'has-transcription-cta'=>$field->isTranscriptionRuntimeMissing()])
+        role="group" aria-label="{{ $getLabel() }}">
+        <div class="fff-audio-field__shell" x-fff-load
+            x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('audio-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+            x-data="audioFieldFormComponent({ ...@js($render->configuration), state:$wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }} })">
+            @include('filament-flex-fields::forms.components.partials.audio.player', ['loop'=>$shouldLoop()])
             @if ($field->isTranscriptionEnabled())
-                @include('filament-flex-fields::forms.components.partials.audio-field-transcription-panel', [
-                    'settingsVisible' => $field->isTranscriptionSettingsVisible(),
-                ])
+                @include('filament-flex-fields::forms.components.partials.audio-field-transcription-panel', ['settingsVisible'=>$field->isTranscriptionSettingsVisible()])
             @elseif ($field->isTranscriptionRuntimeMissing())
                 <div class="fff-audio-field__transcription-cta" role="status">
-                    <p class="fff-audio-field__transcription-cta-text">
-                        {{ __('filament-flex-fields::default.audio.transcription_runtime_missing') }}
-                    </p>
+                    <p class="fff-audio-field__transcription-cta-text">{{ __('filament-flex-fields::default.audio.transcription_runtime_missing') }}</p>
                     <code class="fff-audio-field__transcription-cta-command">{{ \Bjanczak\FilamentFlexFields\Support\WhisperRuntimeManifest::INSTALL_COMMAND }}</code>
                 </div>
             @endif

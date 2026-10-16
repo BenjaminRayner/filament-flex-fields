@@ -15,6 +15,7 @@
     'searchLabel' => 'Search',
     'activeIndexKey' => 'activeIconIndex',
     'optionIdPrefix' => null,
+    'activeDescendantExpression' => null,
 ])
 
 <div class="fi-select-input-search-ctn fff-teleported-menu__search-wrap fff-headless-overlay__search">
@@ -41,7 +42,9 @@
         @if ($listboxId)
             x-bind:aria-controls="{{ $listboxId }}"
         @endif
-        @if ($optionIdPrefix)
+        @if ($activeDescendantExpression)
+            x-bind:aria-activedescendant="{{ $activeDescendantExpression }}"
+        @elseif ($optionIdPrefix)
             {{-- Prefix is an Alpine expression (e.g. componentKey + '-option-'), not a static string. --}}
             x-bind:aria-activedescendant="{{ $activeIndexKey }} >= 0 ? {{ $optionIdPrefix }} + {{ $activeIndexKey }} : null"
         @endif

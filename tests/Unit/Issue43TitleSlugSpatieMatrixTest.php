@@ -136,7 +136,7 @@ it('still works when fieldSlug is renamed away from slug (reporter workaround)',
     $component->assertSet('data.renamed_slug', 'action');
 });
 
-it('does not freeze when Spatie generateSlugsFrom incorrectly points at slug (reporter workaround)', function (): void {
+it('rejects Spatie source that incorrectly points to its output column', function (): void {
     $model = new class extends SlugFieldPost
     {
         use HasSlug;
@@ -158,11 +158,8 @@ it('does not freeze when Spatie generateSlugsFrom incorrectly points at slug (re
     ];
     TestableSlugForm::$modelClass = $model::class;
 
-    $component = Livewire::test(TestableSlugForm::class);
-    typeTitleCharacterByCharacter($component, 'name', 'Action');
-
-    expect((string) $component->get('data.slug'))->not->toBe('a')
-        ->and(strlen((string) $component->get('data.slug')))->toBeGreaterThan(1);
+    expect(fn () => Livewire::test(TestableSlugForm::class)->set('data.name', 'Action'))
+        ->toThrow(InvalidArgumentException::class, 'output column');
 });
 
 it('works without spatieModel like Playground one-liner', function (): void {

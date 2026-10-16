@@ -1,120 +1,64 @@
 @php
-    use Filament\Support\Enums\IconSize;
-
-    $statePath = $getStatePath();
-    $max = $getMax();
-    $size = $getSize();
-    $color = $getColor();
-    $icon = $getIcon();
-    $items = $getItemIndexes();
-    $isDisabled = $isDisabled();
-    $isReadOnly = $isReadOnly();
-    $shouldShowValue = $shouldShowValue();
-    $canInteract = ! $isDisabled && ! $isReadOnly;
-    $inputName = $getId().'-rating';
-    $iconSize = match ($size) {
-        'sm' => IconSize::Small,
-        'lg' => IconSize::Large,
-        default => IconSize::Medium,
-    };
-
-    $initialNumeric = is_numeric($getState()) ? (float) $getState() : null;
-    $initialDisplayValue = $initialNumeric ?? 0;
+    $presentation = $field->getRatingPresentation();
+    $interactive = ! $presentation['disabled'] && ! $presentation['readOnly'];
+    $stateBinding = '$entangle('.\Illuminate\Support\Js::from($getStatePath()).')';
+    $configuration = \Illuminate\Support\Arr::only($presentation, ['max', 'disabled', 'readOnly']);
+    $identity = \Illuminate\Support\Arr::except($presentation, ['value', 'fills']);
+    $selected = $presentation['value'];
 @endphp
 
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
->
-    @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'rating-field',
-        'livewireKey' => $getLivewireKey(),
-    ])
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
     <div
-        x-load
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('rating-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-        x-data="ratingFieldFormComponent({
-            state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
-            disabled: @js($isDisabled),
-            readOnly: @js($isReadOnly),
-            canInteract: @js($canInteract),
-            max: @js($max),
-        })"
-        x-init="init()"
+        @unless ($presentation['readOnly'])
+            x-fff-load
+            x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('rating-field', package: \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+            x-data="ratingFieldFormComponent({ ...@js($configuration), state: $wire.{{ $applyStateBindingModifiers($stateBinding) }} })"
+        @endunless
+        wire:key="{{ $getLivewireKey() }}.{{ hash('xxh128', serialize($identity)) }}"
+        id="{{ $getId() }}"
         @class([
-            'fff-rating',
-            'fff-rating--'.$size,
-            'fi-color-'.$color => filled($color),
-            'is-disabled' => $isDisabled,
-            'is-read-only' => $isReadOnly,
-            'fff-rating--with-value' => $isReadOnly && $shouldShowValue,
-            'is-interactive' => $canInteract,
+            'fff-rating', 'fff-rating--'.$presentation['size'],
+            'fi-color-'.$presentation['color'], 'is-disabled' => $presentation['disabled'],
+            'is-read-only' => $presentation['readOnly'],
+            'fff-rating--with-value' => $presentation['readOnly'] && $presentation['showValue'],
+            'is-interactive' => $interactive,
         ])
-        role="radiogroup"
-        aria-label="{{ $getLabel() }}"
-        aria-orientation="horizontal"
+        role="{{ $presentation['readOnly'] ? 'img' : 'radiogroup' }}"
+        aria-label="{{ $presentation['label'] }}{{ $presentation['readOnly'] ? ': '.number_format($selected ?? 0, 1).' / '.$presentation['max'] : '' }}"
+        @unless ($presentation['readOnly'])
+            aria-orientation="horizontal"
+            aria-disabled="{{ $presentation['disabled'] ? 'true' : 'false' }}"
+        @endunless
         {{ $getExtraAlpineAttributeBag() }}
     >
+        @include('filament-flex-fields::partials.load-stylesheet', ['component' => $presentation['readOnly'] ? 'rating-visuals' : 'rating-field', 'livewireKey' => $getLivewireKey()])
         <div class="fff-rating__items">
-            @foreach ($items as $index)
-                @php
-                    $initialFillPercent = round(max(0, min(1, $initialDisplayValue - ($index - 1))) * 100, 4);
-                    $isInitiallySelected = $initialNumeric !== null && (int) $initialNumeric === $index;
-                @endphp
-                <label
-                    @class([
-                        'fff-rating__item',
-                        'fff-rating__item--'.$size,
-                    ])
-                    data-active="{{ $initialFillPercent > 0 ? 'true' : 'false' }}"
-                    @if ($isInitiallySelected)
-                        data-selected="true"
-                    @endif
-                    x-bind:data-active="fillFor({{ $index }}) > 0 ? 'true' : 'false'"
-                    x-bind:data-selected="isSelected({{ $index }}) ? 'true' : 'false'"
-                    @if ($canInteract)
-                        x-on:mouseenter="preview({{ $index }})"
-                        x-on:mouseleave="clearPreview()"
-                        x-on:click.prevent="select({{ $index }})"
-                    @endif
-                >
-                    @if ($canInteract)
-                        <span class="sr-only">
-                            <input
-                                type="radio"
-                                name="{{ $inputName }}"
-                                value="{{ $index }}"
-                                x-bind:checked="isSelected({{ $index }})"
-                                x-bind:disabled="disabled || readOnly"
-                                tabindex="-1"
-                                aria-label="{{ trans_choice('filament-flex-fields::default.rating.stars', $index, ['count' => $index]) }}"
-                            />
-                        </span>
-                    @endif
-
-                    <span class="fff-rating__icon-stack" aria-hidden="true">
-                        <span class="fff-rating__icon fff-rating__icon--empty">
-                            {{ \Filament\Support\generate_icon_html($icon, size: $iconSize) }}
-                        </span>
-
-                        <span
-                            class="fff-rating__icon-clip"
-                            style="width: {{ $initialFillPercent }}%"
-                            x-bind:style="'width: ' + (fillFor({{ $index }}) * 100) + '%'"
-                        >
-                            <span class="fff-rating__icon fff-rating__icon--filled">
-                                {{ \Filament\Support\generate_icon_html($icon, size: $iconSize) }}
-                            </span>
-                        </span>
+            @foreach ($presentation['fills'] as $offset => $fillPercent)
+                @php $index = $offset + 1; @endphp
+                @if ($presentation['readOnly'])
+                    <span class="fff-rating__item fff-rating__item--{{ $presentation['size'] }}" data-active="{{ $fillPercent > 0 ? 'true' : 'false' }}">
+                        @include('filament-flex-fields::partials.rating.icon')
                     </span>
-                </label>
+                @else
+                    <button
+                        type="button"
+                        class="fff-rating__item fff-rating__item--{{ $presentation['size'] }}"
+                        data-rating-index="{{ $index }}"
+                        data-active="{{ $fillPercent > 0 ? 'true' : 'false' }}"
+                        data-selected="{{ $selected === (float) $index ? 'true' : 'false' }}"
+                        role="radio"
+                        aria-checked="{{ $selected === (float) $index ? 'true' : 'false' }}"
+                        aria-label="{{ trans_choice('filament-flex-fields::default.rating.stars', $index, ['count' => $index]) }}"
+                        tabindex="{{ $interactive && ($selected === (float) $index || ($index === 1 && ($selected === null || $selected < 1))) ? '0' : '-1' }}"
+                        @if ($presentation['disabled']) disabled @endif
+                    >
+                        @include('filament-flex-fields::partials.rating.icon')
+                    </button>
+                @endif
             @endforeach
         </div>
-
-        @if ($isReadOnly && $shouldShowValue)
-            <span
-                class="fff-rating__value"
-                x-text="displayValue().toFixed(1)"
-            >{{ number_format($initialDisplayValue, 1) }}</span>
+        @if ($presentation['readOnly'] && $presentation['showValue'])
+            <span class="fff-rating__value">{{ number_format($selected ?? 0, 1) }}</span>
         @endif
     </div>
 </x-dynamic-component>

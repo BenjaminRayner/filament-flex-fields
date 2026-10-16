@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
+use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 final class FlexFieldsPlaygroundStore
@@ -33,8 +35,13 @@ final class FlexFieldsPlaygroundStore
 
     public function key(string $slug): string
     {
-        $userId = auth()->id() ?? 'guest';
+        $panel = Filament::getCurrentPanel();
+        $tenant = Filament::getTenant();
+        $scope = json_encode([
+            $panel?->getId(), $panel?->getAuthGuard(),
+            $tenant?->getMorphClass(), $tenant?->getKey(), Auth::guard($panel?->getAuthGuard())->id() ?? 'guest', $slug,
+        ], JSON_THROW_ON_ERROR);
 
-        return "flex-fields-playground.{$slug}.{$userId}";
+        return 'flex.catalog.demo.'.hash('sha256', $scope);
     }
 }

@@ -32,11 +32,24 @@ class ProgressColor
             return strtolower($color);
         }
 
-        if (preg_match('/^rgba?\(/i', $color) === 1 || preg_match('/^hsla?\(/i', $color) === 1) {
+        if (preg_match('/^(?:rgba?|hsla?)\([0-9eE.,%+\-\s\/degturnrad]+\)$/i', $color) === 1) {
             return $color;
         }
 
         throw new InvalidArgumentException("Progress color [{$color}] must be a semantic token (primary, success, warning, danger) or a CSS color (hex, rgb, rgba, hsl).");
+    }
+
+    public static function css(string $color): string
+    {
+        $normalized = self::normalize($color);
+
+        return match ($normalized) {
+            'primary' => 'var(--primary-500, #6366f1)',
+            'success' => 'rgb(34 197 94)',
+            'warning' => 'rgb(245 158 11)',
+            'danger' => 'rgb(239 68 68)',
+            default => $normalized,
+        };
     }
 
     /**

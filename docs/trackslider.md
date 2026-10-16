@@ -1,9 +1,118 @@
 ---
 title: "TrackSlider"
 description: Minimalist track-based range slider with optional live value output.
+icon: "audio-lines"
+"canonical": "https://flex-fields.bjanczak.com/docs/trackslider"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/track-slider.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "TrackSlider in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/track-slider-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/track-slider-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/track-slider.webp"
+"twitter:image:alt": "TrackSlider in the FLEX Fields playground"
 ---
 
-![TrackSlider](/art/sc-16.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/trackslider#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/trackslider",
+      "name": "TrackSlider",
+      "description": "Minimalist track-based range slider with optional live value output.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/trackslider#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/trackslider#article",
+      "url": "https://flex-fields.bjanczak.com/docs/trackslider",
+      "headline": "TrackSlider",
+      "description": "Minimalist track-based range slider with optional live value output.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/trackslider#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/track-slider-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/track-slider-motion.mp4#video",
+      "name": "TrackSlider — FLEX Fields demonstration",
+      "description": "A recorded demonstration of TrackSlider in the FLEX Fields playground for Filament. Minimalist track-based range slider with optional live value output.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/track-slider.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT5.083S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/track-slider-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/trackslider#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/track-slider-motion.mp4"
+  poster="/art/previews/track-slider.webp"
+  width="1920"
+  height="1080"
+  aria-label="TrackSlider — FLEX Fields demonstration"
+>
+  <a href="/art/previews/track-slider-motion.mp4">Watch the TrackSlider demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -57,7 +166,22 @@ $record->progress; // 75
 ```
 
 #### Validation rules
-Built-in `NumberStateCast` ensures numeric state. Standard Filament `rule('min:0')` etc. can be added.
+The field validates the numeric type and the configured `min()` and `max()` on the server. With `integer()` enabled, fractional submissions fail validation. Malformed values, arrays, booleans and nonfinite numbers are rejected rather than silently converted into valid values. Add application rules with `rules()` and use `required()` when a value must be supplied.
+
+```php
+TrackSlider::make('capacity')
+    ->min(1)
+    ->max(10)
+    ->required();
+```
+
+`step()` controls pointer and keyboard increments; it does not add a server-side multiple-of-step rule. Add such a rule if your application requires it. Bounds must be finite and ordered, and the step must be positive. Equal bounds create a fixed-value field.
+
+### Interaction
+
+Click or drag anywhere on the track. Arrow keys change the value by one step; `Home` and `End` select the exact bounds. The marker stays slightly inside both edges, while the fill still represents the full 0–100% range. Disabled fields ignore pointer and keyboard changes.
+
+The three sizes share a subtle gray track and darker fill without a shadow. `secondary` provides a stronger fill contrast. Both variants support dark mode and reduced motion.
 
 ---
 
@@ -107,7 +231,7 @@ TrackSlider::make('spacing')
 
 ### Playground
 
-`/admin/flex-fields-playground/track-slider`
+`/admin/flex-fields/track-slider`
 
 See [Playground](/docs/index#playground) for setup.
 

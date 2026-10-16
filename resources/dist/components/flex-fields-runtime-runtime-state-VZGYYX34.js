@@ -1,0 +1,1 @@
+var e=Symbol.for("janczakb.filament-flex-fields.runtime.abi-1");function l(){return globalThis[e]??={preparedModules:new Set,imports:new Map,factories:new Map,registeredNames:new Set,alpine:null,alpineListenerPending:!1,gate:null,fallbackStore:null},globalThis[e].preparedModules??=new Set,globalThis[e]}export{l as a};

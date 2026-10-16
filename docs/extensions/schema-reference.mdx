@@ -1,0 +1,128 @@
+---
+title: "Schema and value reference"
+description: "All family schema flags, render-context parameters, adapter methods and submission contracts."
+---
+
+Use classes from `Bjanczak\FilamentFlexFields\Support\Components\Schema`
+unless another namespace is given.
+
+## FamilySchemaContract
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `adapter` | Required | Instantiable trusted class implementing `FamilySchemaAdapter`. Imported data cannot select it. |
+| `configuration` | Required | Family-owned `ConfigurationSchema`. |
+| `packageDefaults` | `[]` | Validated configuration applied before application, panel and instance options. |
+
+## FamilySchemaDefinition
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `family` | Required | Registered family ID. |
+| `slug` | Required | State key, lowercase first letter then lowercase letters/digits/underscores, up to 96 characters. |
+| `label` | Required | Nonblank UTF-8 label, up to 1024 bytes. |
+| `config` | `[]` | JSON-compatible option map admitted by the installed family contract. |
+| `configurationVersion` | `1` | Persisted configuration version, integer 1–65535. |
+| `valueVersion` | `1` | Persisted value version, independently 1–65535. |
+| `isRequired` | `false` | Add required value enforcement alongside the adapter's rules. |
+| `isActive` | `true` | Include this field in the applicable lifecycle. Inactive values are protected on submission. |
+| `isVisible` | `true` | Presentation visibility; hiding a field is not authorization. |
+| `isDisabled` | `false` | Treat as non-writable on submission. |
+| `isReadOnly` | `false` | Treat as protected state on submission. |
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaDefinition;
+
+$definition = new FamilySchemaDefinition(
+    family: 'acme-rating-family',
+    slug: 'rating',
+    label: 'Rating',
+    config: ['maximum' => 5],
+    isRequired: true,
+);
+```
+
+This assumes your family declares `maximum`. `fromArray()` rejects unknown keys,
+textual flags and noninteger versions; `export()` preserves the defined data shape.
+
+## FamilyRenderContext
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `ownerKey` | Required | Stable, nonempty UTF-8 owner key, up to 512 bytes without control characters. |
+| `statePathPrefix` | `''` | Optional real schema prefix such as `data`; dot-separated path segments. |
+| `locale` | `'en'` | Admitted formatting locale. |
+| `theme` | `'light'` | `light`, `dark` or `system`. |
+| `applicationDefaults` | `[]` | Validated application configuration layer. |
+| `panelDefaults` | `[]` | Validated panel configuration layer. |
+| `userKey` | `null` | Application-supplied identity for authorization context. |
+| `tenantId` | `null` | Application-supplied tenant identity; it does not create a DB query scope itself. |
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyRenderContext;
+
+$context = new FamilyRenderContext(
+    ownerKey: 'post-editor-42',
+    statePathPrefix: 'data',
+    locale: 'pl',
+    theme: 'system',
+    applicationDefaults: ['maximum' => 5],
+    tenantId: 'tenant-7',
+);
+```
+
+`statePath('rating')` produces `data.rating`. `identity($component, $key)` derives a
+stable instance identity. Independent owners need independent keys. Do not keep
+record/user/tenant/configuration contexts in the process registration metadata.
+
+## FamilySchemaAdapter methods
+
+| Method | Responsibility |
+| --- | --- |
+| `authorize($definition, $context): bool` | Admit rendering/configuration in your application context. |
+| `configure($surface, $definition, $context, $configuration): void` | Apply resolved options to the actual Field, Column or Entry. |
+| `rules($definition, $context, $configuration): array` | Return bounded server-owned Laravel validation rules. |
+| `migrateConfiguration($configuration, $fromVersion, $toVersion): array` | Explicitly convert saved configuration; do not use this as permissive client-value conversion. |
+
+Native Laravel ValidationRule/legacy Rule objects, closures and Stringable rules
+such as `Rule::in()` are accepted alongside rule strings. Submission requires
+value rules; rendering may have an empty list. A schema cannot declare callbacks
+or load a PHP validation class from client-provided data.
+
+## FamilySchemaSubmission::prepare()
+
+Provide submitted values, a list of trusted definitions, the request-local context
+and an `authorizeWrite` closure. The policy must return a strict boolean for each
+resolved definition. This path validates but does **not** write the database.
+
+```php
+$validated = app(FamilySchemaSubmission::class)->prepare(
+    values: $submitted,
+    definitions: [$definition],
+    context: $context,
+    authorizeWrite: fn ($field, $context): bool => $canEdit,
+);
+```
+
+Import `FamilySchemaSubmission` from the schema namespace. `$submitted` and `$canEdit`
+come from your application, after authenticating the user and identifying the record.
+Persist validated values through your normal transaction and model policy. Definitions
+are limited to 256 per submission; duplicate state paths reject.
+
+## Value contracts and snapshots
+
+`FieldValueContract` is in `Support\Values\Submission`.
+
+| Constructor parameter | Default | Meaning |
+| --- | --- | --- |
+| `path` | Required | Valid real storage path. |
+| `rules` | Required | Nonempty server-owned rule list. |
+| `encrypted` | `false` | Mark encrypted storage handling through the value submission contract. |
+| `nestedRules` | `[]` | Relative nested rules such as `*.title`; validate parent shape as well. |
+
+`FamilyValueSnapshot($definition, $value)` retains detached stored data and its
+exact schema versions. `FamilyValueSnapshotCodec` encodes/decodes it. Optional
+`FamilyValueMigration` adapters declare supported version pairs and convert stored
+values explicitly. See [saved values](/docs/extensions/saved-values),
+[validation](/docs/extensions/validation) and [migrations](/docs/extensions/migrations)
+for complete code and preservation of protected state.

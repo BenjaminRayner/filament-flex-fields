@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { calculateExpression, calculatorResult } from '../../resources/js/calculator/domain/expression.js'
+const cases = [['2+3*4',14],['(2+3)*4',20],['-2*-3',6],['50%',.5],['1e3/2',500],['3×4−2',10],['0.1+0.2',.30000000000000004]]
+for (const [expression, expected] of cases) assert.equal(calculateExpression(expression),expected)
+for (const invalid of ['1/0','NaN','Math.random()','1++','2(3)','('.repeat(65)+'1'+')'.repeat(65),'1'.repeat(2049)]) assert.throws(()=>calculateExpression(invalid))
+assert.equal(calculatorResult(.1+.2),.3)
+assert.equal(calculatorResult(12.34,{decimalPlaces:2}),12.34)
+assert.equal(calculatorResult(-1.5,{decimalPlaces:0,roundingMode:'round'}),-2)
+assert.throws(()=>calculatorResult(1e20,{integer:true}))
+assert.equal(calculatorResult(12.349,{decimalPlaces:2}),12.34)
+assert.equal(calculatorResult(-12.349,{decimalPlaces:2,roundingMode:'floor'}),-12.35)
+assert.equal(calculatorResult(3.9,{integer:true}),3)
+assert.throws(()=>calculatorResult(101,{max:100}))
+assert.throws(()=>calculatorResult(10,{decimalPlaces:13}))
+const view=readFileSync(new URL('../../resources/views/forms/components/calculator-field.blade.php',import.meta.url),'utf8')
+assert.ok(view.includes("forms.components.flex-text-input-field"))
+assert.ok(!view.includes('<input'))
+assert.ok(!view.includes('@once'))
+const runtime=readFileSync(new URL('../../resources/js/calculator/runtime/document-runtime.js',import.meta.url),'utf8')
+assert.ok(runtime.includes('createImperativeMenuSurface'))
+assert.ok(runtime.includes('const documents = new WeakMap()'))
+assert.ok(runtime.includes('const sessions = new WeakMap()'))
+assert.ok(runtime.includes("input.dispatchEvent(new Event('input'"))
+console.log('PASS: bounded arithmetic, native input composition, shared Select surface and weak per-field sessions.')

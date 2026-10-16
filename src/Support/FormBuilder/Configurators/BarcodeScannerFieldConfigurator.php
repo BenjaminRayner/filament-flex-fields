@@ -27,6 +27,10 @@ final class BarcodeScannerFieldConfigurator implements FieldConfigurator
             $field->formats($config['formats']);
         }
 
+        if (array_key_exists('confirm_scan', $config)) {
+            $field->confirmScan((bool) $config['confirm_scan']);
+        }
+
         if (array_key_exists('continuous', $config)) {
             $field->continuous((bool) $config['continuous']);
         }

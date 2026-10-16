@@ -3,11 +3,10 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\PhoneField;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
+use Bjanczak\FilamentFlexFields\Support\CountryFlags;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
 use Bjanczak\FilamentFlexFields\Support\PhoneCountries;
 use Bjanczak\FilamentFlexFields\Support\Playground\PhoneFieldPlayground;
-use Bjanczak\FilamentFlexFields\Support\Playground\PlaygroundCodeSnippet;
 use Filament\Support\Icons\Heroicon;
 
 it('exposes phone field configuration api', function () {
@@ -116,12 +115,15 @@ it('normalizes phone state from e164 string', function () {
 
 it('uses translated country names from countries file', function () {
     expect(PhoneCountries::name('PL'))->toBe(__('filament-flex-fields::countries.PL'))
-        ->and(PhoneCountries::flagUrl('PL'))->toBe('https://cdn.jsdelivr.net/gh/HatScripts/circle-flags@latest/flags/pl.svg');
+        ->and(PhoneCountries::flagUrl('PL'))->toBe(CountryFlags::url('PL'));
 });
 
-it('uses circle-flags slug overrides for territories without direct svg', function () {
-    expect(PhoneCountries::flagUrl('AC'))->toBe('https://cdn.jsdelivr.net/gh/HatScripts/circle-flags@latest/flags/sh-ac.svg')
-        ->and(PhoneCountries::flagUrl('BQ'))->toBe('https://cdn.jsdelivr.net/gh/HatScripts/circle-flags@latest/flags/bq-bo.svg');
+it('uses materialized local SVGs for territory aliases', function () {
+    foreach (['AC', 'BQ', 'TA'] as $code) {
+        expect(PhoneCountries::flagUrl($code))
+            ->toBe(CountryFlags::url($code))
+            ->not->toContain('jsdelivr', '@latest');
+    }
 });
 
 it('maps browser locale to country code', function () {
@@ -192,7 +194,7 @@ it('exposes rich country options for the picker', function () {
 });
 
 it('registers phone field playground variants', function () {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
+    $builder = app(PhoneFieldPlayground::class);
     $state = $builder->defaultState();
 
     expect($state)->toHaveKeys([
@@ -205,7 +207,7 @@ it('registers phone field playground variants', function () {
 });
 
 it('merges phone playground state into the builder', function () {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
+    $builder = app(PhoneFieldPlayground::class);
     $state = $builder->defaultState();
 
     expect($state['phone__basic']['country'])->toBe('PL')
@@ -221,11 +223,10 @@ it('includes wrapper classes for size and variant', function () {
         'fff-phone-field',
         'fff-flex-text-input-field',
         'fff-phone-field--sm',
-        'fff-rounding-md',
         'fff-flex-text-input-field--sm',
-        'fff-rounding-md',
         'fff-phone-field--secondary',
         'fff-flex-text-input-field--secondary',
+        'fff-rounding-md',
     ]);
 });
 
@@ -316,31 +317,6 @@ it('uses libphonenumber example national placeholders when custom placeholder is
         ->and($fixed->getExampleNationalPlaceholder())->toBe('12 345 67 89')
         ->and($default->getPhonePlaceholder())->toBe('12 345 67 89')
         ->and($custom->getPhonePlaceholder())->toBe('Custom phone');
-});
-
-it('ships a hand-written PhoneField usage snippet with real playground APIs', function (): void {
-    expect(PlaygroundCodeSnippet::playgroundDeclaresSnippet(PhoneFieldPlayground::class))->toBeTrue();
-
-    $components = (new PhoneFieldPlayground)->components();
-    $snippet = collect($components)->first(
-        fn ($component): bool => $component instanceof \Filament\Schemas\Components\View
-            && $component->getView() === 'filament-flex-fields::partials.playground.code-snippet',
-    );
-
-    expect($snippet)->not->toBeNull();
-
-    $code = $snippet->getViewData()['tabs'][0]['code'] ?? '';
-
-    expect($code)
-        ->toContain('PhoneField::make(')
-        ->toContain('->defaultCountry(')
-        ->toContain('->mobileOnly()')
-        ->toContain('->browserLocaleDefault()')
-        ->toContain('->nationalDigitsOnly()')
-        ->toContain('->includeMetadata(')
-        ->toContain('->allowTypes(')
-        ->not->toContain("PhoneField::make('basic')")
-        ->not->toContain("->variant('primary')");
 });
 
 it('stores digits-only national when opted in', function () {

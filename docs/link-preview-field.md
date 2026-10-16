@@ -1,556 +1,376 @@
 ---
-title: "LinkPreviewField"
+title: "Link Preview Field"
+description: "A Filament URL field with Open Graph previews, shared FLEX inputs, cached metadata and protected image delivery."
+icon: "link"
+"canonical": "https://flex-fields.bjanczak.com/docs/link-preview-field"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/link-preview-field.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "Link Preview Field in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/link-preview-field-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/link-preview-field-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/link-preview-field.webp"
+"twitter:image:alt": "Link Preview Field in the FLEX Fields playground"
 ---
 
-![LinkPreviewField](/art/sc-28.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/link-preview-field#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/link-preview-field",
+      "name": "Link Preview Field",
+      "description": "A Filament URL field with Open Graph previews, shared FLEX inputs, cached metadata and protected image delivery.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/link-preview-field#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/link-preview-field#article",
+      "url": "https://flex-fields.bjanczak.com/docs/link-preview-field",
+      "headline": "Link Preview Field",
+      "description": "A Filament URL field with Open Graph previews, shared FLEX inputs, cached metadata and protected image delivery.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/link-preview-field#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/link-preview-field-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/link-preview-field-motion.mp4#video",
+      "name": "Link Preview Field — FLEX Fields demonstration",
+      "description": "A recorded demonstration of Link Preview Field in the FLEX Fields playground for Filament. A Filament URL field with Open Graph previews, shared FLEX inputs, cached metadata and protected image delivery.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/link-preview-field.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT5.033S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/link-preview-field-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/link-preview-field#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
 
-[← Back to Table of Contents](/docs/index)
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/link-preview-field-motion.mp4"
+  poster="/art/previews/link-preview-field.webp"
+  width="1920"
+  height="1080"
+  aria-label="Link Preview Field — FLEX Fields demonstration"
+>
+  <a href="/art/previews/link-preview-field-motion.mp4">Watch the Link Preview Field demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
+Enter a URL and show its page title, description and image without leaving your form.
+Link Preview uses the same input shell, sizes and appearance as [Flex Text Input](/docs/flextextinput).
+The database stores the URL, not downloaded HTML or preview images.
 
-### Summary
+<CardGroup cols={2}>
+  <Card title="Three preview layouts" icon="rectangle-list">Choose a compact horizontal preview, a vertical preview or a full-width image card.</Card>
+  <Card title="Responsive loading" icon="bolt">Requests run after input changes. Cached previews can appear on the first render without a remote request.</Card>
+</CardGroup>
 
-URL input with a live Open Graph / HTML meta preview card. The field uses the **FlexTextInput pill shell** for the input track and fetches page metadata through a **server-side scrape endpoint** (cached, rate-limitable). Preview cards support three layouts, optional URL prefix/suffix affixes, and configurable debounce / skeleton timing.
-
-| | |
-|---|---|
-| **Class** | `Bjanczak\FilamentFlexFields\Filament\Forms\Components\LinkPreviewField` |
-| **State type** | `string\|null` — full URL (including configured prefix) |
-| **Model cast** | `'article_url' =&gt; 'string'` or leave uncast |
-| **FieldType** | *(no dedicated FieldType mapping yet — use the class directly)* |
-| **Playground** | `link-preview-field` slug in Flex Fields playground |
-
----
-
-### Basic usage
+## First field
 
 ```php
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\LinkPreviewField;
 
-LinkPreviewField::make('article_url')
-    ->label('Article URL')
-    ->placeholder('https://example.com/article')
+LinkPreviewField::make('website')
+    ->label('Website')
     ->required();
-
-LinkPreviewField::make('landing_page')
-    ->label('Landing page')
-    ->previewLayout('card')
-    ->previewDebounce(750)
-    ->default('https://laravel.com');
 ```
 
-On a Filament resource:
+Publish the package assets as described in [Installation](/docs/installation).
+Authenticated routes are registered automatically from the component definition.
+No queue worker or additional frontend build is required for previews.
 
+## Layout and appearance
+
+<Tabs>
+  <Tab title="Horizontal">
 ```php
-use Filament\Forms\Form;
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\LinkPreviewField;
-
-public static function form(Form $form): Form
-{
-    return $form->schema([
-        LinkPreviewField::make('external_url')
-            ->label('Source URL')
-            ->helperText('Paste a public URL — title, description, and image are fetched automatically.')
-            ->columnSpanFull(),
-    ]);
-}
+LinkPreviewField::make('article_url')
+    ->previewLayout('horizontal')
+    ->size('md');
 ```
-
----
-
-### State format
-
-| Value | Description | Example |
-|-------|-------------|---------|
-| Valid URL | Trimmed absolute URL stored on save | `https://laravel.com/docs` |
-| Empty | `null` after dehydrate | `null` |
-
-**Important:** when `prefix('https://')` is set, the **stored state is always the full URL** (`https://example.com/path`). The visible input shows only the suffix (`example.com/path`) for readability. On blur, pasted full URLs are normalized back to suffix-only display.
-
+The image sits beside the title, description and domain.
+  </Tab>
+  <Tab title="Vertical">
 ```php
-LinkPreviewField::make('blog_path')
-    ->prefix('https://')
-    ->default('https://acme.test/blog/launch');
-
-// Saved state: "https://acme.test/blog/launch"
-// Input display: "acme.test/blog/launch"
+LinkPreviewField::make('reference_url')
+    ->previewLayout('vertical')
+    ->variant('secondary');
 ```
-
-Whitespace is trimmed on hydrate and dehydrate. Empty strings become `null`.
-
----
-
-### Preview layouts
-
-Three card layouts via `previewLayout()`:
-
-| Layout | Modifier class | Best for |
-|--------|----------------|----------|
-| `horizontal` (default) | `fff-link-preview__card--horizontal` | Compact rows — square thumb left, title + description + domain right (Twitter / X style) |
-| `vertical` | `fff-link-preview__card--vertical` | Narrow columns — wide thumb on top, title + domain below |
-| `card` | `fff-link-preview__card--card` | Full-width social cards — 16:9 thumb, title + domain |
-
+A compact image card shows the title and domain beneath the image.
+  </Tab>
+  <Tab title="Image card">
 ```php
-LinkPreviewField::make('share_url_horizontal')
-    ->label('Share URL')
-    ->previewLayout('horizontal');
-
-LinkPreviewField::make('share_url_vertical')
-    ->label('Share URL')
-    ->previewLayout('vertical');
-
-LinkPreviewField::make('share_url_card')
-    ->label('Share URL')
+LinkPreviewField::make('campaign_url')
     ->previewLayout('card')
     ->columnSpanFull();
 ```
+The image spans the preview width; the title and domain follow below it.
+  </Tab>
+</Tabs>
 
-The preview card is **hidden when metadata is empty** (no title, description, or image). A **skeleton shimmer** shows while fetching or while preloading the OG image. Errors render in a subtle `role="alert"` region below the card.
+## Every field option
 
----
+Fluent options accept closures for values that depend on the record or form.
 
-### Configuration API
+| Method | Default | Behavior |
+| --- | --- | --- |
+| `variant()` | `primary` | `primary`, `secondary`, `soft`, `flat`, or `ghost`; shared input appearance. |
+| `size()` | `md` | `sm`, `md`, `lg`, or a `ControlSize` enum. |
+| `rounding()` | Global field setting | Shared FLEX input rounding token. See [Configuration](/docs/configuration). |
+| `focusOutline()` | `true` | Shows the shared Flex Text Input outline around the whole input on focus. Use `focusOutline(false)` to disable it. |
+| `placeholder()` | Translated URL prompt | Placeholder for the editable portion of the URL. |
+| `prefix()` | `null` | Visible URL prefix; added to the entered value and stored as part of the URL. |
+| `suffix()` | `null` | Visual suffix label; it is **not** appended to the stored URL. |
+| `preview()` | `true` | `false` disables the card and all preview requests for this instance. URL validation remains active. |
+| `previewLayout()` | `horizontal` | `horizontal`, `vertical`, or `card`. |
+| `previewDebounce()` | `500` | Wait after typing, in milliseconds; `0`–`60000`. |
+| `previewMinUrlLength()` | `10` | Minimum full URL length before fetching; `4`–`2048`. |
+| `previewMinSkeletonMs()` | `500` | Minimum loading presentation for a new successful fetch; `0`–`5000`. Cached previews skip this delay. |
+| `resolveInitialPreviewOnServer()` | `true` | Reads **existing cached metadata only** during rendering. It never performs DNS or HTTP requests. `false` leaves the initial lookup to the browser. |
+| `showVisitLink()` | `true` | Makes the domain a link opening in a new tab. `false` shows plain text. |
+| `visitLabel()` | Translated “Visit” label | Accessible label of the domain link. |
+| `visitIcon()` | `FlexIcon::Paperclip` | Filament-compatible icon name, enum, HTML or `null`. |
+| `readOnly()` | `false` | Prevents editing; permits the current URL's preview. |
+| `disabled()` | `false` | Prevents editing and new metadata requests. Existing cached previews may still display and load their image. Native Filament disabled/dehydration behavior applies. |
 
-Each fluent method accepts a `Closure` for dynamic values (e.g. based on `$get`, `$record`, or `$livewire`).
+Standard Filament methods such as `label()`, `helperText()`, `required()`,
+`live()`, `afterStateUpdated()` and `columnSpanFull()` remain available.
 
-#### `variant(string|Closure $variant)`
+## Practical examples
 
-Visual style shared with FlexTextInput.
-
-| Value | Description |
-|-------|-------------|
-| `primary` | Default filled pill shell |
-| `secondary` | Secondary surface tokens |
-| `soft` | Softer background / border |
-| `flat` | Minimal chrome |
-| `ghost` | Transparent shell |
-
-```php
-LinkPreviewField::make('url')
-    ->variant('soft');
-
-LinkPreviewField::make('url')
-    ->variant(fn (): string => 'secondary');
-```
-
-#### `size(string|ControlSize|Closure $size)`
-
-Control height. See [Control size](/docs/shared-concepts). Default: **`md`**.
-
-```php
-use Bjanczak\FilamentFlexFields\Enums\ControlSize;
-
-LinkPreviewField::make('url')->size('sm');
-LinkPreviewField::make('url')->size(ControlSize::Lg);
-```
-
-#### `preview(bool|Closure $condition = true)`
-
-Enable or disable the preview card entirely. When `false`, the field behaves as a styled URL input only.
+### Enter only a path
 
 ```php
-LinkPreviewField::make('internal_path')
-    ->preview(false)
-    ->rules(['url']);
-```
-
-#### `previewDebounce(int|Closure $milliseconds)`
-
-Delay after typing before the client calls the scrape endpoint. Default: **`500`**. Pass **`0`** for immediate fetch (use sparingly).
-
-```php
-LinkPreviewField::make('url')->previewDebounce(750);
-
-LinkPreviewField::make('url')->previewDebounce(0); // instant
-```
-
-#### `previewMinUrlLength(int|Closure $length)`
-
-Minimum resolved URL character length before scraping starts. Default: **`10`**. Enforced minimum: **`4`**.
-
-```php
-LinkPreviewField::make('url')->previewMinUrlLength(12);
-```
-
-Useful with prefixes — the check runs against the **full resolved URL**, not the visible suffix alone.
-
-#### `previewMinSkeletonMs(int|Closure $milliseconds)`
-
-Minimum skeleton display time on initial card reveal (SSR-prefilled URLs or first client fetch). Default: **`500`**. Prevents flicker when metadata resolves instantly from cache.
-
-```php
-LinkPreviewField::make('url')->previewMinSkeletonMs(300);
-LinkPreviewField::make('url')->previewMinSkeletonMs(0); // no minimum
-```
-
-#### `previewLayout('horizontal'|'vertical'|'card'|Closure $layout)`
-
-Card layout. Default: **`horizontal`**. Invalid values throw `InvalidArgumentException`.
-
-```php
-LinkPreviewField::make('url')->previewLayout('card');
-```
-
-#### `resolveInitialPreviewOnServer(bool|Closure $condition = true)`
-
-When **`true`** (default), the Blade view calls `resolveInitialPreview()` during SSR for prefilled URLs so the card can render immediately without waiting for Alpine.
-
-When **`false`**, initial preview is deferred to the client — useful on heavy forms to avoid blocking page render or duplicate scrapes.
-
-```php
-LinkPreviewField::make('url')
-    ->default('https://laravel.com')
-    ->resolveInitialPreviewOnServer(false);
-```
-
-#### `showVisitLink(bool|Closure $condition = true)`
-
-When **`true`** (default), the domain row is an `&lt;a&gt;` opening the URL in a new tab (`rel="noopener noreferrer"`).
-
-When **`false`**, the domain is plain text with the same icon styling (`fff-link-preview__domain--text`).
-
-```php
-LinkPreviewField::make('url')->showVisitLink(false);
-```
-
-#### `visitLabel(string|Closure $label)`
-
-Accessible label for the visit link (`aria-label`). Default: translated `filament-flex-fields::default.link_preview.visit`.
-
-```php
-LinkPreviewField::make('url')->visitLabel('Open article in new tab');
-```
-
-#### `visitIcon(string|BackedEnum|Htmlable|Closure|null $icon)`
-
-Icon beside the domain row. Default: `GravityIcon::Paperclip`.
-
-```php
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
-
-LinkPreviewField::make('url')->visitIcon(GravityIcon::Link);
-LinkPreviewField::make('url')->visitIcon('heroicon-o-arrow-top-right-on-square');
-```
-
-#### `prefix(string|Closure|null $label)` / `suffix(string|Closure|null $label)`
-
-Inline affix labels on the FlexTextInput track. Empty strings are treated as no affix.
-
-```php
-LinkPreviewField::make('article_path')
-    ->prefix('https://')
-    ->suffix('.html');
-
-LinkPreviewField::make('cdn_path')
-    ->prefix(fn (): string => config('app.cdn_url').'/');
-```
-
-#### `placeholder(string|Closure|null $placeholder)`
-
-Inherited from Filament `HasPlaceholder`. Default translation: `filament-flex-fields::default.link_preview.placeholder`.
-
-```php
-LinkPreviewField::make('url')->placeholder('https://example.com');
-```
-
-#### `readOnly(bool|Closure $condition = true)` / `disabled(bool|Closure $condition = true)`
-
-Inherited from Filament. Read-only still shows preview for the current URL; disabled blocks interaction and scraping triggers.
-
-```php
-LinkPreviewField::make('canonical_url')
-    ->default($record->canonical_url)
-    ->readOnly();
-
-LinkPreviewField::make('url')->disabled();
-```
-
-#### `focusOutline(bool|Closure $condition = true)`
-
-Inherited from `HasFieldFocusOutline`. Default: **`false`**. When `true`, shows the shared `--fff-field-focus-*` ring on the input shell.
-
-```php
-LinkPreviewField::make('url')->focusOutline();
-```
-
----
-
-### Public helper methods
-
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `getVariant()` | `string` | Resolved variant |
-| `getSize()` | `string` | Resolved size (`sm`, `md`, `lg`) |
-| `isPreviewEnabled()` | `bool` | Preview card enabled |
-| `getPreviewDebounce()` | `int` | Debounce ms (≥ 0) |
-| `getPreviewMinUrlLength()` | `int` | Min URL length (≥ 4) |
-| `getPreviewMinSkeletonMs()` | `int` | Min skeleton ms (≥ 0) |
-| `getPreviewLayout()` | `string` | `horizontal`, `vertical`, or `card` |
-| `shouldResolveInitialPreviewOnServer()` | `bool` | SSR preview resolution |
-| `shouldShowVisitLink()` | `bool` | Domain row is a link |
-| `getVisitLabel()` | `string` | Visit link aria-label |
-| `getVisitIcon()` | `string\|BackedEnum\|Htmlable\|null` | Resolved visit icon |
-| `getPrefix()` / `getSuffix()` | `string\|null` | Resolved affixes |
-| `getScrapeUrl()` | `string` | Relative scrape route URL for Alpine |
-| `resolveInitialPreview(?string $url)` | `array\|null` | Server-side metadata (`title`, `description`, `image`) |
-| `getAlpineConfiguration()` | `array` | Config passed to `linkPreviewFieldFormComponent` |
-| `getWrapperClasses()` | `array&lt;string, bool&gt;` | Root CSS class map |
-
-`resolveInitialPreview()` returns `null` when preview is disabled, URL is empty, URL is not scrapable, or scrape returns no metadata.
-
----
-
-### Package configuration
-
-Global scrape behaviour in `config/filament-flex-fields.php`:
-
-| Key | Env variable | Default | Description |
-|-----|--------------|---------|-------------|
-| `link_preview.cache_ttl_seconds` | `FLEX_FIELDS_LINK_PREVIEW_CACHE_TTL` | `86400` | Server-side scrape cache TTL |
-| `link_preview.rate_limit_per_minute` | `FLEX_FIELDS_LINK_PREVIEW_RATE_LIMIT` | `30` | Per-user scrape rate limit |
-| `link_preview.timeout_seconds` | `FLEX_FIELDS_LINK_PREVIEW_TIMEOUT` | `8` | HTTP timeout for remote pages |
-
-Publish config:
-
-```bash
-php artisan vendor:publish --tag=filament-flex-fields-config
-```
-
-Example `.env`:
-
-```env
-FLEX_FIELDS_LINK_PREVIEW_CACHE_TTL=43200
-FLEX_FIELDS_LINK_PREVIEW_RATE_LIMIT=30
-FLEX_FIELDS_LINK_PREVIEW_TIMEOUT=10
-```
-
-The client also keeps an **in-memory cache** and **in-flight deduplication** (`url-meta-scrape.js`) so repeated keystrokes do not spam the server.
-
-Scrape endpoint (named route): **`filament-flex-fields.url-meta.scrape`**.
-
----
-
-### Validation
-
-| Rule | Detail |
-|------|--------|
-| Built-in | `nullable`, `url` |
-| `required()` | Standard Filament required validation |
-| Hydrate / dehydrate | Trims whitespace; empty → `null` |
-
-```php
-LinkPreviewField::make('website')
-    ->required()
-    ->rules(['url', 'max:2048']);
-```
-
----
-
-### Model & database examples
-
-```php
-// Migration
-$table->string('article_url')->nullable();
-
-// Model — no special cast required
-protected $fillable = ['article_url'];
-
-// Factory / seeder
-'article_url' => 'https://laravel.com',
-```
-
-Editing an existing record with SSR preview:
-
-```php
-LinkPreviewField::make('article_url')
-    ->default(fn (?Article $record): ?string => $record?->article_url)
-    ->resolveInitialPreviewOnServer(true);
-```
-
----
-
-### Recipe: CMS external link block
-
-```php
-use Filament\Schemas\Components\Grid;
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\LinkPreviewField;
-
-Grid::make(1)->schema([
-    LinkPreviewField::make('cta_url')
-        ->label('Call-to-action URL')
-        ->previewLayout('card')
-        ->visitLabel('Preview landing page')
-        ->previewDebounce(600)
-        ->columnSpanFull(),
-
-    LinkPreviewField::make('social_proof_url')
-        ->label('Social proof link')
-        ->previewLayout('horizontal')
-        ->variant('soft')
-        ->size('sm'),
-]);
-```
-
-### Recipe: prefixed marketing domain
-
-```php
-LinkPreviewField::make('campaign_path')
-    ->label('Campaign page')
-    ->prefix('https://go.acme.com/')
+LinkPreviewField::make('campaign_url')
+    ->prefix('https://example.com/campaigns/')
     ->placeholder('summer-sale')
-    ->previewMinUrlLength(8)
-    ->helperText('Enter the path only — https:// is added automatically.');
+    ->helperText('Enter the campaign path. The full URL is saved.');
 ```
 
-### Recipe: read-only audit display
+Pasting a full matching URL removes the duplicated visible prefix.
 
-```php
-LinkPreviewField::make('submitted_url')
-    ->label('Submitted URL')
-    ->default(fn ($record) => $record->submitted_url)
-    ->readOnly()
-    ->showVisitLink(true)
-    ->previewLayout('vertical');
-```
-
-### Recipe: heavy admin form — defer SSR scrape
+### Smaller input, quieter preview
 
 ```php
 LinkPreviewField::make('reference_url')
-    ->resolveInitialPreviewOnServer(false)
+    ->size('sm')
+    ->variant('soft')
     ->previewDebounce(800)
-    ->previewMinSkeletonMs(400);
+    ->previewMinSkeletonMs(300)
+    ->showVisitLink(false);
 ```
 
-### Recipe: reactive `live()` — drive sibling fields from preview URL
+### URL input without remote requests
 
 ```php
-use Filament\Schemas\Components\Utilities\Get;
+LinkPreviewField::make('internal_url')
+    ->preview(false)
+    ->placeholder('https://intranet.example.com/help');
+```
+
+A valid private URL may be stored. Private hosts cannot be fetched for previews.
+
+### Read-only record
+
+```php
+LinkPreviewField::make('submitted_url')
+    ->readOnly()
+    ->previewLayout('vertical')
+    ->visitLabel('Open submitted page');
+```
+
+### React to URL changes
+
+```php
 use Filament\Schemas\Components\Utilities\Set;
 
 LinkPreviewField::make('source_url')
-    ->label('Source URL')
     ->live(debounce: 500)
     ->afterStateUpdated(function (?string $state, Set $set): void {
-        if (blank($state)) {
-            $set('source_domain', null);
-
-            return;
-        }
-
-        $set('source_domain', parse_url($state, PHP_URL_HOST));
-    })
-    ->columnSpanFull();
-
-TextInput::make('source_domain')
-    ->label('Domain')
-    ->disabled()
-    ->dehydrated();
+        $set('source_domain', filled($state)
+            ? parse_url($state, PHP_URL_HOST)
+            : null);
+    });
 ```
 
-Use `live()` when other form fields should react to URL changes. Preview fetching still debounces independently via `previewDebounce()`.
+Preview debounce and Livewire update debounce are independent settings.
 
-### Recipe: affix-only internal paths (preview disabled)
+## Validation and storage
 
-For intranet or relative paths where server scraping is not useful — URL input only, no preview card:
+The server validates a nullable string of at most **2048 characters**, with an
+HTTP or HTTPS scheme, no embedded credentials, and the default HTTP/HTTPS port.
+Arrays, arbitrary text, `javascript:` URLs and unsupported ports are rejected.
+`required()` makes empty values invalid. Whitespace is trimmed; empty values save as `null`.
+
+A preview failure does not make an otherwise valid URL unsaveable. Pages may omit
+metadata, block automated requests, require a login, or exceed the download limit.
 
 ```php
-LinkPreviewField::make('help_path')
-    ->label('Help article path')
-    ->prefix('https://docs.acme.test/')
-    ->placeholder('getting-started/install')
-    ->preview(false)
-    ->rules(['required', 'max:255'])
-    ->helperText('Enter the path after the docs host — full URL is stored on save.');
+// Migration: use a suitable length for the URLs you accept.
+$table->string('website', 2048)->nullable();
+
+// Field: add a shorter application-specific constraint if necessary.
+LinkPreviewField::make('website')
+    ->required()
+    ->rules(['max:500']);
 ```
 
-### Recipe: scrape errors — longer debounce + no visit link
+No model cast is required. Authorization to edit the record remains your
+application's responsibility.
 
-When users paste slow or rate-limited URLs, reduce churn and keep the domain as plain text:
+## Global configuration
+
+In `config/filament-flex-fields.php`, configure `link_preview`:
+
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `cache_ttl_seconds` | `86400` | Metadata cache lifetime; clamped to `0`–`604800`. `0` disables persistence. Empty results cache for at most 30 seconds. |
+| `rate_limit_per_minute` | `30` | Per authenticated user, separately for metadata and images; clamped to `1`–`600`. A value of `0` does not disable protection. |
+| `timeout_seconds` | `8` | HTTP/DNS allowance tracked across redirects; clamped to `1`–`15` seconds. Native OS DNS can exceed it; isolated DNS is bounded separately. |
+| `dns_strategy` | `auto` | `auto` uses isolated DNS on macOS PHP-FPM and native DNS elsewhere. `isolated` uses a fresh PHP CLI process with a two-second deadline; `native` uses the OS resolver directly. |
+| `route_prefix` | `flex-fields` | Prefix of the metadata and image endpoints. Rebuild your Laravel route cache after changing it. |
+| `middleware` | `['web', 'auth']` | Middleware for both endpoints. Use `auth:your-guard` for a custom guard. Authentication cannot be removed. The image route always also requires a relative URL signature. |
 
 ```php
-LinkPreviewField::make('external_reference')
-    ->label('External reference')
-    ->previewDebounce(1000)
-    ->previewMinSkeletonMs(600)
-    ->showVisitLink(false)
-    ->visitLabel('Open reference')
-    ->helperText('If preview fails, the URL is still saved — check the address is public.');
+'link_preview' => [
+    'cache_ttl_seconds' => 43200,
+    'rate_limit_per_minute' => 30,
+    'timeout_seconds' => 8,
+    'dns_strategy' => 'auto',
+    'route_prefix' => 'flex-fields',
+    'middleware' => ['web', 'auth:admin'],
+],
 ```
 
-Scrape failures render in `fff-link-preview__error` with `role="alert"`; they do not block form submission when `nullable` / `url` rules pass.
+Named routes: `filament-flex-fields.url-meta.scrape` and
+`filament-flex-fields.url-meta.image`. Use route names rather than hardcoded paths.
+The Laravel cache store must support atomic locks. Shared production cache also
+shares rate limits and metadata across application instances.
 
----
+## Loading and safety
 
-### Accessibility
+- CSS and JS belong to each rendered field's asset boundary; closed tabs and modals wait for activation.
+- Requests for the same URL and endpoint share in-flight work and a bounded browser cache.
+- Changing the URL cancels the previous request; stale responses cannot replace the new preview.
+- Removing the field releases its watchers, listeners, timers and pending image work.
+- The server checks every redirect destination, rejects private/reserved addresses and pins DNS for the connection.
+- Remote requests carry no application session cookies or authorization headers.
+- Metadata transfers stop after the HTML head, or at the 256 KiB capture limit. Comments, script text and quoted attributes cannot masquerade as the head boundary. Redirect bodies are skipped. Image responses are limited to 2 MiB.
+- Preview images use a short-lived signed local URL, stable within a five-minute interval so shared images can use the browser cache. The image endpoint revalidates redirects, accepts only supported raster images, and caps dimensions at 8 Mi pixels. SVG and HTML are rejected.
 
-- Preview card container uses `aria-live="polite"` for loading and reveal updates
-- When revealed, `aria-label` on the card reflects the scraped page title
-- Visit link uses `visitLabel()` as `aria-label`
-- Scrape errors use `role="alert"`
-- Input remains a standard Filament field with label / hint / error association
+## Metadata selection
 
----
+The parser reads a bounded HTML head without executing scripts or downloading
+linked structured-data documents. Title selection uses Open Graph, Twitter,
+HTML title and then JSON-LD. Description selection uses Open Graph, Twitter,
+standard description/abstract tags and then JSON-LD.
 
-### CSS classes
+Image selection preserves the first usable Open Graph image group, prefers its
+secure alternate, then tries subsequent groups, Twitter, image metadata,
+JSON-LD and supported link declarations. Empty, malformed and syntactically
+private image candidates do not prevent trying a later candidate. Network
+availability and actual raster safety are checked by the protected image endpoint.
 
-| Class | Role |
-|-------|------|
-| `fff-link-preview-field` | Filament wrapper modifier |
-| `fff-link-preview-field--{sm\|md\|lg}` | Size modifier |
-| `fff-link-preview-field--{variant}` | Variant modifier |
-| `fff-link-preview-field--layout-{horizontal\|vertical\|card}` | Layout modifier on wrapper |
-| `fff-link-preview` | Alpine root (FlexTextInput shell) |
-| `fff-link-preview__card` | Preview card container |
-| `fff-link-preview__card--{horizontal\|vertical\|card}` | Layout modifier |
-| `fff-link-preview__domain--text` | Non-link domain row when `showVisitLink(false)` |
-| `fff-link-preview__error` | Scrape error message |
+JSON-LD supports WebPage, Article, NewsArticle, BlogPosting, Product and
+VideoObject, including `@graph`, image objects and image lists. Up to 16 scripts
+of 64 KiB each are examined with bounded graph traversal; malformed JSON is
+ignored. Body-only metadata and client-rendered metadata are not evaluated.
+Declared Windows-1252/ISO-8859-1 text is converted before extraction.
 
-Shares FlexTextInput shell classes (`fff-flex-text-input`, `fff-flex-text-input__shell`, variant modifiers).
+Open Graph image ordering follows the [Open Graph protocol](https://ogp.me/).
 
----
+## Cache and concurrent requests
 
-### Assets
+Server and browser metadata caches ignore URL fragments and preserve query
+parameters. Cache hits avoid both DNS and remote HTTP. If another worker is
+already fetching the same URL, the endpoint can return `503` with `Retry-After`;
+the browser performs at most four bounded retries, cancelling them when the field
+is removed or its value changes. The browser cache holds at most 64 entries for
+five minutes and separates endpoints. Server cache TTL remains configurable.
 
-Lazy-loaded stylesheets (via `FlexFieldAssets::stylesheetsFor('link-preview-field')`):
+Isolated DNS uses the matching PHP CLI executable and requires `proc_open`.
+It does not use a third-party DNS-over-HTTPS service. Missing CLI/process support,
+malformed DNS output, mixed private/public answers and failed lookups fail closed.
+On other platforms, choose `isolated` when your deployment needs a hard DNS
+process deadline; verify CLI availability as part of deployment.
 
-- `flex-text-input`
-- `link-preview-field`
+The preview card announces updates politely; failures use an accessible alert.
+Input styling supports light/dark themes and logical text alignment for RTL.
 
-Alpine component: `link-preview-field` (loaded with `x-load`).
+## Troubleshooting
 
-Uses `wire:ignore` on the Alpine root — prefer changing Livewire state or sibling fields over direct DOM manipulation in tests.
+<AccordionGroup>
+  <Accordion title="The URL saves but there is no preview">
+Check that the destination is public and serves HTML with title/Open Graph/Twitter metadata. Private addresses, authenticated pages and oversized responses cannot be previewed. A URL can remain valid for storage even when no preview is available.
+  </Accordion>
+  <Accordion title="Requests return 401 or 403">
+Verify the configured authentication guard and logged-in session. Image URLs expire within five to ten minutes; requesting fresh metadata creates a new signature. Do not remove signing or authentication middleware.
+  </Accordion>
+  <Accordion title="Requests return 429">
+The user's request limit was reached. Wait for the period indicated by the response's Retry-After header, or configure an appropriate bounded limit.
+  </Accordion>
+  <Accordion title="The endpoints return 404 after deployment">
+Ensure the package provider is discovered and refresh the Laravel route cache after updating the package or endpoint configuration. Publish current assets so browser requests use the current route names.
+  </Accordion>
+</AccordionGroup>
 
----
-
-### Implementation notes
-
-- Metadata is scraped server-side via `UrlMetaScraper` (Open Graph + fallback `&lt;title&gt;` / `&lt;meta name="description"&gt;` / `&lt;meta property="og:image"&gt;`).
-- Non-scrapable URLs (invalid scheme, localhost, etc.) skip preview quietly.
-- Image preload runs client-side before revealing the card to avoid layout pop-in.
-- Invalid `variant()` or `previewLayout()` values throw `InvalidArgumentException` at render time.
-
----
-
-### Playground
-
-Slug: **`link-preview-field`**
-
-| Demo field | Shows |
-|------------|-------|
-| Default | Horizontal card, debounced scrape |
-| Layout variants | Vertical and card layouts |
-| Affixes | URL prefix/suffix on the pill shell |
-
-`/admin/flex-fields-playground/link-preview-field` — see [Playground](/docs/index#playground).
-
----
-
-### Related components
-
-| Component | When to use instead |
-|-----------|---------------------|
-| [FlexTextInput](/docs/flextextinput) | URL input without Open Graph preview |
-| [SocialLinksField](/docs/social-links-field) | Multiple branded social profile URLs |
-| [SlugField](/docs/slugfield-and-titleslugfield) | Permalink slug with live preview |
-
----
+See [custom component routes](/docs/extensions/routes) to declare protected endpoints
+for your own extension, or try the Link Preview page in the live playground.

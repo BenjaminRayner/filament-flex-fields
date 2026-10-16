@@ -11,15 +11,19 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields;
 
 use Bjanczak\FilamentFlexFields\Enums\Density;
+use Bjanczak\FilamentFlexFields\Filament\Pages\Diagnostics\AssetFormsPage;
+use Bjanczak\FilamentFlexFields\Filament\Pages\Diagnostics\AssetModalsPage;
+use Bjanczak\FilamentFlexFields\Filament\Pages\Diagnostics\AssetTablesPage;
+use Bjanczak\FilamentFlexFields\Filament\Pages\FlexCatalogPluginPage;
 use Bjanczak\FilamentFlexFields\Filament\Pages\FlexFieldsPlaygroundCluster;
 use Bjanczak\FilamentFlexFields\Filament\Pages\FlexFieldsPlaygroundIndexPage;
+use Bjanczak\FilamentFlexFields\Filament\Pages\FlexLicenseGuidePage;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundRegistry;
 use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldGroupResourceRegistrar;
 use Bjanczak\FilamentFlexFields\Support\Theme\FlexFieldsTheme;
+use Bjanczak\FilamentFlexFields\Support\Theme\ThemeTokenMap;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use Filament\Support\Facades\FilamentView;
-use Filament\View\PanelsRenderHook;
 
 class FilamentFlexFieldsPlugin implements Plugin
 {
@@ -41,8 +45,6 @@ class FilamentFlexFieldsPlugin implements Plugin
      * @var array<string, mixed>|null
      */
     protected ?array $theme = null;
-
-    protected static bool $themeRenderHookRegistered = false;
 
     public static function make(): static
     {
@@ -68,13 +70,18 @@ class FilamentFlexFieldsPlugin implements Plugin
             return;
         }
 
-        if (FlexFieldsPlaygroundRegistry::isEnabled()) {
-            $panel->pages([
-                FlexFieldsPlaygroundCluster::class,
-                FlexFieldsPlaygroundIndexPage::class,
-                ...FlexFieldsPlaygroundRegistry::pageConfigurations(),
-            ]);
-        }
+        $panel->pages([
+            FlexFieldsPlaygroundCluster::class,
+            FlexFieldsPlaygroundIndexPage::class,
+            FlexCatalogPluginPage::class,
+            FlexLicenseGuidePage::class,
+            ...FlexFieldsPlaygroundRegistry::pageConfigurations(),
+            ...(app()->environment(['local', 'testing']) ? [
+                AssetFormsPage::class,
+                AssetTablesPage::class,
+                AssetModalsPage::class,
+            ] : []),
+        ]);
 
         FlexFieldGroupResourceRegistrar::register($panel);
     }
@@ -95,14 +102,6 @@ class FilamentFlexFieldsPlugin implements Plugin
             $flexFieldsTheme->mergeTheme($this->theme);
         }
 
-        if (! static::$themeRenderHookRegistered) {
-            FilamentView::registerRenderHook(
-                PanelsRenderHook::HEAD_START,
-                fn (): string => view('filament-flex-fields::partials.flex-fields-theme')->render(),
-            );
-
-            static::$themeRenderHookRegistered = true;
-        }
     }
 
     public function density(Density|string $density): static
@@ -117,7 +116,7 @@ class FilamentFlexFieldsPlugin implements Plugin
      */
     public function theme(array $theme): static
     {
-        $this->theme = $theme;
+        $this->theme = ThemeTokenMap::validate($theme);
 
         return $this;
     }

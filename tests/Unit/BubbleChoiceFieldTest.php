@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\BubbleChoiceField;
+use Bjanczak\FilamentFlexFields\Support\BubbleChoice\ArenaLayout;
+use Bjanczak\FilamentFlexFields\Support\BubbleChoice\Validation\SelectionRule;
 use Bjanczak\FilamentFlexFields\Support\Playground\BubbleChoicePlayground;
+use Illuminate\Support\Facades\Validator;
 
 it('exposes bubble choice styling and layout api', function () {
     $field = BubbleChoiceField::make('habits')
@@ -115,41 +118,16 @@ it('normalizes state and strips unknown or disabled values', function () {
 });
 
 it('validates min max and required selection counts', function () {
-    $minField = BubbleChoiceField::make('habits')
-        ->options(['a' => 'A', 'b' => 'B', 'c' => 'C'])
-        ->minItems(2);
-
-    $minRule = collect($minField->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
-    $minMessage = null;
-    $minRule('habits', ['a'], function (string $failMessage) use (&$minMessage): void {
-        $minMessage = $failMessage;
-    });
-
-    expect($minMessage)->toBe(__('filament-flex-fields::default.validation.bubble_choice.min', ['count' => 2]));
-
-    $maxField = BubbleChoiceField::make('habits')
-        ->options(['a' => 'A', 'b' => 'B', 'c' => 'C'])
-        ->maxItems(1);
-
-    $maxRule = collect($maxField->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
-    $maxMessage = null;
-    $maxRule('habits', ['a', 'b'], function (string $failMessage) use (&$maxMessage): void {
-        $maxMessage = $failMessage;
-    });
-
-    expect($maxMessage)->toBe(__('filament-flex-fields::default.validation.bubble_choice.max', ['count' => 1]));
-
-    $requiredField = BubbleChoiceField::make('habits')
-        ->options(['a' => 'A', 'b' => 'B'])
-        ->required();
-
-    $requiredRule = collect($requiredField->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof Closure);
-    $requiredMessage = null;
-    $requiredRule('habits', [], function (string $failMessage) use (&$requiredMessage): void {
-        $requiredMessage = $failMessage;
-    });
-
-    expect($requiredMessage)->toBe(__('filament-flex-fields::default.validation.bubble_choice.min', ['count' => 1]));
+    foreach ([
+        [BubbleChoiceField::make('habits')->options(['a' => 'A', 'b' => 'B'])->minItems(2), ['a'], 'min', 2],
+        [BubbleChoiceField::make('habits')->options(['a' => 'A', 'b' => 'B'])->maxItems(1), ['a', 'b'], 'max', 1],
+        [BubbleChoiceField::make('habits')->options(['a' => 'A', 'b' => 'B'])->required(), [], 'min', 1],
+    ] as [$field, $value, $message, $count]) {
+        $rule = collect($field->getValidationRules())->first(fn (mixed $rule): bool => $rule instanceof SelectionRule);
+        $validator = Validator::make(['habits' => $value], ['habits' => [$rule]]);
+        expect($validator->fails())->toBeTrue()
+            ->and($validator->errors()->first('habits'))->toBe(__('filament-flex-fields::default.validation.bubble_choice.'.$message, ['count' => $count]));
+    }
 });
 
 it('exposes wrapper classes for variant and selected shape', function () {
@@ -178,15 +156,48 @@ it('includes a playground demo for bubble choice', function () {
         ->and($source)->toContain('fringeWidth');
 });
 
-it('renders svg selection stroke geometry for image background bubbles', function () {
+it('renders instance-owned geometry and a single SSR option renderer', function () {
     $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/bubble-choice-field.blade.php');
-    $defs = file_get_contents(__DIR__.'/../../resources/views/forms/components/partials/bubble-choice-clip-defs.blade.php');
+    $option = file_get_contents(__DIR__.'/../../resources/views/forms/components/bubble-choice/option.blade.php');
+    $defs = file_get_contents(__DIR__.'/../../resources/views/forms/components/bubble-choice/geometry.blade.php');
+    expect($blade)->toContain('configurationKey', 'wire:key=', 'bubble-choice.option')
+        ->not->toContain('x-for', 'x-init=', 'selectionStrokePath(')
+        ->and($option)->toContain('fff-bubble-choice__selection-stroke', 'aria-label=', 'data-bubble-value=')
+        ->and($defs)->toContain('data-bubble-scallop', '$clipPrefix')
+        ->not->toContain('@once', '<use');
+});
 
-    expect($blade)->toContain('fff-bubble-choice__selection-stroke')
-        ->and($blade)->toContain('selectionStrokePath(')
-        ->and($blade)->toContain('selectionStrokeWidth(')
-        ->and($blade)->toContain('selectionStrokeStyle(')
-        ->and($blade)->not->toContain('<use')
-        ->and($defs)->toContain('id="fff-bubble-choice-geom-scallop"')
-        ->and($defs)->toContain('id="fff-bubble-choice-geom-circle"');
+it('resolves dynamic option closures without stale caches', function () {
+    $label = 'First';
+    $field = BubbleChoiceField::make('choice')->options(function () use (&$label): array {
+        return ['a' => $label];
+    });
+    expect($field->getOptionsForJs()[0]['label'])->toBe('First');
+    $label = 'Second';
+    expect($field->getOptionsForJs()[0]['label'])->toBe('Second');
+});
+
+it('resolves injected layout closures lazily and gives later setters priority', function () {
+    $size = 80;
+    $field = BubbleChoiceField::make('choice')->layoutOptions(function () use (&$size): array {
+        return ['size' => $size];
+    });
+    expect($field->getLayoutOptionsForJs()['size'])->toBe(80.0);
+    $size = 120;
+    expect($field->getLayoutOptionsForJs()['size'])->toBe(120.0);
+    $field->bubbleSize(140);
+    expect($field->getLayoutOptionsForJs()['size'])->toBe(140.0);
+    $field->layoutOptions(['size' => 100]);
+    expect($field->getLayoutOptionsForJs()['size'])->toBe(100.0);
+});
+
+it('rejects invalid and contradictory configuration', function (array $layout) {
+    expect(fn () => BubbleChoiceField::make('choice')->layoutOptions($layout)->getLayoutOptionsForJs())
+        ->toThrow(InvalidArgumentException::class);
+})->with([[['size' => 0]], [['size' => INF]], [['numCols' => 1.5]], [['minSize' => 500]], [['gutter' => -1]], [['unknown' => 1]], [['compact' => 'false']]]);
+
+it('packs zero and single-column collections without dropping options', function () {
+    $layout = ArenaLayout::class;
+    expect($layout::rows([], 6))->toBe([])
+        ->and($layout::rows([['value' => 'a'], ['value' => 'b']], 1))->toBe([[['value' => 'a']], [['value' => 'b'], null]]);
 });

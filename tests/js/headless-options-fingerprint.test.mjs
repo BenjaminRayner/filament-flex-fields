@@ -57,7 +57,7 @@ describe('headless options fingerprint', () => {
 
         host.syncEngineOptions()
         assert.equal(host._engineOptionsFingerprint, firstFingerprint)
-        assert.equal(setOptionsCalls, 2)
+        assert.equal(setOptionsCalls, 1)
         assert.equal(syncCalls, 1)
     })
 })

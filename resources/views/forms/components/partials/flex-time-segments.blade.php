@@ -60,8 +60,8 @@
     ])
     @if ($live)
         @if (! $skipScriptLoad)
-            x-load
-            x-load-src="{{ FilamentAsset::getAlpineComponentSrc('flex-time-segments', FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+            x-fff-load
+            x-fff-load-src="{{ FilamentAsset::getAlpineComponentSrc('flex-time-segments', FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
         @endif
         x-data="flexTimeSegmentsComponent({
             getValue: {!! $getValueExpression ?? 'null' !!},
@@ -128,7 +128,7 @@
                 </span>
 
                 <x-filament::icon
-                    icon="heroicon-m-chevron-up-down"
+                    :icon="\Bjanczak\FilamentFlexFields\Support\FlexIcon::ChevronDown"
                     class="fff-flex-time-segments__chevron"
                 />
             </button>
@@ -156,7 +156,7 @@
                             <template x-for="hour in hourOptions()" x-bind:key="`hour-${hour}`">
                                 <button
                                     type="button"
-                                    class="fff-flex-time-segments__option"
+                                    class="fff-flex-time-segments__option fff-select-menu-choice"
                                     role="option"
                                     x-bind:class="{ 'is-selected': selectedHour() === hour }"
                                     x-bind:data-selected="selectedHour() === hour ? 'true' : 'false'"
@@ -176,7 +176,7 @@
                             <template x-for="minute in minuteOptions()" x-bind:key="`minute-${minute}`">
                                 <button
                                     type="button"
-                                    class="fff-flex-time-segments__option"
+                                    class="fff-flex-time-segments__option fff-select-menu-choice"
                                     role="option"
                                     x-bind:class="{ 'is-selected': selectedMinute() === minute }"
                                     x-bind:data-selected="selectedMinute() === minute ? 'true' : 'false'"
@@ -197,7 +197,7 @@
                                 <template x-for="period in dayPeriodOptions()" x-bind:key="`period-${period}`">
                                     <button
                                         type="button"
-                                        class="fff-flex-time-segments__option"
+                                        class="fff-flex-time-segments__option fff-select-menu-choice"
                                         role="option"
                                         x-bind:class="{ 'is-selected': selectedDayPeriod() === period }"
                                         x-bind:data-selected="selectedDayPeriod() === period ? 'true' : 'false'"
@@ -225,7 +225,7 @@
                 ])>{{ e($displayLabel) }}</span>
 
                 <x-filament::icon
-                    icon="heroicon-m-chevron-up-down"
+                    :icon="\Bjanczak\FilamentFlexFields\Support\FlexIcon::ChevronDown"
                     class="fff-flex-time-segments__chevron"
                 />
             </button>

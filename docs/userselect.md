@@ -1,7 +1,118 @@
 ---
 title: "UserSelect"
 description: Rich user picker with avatars, email secondary line, verification badge, and names/tags multi-trigger.
+icon: "user-round-search"
+"canonical": "https://flex-fields.bjanczak.com/docs/userselect"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/user-select.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "UserSelect in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/user-select-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/user-select-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/user-select.webp"
+"twitter:image:alt": "UserSelect in the FLEX Fields playground"
 ---
+
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/userselect#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/userselect",
+      "name": "UserSelect",
+      "description": "Rich user picker with avatars, email secondary line, verification badge, and names/tags multi-trigger.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/userselect#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/userselect#article",
+      "url": "https://flex-fields.bjanczak.com/docs/userselect",
+      "headline": "UserSelect",
+      "description": "Rich user picker with avatars, email secondary line, verification badge, and names/tags multi-trigger.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/userselect#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/user-select-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/user-select-motion.mp4#video",
+      "name": "UserSelect — FLEX Fields demonstration",
+      "description": "A recorded demonstration of UserSelect in the FLEX Fields playground for Filament. Rich user picker with avatars, email secondary line, verification badge, and names/tags multi-trigger.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/user-select.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT4.283S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/user-select-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/userselect#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/user-select-motion.mp4"
+  poster="/art/previews/user-select.webp"
+  width="1920"
+  height="1080"
+  aria-label="UserSelect — FLEX Fields demonstration"
+>
+  <a href="/art/previews/user-select-motion.mp4">Watch the UserSelect demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -95,7 +206,7 @@ All methods accept `Closure` unless noted.
 | `name_column` / `email_column` / `avatar_column` / `verification_column` | matching column methods |
 | `max_visible_avatars` | `maxVisibleAvatars()` |
 
-Async search and `relationship()` remain PHP-only (same boundary as [SelectField](/docs/selectfield#flexfieldformbuilder--studio-config)).
+Async search and `relationship()` remain PHP-only (same boundary as [SelectField](/docs/selectfield#flexfieldformbuilder-/-studio-config)).
 
 ---
 
@@ -126,7 +237,7 @@ UserSelect::make('reviewer_id')
 
 ### Playground
 
-`/admin/flex-fields-playground/user-select`
+`/admin/flex-fields/user-select`
 
 See [Playground](/docs/index#playground) for setup.
 

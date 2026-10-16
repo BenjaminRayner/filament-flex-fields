@@ -1,4 +1,4 @@
-/** @type {Promise<{ env: import('@xenova/transformers').env, pipeline: import('@xenova/transformers').pipeline }> | null} */
+/** @type {Promise<{ env: import('@huggingface/transformers').env, pipeline: import('@huggingface/transformers').pipeline }> | null} */
 let runtimePromise = null
 
 /**
@@ -18,7 +18,12 @@ export function loadTransformersRuntime(moduleUrl, wasmBaseUrl) {
 
             if (env.backends?.onnx?.wasm) {
                 env.backends.onnx.wasm.proxy = false
-                env.backends.onnx.wasm.wasmPaths = wasmBaseUrl
+                env.backends.onnx.wasm.wasmPaths = {
+                    mjs: new URL('ort-wasm-simd-threaded.mjs', new URL(wasmBaseUrl, globalThis.location?.href)).href,
+                    wasm: new URL('ort-wasm-simd-threaded.wasm', new URL(wasmBaseUrl, globalThis.location?.href)).href,
+                }
+                // Normal Filament pages do not require cross-origin isolation.
+                env.backends.onnx.wasm.numThreads = globalThis.crossOriginIsolated ? Math.min(4, globalThis.navigator?.hardwareConcurrency || 1) : 1
             }
 
             return { env, pipeline }

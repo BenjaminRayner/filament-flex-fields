@@ -6,97 +6,68 @@ namespace Bjanczak\FilamentFlexFields\Support\Barcode;
 
 use Bjanczak\FilamentFlexFields\Enums\BarcodeFormat;
 
-class BarcodeStateNormalizer
+final class BarcodeStateNormalizer
 {
-    /**
-     * @return array{value: string, format: string|null}|null
-     */
+    public const MAX_BYTES = 4096;
+
+    public static function isValidShape(mixed $state): bool
+    {
+        if ($state === null) {
+            return true;
+        }
+        if (is_string($state)) {
+            return self::isValidText($state);
+        }
+        if (! is_array($state) || ! array_key_exists('value', $state)
+            || array_diff(array_keys($state), ['value', 'format']) !== []
+            || ! is_string($state['value']) || ! self::isValidText($state['value'])) {
+            return false;
+        }
+        $format = $state['format'] ?? null;
+
+        return $format === null || (is_string($format) && BarcodeFormat::tryFrom($format) !== null);
+    }
+
+    private static function isValidText(string $value): bool
+    {
+        return strlen($value) <= self::MAX_BYTES && preg_match('//u', $value) === 1 && ! str_contains($value, "\0");
+    }
+
+    /** @return array{value: string, format: string|null}|null */
     public static function normalize(mixed $state, bool $storeDetectedFormat = false): ?array
     {
-        if ($state === null || $state === '') {
+        if ($state === null || ! self::isValidShape($state)) {
             return null;
         }
-
-        if (is_string($state)) {
-            $value = trim($state);
-
-            if ($value === '') {
-                return null;
-            }
-
-            return [
-                'value' => $value,
-                'format' => $storeDetectedFormat ? BarcodeValidator::detectFormat($value)?->value : null,
-            ];
-        }
-
-        if (! is_array($state)) {
-            return null;
-        }
-
-        $value = trim((string) ($state['value'] ?? $state[0] ?? ''));
-
+        $value = trim(is_string($state) ? $state : $state['value']);
         if ($value === '') {
             return null;
         }
+        $format = is_array($state) ? ($state['format'] ?? null) : BarcodeValidator::detectFormat($value)?->value;
 
-        $format = $state['format'] ?? null;
-
-        if (is_string($format) && $format !== '') {
-            $resolved = BarcodeFormat::tryFrom($format);
-
-            $format = $resolved?->value;
-        } else {
-            $format = null;
-        }
-
-        if ($storeDetectedFormat && $format === null) {
-            $format = BarcodeValidator::detectFormat($value)?->value;
-        }
-
-        return [
-            'value' => $value,
-            'format' => $storeDetectedFormat ? $format : null,
-        ];
+        return ['value' => $value, 'format' => $storeDetectedFormat ? $format : null];
     }
 
     public static function extractValue(mixed $state): ?string
     {
-        $normalized = self::normalize($state);
-
-        return $normalized['value'] ?? null;
+        return self::normalize($state)['value'] ?? null;
     }
 
     public static function extractFormat(mixed $state): ?string
     {
-        $normalized = self::normalize($state, storeDetectedFormat: true);
-
-        return $normalized['format'] ?? null;
+        return self::normalize($state, true)['format'] ?? null;
     }
 
-    /**
-     * @return string|array{value: string, format: string|null}|null
-     */
+    /** @return string|array{value: string, format: string|null}|null */
     public static function dehydrate(mixed $state, bool $storeDetectedFormat = false): string|array|null
     {
         $normalized = self::normalize($state, $storeDetectedFormat);
 
-        if ($normalized === null) {
-            return null;
-        }
-
-        if (! $storeDetectedFormat) {
-            return $normalized['value'];
-        }
-
-        return [
-            'value' => $normalized['value'],
-            'format' => $normalized['format'],
-        ];
+        return $normalized === null ? null : ($storeDetectedFormat ? $normalized : $normalized['value']);
     }
 
     public static function isEmpty(mixed $state): bool
     {
-        return self::normalize($state) === null;
+        return self::isValidShape($state) && self::normalize($state) === null;
     }
 }

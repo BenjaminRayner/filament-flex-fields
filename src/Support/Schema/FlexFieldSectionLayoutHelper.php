@@ -199,7 +199,7 @@ final class FlexFieldSectionLayoutHelper
         $ungrouped = $definitionsBySection->get('__ungrouped__', collect())->values()->all();
 
         if ($ungrouped !== []) {
-            $ungroupedSection = Section::make($ungroupedLabel ?? __('filament-flex-fields::default.schema.custom_fields_section'))
+            $ungroupedSection = Section::make(fn () => $ungroupedLabel ?? __('filament-flex-fields::default.schema.custom_fields_section'))
                 ->schema($buildItems($ungrouped));
 
             if ($collapsible) {

@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{NAMESPACE}};
+
+use {{NAMESPACE}}\Forms\{{CLASS}}Field;
+use {{NAMESPACE}}\Tables\{{CLASS}}Column;
+use {{NAMESPACE}}\Infolists\{{CLASS}}Entry;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+use Bjanczak\FilamentFlexFields\Support\Assets\Manifest\AssetManifestCompiler;
+use Bjanczak\FilamentFlexFields\Support\Assets\Manifest\AssetPackage;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentRegistrar;
+use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildSlot;
+use Bjanczak\FilamentFlexFields\Support\Components\Contracts\ComponentFamily;
+use Bjanczak\FilamentFlexFields\Support\Components\Contracts\ComponentPackage;
+use Bjanczak\FilamentFlexFields\Support\Components\Contracts\ComponentSurface;
+use Bjanczak\FilamentFlexFields\Support\Components\Registration\DefinitionOrigin;
+use Bjanczak\FilamentFlexFields\Support\Components\Registration\RegistrationMetadata;
+use Illuminate\Support\ServiceProvider;
+
+final class {{CLASS}}ServiceProvider extends ServiceProvider
+{
+    public function boot(ComponentRegistrar $components): void
+    {
+        $root = dirname(__DIR__);
+        $this->loadViewsFrom($root.'/resources/views', '{{PREFIX}}');
+        $manifest = (new AssetManifestCompiler)->load($root.'/resources/asset-manifest.json');
+        $package = new ComponentPackage(new AssetPackage($manifest, $root.'/resources/dist/'.$manifest->release), '{{PREFIX}}', '1.0.0');
+        $family = new ComponentFamily($package, '{{PREFIX}}-family', [
+            'field' => '{{PREFIX}}-field',
+            'column' => '{{PREFIX}}-column',
+            'entry' => '{{PREFIX}}-entry',
+        ]);
+        $definitions = [
+            new ComponentDefinition(
+                id: '{{PREFIX}}-field', kind: ComponentKind::Field,
+                stylesFrom: ['{{PREFIX}}-display', 'composite-field'], entry: '{{PREFIX}}-field',
+                surface: new ComponentSurface($family, ComponentKind::Field, {{CLASS}}Field::class),
+                children: ['text' => new ChildSlot('text', 'flex-text-input', ComponentKind::Field, renderer: FlexTextInput::class)],
+            ),
+            new ComponentDefinition(
+                id: '{{PREFIX}}-column', kind: ComponentKind::Column, stylesFrom: ['{{PREFIX}}-display'],
+                surface: new ComponentSurface($family, ComponentKind::Column, {{CLASS}}Column::class),
+            ),
+            new ComponentDefinition(
+                id: '{{PREFIX}}-entry', kind: ComponentKind::Entry, stylesFrom: ['{{PREFIX}}-display'],
+                surface: new ComponentSurface($family, ComponentKind::Entry, {{CLASS}}Entry::class),
+            ),
+            new ComponentDefinition(id: '{{PREFIX}}-display', kind: ComponentKind::Primitive, styles: ['{{PREFIX}}-display']),
+        ];
+        $metadata = new RegistrationMetadata(origin: new DefinitionOrigin(__FILE__, __LINE__));
+        $components->collectComponentFamily($family, $definitions, array_fill_keys(
+            array_map(static fn (ComponentDefinition $definition): string => $definition->id, $definitions),
+            $metadata,
+        ));
+    }
+}

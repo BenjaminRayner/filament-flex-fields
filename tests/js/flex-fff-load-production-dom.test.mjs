@@ -56,7 +56,7 @@ function createAlpineStub() {
             return `x-${name}`
         },
         skipDuringClone(callback) {
-            return callback()
+            return (...args) => callback(...args)
         },
         destroyTree() {},
         initTreeCalls: [],

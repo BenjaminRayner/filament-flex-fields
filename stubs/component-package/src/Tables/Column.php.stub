@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{NAMESPACE}}\Tables;
+
+use {{NAMESPACE}}\Support\DisplayValue;
+use Bjanczak\FilamentFlexFields\Filament\Concerns\EmitsFlexDisplayAssets;
+use Filament\Tables\Columns\Column;
+
+class {{CLASS}}Column extends Column
+{
+    use EmitsFlexDisplayAssets;
+
+    protected string $view = '{{PREFIX}}::column';
+
+    protected function flexDisplayComponentId(): string
+    {
+        return '{{PREFIX}}-column';
+    }
+
+    public function getDisplayValue(): string
+    {
+        return DisplayValue::text($this->getState());
+    }
+}

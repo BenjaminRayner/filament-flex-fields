@@ -1,0 +1,1 @@
+async function s(n,i,o=8e3){let e=null;if(await i.wait(()=>e,{timeoutMs:o,subscribe(a){let t=!0;return Promise.resolve(n).then(r=>{t&&(e={value:r},a())},r=>{t&&(e={error:r},a())}),()=>{t=!1}}}),i.assertActive(),e.error)throw e.error;return e.value}export{s as a};

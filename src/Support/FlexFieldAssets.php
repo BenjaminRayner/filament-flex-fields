@@ -10,130 +10,50 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support;
 
+use Bjanczak\FilamentFlexFields\Filament\Pages\FlexFieldsPlaygroundCluster;
 use Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin;
+use Bjanczak\FilamentFlexFields\Support\Assets\AssetVersionManifest;
+use Bjanczak\FilamentFlexFields\Support\Assets\Build\AlpineBuildManifest;
+use Bjanczak\FilamentFlexFields\Support\Assets\Build\DevelopmentAssetFallback;
+use Bjanczak\FilamentFlexFields\Support\Assets\ComponentAssetCatalog;
+use Bjanczak\FilamentFlexFields\Support\Assets\ComponentAssetPublisher;
+use Bjanczak\FilamentFlexFields\Support\Assets\Manifest\PackageArtifactReference;
+use Bjanczak\FilamentFlexFields\Support\Assets\Rendering\FirstPaintScripts;
+use Bjanczak\FilamentFlexFields\Support\Assets\StylesheetDependencyGraph;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Filesystem\Filesystem;
 use Livewire\LivewireManager;
 
 class FlexFieldAssets
 {
-    public const CORE_STYLESHEET_ID = 'flex-fields-core';
+    public const CORE_STYLESHEET_ID = ComponentAssetCatalog::CORE_STYLESHEET_ID;
 
-    public const PLAYGROUND_STYLESHEET_ID = 'flex-fields-playground';
+    public const PLAYGROUND_STYLESHEET_ID = ComponentAssetCatalog::PLAYGROUND_STYLESHEET_ID;
 
-    public const ASSET_INJECTOR_SCRIPT_ID = 'flex-field-asset-injector';
+    public const ASSET_INJECTOR_SCRIPT_ID = ComponentAssetCatalog::ASSET_INJECTOR_SCRIPT_ID;
 
-    public const FFF_LOAD_BOOTSTRAP_SCRIPT_ID = 'flex-fff-load-bootstrap';
+    public const FFF_LOAD_BOOTSTRAP_SCRIPT_ID = ComponentAssetCatalog::FFF_LOAD_BOOTSTRAP_SCRIPT_ID;
 
-    public const ASSET_INSPECTOR_SCRIPT_ID = 'flex-field-asset-inspector';
+    public const ASSET_INSPECTOR_SCRIPT_ID = ComponentAssetCatalog::ASSET_INSPECTOR_SCRIPT_ID;
 
-    public const FLEX_RICH_EDITOR_PASTE_EXTENSION_SCRIPT_ID = 'flex-rich-editor-paste-extension';
+    public const FLEX_RICH_EDITOR_PASTE_EXTENSION_SCRIPT_ID = ComponentAssetCatalog::FLEX_RICH_EDITOR_PASTE_EXTENSION_SCRIPT_ID;
 
-    public const FLEX_RICH_EDITOR_BLOCK_IMAGE_EXTENSION_SCRIPT_ID = 'flex-rich-editor-block-image-extension';
+    public const FLEX_RICH_EDITOR_BLOCK_IMAGE_EXTENSION_SCRIPT_ID = ComponentAssetCatalog::FLEX_RICH_EDITOR_BLOCK_IMAGE_EXTENSION_SCRIPT_ID;
 
-    public const FLEX_RICH_EDITOR_YOUTUBE_EXTENSION_SCRIPT_ID = 'flex-rich-editor-youtube-extension';
+    public const FLEX_RICH_EDITOR_YOUTUBE_EXTENSION_SCRIPT_ID = ComponentAssetCatalog::FLEX_RICH_EDITOR_YOUTUBE_EXTENSION_SCRIPT_ID;
 
-    public const PLAYGROUND_SKELETON_DEMO_SCRIPT_ID = 'playground-skeleton-demo';
+    public const SEGMENT_OVERFLOW_SSR_SCRIPT_ID = ComponentAssetCatalog::SEGMENT_OVERFLOW_SSR_SCRIPT_ID;
 
-    public const SEGMENT_OVERFLOW_SSR_SCRIPT_ID = 'flex-fields-segment-overflow-ssr';
+    public const TIMEZONE_BROWSER_SSR_BOOT_SCRIPT_ID = ComponentAssetCatalog::TIMEZONE_BROWSER_SSR_BOOT_SCRIPT_ID;
 
-    public const TIMEZONE_BROWSER_SSR_BOOT_SCRIPT_ID = 'flex-fields-timezone-browser-ssr-boot';
+    public const STATIC_ASSETS_PUBLIC_DIRECTORY = ComponentAssetCatalog::STATIC_ASSETS_PUBLIC_DIRECTORY;
 
-    public const STATIC_ASSETS_PUBLIC_DIRECTORY = 'filament-flex-fields-assets';
+    public const STYLESHEET_SSR_SCRIPTS = ComponentAssetCatalog::STYLESHEET_SSR_SCRIPTS;
 
-    /**
-     * Blocking SSR scripts emitted by shared Blade shells when segment overflow CSS loads.
-     *
-     * @var array<string, list<string>>
-     */
-    public const STYLESHEET_SSR_SCRIPTS = [
-        'segment-control' => [
-            self::SEGMENT_OVERFLOW_SSR_SCRIPT_ID,
-        ],
-        'segment-tabs' => [
-            self::SEGMENT_OVERFLOW_SSR_SCRIPT_ID,
-        ],
-    ];
+    public const CRITICAL_PRELOAD_STYLESHEETS = ComponentAssetCatalog::CRITICAL_PRELOAD_STYLESHEETS;
 
-    /**
-     * Most common lazy bundles preloaded in <head> to reduce modal and form FOUC.
-     *
-     * @var list<string>
-     */
-    public const CRITICAL_PRELOAD_STYLESHEETS = [
-        'overlay-runtime',
-        'teleported-menu',
-    ];
-
-    /** @var list<string> */
-    public const LAZY_COMPONENT_STYLESHEETS = [
-        'cover-card',
-        'emoji-picker',
-        'number-stepper',
-        'traffic-split',
-        'dual-listbox',
-        'bubble-choice',
-        'todo-list-field',
-        'price-range',
-        'flex-textarea',
-        'rich-editor-field',
-        'flex-text-input',
-        'link-preview-field',
-        'barcode-scanner-field',
-        'social-links-field',
-        'schedule-field',
-        'credit-card',
-        'phone-field',
-        'country-field',
-        'timezone-field',
-        'flex-date-time-field',
-        'flex-time-segments',
-        'flex-file-upload',
-        'currency-field',
-        'calculator-field',
-        'calculator-panel',
-        'slug-field',
-        'video-field',
-        'audio-field',
-        'flex-slider',
-        'flex-verification-code',
-        'map-picker-dropdown',
-        'map-picker',
-        'address-autocomplete',
-        'signature-field',
-        'flex-color-picker',
-        'flex-checklist',
-        'progress-bar',
-        'progress-circle',
-        'matrix-choice-field',
-        'tags-field',
-        'tag-chips',
-        'voice-note-recorder-field',
-        'switch',
-        'item-card',
-        'choice-cards',
-        'image-choice-cards',
-        'rating-field',
-        'color-swatch',
-        'select-field',
-        'icon-picker-field',
-        'user-select',
-        'user-display',
-        'user-column',
-        'rating-column',
-        'icon-column',
-        'progress-column',
-        'status-chip-column',
-        'signature-preview-column',
-        'map-pin-column',
-        'hold-confirm-action',
-        'track-slider',
-        'segment-control',
-        'segment-tabs',
-        'nps-field',
-        'overlay-runtime',
-        'teleported-menu',
-    ];
+    public const LAZY_COMPONENT_STYLESHEETS = ComponentAssetCatalog::LAZY_COMPONENT_STYLESHEETS;
 
     public static function stylesheetId(string $component): string
     {
@@ -142,7 +62,7 @@ class FlexFieldAssets
 
     public static function hasLazyStylesheet(string $component): bool
     {
-        return in_array($component, self::LAZY_COMPONENT_STYLESHEETS, true);
+        return in_array($component, ComponentAssetCatalog::stylesheetIds(), true);
     }
 
     public static function shouldLoadStylesheetsFor(string $component): bool
@@ -150,7 +70,7 @@ class FlexFieldAssets
         $component = self::resolveStylesheetComponent($component);
 
         return self::hasLazyStylesheet($component)
-            || array_key_exists($component, self::STYLESHEET_DEPENDENCIES);
+            || ComponentAssetCatalog::registry()->has($component);
     }
 
     public static function resolveStylesheetComponent(string $component): string
@@ -158,111 +78,18 @@ class FlexFieldAssets
         return self::PLAYGROUND_STYLESHEET_ALIASES[$component] ?? $component;
     }
 
-    /**
-     * Declared stylesheet dependencies loaded before the component bundle.
-     * Each dependency is a separate lazy CSS file — never duplicated in bundles.
-     *
-     * @var array<string, list<string>>
-     */
-    public const STYLESHEET_DEPENDENCIES = [
-        'flex-text-input' => ['emoji-picker'],
-        'flex-textarea' => ['emoji-picker'],
-        'phone-field' => ['flex-text-input', 'teleported-menu'],
-        'country-field' => ['flex-text-input', 'teleported-menu'],
-        'timezone-field' => ['flex-text-input', 'teleported-menu'],
-        'currency-field' => ['flex-text-input', 'teleported-menu'],
-        'calculator-field' => ['flex-text-input'],
-        'calculator-panel' => [],
-        'address-autocomplete' => ['flex-text-input', 'teleported-menu', 'map-picker-dropdown'],
-        'flex-color-picker' => ['flex-text-input'],
-        'icon-picker-field' => ['teleported-menu', 'select-field'],
-        'slug-field' => ['flex-text-input'],
-        'link-preview-field' => ['flex-text-input'],
-        'barcode-scanner-field' => ['flex-text-input'],
-        'social-links-field' => ['flex-text-input', 'teleported-menu'],
-        'schedule-field' => ['flex-text-input', 'switch', 'teleported-menu', 'timezone-field', 'flex-time-segments'],
-        'tags-field' => ['flex-text-input', 'tag-chips', 'teleported-menu', 'select-field'],
-        'flex-date-time-field' => ['flex-text-input'],
-        'flex-time-segments' => ['flex-text-input', 'teleported-menu'],
-        'map-picker-dropdown' => ['teleported-menu', 'select-field'],
-        'map-picker' => ['flex-text-input', 'teleported-menu', 'map-picker-dropdown'],
-        'select-field' => ['teleported-menu'],
-        'nps-field' => ['segment-control'],
-        'user-select' => ['teleported-menu', 'select-field', 'tag-chips', 'user-display'],
-        'user-column' => ['user-display'],
-        'voice-note-recorder-field' => ['emoji-picker'],
-        'segment-tabs' => ['segment-control'],
-        'teleported-menu' => ['overlay-runtime'],
-        'audio-field' => ['switch'],
-    ];
+    public const STYLESHEET_DEPENDENCIES = ComponentAssetCatalog::STYLESHEET_DEPENDENCIES;
 
-    /**
-     * Playground navigation slugs that differ from lazy stylesheet component ids.
-     *
-     * @var array<string, string>
-     */
-    public const PLAYGROUND_STYLESHEET_ALIASES = [
-        'admin-columns' => 'progress-column',
-        'hold-confirm' => 'hold-confirm-action',
-        'schema-conditions' => 'flex-text-input',
-        'field-intelligence' => 'flex-text-input',
-        'focus-outline' => 'flex-text-input',
-        'date-time-fields' => 'flex-date-time-field',
-        'file-upload' => 'flex-file-upload',
-        'verification-code' => 'flex-verification-code',
-        'flex-radiolist' => 'flex-checklist',
-        'matrix-choice' => 'matrix-choice-field',
-        'rating' => 'rating-field',
-        'flex-rich-editor' => 'rich-editor-field',
-        'translatable-fields' => 'segment-tabs',
-    ];
+    public const PLAYGROUND_STYLESHEET_ALIASES = ComponentAssetCatalog::PLAYGROUND_STYLESHEET_ALIASES;
 
-    /**
-     * Extra lazy stylesheets bundled into playground slug CSS beyond the resolved alias component.
-     *
-     * @var array<string, list<string>>
-     */
-    public const PLAYGROUND_EXTRA_STYLESHEETS = [
-        'calculator-field' => ['calculator-panel'],
-        'date-time-fields' => ['flex-time-segments'],
-        'field-intelligence' => ['number-stepper', 'select-field', 'flex-textarea', 'currency-field'],
-        'focus-outline' => ['select-field', 'flex-textarea', 'phone-field', 'credit-card'],
-        // Schema conditions demos SelectField + FlexTextInput — select must be in the
-        // blocking playground bundle or Filament’s fi-input-wrp chrome flashes on reload.
-        'schema-conditions' => ['select-field'],
-        'translatable-fields' => ['flex-text-input', 'flex-textarea'],
-    ];
+    public const PLAYGROUND_EXTRA_STYLESHEETS = ComponentAssetCatalog::PLAYGROUND_EXTRA_STYLESHEETS;
 
     /**
      * @return list<string>
      */
     public static function stylesheetsFor(string $component): array
     {
-        $component = self::resolveStylesheetComponent($component);
-        $stylesheets = [];
-        $visited = [];
-
-        $resolve = function (string $comp) use (&$resolve, &$stylesheets, &$visited) {
-            if (isset($visited[$comp])) {
-                return;
-            }
-
-            $visited[$comp] = true;
-
-            foreach (self::STYLESHEET_DEPENDENCIES[$comp] ?? [] as $dep) {
-                $resolve($dep);
-            }
-
-            if (self::hasLazyStylesheet($comp)) {
-                if (! in_array($comp, $stylesheets, true)) {
-                    $stylesheets[] = $comp;
-                }
-            }
-        };
-
-        $resolve($component);
-
-        return $stylesheets;
+        return StylesheetDependencyGraph::stylesheetsFor(self::resolveCanonicalComponent($component));
     }
 
     /**
@@ -272,31 +99,7 @@ class FlexFieldAssets
      */
     public static function ssrScriptsFor(string $component): array
     {
-        $component = self::resolveStylesheetComponent($component);
-        $scripts = [];
-        $visited = [];
-
-        $resolve = function (string $comp) use (&$resolve, &$scripts, &$visited): void {
-            if (isset($visited[$comp])) {
-                return;
-            }
-
-            $visited[$comp] = true;
-
-            foreach (self::STYLESHEET_DEPENDENCIES[$comp] ?? [] as $dep) {
-                $resolve($dep);
-            }
-
-            foreach (self::STYLESHEET_SSR_SCRIPTS[$comp] ?? [] as $scriptId) {
-                if (! in_array($scriptId, $scripts, true)) {
-                    $scripts[] = $scriptId;
-                }
-            }
-        };
-
-        $resolve($component);
-
-        return $scripts;
+        return StylesheetDependencyGraph::scriptsFor(self::resolveCanonicalComponent($component));
     }
 
     /**
@@ -347,22 +150,16 @@ class FlexFieldAssets
      */
     public static function playgroundStylesheetsFor(string $slug): array
     {
-        $component = self::resolveStylesheetComponent($slug);
-        $stylesheets = self::stylesheetsFor($component);
-
-        foreach (self::PLAYGROUND_EXTRA_STYLESHEETS[$slug] ?? [] as $extra) {
-            foreach (self::stylesheetsFor($extra) as $stylesheet) {
-                if (! in_array($stylesheet, $stylesheets, true)) {
-                    $stylesheets[] = $stylesheet;
-                }
-            }
-        }
-
-        return $stylesheets;
+        return self::stylesheetsFor($slug);
     }
 
     public static function stylesheetHref(string $component): string
     {
+        $reference = ComponentAssetCatalog::registry()->packageAssets()->styles[$component] ?? null;
+        if ($reference !== null) {
+            return self::packageArtifactUrl($reference);
+        }
+
         return FilamentAsset::getStyleHref(
             self::stylesheetId($component),
             FilamentFlexFieldsPlugin::PACKAGE_NAME,
@@ -374,15 +171,7 @@ class FlexFieldAssets
      */
     public static function segmentOverflowSsrInlineContents(): string
     {
-        return once(function (): string {
-            $path = dirname(__DIR__, 2).'/resources/dist/core/segment-overflow-ssr.js';
-
-            if (! is_readable($path)) {
-                return '';
-            }
-
-            return (string) file_get_contents($path);
-        });
+        return RequestState::resolve(FirstPaintScripts::class)->inline('segment');
     }
 
     /**
@@ -391,51 +180,7 @@ class FlexFieldAssets
      */
     public static function timezoneBrowserSsrInlineContents(): string
     {
-        return once(function (): string {
-            $path = dirname(__DIR__, 2).'/resources/dist/core/timezone-browser-ssr-boot.js';
-
-            if (! is_readable($path)) {
-                return '';
-            }
-
-            return (string) file_get_contents($path);
-        });
-    }
-
-    /**
-     * @return list<string>
-     */
-    public static function criticalPreloadStylesheets(): array
-    {
-        $preloads = array_values(array_filter(
-            self::CRITICAL_PRELOAD_STYLESHEETS,
-            fn (string $component): bool => self::hasLazyStylesheet($component),
-        ));
-
-        if (! request()->is('*flex-fields-playground*')) {
-            if (! FlexFieldStylesheetQueue::hasQueuedSelectFamilyPicker()) {
-                return [];
-            }
-
-            return $preloads;
-        }
-
-        $slug = self::resolvePlaygroundSlugFromRequest();
-
-        if (blank($slug)) {
-            return $preloads;
-        }
-
-        if (self::hasPlaygroundBundleForSlug($slug)) {
-            return [];
-        }
-
-        $needed = self::playgroundStylesheetsFor($slug);
-
-        return array_values(array_filter(
-            $preloads,
-            fn (string $component): bool => in_array($component, $needed, true),
-        ));
+        return RequestState::resolve(FirstPaintScripts::class)->inline('timezone');
     }
 
     public static function playgroundStylesheetHref(): string
@@ -446,42 +191,22 @@ class FlexFieldAssets
         );
     }
 
-    public static function playgroundBundleStylesheetId(string $slug): string
-    {
-        return 'flex-fields-playground-'.$slug;
-    }
-
-    public static function playgroundBundleHrefForSlug(?string $slug): string
-    {
-        if (blank($slug)) {
-            return self::playgroundStylesheetHref();
-        }
-
-        return FilamentAsset::getStyleHref(
-            self::playgroundBundleStylesheetId($slug),
-            FilamentFlexFieldsPlugin::PACKAGE_NAME,
-        );
-    }
-
-    public static function playgroundBundlePathForSlug(string $slug): string
-    {
-        return __DIR__.'/../../resources/dist/css/playground-'.$slug.'.css';
-    }
-
-    public static function hasPlaygroundBundleForSlug(string $slug): bool
-    {
-        $path = self::playgroundBundlePathForSlug($slug);
-
-        return is_file($path) && filesize($path) > 0;
-    }
-
     public static function resolvePlaygroundSlugFromRequest(): ?string
     {
-        if (preg_match('#flex-fields-playground/([^/]+)#', request()->path(), $matches) === 1) {
+        $catalogSlug = preg_quote(FlexFieldsPlaygroundCluster::SLUG, '#');
+
+        if (preg_match('#(?:^|/)'.$catalogSlug.'/([^/]+)(?:/|$)#', request()->path(), $matches) === 1) {
             return $matches[1];
         }
 
         return null;
+    }
+
+    public static function isPlaygroundRequest(): bool
+    {
+        $slug = FlexFieldsPlaygroundCluster::SLUG;
+
+        return request()->is($slug, $slug.'/*', '*/'.$slug, '*/'.$slug.'/*');
     }
 
     /**
@@ -493,14 +218,12 @@ class FlexFieldAssets
             return [self::playgroundStylesheetHref()];
         }
 
-        if (self::hasPlaygroundBundleForSlug($slug)) {
-            return [
-                self::playgroundStylesheetHref(),
-                self::playgroundBundleHrefForSlug($slug),
-            ];
-        }
-
-        return [self::playgroundStylesheetHref()];
+        // Component styles have one URL/owner across the page and its modals.
+        // Concatenated playground copies cannot participate in reference counting.
+        return array_values(array_unique([
+            self::playgroundStylesheetHref(),
+            ...array_map(self::stylesheetHref(...), self::playgroundStylesheetsFor($slug)),
+        ]));
     }
 
     public static function playgroundStylesheetHrefForSlug(?string $slug): string
@@ -520,7 +243,7 @@ class FlexFieldAssets
      */
     public static function playgroundStylesheetHrefsForRequest(): array
     {
-        if (! request()->is('*flex-fields-playground*')) {
+        if (! self::isPlaygroundRequest()) {
             return [];
         }
 
@@ -542,7 +265,7 @@ class FlexFieldAssets
 
     public static function resolveCanonicalComponent(string $component): string
     {
-        return self::resolveStylesheetComponent($component);
+        return ComponentAssetCatalog::registry()->has($component) ? $component : self::resolveStylesheetComponent($component);
     }
 
     /**
@@ -557,18 +280,20 @@ class FlexFieldAssets
     public static function assetBundleFor(string $component): array
     {
         $canonical = self::resolveCanonicalComponent($component);
+        $entry = self::resolveAlpineEntryComponent($canonical);
         $manifest = self::alpineManifest();
-        $hasAlpineEntry = array_key_exists($canonical, $manifest)
-            && ! str_starts_with($canonical, '__');
+        $hasAlpineEntry = ComponentAssetCatalog::registry()->has($canonical)
+            && ComponentAssetCatalog::registry()->definition($canonical)->entry !== null;
 
         return [
             'componentId' => $canonical,
+            'componentKind' => ComponentAssetCatalog::registry()->definition($canonical)->kind->value,
             'stylesheets' => self::stylesheetHrefsFor($canonical),
             'chunks' => array_map(
                 fn (string $chunk): string => self::alpineChunkSrc($chunk),
                 self::alpineChunksFor($canonical),
             ),
-            'entry' => $hasAlpineEntry ? self::alpineEntrySrc($canonical) : null,
+            'entry' => $hasAlpineEntry ? self::alpineEntrySrc($entry) : null,
             'kind' => $hasAlpineEntry ? 'full' : 'styles-only',
         ];
     }
@@ -625,7 +350,7 @@ class FlexFieldAssets
      *     componentId: string,
      *     stylesheets: list<string>,
      *     chunks: list<string>,
-     *     entry: string,
+     *     entry: string|null,
      *     kind: string,
      * }>
      */
@@ -633,7 +358,7 @@ class FlexFieldAssets
     {
         $bundles = [];
 
-        foreach (self::LAZY_COMPONENT_STYLESHEETS as $component) {
+        foreach (array_keys(ComponentAssetCatalog::registry()->all()) as $component) {
             $bundles[$component] = self::assetBundleFor($component);
         }
 
@@ -651,7 +376,7 @@ class FlexFieldAssets
      *         componentId: string,
      *         stylesheets: list<string>,
      *         chunks: list<string>,
-     *         entry: string,
+     *         entry: string|null,
      *         kind: string,
      *     }>,
      * }
@@ -659,18 +384,13 @@ class FlexFieldAssets
     public static function exportRegistry(): array
     {
         return [
-            'lazy_stylesheets' => self::LAZY_COMPONENT_STYLESHEETS,
-            'stylesheet_dependencies' => self::STYLESHEET_DEPENDENCIES,
+            'lazy_stylesheets' => ComponentAssetCatalog::stylesheetIds(),
+            'stylesheet_dependencies' => ComponentAssetCatalog::dependencies(),
             'playground_aliases' => self::PLAYGROUND_STYLESHEET_ALIASES,
             'playground_extras' => self::PLAYGROUND_EXTRA_STYLESHEETS,
             'critical_preload' => self::CRITICAL_PRELOAD_STYLESHEETS,
             'bundles' => self::exportConsumerBundles(),
         ];
-    }
-
-    public static function assetRegistryPath(): string
-    {
-        return __DIR__.'/../../resources/dist/asset-registry.json';
     }
 
     public static function alpineManifestPath(): string
@@ -683,17 +403,13 @@ class FlexFieldAssets
      */
     public static function alpineManifest(): array
     {
-        static $manifest = null;
+        try {
+            return RequestState::resolve(AlpineBuildManifest::class)->data();
+        } catch (\RuntimeException $exception) {
+            DevelopmentAssetFallback::report($exception);
 
-        if ($manifest === null) {
-            $path = self::alpineManifestPath();
-
-            $manifest = is_file($path)
-                ? (json_decode((string) file_get_contents($path), true) ?: [])
-                : [];
+            return [];
         }
-
-        return $manifest;
     }
 
     /**
@@ -726,6 +442,30 @@ class FlexFieldAssets
      */
     public static function alpineChunksFor(string $component): array
     {
+        $chunks = [];
+        if (! ComponentAssetCatalog::registry()->has(self::resolveCanonicalComponent($component))) {
+            return [];
+        }
+        foreach (ComponentAssetCatalog::registry()->runtimeComponents(self::resolveCanonicalComponent($component)) as $id) {
+            $packageAssets = ComponentAssetCatalog::registry()->packageAssets();
+            if (isset($packageAssets->bindings[$id])) {
+                $chunks = [...$chunks, ...$packageAssets->eagerChunks[$id]];
+
+                continue;
+            }
+            $entry = ComponentAssetCatalog::registry()->definition($id)->entry;
+            if ($entry !== null) {
+                $chunks = [...$chunks, $entry.'.js', ...self::alpineChunksForEntry($entry)];
+            }
+        }
+
+        return array_values(array_unique($chunks));
+    }
+
+    /** @return list<string> */
+    private static function alpineChunksForEntry(string $component): array
+    {
+        $component = self::resolveAlpineEntryComponent($component);
         $manifest = self::alpineManifest();
 
         $chunks = $manifest[$component] ?? [];
@@ -734,7 +474,7 @@ class FlexFieldAssets
             $chunks = [];
         }
 
-        if ($component === 'select-field') {
+        if (($manifest['__format__'] ?? 1) < 2 && $component === 'select-field') {
             $overlayCoordinatorChunk = self::overlayCoordinatorChunk($manifest);
 
             if (is_string($overlayCoordinatorChunk) && $overlayCoordinatorChunk !== '') {
@@ -748,12 +488,12 @@ class FlexFieldAssets
             array_unique($chunks),
             fn (mixed $chunk): bool => is_string($chunk)
                 && $chunk !== ''
-                && ! str_starts_with($chunk, 'flex-fields-phone-lib'),
+                && (($manifest['__format__'] ?? 1) >= 2 || ! str_starts_with($chunk, 'flex-fields-phone-lib')),
         ));
     }
 
     /**
-     * Resolve nested dynamic-import chunks (e.g. ZXing fallback inside barcode scanner).
+     * Resolve eager transitive edges. Format 2 keeps dynamic imports out of preloads.
      *
      * @param  list<string>  $chunks
      * @return list<string>
@@ -813,23 +553,72 @@ class FlexFieldAssets
 
     public static function alpineChunkSrc(string $chunk): string
     {
+        $reference = ComponentAssetCatalog::registry()->packageAssets()->chunks[$chunk] ?? null;
+        if ($reference !== null) {
+            return self::packageArtifactUrl($reference);
+        }
+
         return FilamentAsset::getAlpineComponentSrc(
             str_replace('.js', '', $chunk),
             FilamentFlexFieldsPlugin::PACKAGE_NAME,
         );
     }
 
+    public static function resolveAlpineEntryComponent(string $component): string
+    {
+        if (ComponentAssetCatalog::registry()->has($component)) {
+            return ComponentAssetCatalog::registry()->definition($component)->entry ?? $component;
+        }
+
+        return ComponentAssetCatalog::ALPINE_ENTRY_ALIASES[$component] ?? $component;
+    }
+
     public static function alpineEntrySrc(string $component): string
     {
+        $reference = ComponentAssetCatalog::registry()->packageAssets()->entries[$component] ?? null;
+        if ($reference !== null) {
+            return self::packageArtifactUrl($reference);
+        }
+
         return FilamentAsset::getAlpineComponentSrc(
             $component,
             FilamentFlexFieldsPlugin::PACKAGE_NAME,
         );
     }
 
+    public static function ssrScriptSrc(string $helper): string
+    {
+        $reference = ComponentAssetCatalog::registry()->packageAssets()->helpers[$helper] ?? null;
+
+        return $reference !== null ? self::packageArtifactUrl($reference)
+            : FilamentAsset::getScriptSrc($helper, FilamentFlexFieldsPlugin::PACKAGE_NAME);
+    }
+
+    public static function packageArtifactUrl(PackageArtifactReference $reference): string
+    {
+        $prefix = config('filament.assets_path') ?? '';
+        if (! is_string($prefix)) {
+            throw new \InvalidArgumentException('Filament asset prefix must be a string.');
+        }
+
+        return asset($reference->relativePublicPath($prefix));
+    }
+
+    public static function stylesheetBytes(string $style): ?int
+    {
+        return ComponentAssetCatalog::registry()->packageAssets()->styles[$style]->artifact->bytes
+            ?? app(AssetVersionManifest::class)->bytesFor('css/'.$style.'.css');
+    }
+
+    public static function chunkBytes(string $chunk): ?int
+    {
+        return ComponentAssetCatalog::registry()->packageAssets()->chunks[$chunk]->artifact->bytes
+            ?? app(AssetVersionManifest::class)->bytesFor('components/'.$chunk);
+    }
+
     public static function whisperRuntimeModuleSrc(): string
     {
-        return self::assetUrl('whisper/transformers.min.js');
+        return self::assetUrl('whisper/'.WhisperRuntimeManifest::VERSION.'/transformers.min.js');
     }
 
     public static function whisperRuntimeWasmBaseSrc(): string
@@ -840,37 +629,12 @@ class FlexFieldAssets
         return str_ends_with($base, '/') ? $base : "{$base}/";
     }
 
-    /**
-     * @return array<string, string>
-     */
-    public static function playgroundNavigateStylesheetMap(): array
-    {
-        if (! FlexFieldsConfig::isPlaygroundEnabled()) {
-            return [];
-        }
-
-        $map = [];
-
-        foreach (FlexFieldsPlaygroundRegistry::definitions() as $slug => $definition) {
-            $component = self::resolveStylesheetComponent($slug);
-
-            if (! self::shouldLoadStylesheetsFor($component)) {
-                continue;
-            }
-
-            $map[$slug] = self::playgroundStylesheetHrefForSlug($slug);
-        }
-
-        return $map;
-    }
-
     public static function assetUrl(string $path): string
     {
         $relative = self::STATIC_ASSETS_PUBLIC_DIRECTORY.'/'.ltrim($path, '/');
-        $public = public_path($relative);
-        $version = is_file($public) ? (string) filemtime($public) : '1';
+        $version = app(AssetVersionManifest::class)->versionFor(self::staticAssetsSourceDirectory().'/'.ltrim($path, '/'));
 
-        return asset($relative).'?v='.$version;
+        return $version === null ? asset($relative) : asset($relative).'?v='.$version;
     }
 
     public static function staticAssetsSourceDirectory(): string
@@ -897,92 +661,8 @@ class FlexFieldAssets
         return in_array(app()->environment(), ['local', 'testing'], true);
     }
 
-    public static function publishRegisteredFilamentAssetsIfStale(Filesystem $filesystem): void
-    {
-        $assets = [
-            ...FilamentAsset::getStyles([FilamentFlexFieldsPlugin::PACKAGE_NAME]),
-            ...FilamentAsset::getScripts([FilamentFlexFieldsPlugin::PACKAGE_NAME]),
-            ...FilamentAsset::getAlpineComponents([FilamentFlexFieldsPlugin::PACKAGE_NAME]),
-        ];
-
-        foreach ($assets as $asset) {
-            if ($asset->isRemote()) {
-                continue;
-            }
-
-            $source = $asset->getPath();
-
-            if (! is_string($source) || ! is_file($source)) {
-                continue;
-            }
-
-            $destination = $asset->getPublicPath();
-
-            if (is_file($destination) && filemtime($source) <= filemtime($destination)) {
-                continue;
-            }
-
-            $filesystem->ensureDirectoryExists(dirname($destination));
-            $filesystem->copy($source, $destination);
-        }
-    }
-
-    public static function publishStaticAssetsIfStale(Filesystem $filesystem): void
-    {
-        $source = self::staticAssetsSourceDirectory();
-        $destination = self::staticAssetsPublicDirectory();
-
-        if (! is_dir($source)) {
-            return;
-        }
-
-        $filesystem->ensureDirectoryExists($destination);
-
-        foreach ($filesystem->allFiles($source) as $file) {
-            $relativePath = str_replace('\\', '/', substr($file->getPathname(), strlen($source) + 1));
-
-            // Whisper / ONNX runtime is opt-in via `fff:whisper:install` — never auto-copied.
-            if ($relativePath === 'whisper' || str_starts_with($relativePath, 'whisper/')) {
-                continue;
-            }
-
-            $target = $destination.'/'.$relativePath;
-
-            if (is_file($target) && filemtime($file->getPathname()) <= filemtime($target)) {
-                continue;
-            }
-
-            $filesystem->ensureDirectoryExists(dirname($target));
-            $filesystem->copy($file->getPathname(), $target);
-        }
-    }
-
     public static function publishStalePackageAssets(Filesystem $filesystem): void
     {
-        self::publishRegisteredFilamentAssetsIfStale($filesystem);
-        self::publishStaticAssetsIfStale($filesystem);
-        self::publishTodoListAudioIfStale($filesystem);
-    }
-
-    public static function publishTodoListAudioIfStale(Filesystem $filesystem): void
-    {
-        $source = dirname(__DIR__, 2).'/resources/dist/audio/todo-list-field';
-
-        if (! is_dir($source)) {
-            return;
-        }
-
-        $destination = public_path('js/'.FilamentFlexFieldsPlugin::PACKAGE_NAME.'/audio/todo-list-field');
-        $filesystem->ensureDirectoryExists($destination);
-
-        foreach ($filesystem->files($source) as $file) {
-            $target = $destination.'/'.$file->getFilename();
-
-            if (is_file($target) && filemtime($file->getPathname()) <= filemtime($target)) {
-                continue;
-            }
-
-            $filesystem->copy($file->getPathname(), $target);
-        }
+        (new ComponentAssetPublisher(ComponentAssetCatalog::registry(), $filesystem))->publish();
     }
 }

@@ -56,7 +56,7 @@ it('resolves indicator automatically by layout', function () {
     $media = ChoiceCards::make('payment')->layout('media');
     $featured = ChoiceCards::make('workspace')->layout('featured');
 
-    expect($stack->getIndicator())->toBe('radio')
+    expect($stack->getIndicator())->toBe('check')
         ->and($media->getIndicator())->toBe('none')
         ->and($featured->getIndicator())->toBe('check');
 });
@@ -126,4 +126,13 @@ it('caches normalized options and evaluates options closure only once', function
     $options2 = $field->getNormalizedOptions();
     expect($evaluations)->toBe(1)
         ->and($options2)->toBe($options1);
+});
+
+it('invalidates normalized options when an author changes their configuration', function () {
+    $field = ChoiceCards::make('plan')->options(['a' => 'A', 'b' => 'B']);
+    expect($field->getEnabledOptionKeys())->toBe(['a', 'b']);
+    $field->disabledOptions(['b']);
+    expect($field->getEnabledOptionKeys())->toBe(['a']);
+    $field->options(['c' => 'C']);
+    expect($field->getOptionKeys())->toBe(['c']);
 });

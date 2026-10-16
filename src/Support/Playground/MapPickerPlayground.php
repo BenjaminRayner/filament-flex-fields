@@ -7,6 +7,10 @@ namespace Bjanczak\FilamentFlexFields\Support\Playground;
 use Bjanczak\FilamentFlexFields\Enums\MapboxSearchType;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\MapPickerField;
+use Bjanczak\FilamentFlexFields\Support\Playground\Location\MapCoordinatesPlayground;
+use Bjanczak\FilamentFlexFields\Support\Playground\Location\MapDisplayPlayground;
+use Bjanczak\FilamentFlexFields\Support\Playground\Location\MapExampleData;
+use Bjanczak\FilamentFlexFields\Support\Playground\Location\MapExperiencesPlayground;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -24,25 +28,27 @@ class MapPickerPlayground
         $split = [
             'lat' => 52.2297,
             'lng' => 21.0122,
-            'street' => 'plac Defilad',
+            'street' => '1 plac Defilad',
             'city' => 'Warszawa',
             'region' => 'mazowieckie',
             'postcode' => '00-901',
             'country' => 'PL',
             'country_name' => 'Polska',
-            'place_name' => 'plac Defilad, 00-901 Warszawa, Polska',
+            'place_name' => '1 plac Defilad, 00-901 Warszawa, Polska',
         ];
 
         return [
+            ...app(MapCoordinatesPlayground::class)->defaultState(),
+            ...app(MapDisplayPlayground::class)->defaultState(),
             'map_picker__full' => [
                 'lat' => 52.2297,
                 'lng' => 21.0122,
-                'street' => 'plac Defilad',
+                'street' => '1 plac Defilad',
                 'city' => 'Warszawa',
                 'postcode' => '00-901',
                 'country' => 'PL',
                 'country_name' => 'Polska',
-                'place_name' => 'plac Defilad, 00-901 Warszawa, Polska',
+                'place_name' => '1 plac Defilad, 00-901 Warszawa, Polska',
             ],
             'map_picker__split' => $split,
             'map_picker__split_street' => $split['street'],
@@ -69,18 +75,30 @@ class MapPickerPlayground
     public function components(): array
     {
         return [
+            ...app(MapExperiencesPlayground::class)->components(),
+            ...$this->pointComponents(),
+            Section::make('Coordinates')->schema(app(MapCoordinatesPlayground::class)->components()),
+            Section::make('Map display')->schema(app(MapDisplayPlayground::class)->components()),
+        ];
+    }
+
+    /** @return list<Component> */
+    private function pointComponents(): array
+    {
+        return [
             Section::make('Structured pickup')
-                ->description('Full street address with coordinates. Search, click the map, or drag the pin — state is one structured array.')
+                ->description('Full street address with coordinates. Search, click the map, or drag the point — state is one structured array.')
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
                     MapPickerField::make('map_picker__full')
                         ->label('Pickup location')
-                        ->helperText('fields([lat, lng, street, city, postcode, country, country_name, place_name]) · streetAddressesOnly() · countries([PL]).')
+                        ->helperText('fields([lat, lng, street, city, postcode, country, country_name, place_name]) · requireStreetNumber() · countries([PL]).')
                         ->fields(['lat', 'lng', 'street', 'city', 'postcode', 'country', 'country_name', 'place_name'])
                         ->storeFormat(MapPickerField::STORE_STRUCTURED)
                         ->requiredFields(['city', 'lat', 'lng'])
-                        ->streetAddressesOnly()
+                        ->requireStreetNumber()
                         ->defaultCenter([52.2297, 21.0122])
+                        ->scrollZoom()->cooperativeGestures(false)
                         ->defaultZoom(12)
                         ->countries(['PL'])
                         ->columnSpanFull(),
@@ -97,6 +115,7 @@ class MapPickerPlayground
                         ->storeFormat(MapPickerField::STORE_STRUCTURED)
                         ->streetAddressesOnly()
                         ->defaultCenter([52.2297, 21.0122])
+                        ->scrollZoom()->cooperativeGestures(false)
                         ->defaultZoom(13)
                         ->countries(['PL'])
                         ->live()
@@ -104,36 +123,6 @@ class MapPickerPlayground
                         ->columnSpanFull(),
                     Grid::make(['default' => 1, 'md' => 2, 'xl' => 3])
                         ->schema($this->splitAddressMirrorFields()),
-                    PlaygroundCodeSnippet::make(<<<'PHP'
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\MapPickerField;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Utilities\Set;
-
-MapPickerField::make('location')
-    ->fields(['lat', 'lng', 'street', 'city', 'postcode', 'country', 'country_name'])
-    ->streetAddressesOnly()
-    ->live()
-    ->afterStateUpdated(function (?array $state, Set $set): void {
-        $set('street', data_get($state, 'street', ''));
-        $set('city', data_get($state, 'city', ''));
-        $set('postcode', data_get($state, 'postcode', ''));
-        $set('country', data_get($state, 'country', ''));
-        $set('country_name', data_get($state, 'country_name', ''));
-        $set('latitude', (string) data_get($state, 'lat', ''));
-        $set('longitude', (string) data_get($state, 'lng', ''));
-    });
-
-Grid::make(3)->schema([
-    FlexTextInput::make('street')->disabled()->dehydrated(false),
-    FlexTextInput::make('city')->disabled()->dehydrated(false),
-    FlexTextInput::make('postcode')->disabled()->dehydrated(false),
-    FlexTextInput::make('country')->disabled()->dehydrated(false),
-    FlexTextInput::make('country_name')->label('Country name')->disabled()->dehydrated(false),
-    FlexTextInput::make('latitude')->disabled()->dehydrated(false),
-    FlexTextInput::make('longitude')->disabled()->dehydrated(false),
-]);
-PHP, filename: 'map-picker-split-address.php'),
                 ]),
 
             Section::make('String output formats')
@@ -151,6 +140,7 @@ PHP, filename: 'map-picker-split-address.php'),
                                 ->stringFormat('{city}, {country_name}')
                                 ->requiredFields(['city'])
                                 ->defaultCenter([50.0647, 19.9450])
+                                ->scrollZoom()->cooperativeGestures(false)
                                 ->defaultZoom(11),
                             MapPickerField::make('map_picker__venue')
                                 ->label('Venue line')
@@ -160,6 +150,7 @@ PHP, filename: 'map-picker-split-address.php'),
                                 ->stringFormat('{street}, {city} ({country})')
                                 ->streetAddressesOnly()
                                 ->defaultCenter([52.2297, 21.0122])
+                                ->scrollZoom()->cooperativeGestures(false)
                                 ->defaultZoom(14)
                                 ->countries(['PL']),
                         ]),
@@ -176,6 +167,7 @@ PHP, filename: 'map-picker-split-address.php'),
                         ->fields(['place_name', 'lat', 'lng'])
                         ->requiredFields(['lat', 'lng', 'place_name'])
                         ->defaultCenter([50.0647, 19.9450])
+                        ->scrollZoom()->cooperativeGestures(false)
                         ->defaultZoom(14)
                         ->countries(['PL'])
                         ->columnSpanFull(),
@@ -184,8 +176,20 @@ PHP, filename: 'map-picker-split-address.php'),
     }
 
     /**
-     * @param  array<string, mixed>|null  $state
+     * @return array<string, mixed>
      */
+    public static function zones(): array
+    {
+        return MapExampleData::zones();
+    }
+
+    /** @return array<string, mixed> */
+    public static function markers(): array
+    {
+        return MapExampleData::markers();
+    }
+
+    /** @param array<string, mixed>|null $state */
     public function syncSplitAddressFields(?array $state, Set $set): void
     {
         $fields = [

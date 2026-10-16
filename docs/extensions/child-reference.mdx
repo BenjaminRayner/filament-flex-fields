@@ -1,0 +1,103 @@
+---
+title: "Child composition reference"
+description: "Every ChildSlot, ChildComponentContract and ChildRenderer option, state rule and trusted PHP callback."
+---
+
+Import composition classes from
+`Bjanczak\FilamentFlexFields\Support\Components\Composition`.
+A child slot references an actual registered component. It does not clone its HTML
+or create a global singleton field.
+
+## ChildSlot
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `name` | Required | Slot key, lowercase letter followed by lowercase letters/digits/underscores, up to 64 characters. Must equal its key in `children`. |
+| `component` | Required | Registered child component identity. |
+| `kind` | Required | Kind matching the child's definition. |
+| `renderer` | `null` | Optional explicit renderer; normally inherited from the registered reusable contract. |
+| `factory` | `null` | Optional `ChildFactory` class; otherwise use the child's contract or the fluent factory. |
+| `configuration` | `null` | Optional explicit schema. Prefer the reusable child-owned contract; a parent cannot silently replace it. |
+| `configurationMap` | `[]` | Parent option name → child option name. Targets must be declared and unique. |
+| `capabilities` | `[]` | Child capability names selected for this slot. They must exist in the child's definition. |
+| `shareState` | `false` | Use parent state rather than a separate relative child state path. Choose intentionally for value shape and validation. |
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildSlot;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+
+$slot = new ChildSlot(
+    name: 'category',
+    component: 'select-field',
+    kind: ComponentKind::Field,
+    configurationMap: ['categoryLimit' => 'optionsLimit'],
+);
+```
+
+This example assumes the parent declares `categoryLimit`. See the
+[Select composition guide](/docs/extensions/child-select) for the complete parent
+registration and the supported child option names.
+
+## ChildComponentContract
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `kind` | Required | The reusable renderer's kind. |
+| `renderer` | Required | Actual supported PHP class, validated against the surface kind. |
+| `configuration` | Empty schema | Typed portable options owned by the child. |
+| `factory` | `FluentChildFactory::class` | Trusted `ChildFactory` used to construct the renderer. |
+| `bindings` | `[]` | PHP method name → ordered list of configuration option arguments. Only declared public fluent methods are callable. |
+| `packageDefaults` | `[]` | Validated child package defaults applied before explicit and parent-mapped options. |
+
+With the fluent factory, unbound options automatically map to a same-name public
+fluent method accepting one argument. Explicit bindings let one method take a group
+of options. Every group must be complete when applied. Binding methods must return
+`self` or `static` and preserve the same renderer instance. Imported JSON cannot
+select arbitrary methods or PHP classes.
+
+## ChildRenderer construction
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `registry` | Required | Validated `ComponentRegistry`. |
+| `parentComponent` | Required | Registered parent definition owning the slots. |
+| `context` | Required | Request-local `FamilyRenderContext` for identity, locale and state prefix. |
+| `parentConfiguration` | `[]` | Parent's resolved options; only explicit mapping entries pass to a child. |
+| `disabled` | `false` | Disable child fields and prevent dehydration/validation as writable state. |
+| `readOnly` | `false` | Protect child fields through the same non-writable behavior. |
+
+## render()
+
+| Argument | Default | Meaning |
+| --- | --- | --- |
+| `slotName` | Required | One of the parent's declared slots. |
+| `key` | Required | Stable key for this particular child; unique within the composition session. |
+| `configuration` | `[]` | Explicit portable options for this child instance. |
+| `configure` | `null` | Trusted PHP callback receiving the real child and `ChildRenderContext`. Return the same child or `null`. |
+
+```php
+$child = $children->render(
+    slotName: 'category',
+    key: 'main',
+    configuration: ['optionsLimit' => 50],
+    configure: function ($select, $context): void {
+        $select->label('Category');
+    },
+);
+```
+
+`$children` is your request-local `ChildRenderer`. Use the full PHP callback for
+relationship queries, authorization closures and other non-JSON configuration.
+Mapped parent options apply after explicit child options; locked bindings are
+reapplied after the PHP callback. The parent cannot override them indirectly.
+
+Each session allows up to 256 distinct child claims. A duplicate slot/key pair
+rejects rather than reusing another field's state. Each child has its own consumer
+and stable schema key, including inside repeaters and nested surfaces.
+
+## ChildRenderContext in a custom factory
+
+Read `parent`, `component`, `identity`, `statePath`, `configuration`, `capabilities`,
+`contract` and `stateSlots` from the context passed to your factory. Preserve the
+supplied identity and relative state semantics; do not cache the context globally.
+See [custom child factories](/docs/extensions/custom-child-factories) for a complete example.

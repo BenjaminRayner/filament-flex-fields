@@ -33,6 +33,7 @@ class FlexVerificationCodePlayground
             'verification_code__lg' => '',
             'verification_code__required' => '',
             'verification_code__disabled' => '123456',
+            'verification_code__long' => '',
         ];
     }
 
@@ -139,6 +140,14 @@ class FlexVerificationCodePlayground
                             ->groupSeparator('-')
                             ->size(ControlSize::Lg),
                     ]),
+                FlexVerificationCode::make('verification_code__long')
+                    ->label('Long code · 16 characters')
+                    ->length(16)
+                    ->groups([4, 4, 4, 4])
+                    ->groupSeparator('-')
+                    ->allowedCharacters('alphanumeric')
+                    ->helperText('Long codes stay within the field; the digit strip scrolls when needed.')
+                    ->columnSpanFull(),
                 Grid::make(['default' => 1, 'sm' => 2])
                     ->extraAttributes(['class' => 'fff-playground-variants'])
                     ->schema([

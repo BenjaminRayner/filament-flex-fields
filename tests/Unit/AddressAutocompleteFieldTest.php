@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\AddressAutocompleteField;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
+use Bjanczak\FilamentFlexFields\Support\Playground\AddressAutocompletePlayground;
 
 it('dehydrates structured state using configured fields only', function () {
     $field = AddressAutocompleteField::make('address')
@@ -55,12 +55,11 @@ it('hydrates string state into canonical place name', function () {
         ]);
 });
 
-it('does not include coordinates in canonical state', function () {
+it('includes nullable coordinates in structured address state', function () {
     $field = AddressAutocompleteField::make('address');
-
-    expect($field->getEmptyCanonicalState())
-        ->not->toHaveKey('lat')
-        ->not->toHaveKey('lng');
+    expect($field->getEmptyCanonicalState())->toHaveKeys(['lat', 'lng'])
+        ->and($field->getEmptyCanonicalState()['lat'])->toBeNull()
+        ->and($field->getEmptyCanonicalState()['lng'])->toBeNull();
 });
 
 it('validates required configured fields', function () {
@@ -96,7 +95,7 @@ it('validates street addresses only mode requires a street name', function () {
 });
 
 it('registers address autocomplete playground defaults', function () {
-    $state = app(FlexFieldsPlaygroundBuilder::class)->defaultState();
+    $state = app(AddressAutocompletePlayground::class)->defaultState();
 
     expect($state)->toHaveKeys([
         'address_autocomplete__full',

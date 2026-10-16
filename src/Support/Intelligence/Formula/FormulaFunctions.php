@@ -28,7 +28,7 @@ final class FormulaFunctions
             'abs' => self::unary($name, $arguments, static fn (float $value): float => abs($value)),
             'floor' => self::unary($name, $arguments, static fn (float $value): float => floor($value)),
             'ceil' => self::unary($name, $arguments, static fn (float $value): float => ceil($value)),
-            'trunc' => self::unary($name, $arguments, static fn (float $value): float => (float) ((int) $value)),
+            'trunc' => self::unary($name, $arguments, static fn (float $value): float => $value < 0 ? ceil($value) : floor($value)),
             'pct' => self::unary($name, $arguments, static fn (float $value): float => $value / 100),
             'sign' => self::unary($name, $arguments, static function (float $value): float {
                 if ($value > 0) {
@@ -95,7 +95,7 @@ final class FormulaFunctions
         if ($count === 2) {
             $precision = (int) $arguments[1];
 
-            if ($precision < 0 || $precision > 12) {
+            if ($arguments[1] !== (float) $precision || $precision < 0 || $precision > 12) {
                 throw new InvalidArgumentException('Function [round] precision must be between 0 and 12.');
             }
 

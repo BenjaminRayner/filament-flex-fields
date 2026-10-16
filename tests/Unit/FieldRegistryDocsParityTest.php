@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Enums\FieldType;
-use Bjanczak\FilamentFlexFields\Support\Docs\FieldTypeDocsMap;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundRegistry;
+use Bjanczak\FilamentFlexFields\Tests\Support\Docs\FieldTypeDocsMap;
 
-it('includes focus outline documentation for the first playground hub', function (): void {
-    expect(FlexFieldsPlaygroundRegistry::firstSlug())->toBe('focus-outline')
-        ->and(is_file(dirname(__DIR__, 2).'/docs/focus-outline.md'))->toBeTrue();
+it('includes intelligence documentation for the first playground hub', function (): void {
+    expect(FlexFieldsPlaygroundRegistry::firstSlug())->toBe('field-intelligence')
+        ->and(is_file(dirname(__DIR__, 2).'/docs/field-intelligence.md'))->toBeTrue();
 });
 
 it('maps every field type to a documentation file', function (): void {

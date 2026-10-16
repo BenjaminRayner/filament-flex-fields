@@ -29,7 +29,36 @@ trait HasUserSelectCollaborators
 
     protected function runtimeState(): UserSelectRuntimeState
     {
-        return $this->runtimeState ??= new UserSelectRuntimeState;
+        $this->runtimeState ??= new UserSelectRuntimeState(
+            maxSearchEntries: (int) config('filament-flex-fields.select.search_cache_entries', 64),
+            maxSearchBytes: (int) config('filament-flex-fields.select.search_cache_bytes', 4194304),
+        );
+        $this->runtimeState->synchronizeContext($this->getUserSelectProviderContextKey());
+
+        return $this->runtimeState;
+    }
+
+    public function getUserSelectProviderContextKey(): string
+    {
+        return $this->getSelectSearchCacheContextKey();
+    }
+
+    /** @return list<mixed> */
+    protected function selectSearchProviderIdentity(): array
+    {
+        $callbacks = array_map(
+            static fn (?\Closure $callback): ?int => $callback === null ? null : spl_object_id($callback),
+            [$this->getModifyQueryUsing(), $this->getApplySearchUsing(), $this->getNameResolver(),
+                $this->getEmailResolver(), $this->getAvatarUrlResolver(), $this->getVerifiedResolver(),
+                $this->getCustomUserSelectSelectedRecordResolver()],
+        );
+
+        return [
+            parent::selectSearchProviderIdentity(), $this->getUserModel(),
+            $this->getNameColumn(), $this->getEmailColumn(), $this->getAvatarColumn(), $this->getVerificationColumn(),
+            $this->getMinSearchLength(), $this->getDefaultSuggestionsLimit(), $callbacks,
+            $this->getSearchColumns(), $this->isSearchForcedCaseInsensitive(),
+        ];
     }
 
     protected function recordMapper(): UserSelectRecordMapper

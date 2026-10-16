@@ -1,0 +1,229 @@
+.fff-price-range__histogram { container-type: inline-size; container-name: fff-price-histogram; }
+.fff-price-range__chart { --fff-price-range-bars: 8; }
+.fff-price-range__bar { display: none; height: var(--fff-price-bar-height-8); }
+.fff-price-range__bar:nth-child(-n + 8) { display: block; }
+@container fff-price-histogram (min-width: 3rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(16, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-16, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 16) { display: block; }
+}
+@container fff-price-histogram (min-width: 5rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(24, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-24, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 24) { display: block; }
+}
+@container fff-price-histogram (min-width: 7rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(32, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-32, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 32) { display: block; }
+}
+@container fff-price-histogram (min-width: 9rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(40, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-40, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 40) { display: block; }
+}
+@container fff-price-histogram (min-width: 11rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(48, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-48, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 48) { display: block; }
+}
+@container fff-price-histogram (min-width: 13rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(56, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-56, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 56) { display: block; }
+}
+@container fff-price-histogram (min-width: 15rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(64, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-64, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 64) { display: block; }
+}
+@container fff-price-histogram (min-width: 17rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(72, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-72, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 72) { display: block; }
+}
+@container fff-price-histogram (min-width: 19rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(80, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-80, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 80) { display: block; }
+}
+@container fff-price-histogram (min-width: 21rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(88, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-88, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 88) { display: block; }
+}
+@container fff-price-histogram (min-width: 23rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(96, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-96, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 96) { display: block; }
+}
+@container fff-price-histogram (min-width: 25rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(104, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-104, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 104) { display: block; }
+}
+@container fff-price-histogram (min-width: 27rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(112, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-112, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 112) { display: block; }
+}
+@container fff-price-histogram (min-width: 29rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(120, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-120, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 120) { display: block; }
+}
+@container fff-price-histogram (min-width: 31rem) {
+    .fff-price-range--sm .fff-price-range__chart { --fff-price-range-bars: min(128, var(--fff-price-range-max-bars)); }
+    .fff-price-range--sm .fff-price-range__bar { height: var(--fff-price-bar-height-128, var(--fff-price-bar-height-max)); }
+    .fff-price-range--sm .fff-price-range__bar:nth-child(-n + 128) { display: block; }
+}
+@container fff-price-histogram (min-width: 7.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(16, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-16, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 16) { display: block; }
+}
+@container fff-price-histogram (min-width: 12.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(24, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-24, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 24) { display: block; }
+}
+@container fff-price-histogram (min-width: 17.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(32, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-32, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 32) { display: block; }
+}
+@container fff-price-histogram (min-width: 22.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(40, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-40, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 40) { display: block; }
+}
+@container fff-price-histogram (min-width: 27.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(48, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-48, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 48) { display: block; }
+}
+@container fff-price-histogram (min-width: 32.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(56, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-56, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 56) { display: block; }
+}
+@container fff-price-histogram (min-width: 37.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(64, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-64, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 64) { display: block; }
+}
+@container fff-price-histogram (min-width: 42.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(72, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-72, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 72) { display: block; }
+}
+@container fff-price-histogram (min-width: 47.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(80, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-80, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 80) { display: block; }
+}
+@container fff-price-histogram (min-width: 52.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(88, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-88, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 88) { display: block; }
+}
+@container fff-price-histogram (min-width: 57.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(96, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-96, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 96) { display: block; }
+}
+@container fff-price-histogram (min-width: 62.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(104, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-104, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 104) { display: block; }
+}
+@container fff-price-histogram (min-width: 67.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(112, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-112, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 112) { display: block; }
+}
+@container fff-price-histogram (min-width: 72.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(120, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-120, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 120) { display: block; }
+}
+@container fff-price-histogram (min-width: 77.5rem) {
+    .fff-price-range--md .fff-price-range__chart { --fff-price-range-bars: min(128, var(--fff-price-range-max-bars)); }
+    .fff-price-range--md .fff-price-range__bar { height: var(--fff-price-bar-height-128, var(--fff-price-bar-height-max)); }
+    .fff-price-range--md .fff-price-range__bar:nth-child(-n + 128) { display: block; }
+}
+@container fff-price-histogram (min-width: 7.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(16, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-16, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 16) { display: block; }
+}
+@container fff-price-histogram (min-width: 12.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(24, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-24, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 24) { display: block; }
+}
+@container fff-price-histogram (min-width: 17.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(32, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-32, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 32) { display: block; }
+}
+@container fff-price-histogram (min-width: 22.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(40, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-40, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 40) { display: block; }
+}
+@container fff-price-histogram (min-width: 27.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(48, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-48, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 48) { display: block; }
+}
+@container fff-price-histogram (min-width: 32.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(56, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-56, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 56) { display: block; }
+}
+@container fff-price-histogram (min-width: 37.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(64, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-64, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 64) { display: block; }
+}
+@container fff-price-histogram (min-width: 42.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(72, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-72, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 72) { display: block; }
+}
+@container fff-price-histogram (min-width: 47.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(80, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-80, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 80) { display: block; }
+}
+@container fff-price-histogram (min-width: 52.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(88, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-88, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 88) { display: block; }
+}
+@container fff-price-histogram (min-width: 57.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(96, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-96, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 96) { display: block; }
+}
+@container fff-price-histogram (min-width: 62.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(104, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-104, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 104) { display: block; }
+}
+@container fff-price-histogram (min-width: 67.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(112, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-112, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 112) { display: block; }
+}
+@container fff-price-histogram (min-width: 72.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(120, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-120, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 120) { display: block; }
+}
+@container fff-price-histogram (min-width: 77.5rem) {
+    .fff-price-range--lg .fff-price-range__chart { --fff-price-range-bars: min(128, var(--fff-price-range-max-bars)); }
+    .fff-price-range--lg .fff-price-range__bar { height: var(--fff-price-bar-height-128, var(--fff-price-bar-height-max)); }
+    .fff-price-range--lg .fff-price-range__bar:nth-child(-n + 128) { display: block; }
+}

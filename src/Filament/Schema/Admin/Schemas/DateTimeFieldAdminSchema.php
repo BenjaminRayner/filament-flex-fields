@@ -39,11 +39,11 @@ final class DateTimeFieldAdminSchema
         ];
 
         return [
-            Fieldset::make(__('filament-flex-fields::default.schema.settings.datetime'))
+            Fieldset::make(fn () => __('filament-flex-fields::default.schema.settings.datetime'))
                 ->columns(3)
                 ->schema([
                     Select::make(self::settingsPath('granularity'))
-                        ->label(__('filament-flex-fields::default.schema.settings.granularity'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.granularity'))
                         ->options([
                             'day' => 'Day',
                             'hour' => 'Hour',
@@ -52,37 +52,37 @@ final class DateTimeFieldAdminSchema
                         ])
                         ->native(false),
                     TextInput::make(self::settingsPath('minute_step'))
-                        ->label(__('filament-flex-fields::default.schema.settings.minute_step'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.minute_step'))
                         ->numeric(),
                     Toggle::make(self::settingsPath('show_seconds'))
-                        ->label(__('filament-flex-fields::default.schema.settings.show_seconds')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.show_seconds')),
                     Toggle::make(self::settingsPath('close_on_select'))
-                        ->label(__('filament-flex-fields::default.schema.settings.close_on_select')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.close_on_select')),
                     TextInput::make(self::settingsPath('display_format'))
-                        ->label(__('filament-flex-fields::default.schema.settings.display_format')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.display_format')),
                     TextInput::make(self::settingsPath('time_zone'))
-                        ->label(__('filament-flex-fields::default.schema.settings.time_zone')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.time_zone')),
                     ...self::sizeVariantFields(),
                 ])
                 ->visible(fn (Get $get): bool => self::isOneOf($get, $types))
                 ->columnSpanFull(),
 
-            Fieldset::make(__('filament-flex-fields::default.schema.settings.schedule'))
+            Fieldset::make(fn () => __('filament-flex-fields::default.schema.settings.schedule'))
                 ->columns(3)
                 ->schema([
                     TextInput::make(self::settingsPath('timezone'))
-                        ->label(__('filament-flex-fields::default.schema.settings.time_zone')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.time_zone')),
                     TextInput::make(self::settingsPath('time_step'))
-                        ->label(__('filament-flex-fields::default.schema.settings.minute_step'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.minute_step'))
                         ->numeric(),
                     TextInput::make(self::settingsPath('min_slots'))
-                        ->label(__('filament-flex-fields::default.schema.settings.min_slots'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.min_slots'))
                         ->numeric(),
                     TextInput::make(self::settingsPath('max_slots'))
-                        ->label(__('filament-flex-fields::default.schema.settings.max_slots'))
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.max_slots'))
                         ->numeric(),
                     Toggle::make(self::settingsPath('allow_copy_to_weekdays'))
-                        ->label(__('filament-flex-fields::default.schema.settings.allow_copy_to_weekdays')),
+                        ->label(fn () => __('filament-flex-fields::default.schema.settings.allow_copy_to_weekdays')),
                 ])
                 ->visible(fn (Get $get): bool => self::isType($get, FieldType::Schedule))
                 ->columnSpanFull(),

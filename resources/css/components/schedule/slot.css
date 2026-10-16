@@ -1,0 +1,25 @@
+ .fff-schedule-field__slots { margin-block-start: .75rem; display: flex; flex-direction: column; gap: .625rem; }
+.fff-schedule-field__slot { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; padding: .625rem; border: 1px solid #e4e4e7; border-radius: 21px; background: #fff; }
+.dark .fff-schedule-field__slot { border-color: #3f3f46; background: #18181b; }
+.fff-schedule-field__slot--break { border-style: dashed; border-color: #fdba74; background: #fff7ed; }
+.dark .fff-schedule-field__slot--break { border-color: #fb923c66; background: #f973161a; }
+.fff-schedule-field__slot-label { display: inline-flex; flex-shrink: 0; align-items: center; gap: .375rem; font-size: .75rem; line-height: 1rem; font-weight: 500; width: var(--fff-schedule-slot-label-w,7.25rem); color: var(--fff-schedule-text); }
+.fff-schedule-field__slot-label-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: .025em; color: var(--fff-schedule-muted); }
+.fff-schedule-field__slot--break .fff-schedule-field__slot-label-text { padding: .125rem .625rem; border-radius: 9999px; background: #ffedd5; color: #431407; font-size: 11px; font-weight: 600; text-transform: none; letter-spacing: normal; }
+.dark .fff-schedule-field__slot--break .fff-schedule-field__slot-label-text { background: #f9731633; color: #ffedd5; }
+.fff-schedule-field__slot-label-icon { display: inline-flex; width: 1.5rem; height: 1.5rem; flex-shrink: 0; align-items: center; justify-content: center; border-radius: .375rem; }
+.fff-schedule-field__slot-label-icon--slot { background: #ede9fe; color: #6d28d9; }
+.fff-schedule-field__slot-label-icon--break { border-radius: 9999px; background: #ffedd5; color: #9a3412; box-shadow: 0 0 0 1px #fdba74; }
+.dark .fff-schedule-field__slot-label-icon--slot { background: #8b5cf626; color: #c4b5fd; }
+.dark .fff-schedule-field__slot-label-icon--break { background: #f9731633; color: #fed7aa; box-shadow: 0 0 0 1px #fb923c4d; }
+.fff-schedule-field__slot-icon { width: .875rem; height: .875rem; flex-shrink: 0; }
+.fff-schedule-field__slot.is-invalid { border-color: #fca5a5; box-shadow: 0 0 0 1px #f8717166; }
+.dark .fff-schedule-field__slot.is-invalid { border-color: #ef444480; box-shadow: 0 0 0 1px #f871714d; }
+.fff-schedule-field__slot.is-overlap:not(.is-invalid) { border-color: #fcd34d; box-shadow: 0 0 0 2px #fbbf2480; }
+.fff-schedule-field__slot.is-overnight:not(.is-invalid):not(.is-overlap) { border-color: #c4b5fd; }
+.fff-schedule-field__time-fields { display: inline-flex; flex-shrink: 0; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.fff-schedule-field__time-group { display: inline-flex; flex-shrink: 0; align-items: center; gap: .375rem; }
+.fff-schedule-field__time-label { flex-shrink: 0; font-size: .75rem; font-weight: 500; line-height: 1rem; color: var(--fff-schedule-muted); }
+.fff-schedule-field__time-group > .fff-select-control { width: 7.5rem; min-width: 7.5rem; }
+.fff-schedule-field__slot-meta { display: inline-flex; flex-shrink: 0; align-items: center; }
+.fff-schedule-field__slot-actions { gap: .25rem; margin-inline-start: auto; display: inline-flex; flex-shrink: 0; align-items: center; justify-content: flex-end; min-width: 2rem; min-height: 2rem; }

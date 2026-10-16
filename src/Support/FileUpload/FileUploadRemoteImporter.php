@@ -33,6 +33,13 @@ final class FileUploadRemoteImporter
         return TemporaryUploadedFile::createFromLivewire($storedFilename);
     }
 
+    /** URL imports have a companion metadata file on the Livewire temporary disk. */
+    public function discardStagedFile(TemporaryUploadedFile $file): void
+    {
+        $path = FileUploadConfiguration::path($file->getFilename());
+        FileUploadConfiguration::storage()->delete([$path, $path.'.json']);
+    }
+
     public function storeOnFieldDisk(
         RemoteFilePayload $payload,
         Filesystem $disk,

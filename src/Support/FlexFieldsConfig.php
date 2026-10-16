@@ -46,7 +46,7 @@ class FlexFieldsConfig
 
     public static function isPlaygroundEnabled(): bool
     {
-        return (bool) config('filament-flex-fields.playground.enabled', false);
+        return true; // FLEX discovery is always available behind panel authentication.
     }
 
     public static function isSchemaResourceEnabled(): bool
@@ -135,16 +135,12 @@ class FlexFieldsConfig
 
     public static function getPlaygroundNavigationGroup(): ?string
     {
-        $group = config('filament-flex-fields.playground.navigation_group');
-
-        return is_string($group) ? $group : null;
+        return Translations::get('filament-flex-fields::catalog.navigation_group');
     }
 
     public static function getPlaygroundNavigationSort(): ?int
     {
-        $sort = config('filament-flex-fields.playground.navigation_sort');
-
-        return is_int($sort) || is_numeric($sort) ? (int) $sort : null;
+        return (int) config('filament-flex-fields.navigation.sort', 91);
     }
 
     public static function getMapboxAccessToken(): ?string

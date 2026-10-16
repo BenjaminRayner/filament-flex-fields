@@ -8,18 +8,6 @@ use Bjanczak\FilamentFlexFields\Support\FlexFieldsConfig;
 
 class SafeMediaUrl
 {
-    /**
-     * Dangerous URL schemes that must never be used as media sources.
-     *
-     * @var list<string>
-     */
-    protected const BLOCKED_SCHEMES = [
-        'javascript:',
-        'data:',
-        'vbscript:',
-        'file:',
-    ];
-
     public static function isAllowed(?string $url): bool
     {
         return self::sanitize($url) !== null;
@@ -31,80 +19,33 @@ class SafeMediaUrl
             return null;
         }
 
-        $trimmed = trim($url);
+        $url = trim($url);
 
-        if ($trimmed === '') {
+        if ($url === '' || strlen($url) > 8192 || preg_match('/[\x00-\x20\x7F\\\\]/', $url)) {
             return null;
         }
 
-        $lower = strtolower($trimmed);
-
-        foreach (self::BLOCKED_SCHEMES as $scheme) {
-            if (str_starts_with($lower, $scheme)) {
-                return null;
-            }
+        if (str_starts_with($url, '/')) {
+            return str_starts_with($url, '//') ? null : $url;
         }
 
-        if (str_starts_with($trimmed, '/')) {
-            // Block protocol-relative URLs (//host/path) — not a safe relative path.
-            if (str_starts_with($trimmed, '//')) {
-                return null;
-            }
+        $parts = parse_url($url);
 
-            return $trimmed;
+        if ($parts === false || ! isset($parts['scheme'], $parts['host']) || $parts['host'] === '' || isset($parts['user']) || isset($parts['pass'])) {
+            return null;
         }
 
-        if (str_starts_with($lower, 'https://')) {
-            return $trimmed;
+        $scheme = strtolower($parts['scheme']);
+
+        if ($scheme !== 'https' && ($scheme !== 'http' || ! self::allowsHttp())) {
+            return null;
         }
 
-        if (str_starts_with($lower, 'http://') && self::allowsHttp()) {
-            return $trimmed;
-        }
-
-        if (self::isAllowedEmbedUrl($trimmed)) {
-            return $trimmed;
-        }
-
-        return null;
+        return $url;
     }
 
     protected static function allowsHttp(): bool
     {
         return FlexFieldsConfig::allowHttpMedia();
-    }
-
-    protected static function isAllowedEmbedUrl(string $url): bool
-    {
-        $host = parse_url($url, PHP_URL_HOST);
-
-        if (! is_string($host) || $host === '') {
-            return false;
-        }
-
-        $host = strtolower($host);
-
-        if (str_starts_with($host, 'www.')) {
-            $host = substr($host, 4);
-        }
-
-        $allowedHosts = [
-            'youtube.com',
-            'youtu.be',
-            'm.youtube.com',
-            'www.youtube.com',
-            'www.youtu.be',
-            'vimeo.com',
-            'player.vimeo.com',
-            'www.vimeo.com',
-        ];
-
-        foreach ($allowedHosts as $allowedHost) {
-            if ($host === $allowedHost || str_ends_with($host, '.'.$allowedHost)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

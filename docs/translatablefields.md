@@ -1,8 +1,118 @@
 ---
 title: "TranslatableFields"
+description: "Group translated Filament fields into locale tabs with shared validation, configurable languages and optional Spatie Translatable support."
+icon: "languages"
+"canonical": "https://flex-fields.bjanczak.com/docs/translatablefields"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/translatable-fields.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "TranslatableFields in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/translatable-fields-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/translatable-fields-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/translatable-fields.webp"
+"twitter:image:alt": "TranslatableFields in the FLEX Fields playground"
 ---
 
-![TranslatableFields](/art/sc-22.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/translatablefields#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/translatablefields",
+      "name": "TranslatableFields",
+      "description": "Group translated Filament fields into locale tabs with shared validation, configurable languages and optional Spatie Translatable support.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/translatablefields#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/translatablefields#article",
+      "url": "https://flex-fields.bjanczak.com/docs/translatablefields",
+      "headline": "TranslatableFields",
+      "description": "Group translated Filament fields into locale tabs with shared validation, configurable languages and optional Spatie Translatable support.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/translatablefields#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/translatable-fields-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/translatable-fields-motion.mp4#video",
+      "name": "TranslatableFields — FLEX Fields demonstration",
+      "description": "A recorded demonstration of TranslatableFields in the FLEX Fields playground for Filament. Group translated Filament fields into locale tabs with shared validation, configurable languages and optional Spatie Translatable support.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/translatable-fields.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT5.25S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/translatable-fields-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/translatablefields#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/translatable-fields-motion.mp4"
+  poster="/art/previews/translatable-fields.webp"
+  width="1920"
+  height="1080"
+  aria-label="TranslatableFields — FLEX Fields demonstration"
+>
+  <a href="/art/previews/translatable-fields-motion.mp4">Watch the TranslatableFields demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
@@ -253,7 +363,7 @@ TranslatableFields::make('Content')
     ->schema([FlexTextInput::make('title')]);
 ```
 
-Tabs use `-&gt;live()` so badges update as the user types.
+This preset enables inherited live binding with a 250 ms debounce so badges update as the user types. A template can override that policy with its own `live()`/binding configuration.
 
 #### `activeTabWithValue()`
 
@@ -307,12 +417,12 @@ TranslatableFields::make('Content')
 | Form state paths | `title.pl`, `title.en`, `body.pl`, … |
 | Persisted attribute | `{"pl":"Tytuł","en":"Title"}` per column |
 
-On edit, `TranslatableHydrator` reads the JSON/array attribute and fills each locale field when its state is empty.
+Before native Filament hydration, the locale owner prepares JSON/array maps. Explicit empty maps, `null` and cleared locale values remain authoritative. Rendering and badge evaluation never reload a record value over an edit.
 
 ### Storage — Spatie `laravel-translatable` (optional)
 
 ```bash
-composer require spatie/laravel-translatable
+composer require spatie/laravel-translatable:^6.0
 ```
 
 ```php
@@ -340,18 +450,27 @@ TranslatableFields::make('Content')
 
 | Behaviour | Detail |
 |-----------|--------|
-| **Without Spatie installed** | `spatieTranslatable(true)` is an intent flag; JSON/array hydration still works. |
-| **On edit** | When the record uses `HasTranslations`, each field hydrates via `getTranslation($attribute, $locale, false)`. |
-| **On save** | With `spatieTranslatable(true)`, empty strings dehydrate to `null` per locale (trimmed). Spatie JSON-encodes translatable attributes. |
-| **Package dependency** | Spatie is **optional** — not required by this package. |
+| **Without Spatie installed** | JSON/array mode has no Spatie dependency. Explicit opt-in without the optional package reports an actionable configuration error. |
+| **Model contract** | Use `HasTranslations` and declare every mapped attribute in its translatable list (or Spatie's attribute declaration). Misconfigured models report an error. |
+| **On edit** | Prepare the full translation map before native field hydration. Existing locale getters are respected; missing locales never acquire fallback text. |
+| **On save** | Native field defaults, hydration hooks, state casts, validation and dehydration callbacks remain intact. No implicit trimming or conversion of `false`, `0`, arrays, empty strings or `null` is added. |
+| **Unexposed locales** | Spatie's native `setTranslations` merging preserves languages omitted from the configured locale list. |
+| **Spatie policies** | Its null/empty-string filtering, setters, translation events and model persistence retain their native behavior. FLEX does not replace the model's save logic. |
+| **Nested JSON attributes** | `meta->description` renders at `meta.description.en` in form state and dehydrates to `meta->description => [locale => value]` for native Spatie persistence. |
 
-Works alongside array/json casts when Spatie is not used on the model.
+Spatie remains optional and is not added to the package's required dependencies.
+The editor reads stored locale maps; application-facing fallback and translation
+query APIs remain the model's responsibility. See the [Spatie v6 documentation](https://spatie.be/docs/laravel-translatable/v6/introduction).
 
 ### Advanced customization
 
-#### `localeFieldUsing(Closure $callback)`
+#### `localeFieldUsing(Closure $callback, bool $useTemplateStatePath = false)`
 
-Replace the default field-cloning strategy. Return a custom `Field` instance or `null` to fall back to the default clone.
+Replace the default field-cloning strategy. Return a custom `Field` instance or `null` to fall back to the default clone. Custom instances are cloned for isolation; their own names/paths remain intact by default for compatibility. In that mode the callback owns state mapping and persistence.
+
+Pass `useTemplateStatePath: true` to replace only the renderer: FLEX assigns the
+template's automatic locale path and storage binding. This is the recommended mode
+when the replacement should participate in standard JSON/Spatie persistence.
 
 ```php
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
@@ -413,7 +532,7 @@ TranslatableFields::make('Content')
     ->schema([FlexTextInput::make('title')]);
 ```
 
-Presets such as `directionByLocale()` and `emptyBadgeWhenAllFieldsAreEmpty()` are implemented as stacked `modifyTabsUsing` / `modifyFieldsUsing` callbacks.
+Presets are typed options applied once to each locale clone before user modifiers. Repeating a preset replaces its option instead of stacking callbacks. `borderedPanels(false)` reverses a previous `true`; it also accepts an injected closure.
 
 #### Custom tab badges
 
@@ -483,7 +602,7 @@ Marks fields for Spatie-aware dehydration and documents intent. Hydration auto-d
 TranslatableFields::make('field_name')
     ->spatieTranslatable(true);
 ```
-#### `localeFieldUsing(Closure $callback)` / `storageAttributeUsing(Closure $callback)`
+#### `localeFieldUsing(Closure $callback, bool $useTemplateStatePath = false)` / `storageAttributeUsing(Closure $callback)`
 
 
 See [Advanced customization](#advanced-customization).
@@ -532,7 +651,7 @@ TranslatableFields::make('field_name')
 | `iconOnly(bool\|Closure $condition = true)` | Hide tab labels; show icons only. |
 | `expandSelectedLabel(bool\|Closure $condition = true)` | Animate selected tab to wider width. |
 | `helperText(string\|Htmlable\|Closure\|null $text)` | Helper copy below the tab panels (field-style). |
-| `size(string\|ControlSize\|Closure $size)` | See [Control size](/docs/shared-concepts). |
+| `size(string\|ControlSize\|Closure $size)` | See [Control size](/docs/configuration). |
 
 ### Global defaults
 
@@ -617,7 +736,7 @@ For translatable titles with permalink generation, see [Translatable titles (sin
 
 ### Playground
 
-Slug: **`translatable-fields`** — `/admin/flex-fields-playground/translatable-fields`
+Slug: **`translatable-fields`** — `/admin/flex-fields/translatable-fields`
 
 ---
 
@@ -628,8 +747,40 @@ Slug: **`translatable-fields`** — `/admin/flex-fields-playground/translatable-
 | [SegmentTabs](/docs/segmenttabs) | Generic segmented tabs without locale cloning |
 | [TitleSlugField](/docs/slugfield-and-titleslugfield) | Translatable titles with one shared slug |
 | [FlexTextInput](/docs/flextextinput) | Single-locale text without JSON storage |
-| [TranslatableFields macro](/docs/translatablefields#field-macro-translatablefields) | Same layout via `Field::translatableFields()` |
+| [TranslatableFields macro](/docs/translatablefields#basic-usage-—-field-macro) | Same layout via `Field::translatableFields()` |
 
 ---
 
 # Part III — Appendix
+
+## Shared locale tabs
+
+Locale tabs reuse SegmentTabs and its Control renderer, CSS and runtime. Each locale
+schema is cloned and modified once per instance. Changing templates/locales/modifiers
+invalidates that cache; cloning the wrapper creates an independent cache. Actual
+child fields declare their own assets, so the wrapper does not preload every
+possible input type. Multiple locale groups have independent selection and unique
+panel IDs, including inside nested Filament action modals.
+
+### Locale keys and lifecycle contract
+
+Locale keys retain their exact spelling, including `pt_BR` and `zh-Hant`, so they
+match existing Spatie data. Duplicate keys and invalid dot-path codes are rejected;
+`localesLabels()` can override labels for both lists and locale-to-label maps.
+
+Schemas and injected locale/storage callbacks resolve in their actual form context.
+Locale templates are isolated clones. The owner caches one composed schema per
+instance, clears it after configuration changes or cloning, and discards a partly
+configured cache when a modifier fails. Defaults and all native callbacks run through
+Filament; the translation adapter never replaces them. Full and partial fills use
+the same preparation rules, including inside repeater items.
+
+The wrapper shares SegmentTabs' renderer and runtime. Each actual child retains
+its own CSS/JS consumer boundary; configuring many locales does not eagerly activate
+fields in inactive tabs. Code examples remain separate files, read only by the
+catalog's Code Example surface.
+
+Behavior changes in the rebuild: locale keys are no longer lowercased, explicit
+Spatie opt-in validates its optional dependency/model contract, and strings are no
+longer trimmed or converted to null by FLEX. Applications requiring that conversion
+can declare it explicitly with the field's `dehydrateStateUsing()` callback.

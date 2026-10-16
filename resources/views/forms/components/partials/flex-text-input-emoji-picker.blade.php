@@ -8,8 +8,8 @@
         x-ref="emojiTrigger"
         class="fff-flex-text-input__action-btn fff-flex-text-input__action-btn--emoji"
         x-bind:aria-expanded="emojiPickerOpen ? 'true' : 'false'"
-        x-bind:title="emojiPickerLabel"
-        x-bind:aria-label="emojiPickerLabel"
+        title="{{ $getEmojiPickerLabel() }}"
+        aria-label="{{ $getEmojiPickerLabel() }}"
         x-on:click="toggleEmojiPicker()"
     >
         {{ \Filament\Support\generate_icon_html($getEmojiIcon(), size: IconSize::Small, attributes: new \Illuminate\View\ComponentAttributeBag(['class' => 'fff-flex-text-input__action-icon'])) }}

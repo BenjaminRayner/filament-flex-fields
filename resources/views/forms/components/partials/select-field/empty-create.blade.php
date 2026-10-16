@@ -42,8 +42,12 @@
                             x-bind:aria-busy="shouldShowHeadlessSelectSkeleton() ? 'true' : 'false'"
                             x-bind:aria-label="headlessSelectSkeletonAriaLabel()"
                         >
-                            <x-filament::loading-indicator class="fff-select-dropdown-loading__spinner" />
-                            <span class="fff-select-dropdown-loading__label" x-text="headlessSelectSkeletonAriaLabel()"></span>
+                            @if ($headlessLoadingView ?? null)
+                                @include($headlessLoadingView, $headlessRendererData ?? [])
+                            @else
+                                <x-filament::loading-indicator class="fff-select-dropdown-loading__spinner" />
+                                <span class="fff-select-dropdown-loading__label" x-text="headlessSelectSkeletonAriaLabel()"></span>
+                            @endif
                         </div>
 
                         <div
@@ -52,7 +56,7 @@
                             class="fff-select-dropdown-empty"
                             role="status"
                         >
-                            <span class="fff-select-dropdown-empty-icon" aria-hidden="true" x-html="headlessSelectEmptyIconHtml()"></span>
+                            <span class="fff-select-dropdown-empty-icon" aria-hidden="true" x-html="headlessSelectEmptyIconHtml() || @js($headlessEmptyIconHtml ?? '')"></span>
                             <span class="fff-select-dropdown-empty-title" x-text="headlessSelectEmptyTitle()"></span>
                             <span class="fff-select-dropdown-empty-hint" x-text="headlessSelectEmptyHint()"></span>
                         </div>

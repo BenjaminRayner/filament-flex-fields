@@ -1,13 +1,10 @@
 <div class="fff-progress-bar__segmented">
     <div
         class="fff-progress-bar__segment-track"
-        role="progressbar"
-        aria-valuemin="0"
-        aria-valuemax="{{ $segmentCount }}"
-        aria-valuenow="{{ $getActiveSegmentIndex() + 1 }}"
+        aria-hidden="true"
     >
         @foreach ($segments as $index => $segment)
-            @php($segmentFill = $getSegmentFillWidthForIndex($index))
+            @php($segmentFill = $data['fills'][$index])
 
             <div @class([
                 'fff-progress-bar__segment',
@@ -21,7 +18,7 @@
                         style="--fff-progress-bar-segment-fill: {{ $segmentFill }}%"
                     ></span>
 
-                    @if ($segment['state'] === 'active' && $shouldShowSegmentThumb())
+                    @if ($segment['state'] === 'active' && $data['segmentThumb'])
                         <span
                             class="fff-progress-bar__segment-dot"
                             style="--fff-progress-bar-segment-dot-position: {{ $segmentFill }}%"
@@ -33,7 +30,7 @@
         @endforeach
     </div>
 
-    @if ($hasSegmentLabels())
+    @if ($data['hasLabels'])
         <div class="fff-progress-bar__segment-labels">
             @foreach ($segments as $segment)
                 <div @class([

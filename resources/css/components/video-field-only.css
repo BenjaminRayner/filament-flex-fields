@@ -358,8 +358,8 @@
 }
 
 .fff-video-field__progress-track {
-    backdrop-filter: var(--fff-video-field-glass-blur) var(--fff-video-field-glass-saturate);
     -webkit-backdrop-filter: var(--fff-video-field-glass-blur) var(--fff-video-field-glass-saturate);
+    backdrop-filter: var(--fff-video-field-glass-blur) var(--fff-video-field-glass-saturate);
 }
 
 .fff-video-field__progress-buffer {

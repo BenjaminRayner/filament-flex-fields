@@ -1,13 +1,11 @@
-@import "tailwindcss/theme";
-@import "tailwindcss/utilities";
-@import "./base.css";
+/* Core owns the shared tokens, theme and utilities. The catalog loads after it. */
+@reference "./core.css";
 
 /* Match Filament's class-based dark mode strategy — see core.css for why. */
 @variant dark (&:where(.dark, .dark *));
 
-@source "../views/partials/playground/**/*.blade.php";
-@source "../views/pages/flex-fields-playground-component.blade.php";
-@source "../views/pages/flex-fields-playground-index.blade.php";
-
 @import "./playground/playground.css";
 @import "./playground/user-column-playground.css";
+
+.fff-hold-confirm-demo-help { margin-block-end: 1rem; max-inline-size: 42rem; font-size: .875rem; line-height: 1.5; color: rgb(113 113 122); }
+.dark .fff-hold-confirm-demo-help { color: rgb(161 161 170); }

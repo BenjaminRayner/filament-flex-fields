@@ -1,0 +1,387 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'field_variant' => 'Field',
+    'display_variant' => 'Display',
+    'column_variant' => 'Table column',
+    'recording' => [
+        'title' => 'Recording view',
+        'choose_hint' => 'Click an example to preview it. Shift-click to select up to three.',
+        'preview' => 'Preview selection',
+        'cancel' => 'Cancel',
+        'close' => 'Close recording view',
+        'zoom' => 'Zoom',
+        'vertical' => 'Vertical position',
+        'helpers' => 'Show helper text',
+        'width' => 'Component width',
+        'shortcuts' => '16:9 · Alt+H hides controls · Escape / Alt+R exits',
+    ],
+    'developer_tools' => 'Developer tools',
+    'developer_tools_description' => 'Test how shared assets load and retire in real Filament forms, tables and nested modals.',
+    'included' => 'Included',
+    'dark_mode' => 'Dark mode',
+    'light_mode' => 'Light mode',
+    'sponsors' => 'Sponsors',
+    'top_sponsors' => 'Top sponsors',
+    'become_sponsor' => 'Become a sponsor on GitHub',
+    'sponsors_scroll' => 'Scroll sponsors using the arrow keys or swipe',
+    'previous_sponsors' => 'Previous sponsors',
+    'next_sponsors' => 'More sponsors',
+    'sponsor_ranks' => [
+        'bronze' => 'Bronze',
+        'silver' => 'Silver',
+        'gold' => 'Gold',
+    ],
+    'form_state' => 'Form state',
+    'form_state_hint' => 'A snapshot of the current demo values.',
+    'close' => 'Close',
+    'demo_reset' => 'Demo reset',
+    'loading_examples' => 'Loading code examples…',
+    'no_examples' => 'No code examples have been published for this component yet.',
+    'example_files' => 'Example files',
+    'copy_code' => 'Copy',
+    'code_copied' => 'Copied',
+    'copy_failed' => 'Copy failed',
+    'example_unavailable' => 'This example file is currently unavailable.',
+    'example_hint' => 'Ready to adapt to your own form.',
+    'live_demo' => 'Live preview',
+    'demo_actions' => 'Demo actions',
+    'pause_banners' => 'Pause automatic slides',
+    'resume_banners' => 'Resume automatic slides',
+    'footer_tagline' => 'Thoughtfully built. Ready to compose.',
+    'footer_project' => 'Project on GitHub',
+    'loading_banner' => 'Loading featured content…',
+    'loading_promotions' => 'Updating featured banners…',
+    'banner_slide' => 'Show banner :number',
+    'banner_slides' => 'Choose banner',
+    'information' => 'Information',
+    'developer' => 'Developer',
+    'category' => 'Category',
+    'version' => 'Version',
+    'website' => 'Website',
+    'privacy_policy' => 'Privacy Policy',
+    'terms_of_service' => 'Terms of Service',
+    'install_short' => 'Install',
+    'breadcrumb' => 'Breadcrumb',
+    'validate' => 'Validate',
+    'dump_json' => 'Dump JSON',
+    'reset_defaults' => 'Reset defaults',
+    'count' => ':count components and extensions',
+    'search' => 'Search components…',
+    'collection' => 'Browse collection',
+    'all' => 'All',
+    'installed' => 'Installed',
+    'community' => 'Community',
+    'component_type' => 'Component type',
+    'component_types' => [
+        'all' => 'All types',
+        'field' => 'Form fields',
+        'column' => 'Table columns',
+        'display' => 'Content & layouts',
+        'entry' => 'Infolist entries',
+        'action' => 'Actions',
+    ],
+    'results' => 'results',
+    'categories' => 'Categories',
+    'all_categories' => 'All categories',
+    'popular' => 'Popular',
+    'noteworthy' => 'New & Noteworthy',
+    'all_components' => 'Explore FLEX',
+    'empty' => 'No components match your search.',
+    'clear_filters' => 'Clear filters',
+    'install_named' => 'Install :name',
+    'explore_named' => 'Explore :name',
+    'official' => 'Official FLEX component',
+    'carousel' => 'carousel',
+    'promotion' => 'Featured',
+    'previous_banner' => 'Previous banner',
+    'next_banner' => 'Next banner',
+    'verified' => 'Official FLEX component',
+    'install' => 'Install plugin',
+    'github' => 'View on GitHub',
+    'demo' => 'Demo',
+    'code_example' => 'Code Example',
+    'extension_notice' => 'This is a recommended external plugin. Installation and documentation are provided by its author on GitHub.',
+    'component_notice' => 'This component is registered in FLEX and available to use. Its author has not provided an interactive demo.',
+    'previous' => 'Previous banner',
+    'next' => 'Next banner',
+    'navigation_group' => 'Settings & Tools',
+    'category_labels' => [
+        'buttons' => 'Actions',
+        'collections' => 'Collections',
+        'colors' => 'Colors',
+        'controls' => 'Controls',
+        'data-display' => 'Data display',
+        'date-and-time' => 'Date & time',
+        'guides' => 'Guides',
+        'location' => 'Location',
+        'media' => 'Media',
+        'navigation' => 'Navigation',
+        'pickers' => 'Pickers',
+        'text-input' => 'Text inputs',
+    ],
+    'components' => [
+        'font-select' => [
+            'label' => 'Font Select',
+            'description' => 'Search fonts with live previews, category filters and virtualized infinite scrolling.',
+        ],
+        'address-autocomplete' => [
+            'label' => 'Address autocomplete',
+            'description' => 'Find addresses with shared search, structured results and configurable geocoding.',
+        ],
+        'admin-columns' => [
+            'label' => 'Admin columns',
+            'description' => 'Table presentations for statuses, progress, icons and other compact data.',
+        ],
+        'audio-field' => [
+            'label' => 'Audio player',
+            'description' => 'Compact audio player with waveform visualization, play/pause control, optional loop, and optional client-side Whisper speech-to-text.',
+        ],
+        'barcode-scanner-field' => [
+            'label' => 'Barcode scanner',
+            'description' => 'Explore barcode scanner with configurable behavior, styling and live examples.',
+        ],
+        'bubble-choice' => [
+            'label' => 'Bubble Choice',
+            'description' => 'Bubble multi-select with center magnification, fringe shrink on pan, and optional scalloped selection.',
+        ],
+        'calculator-field' => [
+            'label' => 'Calculator field',
+            'description' => 'Numeric input with a shared iOS-style calculator panel, per-field session memory, and full numeric constraints.',
+        ],
+        'choice-cards' => [
+            'label' => 'Choice Cards',
+            'description' => 'Present selectable cards with icons, labels, descriptions and checked states.',
+        ],
+        'choice-checkbox-cards' => [
+            'label' => 'Choice Checkbox Cards',
+            'description' => 'Multiple-choice cards using the shared animated selection indicator.',
+        ],
+        'color-swatch' => [
+            'label' => 'Color swatch',
+            'description' => 'Preset color picker: horizontal swatch pills with optional section header and tooltips.',
+        ],
+        'country-field' => [
+            'label' => 'Country field',
+            'description' => 'Search countries and territories with local flags; store a two-letter country code.',
+        ],
+        'country-map-field' => [
+            'label' => 'Country map',
+            'description' => 'Choose countries on an interactive world map with region selection and search.',
+        ],
+        'cover-card' => [
+            'label' => 'Cover card',
+            'description' => 'Present a cover image, title and description in a static card.',
+        ],
+        'credit-card' => [
+            'label' => 'Credit card',
+            'description' => 'Credit card input with live brand detection, interactive preview and server-side Luhn validation.',
+        ],
+        'currency-field' => [
+            'label' => 'Currency field',
+            'description' => 'Revolut-style currency input with locale-aware formatting, digit animations, optional currency picker, and minor-unit storage.',
+        ],
+        'date-time-fields' => [
+            'label' => 'Date & time fields',
+            'description' => 'Date, time and range selection with a shared calendar surface and keyboard support.',
+        ],
+        'dual-listbox' => [
+            'label' => 'Dual Listbox',
+            'description' => 'Dual-pane selection tool with search, reordering, and virtual scrolling.',
+        ],
+        'field-intelligence' => [
+            'label' => 'Calculated formulas',
+            'description' => 'Validated calculations, dependency-aware formulas and server-calculated form values.',
+        ],
+        'file-upload' => [
+            'label' => 'File upload',
+            'description' => 'Upload files and images with previews, constraints and media configuration.',
+        ],
+        'flex-checklist' => [
+            'label' => 'Flex Checklist',
+            'description' => 'Accessible single or multiple choices with configurable list presentations.',
+        ],
+        'flex-color-picker' => [
+            'label' => 'Flex color picker',
+            'description' => 'Choose colors with an HSV area, channel sliders, formats and swatches.',
+        ],
+        'flex-matrix-table' => [
+            'label' => 'Flex Matrix Table',
+            'description' => 'Edit structured choices in rows and columns with shared form controls.',
+        ],
+        'flex-radiolist' => [
+            'label' => 'Flex Radiolist',
+            'description' => 'Enhanced radio list with icons, descriptions, and custom sizing.',
+        ],
+        'flex-rich-editor' => [
+            'label' => 'Flex Rich Editor',
+            'description' => 'Rich document editing, formatting, media and extensible content blocks.',
+        ],
+        'flex-slider' => [
+            'label' => 'Flex Slider',
+            'description' => 'Pill and circular sliders with elastic motion, rolling numbers, magnetic marks and validated ranges.',
+        ],
+        'flex-text-input' => [
+            'label' => 'Flex text input',
+            'description' => 'Versatile text inputs with shared styles, validation, sizes and visual variants.',
+        ],
+        'flex-textarea' => [
+            'label' => 'Flex Textarea',
+            'description' => 'Smart auto-sizing textarea with character counters, speech dictation, and emoji support.',
+        ],
+        'hold-confirm' => [
+            'label' => 'Hold confirm',
+            'description' => 'Confirm deliberate actions with hold, inline questions, countdown, server progress and optional undo.',
+        ],
+        'icon-column' => [
+            'label' => 'IconColumn',
+            'description' => 'Read-only table column for displaying blade-icons with optional labels, colors, and sizes.',
+        ],
+        'icon-picker-field' => [
+            'label' => 'Icon picker',
+            'description' => 'Browse icons with search, list or grid layouts, virtual rendering and pagination.',
+        ],
+        'image-choice-cards' => [
+            'label' => 'Image Choice Cards',
+            'description' => 'Select visual options with image cards, captions and consistent checked states.',
+        ],
+        'item-card-group' => [
+            'label' => 'ItemCardGroup',
+            'description' => 'Group content and actions into configurable card layouts.',
+        ],
+        'link-preview-field' => [
+            'label' => 'Link preview',
+            'description' => 'Explore link preview with configurable behavior, styling and live examples.',
+        ],
+        'map-picker' => [
+            'label' => 'Map picker',
+            'description' => 'Search for addresses and choose a location with structured coordinates.',
+        ],
+        'matrix-choice' => [
+            'label' => 'Matrix Choice',
+            'description' => 'Explore matrix choice with configurable behavior, styling and live examples.',
+        ],
+        'nps-field' => [
+            'label' => 'NPS Field',
+            'description' => 'NPS, CSAT, and Likert scale inputs with three visual variants.',
+        ],
+        'number-stepper' => [
+            'label' => 'Number Stepper',
+            'description' => 'Pill-shaped numeric control with − / + buttons and an animated NumberFlow display.',
+        ],
+        'phone-field' => [
+            'label' => 'Phone field',
+            'description' => 'International phone numbers with searchable country codes and validation.',
+        ],
+        'price-range' => [
+            'label' => 'Price Range',
+            'description' => 'Dual-handle price range slider with histogram backdrop, min/max numeric inputs, and currency prefix.',
+        ],
+        'progress-bar' => [
+            'label' => 'Progress bar',
+            'description' => 'Present progress, targets and milestones with configurable visual states.',
+        ],
+        'progress-circle' => [
+            'label' => 'Progress circle',
+            'description' => 'Circular progress displays with labels, colors and sizes.',
+        ],
+        'rating-column' => [
+            'label' => 'RatingColumn',
+            'description' => 'Show ratings in tables with configurable symbols and numeric values.',
+        ],
+        'rating' => [
+            'label' => 'Rating',
+            'description' => 'Capture ratings with custom symbols, precision, labels and sizes.',
+        ],
+        'schedule-field' => [
+            'label' => 'Schedule field',
+            'description' => 'Weekly availability, time ranges, breaks and time-zone aware configuration.',
+        ],
+        'segment-control' => [
+            'label' => 'Segment Control',
+            'description' => 'IOS-style single-select segmented control with sliding indicators, icons, and animated label expansion.',
+        ],
+        'segment-tabs' => [
+            'label' => 'Segment Tabs',
+            'description' => 'Compose form sections with animated tabs, nested schemas and persistent selection.',
+        ],
+        'select-field' => [
+            'label' => 'SelectField',
+            'description' => 'Rich selection with search, grouped options, virtual lists and remote pagination.',
+        ],
+        'signature-field' => [
+            'label' => 'Signature',
+            'description' => 'Explore signature with configurable behavior, styling and live examples.',
+        ],
+        'slug-field' => [
+            'label' => 'Slug field',
+            'description' => 'Explore slug field with configurable behavior, styling and live examples.',
+        ],
+        'social-links-field' => [
+            'label' => 'Social links',
+            'description' => 'Build a set of social links with platform icons and URL validation.',
+        ],
+        'switch' => [
+            'label' => 'Switch',
+            'description' => 'Boolean toggle with row and card layouts, badges, and ripple effects.',
+        ],
+        'tags-field' => [
+            'label' => 'Tags field',
+            'description' => 'Search, choose and create tags with compact chips and a shared dropdown.',
+        ],
+        'timezone-field' => [
+            'label' => 'Timezone field',
+            'description' => 'Search world time zones with local offsets and browser defaults.',
+        ],
+        'todo-list-field' => [
+            'label' => 'Todo list',
+            'description' => 'Interactive task lists with completion, ordering and configurable feedback.',
+        ],
+        'track-slider' => [
+            'label' => 'Track Slider',
+            'description' => 'Minimalist track-based range slider with optional live value output.',
+        ],
+        'traffic-split' => [
+            'label' => 'Traffic Split',
+            'description' => 'Interactive percentage-based weight distributor for A/B testing and traffic allocation.',
+        ],
+        'translatable-fields' => [
+            'label' => 'Translatable Fields',
+            'description' => 'Build localized fields and switch between language-specific form states.',
+        ],
+        'user-column' => [
+            'label' => 'UserColumn',
+            'description' => 'Present users, avatars and additional identity information in table columns.',
+        ],
+        'user-select' => [
+            'label' => 'UserSelect',
+            'description' => 'Choose people with avatars, names, secondary details and multiple selection.',
+        ],
+        'verification-code' => [
+            'label' => 'Verification Code',
+            'description' => 'OTP / verification code input with grouped digit boxes, paste support, and optional account-verify chrome.',
+        ],
+        'video-field' => [
+            'label' => 'Video field',
+            'description' => 'Custom video player with optional YouTube embed, skip controls, PiP, fullscreen, and compact control layout.',
+        ],
+        'voice-note-recorder-field' => [
+            'label' => 'Voice note recorder',
+            'description' => 'In-browser voice recorder with real-time visualizer, inline playback, and Filament storage integration.',
+        ],
+    ],
+    'promotions' => [
+        'discover-flex' => [
+            'title' => 'Small details. Better experiences.',
+            'description' => 'Explore FLEX components, try the demos and find the right building blocks for your next idea.',
+            'action' => 'Meet FLEX',
+        ],
+        'compose-with-flex' => [
+            'title' => 'Your next idea starts here.',
+            'description' => 'Build with shared components, explore their configuration and make them your own.',
+            'action' => 'Explore the project',
+        ],
+    ],
+];

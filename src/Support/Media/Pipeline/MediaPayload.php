@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Media\Pipeline;
 
+use Bjanczak\FilamentFlexFields\Support\Media\Data\MediaFailure;
+use Bjanczak\FilamentFlexFields\Support\Media\Data\MediaPolicy;
+use Bjanczak\FilamentFlexFields\Support\Media\Runtime\MediaDefaults;
+use Bjanczak\FilamentFlexFields\Support\Media\Sources\MediaSource;
+use Bjanczak\FilamentFlexFields\Support\Media\Sources\PreparedMedia;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-use RuntimeException;
 
-/**
- * Binary ingress body as path and/or stream — never requires a full-file string buffer.
- */
+/** @deprecated Compatibility value object; preparation belongs to Sources/PreparedMedia. */
 final class MediaPayload
 {
-    /**
-     * @param  resource|null  $stream
-     */
+    private ?PreparedMedia $snapshot = null;
+
+    private function __clone() {}
+
+    /** @param resource|null $stream */
     private function __construct(
         public readonly ?string $localPath,
         public readonly mixed $stream,
@@ -26,83 +30,49 @@ final class MediaPayload
 
     public static function fromTemporaryUploadedFile(TemporaryUploadedFile $file): self
     {
-        $path = rescue(fn (): string => $file->getRealPath() ?: $file->path(), '', report: false);
-        $path = is_string($path) && $path !== '' && is_file($path) ? $path : null;
-
-        $originalName = rescue(fn (): string => (string) $file->getClientOriginalName(), '', report: false);
-        $mime = rescue(fn (): string => (string) ($file->getMimeType() ?: ''), '', report: false);
-        $size = rescue(fn (): int => (int) $file->getSize(), 0, report: false);
-
-        return new self(
-            localPath: $path,
-            stream: null,
-            inlineContents: null,
-            originalName: $originalName !== '' ? $originalName : null,
-            mimeType: $mime !== '' ? $mime : null,
-            size: $size > 0 ? $size : null,
-        );
+        return self::snapshot(MediaSource::upload($file), app(MediaDefaults::class)->policy());
     }
 
-    public static function fromPath(
-        string $absolutePath,
-        ?string $originalName = null,
-        ?string $mimeType = null,
-        ?int $size = null,
-    ): self {
-        return new self(
-            localPath: $absolutePath,
-            stream: null,
-            inlineContents: null,
-            originalName: $originalName ?? basename($absolutePath),
-            mimeType: $mimeType,
-            size: $size ?? (is_file($absolutePath) ? (int) filesize($absolutePath) : null),
-        );
+    public static function fromPath(string $absolutePath, ?string $originalName = null, ?string $mimeType = null, ?int $size = null): self
+    {
+        return new self($absolutePath, null, null, $originalName ?? basename($absolutePath), $mimeType, $size);
     }
 
-    /**
-     * @param  resource  $stream
-     */
-    public static function fromStream(
-        mixed $stream,
-        ?string $originalName = null,
-        ?string $mimeType = null,
-        ?int $size = null,
-    ): self {
-        if (! is_resource($stream)) {
-            throw new RuntimeException('MediaPayload::fromStream requires a stream resource.');
+    /** @param resource $stream */
+    public static function fromStream(mixed $stream, ?string $originalName = null, ?string $mimeType = null, ?int $size = null, int $maxBytes = 268435456): self
+    {
+        if ($size !== null && ($size < 0 || $size > $maxBytes)) {
+            throw new MediaFailure('size_rejected', 'Declared media size exceeds its byte budget.');
         }
 
-        return new self(
-            localPath: null,
-            stream: $stream,
-            inlineContents: null,
-            originalName: $originalName,
-            mimeType: $mimeType,
-            size: $size,
-        );
+        return self::snapshot(MediaSource::stream($stream, $originalName ?? 'upload.bin'), new MediaPolicy(maxBytes: $maxBytes));
     }
 
-    /**
-     * Small inline bodies only (e.g. signature SVG). Prefer path/stream for uploads.
-     */
-    public static function fromInlineString(
-        string $contents,
-        ?string $originalName = null,
-        ?string $mimeType = null,
-    ): self {
-        return new self(
-            localPath: null,
-            stream: null,
-            inlineContents: $contents,
-            originalName: $originalName,
-            mimeType: $mimeType,
-            size: strlen($contents),
-        );
+    public static function fromInlineString(string $contents, ?string $originalName = null, ?string $mimeType = null): self
+    {
+        MediaSource::bytes($contents, $originalName ?? 'capture.bin');
+
+        return new self(null, null, $contents, $originalName, $mimeType, strlen($contents));
+    }
+
+    public function source(): MediaSource
+    {
+        if ($this->localPath !== null) {
+            return MediaSource::path($this->localPath, $this->originalName);
+        }
+        if ($this->inlineContents !== null) {
+            return MediaSource::bytes($this->inlineContents, $this->originalName ?? 'upload.bin');
+        }
+        if (is_resource($this->stream)) {
+            return MediaSource::stream($this->stream, $this->originalName ?? 'upload.bin');
+        }
+
+        throw new MediaFailure('invalid_source', 'Media payload has no readable source.');
     }
 
     public function hasLocalPath(): bool
     {
-        return is_string($this->localPath) && $this->localPath !== '' && is_file($this->localPath);
+        return $this->localPath !== null && is_file($this->localPath);
     }
 
     public function scanPath(): ?string
@@ -110,43 +80,29 @@ final class MediaPayload
         return $this->hasLocalPath() ? $this->localPath : null;
     }
 
-    /**
-     * Open a readable stream without loading the whole file into a string when a path exists.
-     *
-     * @return resource
-     */
+    /** @return resource */
     public function openReadableStream(): mixed
     {
-        if ($this->hasLocalPath()) {
-            $localPath = $this->localPath;
-            assert(is_string($localPath));
+        return $this->source()->open();
+    }
 
-            $handle = fopen($localPath, 'rb');
+    public function close(): void
+    {
+        $this->snapshot?->close();
+        $this->snapshot = null;
+    }
 
-            if (! is_resource($handle)) {
-                throw new RuntimeException('Unable to open media payload path for reading.');
-            }
+    public function __destruct()
+    {
+        $this->close();
+    }
 
-            return $handle;
-        }
+    private static function snapshot(MediaSource $source, MediaPolicy $policy): self
+    {
+        $file = PreparedMedia::prepare($source, $policy);
+        $payload = new self($file->path, null, null, $file->file->originalName, $file->file->mimeType, $file->file->bytes);
+        $payload->snapshot = $file;
 
-        if (is_resource($this->stream)) {
-            return $this->stream;
-        }
-
-        if (is_string($this->inlineContents)) {
-            $handle = fopen('php://temp', 'r+b');
-
-            if (! is_resource($handle)) {
-                throw new RuntimeException('Unable to open temp stream for inline media payload.');
-            }
-
-            fwrite($handle, $this->inlineContents);
-            rewind($handle);
-
-            return $handle;
-        }
-
-        throw new RuntimeException('MediaPayload has no readable source (path, stream, or inline).');
+        return $payload;
     }
 }

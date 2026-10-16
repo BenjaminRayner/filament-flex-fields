@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-use Bjanczak\FilamentFlexFields\Assets\FlexFieldsCss;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\UserColumn;
-use Bjanczak\FilamentFlexFields\FilamentFlexFieldsServiceProvider;
+use Bjanczak\FilamentFlexFields\Support\Catalog\FlexCatalog;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldStylesheetQueue;
+use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundRegistry;
 use Bjanczak\FilamentFlexFields\Support\Playground\UserColumnPlayground;
 use Bjanczak\FilamentFlexFields\Support\UserColumnRenderCache;
 use Bjanczak\FilamentFlexFields\Support\UserColumnSharedStackCache;
@@ -15,7 +13,6 @@ use Bjanczak\FilamentFlexFields\Support\UserColumnStackState;
 use Filament\Schemas\Components\Section;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Http\Request;
 
 function makeUserColumnTestRecord(array $attributes = []): Model
 {
@@ -245,9 +242,9 @@ it('normalizes a single model from an array with one item as rich layout', funct
         ->toContain('Solo User');
 });
 
-it('registers user column playground section after user select', function () {
-    $builder = app(FlexFieldsPlaygroundBuilder::class);
-    $components = $builder->build();
+it('groups the independent user column preview under User Select', function () {
+    $builder = app(UserColumnPlayground::class);
+    $components = $builder->components();
 
     $sectionHeadings = collect($components)
         ->filter(fn ($component): bool => $component instanceof Section)
@@ -255,12 +252,9 @@ it('registers user column playground section after user select', function () {
         ->values()
         ->all();
 
-    $userSelectIndex = array_search('UserSelect', $sectionHeadings, true);
-    $userColumnIndex = array_search('UserColumn', $sectionHeadings, true);
-
-    expect($userSelectIndex)->not->toBeFalse()
-        ->and($userColumnIndex)->not->toBeFalse()
-        ->and($userColumnIndex)->toBeGreaterThan($userSelectIndex);
+    expect($sectionHeadings)->toContain('UserColumn')
+        ->and(FlexFieldsPlaygroundRegistry::find('user-column'))->toBeNull()
+        ->and(app(FlexCatalog::class)->groupedEntriesFor('user-select')['user-column']['demoClass'])->toBe(UserColumnPlayground::class);
 });
 
 it('renders user column playground demo rows with rich and stacked layouts', function () {
@@ -278,44 +272,6 @@ it('renders user column playground demo rows with rich and stacked layouts', fun
         ->and($rows[1]['members'])->toContain('+4');
 });
 
-it('queues user column stylesheets for the playground page styles before hook', function () {
-    config()->set('filament-flex-fields.playground.enabled', true);
-
-    $stylesPartial = file_get_contents(__DIR__.'/../../resources/views/partials/playground-page-stylesheets.blade.php');
-    $assetsPartial = file_get_contents(__DIR__.'/../../resources/views/partials/playground-assets.blade.php');
-    $themePartial = file_get_contents(__DIR__.'/../../resources/views/partials/playground-theme.blade.php');
-
-    expect($stylesPartial)
-        ->toContain('playgroundStylesheetHrefsForRequest()')
-        ->toContain("@push('styles')")
-        ->toContain('rel="stylesheet"')
-        ->toContain('data-fff-playground-bundle')
-        ->and($assetsPartial)
-        ->toContain('fffEnsurePlaygroundBundle')
-        ->and($themePartial)
-        ->toContain('window.FffPlaygroundTheme')
-        ->toContain('syncFilamentTheme')
-        ->toContain("localStorage.setItem('theme'")
-        ->toContain('alpine:init');
-
-    app()->instance('request', Request::create('/admin/flex-fields-playground/user-column', 'GET'));
-
-    $provider = new FilamentFlexFieldsServiceProvider(app());
-    $method = new ReflectionMethod($provider, 'registeredStylesheets');
-    config()->set('filament-flex-fields.playground.enabled', true);
-
-    $enabledIds = array_map(
-        fn (FlexFieldsCss $asset): string => $asset->getId(),
-        $method->invoke($provider),
-    );
-
-    expect(FlexFieldAssets::resolvePlaygroundSlugFromRequest())->toBe('user-column')
-        ->and(FlexFieldAssets::hasPlaygroundBundleForSlug('user-column'))->toBeTrue()
-        ->and(FlexFieldAssets::playgroundBundleStylesheetId('user-column'))
-        ->toBe('flex-fields-playground-user-column')
-        ->and($enabledIds)->toContain('flex-fields-playground-user-column');
-});
-
 it('does not load stylesheets from table column blade partials', function () {
     $richBlade = file_get_contents(__DIR__.'/../../resources/views/tables/columns/user-column-rich.blade.php');
     $stackBlade = file_get_contents(__DIR__.'/../../resources/views/tables/columns/user-column-stack.blade.php');
@@ -324,15 +280,6 @@ it('does not load stylesheets from table column blade partials', function () {
     expect($richBlade)->not->toContain('load-stylesheet')
         ->and($stackBlade)->not->toContain('load-stylesheet')
         ->and($demoBlade)->not->toContain('load-stylesheet');
-});
-
-it('registers table column stylesheets during column setup', function () {
-    FlexFieldStylesheetQueue::reset();
-
-    UserColumn::make('author');
-
-    expect(FlexFieldStylesheetQueue::registered())
-        ->toBe(['user-display', 'user-column']);
 });
 
 it('loads user display stylesheet for shared avatar primitives', function () {

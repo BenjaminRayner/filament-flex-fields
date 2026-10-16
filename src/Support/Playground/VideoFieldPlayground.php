@@ -209,8 +209,7 @@ class VideoFieldPlayground
                                         ->src(self::DEMO_VIDEO)
                                         ->poster(self::DEMO_POSTER)
                                         ->ratio('16:9')
-                                        ->nativeControls()
-                                        ->controls(false),
+                                        ->nativeControls(),
                                 ]),
                         ]),
                 ]),

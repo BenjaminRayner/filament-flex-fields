@@ -1,3 +1,4 @@
+import { loadAudioBuffer } from '../audio/load-buffer.js'
 export const AUDIO_WAVEFORM_SAMPLE_COUNT = 64
 
 const waveformCache = new Map()
@@ -104,7 +105,8 @@ export function extractPeaksFromBuffer(audioBuffer, sampleCount = AUDIO_WAVEFORM
         let sumSquares = 0
         let count = 0
 
-        for (let sample = start; sample < end; sample++) {
+        const stride = Math.max(1, Math.floor(blockSize / 1024))
+        for (let sample = start; sample < end; sample += stride) {
             const value = channel[sample] ?? 0
 
             sumSquares += value * value
@@ -126,10 +128,12 @@ export function cacheWaveform(src, peaks) {
         return
     }
 
+    waveformCache.delete(src)
     waveformCache.set(src, peaks)
+    if (waveformCache.size > 64) waveformCache.delete(waveformCache.keys().next().value)
 }
 
-export async function extractWaveformFromUrl(src, sampleCount = AUDIO_WAVEFORM_SAMPLE_COUNT) {
+export async function extractWaveformFromUrl(src, sampleCount = AUDIO_WAVEFORM_SAMPLE_COUNT, { signal, maxBytes = 32 * 1024 * 1024 } = {}) {
     if (! src) {
         return null
     }
@@ -141,30 +145,11 @@ export async function extractWaveformFromUrl(src, sampleCount = AUDIO_WAVEFORM_S
     }
 
     try {
-        const response = await fetch(src)
-
-        if (! response.ok) {
-            return null
-        }
-
-        const arrayBuffer = await response.arrayBuffer()
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext
-
-        if (! AudioContextClass) {
-            return null
-        }
-
-        const context = new AudioContextClass()
-        const audioBuffer = await context.decodeAudioData(arrayBuffer.slice(0))
-
-        await context.close()
-
+        if (signal?.aborted) return null
+        const audioBuffer = await loadAudioBuffer(src, { signal, maxBytes })
+        if (signal?.aborted) return null
         const peaks = extractPeaksFromBuffer(audioBuffer, sampleCount)
-
         cacheWaveform(src, peaks)
-
         return peaks
-    } catch {
-        return null
-    }
+    } catch { return null }
 }

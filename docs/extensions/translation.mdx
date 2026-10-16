@@ -1,0 +1,42 @@
+---
+title: "Formatting and translation"
+description: "Format extension values and translate labels using request-local locale context."
+---
+
+A component can format for a language that FLEX does not ship as an interface
+translation. Keep the context with the rendered instance:
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Locale\LocaleContext;
+use Bjanczak\FilamentFlexFields\Support\Locale\FlexFieldsLocale;
+use Bjanczak\FilamentFlexFields\Support\Translations;
+
+$context = new LocaleContext(
+    locale: 'ja-JP',
+    translationLocales: ['ja', 'en'],
+    fallback: 'en',
+);
+
+$label = Translations::forContext('vendor-package::fields.label', $context);
+$formatted = FlexFieldsLocale::formatDate($record->starts_at, $context->formatting->php);
+$direction = $context->direction;
+```
+
+Register those translations with the normal Laravel package namespace. Missing
+Japanese keys use the chosen English fallback; formatting continues to use Japan.
+Contexts never change the application locale. The initial identifier contract
+supports language/script/region/variants, not ICU keywords or Unicode extensions.
+An explicit `direction: 'rtl'` or `'ltr'` overrides the inferred direction.
+
+For plain PHP batch operations outside Laravel's request/job container, wrap each
+operation in `RequestState::withStandaloneScope(fn () => ...)` or call
+`RequestState::resetStandalone()` between operations. Nested scopes restore their
+caller even on failure, and Fibers have independent state. This API does not reset
+Laravel services; use the framework's request/job scope lifecycle there.
+
+Standalone state construction also rejects recursive constructors and releases its admission guard on constructor exceptions. These guards do not change Laravel container resolution.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

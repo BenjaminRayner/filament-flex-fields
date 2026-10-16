@@ -1,0 +1,69 @@
+---
+title: "Package structure"
+description: "Understand the generated provider, surface classes, views, shared display formatting and distributable build."
+---
+
+Keep your extension's public classes, templates and build together. The generated
+Summary package follows this layout; `asset-manifest.json` and the release directory
+are produced by the build rather than edited manually.
+
+```text
+summary/
+├── composer.json
+├── package.json
+├── README.md
+├── build.mjs
+├── src/
+│   ├── SummaryServiceProvider.php
+│   ├── Forms/SummaryField.php
+│   ├── Tables/SummaryColumn.php
+│   ├── Infolists/SummaryEntry.php
+│   └── Support/DisplayValue.php
+└── resources/
+    ├── views/
+    │   ├── field.blade.php
+    │   ├── column.blade.php
+    │   └── entry.blade.php
+    ├── css/display.css
+    ├── js/field.js
+    ├── asset-manifest.json
+    └── dist/<release>/
+```
+
+## Which file should you change?
+
+| Requirement | Owner |
+| --- | --- |
+| New fluent field options or child schema | `Forms/SummaryField.php` |
+| Shared interpretation of your stored value | `Support/DisplayValue.php` |
+| Table-specific presentation | `Tables/SummaryColumn.php`, `column.blade.php` |
+| Infolist-specific presentation and label wrapper | `Infolists/SummaryEntry.php`, `entry.blade.php` |
+| Package identity, version constraints and provider discovery | `composer.json` |
+| Definitions, family surfaces and view namespace | `SummaryServiceProvider.php` |
+| Shared display styles | `resources/css/display.css` |
+| Instance interaction and cleanup | `resources/js/field.js` |
+| Build entry points and resource declarations | `build.mjs` |
+
+## Keep one owner for each implementation
+
+A field that contains `FlexTextInput` uses its real child renderer. Your package's
+CSS owns the parent layout and its display surfaces; it should not reproduce the
+child's input styles. The column and entry can call the same PHP formatter while
+keeping their own label and cell wrappers. Shared JavaScript comes from the public
+SDK rather than copied runtime files.
+
+## Files to distribute
+
+Ship Composer metadata, public PHP classes, views, the manifest and every artifact
+in the manifest's selected release directory. Users installing a built package do
+not need to install Node to consume those artifacts. Keep your build source and
+lockfile in your package repository so you can reproduce the output.
+
+Set a suitable package description, PHP/FLEX requirements and license before
+publishing. Do not exclude the manifest or selected `resources/dist/<release>`
+directory from your Composer archive. Use your own release tag and semantic version;
+ABI versions describe the FLEX protocol, not your package release number.
+
+<Card title="Build and publish" icon="package-check" href="/docs/extensions/build">
+  Compile dependency graphs and publish complete immutable releases.
+</Card>

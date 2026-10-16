@@ -1,6 +1,7 @@
 ---
 title: "UserColumn"
 description: Read-only table column for displaying users with avatars, names, and overlapping stacks.
+icon: "contact-round"
 ---
 
 [← Back to Table of Contents](/docs/index)
@@ -15,7 +16,7 @@ Read-only **table column** for displaying users with the same visual language as
 | **Context** | Filament tables (`$table->columns([...])`) |
 | **State type** | `Model`, `Collection` of models, or `list<Model>` |
 | **Parent** | `Filament\Tables\Columns\TextColumn` |
-| **Playground** | `user-column` slug in Flex Fields playground |
+| **Playground** | `user-select` → **Demo → Table column** |
 
 ---
 
@@ -94,7 +95,7 @@ UserColumn::make('team_preview')
 
 ### Playground
 
-`/admin/flex-fields-playground/user-column`
+`/admin/flex-fields/user-select?variant=table-column`
 
 See [Playground](/docs/index#playground) for setup.
 

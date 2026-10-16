@@ -15,7 +15,7 @@ final class FlexFieldTargetModelSelect
     public static function make(string $name = 'target_type'): Select
     {
         return Select::make($name)
-            ->label(__('filament-flex-fields::default.schema.target_model'))
+            ->label(fn () => __('filament-flex-fields::default.schema.target_model'))
             ->options(fn (?FlexFieldGroup $record): array => app(FlexFieldEntityRegistry::class)->selectOptions($record?->target_type))
             ->default(fn (): string => app(FlexFieldEntityRegistry::class)->defaultModelClass())
             ->required()
@@ -27,15 +27,15 @@ final class FlexFieldTargetModelSelect
             ->helperText(fn (Get $get): ?string => filled($get($name))
                 ? (string) $get($name)
                 : __('filament-flex-fields::default.schema.target_model_help'))
-            ->placeholder(__('filament-flex-fields::default.schema.target_model_placeholder'))
+            ->placeholder(fn () => __('filament-flex-fields::default.schema.target_model_placeholder'))
             ->visible(fn (): bool => app(FlexFieldEntityRegistry::class)->selectOptions() !== []);
     }
 
     public static function missingEntitiesPlaceholder(): Placeholder
     {
         return Placeholder::make('target_model_missing')
-            ->label(__('filament-flex-fields::default.schema.target_model'))
-            ->content(__('filament-flex-fields::default.schema.target_model_missing'))
+            ->label(fn () => __('filament-flex-fields::default.schema.target_model'))
+            ->content(fn () => __('filament-flex-fields::default.schema.target_model_missing'))
             ->visible(fn (): bool => app(FlexFieldEntityRegistry::class)->selectOptions() === []);
     }
 }

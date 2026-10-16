@@ -3,7 +3,7 @@ import { describe, it } from 'node:test'
 
 import { normalizeSearchQuery } from '../../resources/js/core/search-normalize.js'
 import { createCountrySearchMixin } from '../../resources/js/core/country-search.js'
-import { createTimezonePickerMixin } from '../../resources/js/support/timezone-picker-mixin.js'
+import { createCatalogSearchIndex } from '../../resources/js/select/options/catalog-search-index.js'
 
 describe('normalizeSearchQuery', () => {
     it('lowercases and trims', () => {
@@ -31,12 +31,8 @@ describe('normalizeSearchQuery', () => {
 })
 
 function timezonePicker(timezones, search) {
-    const mixin = createTimezonePickerMixin()
-
-    mixin.timezones = timezones
-    mixin.timezoneSearch = search
-
-    return mixin.filteredTimezones
+    const index = createCatalogSearchIndex(timezone => [timezone.label, timezone.id, timezone.region, timezone.offset])
+    return index.read(timezones, search)
 }
 
 describe('timezone picker search', () => {

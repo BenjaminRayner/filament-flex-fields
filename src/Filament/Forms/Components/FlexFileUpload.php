@@ -9,7 +9,10 @@ use Bjanczak\FilamentFlexFields\Concerns\HasFieldFocusOutline;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\InteractsWithFlexFileUpload;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\FlexSpatieMediaLibraryFileUpload;
 use Closure;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use LogicException;
 
 class FlexFileUpload extends FileUpload
 {
@@ -28,6 +31,8 @@ class FlexFileUpload extends FileUpload
             fn (FileUpload $component): string => $component->hasImageEditor() ? 'left' : 'right',
         );
         $this->registerFlexFileUploadHooks();
+        $this->registerFileMetadataAction();
+        $this->registerFileViewerAction();
     }
 
     /**
@@ -45,8 +50,13 @@ class FlexFileUpload extends FileUpload
     /**
      * Factory sugar returning the Spatie field class (UUID state). Does not make this class bipedal.
      */
-    public static function spatie(string $name): FlexSpatieMediaLibraryFileUpload
+    /** @return FlexSpatieMediaLibraryFileUpload */
+    public static function spatie(string $name): BaseFileUpload
     {
+        if (! class_exists(SpatieMediaLibraryFileUpload::class)) {
+            throw new LogicException('Install filament/spatie-laravel-media-library-plugin before selecting the Spatie upload driver.');
+        }
+
         return FlexSpatieMediaLibraryFileUpload::make($name);
     }
 

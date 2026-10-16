@@ -3,11 +3,9 @@ import { test, expect } from '@playwright/test'
 import { trackConsoleErrors } from './helpers/console-errors.mjs'
 import { ensurePlaygroundAuthenticated, playgroundUrl } from './helpers/playground-auth.mjs'
 
-/** Keep in sync with ShowreelMode::hubOrder() in PHP. */
-const v3Hubs = [
-    'schema-conditions',
+// Smoke coverage of the registered catalog hubs.
+const guidePages = [
     'field-intelligence',
-    'composition-recipes',
     'select-field',
     'phone-field',
     'country-field',
@@ -16,24 +14,22 @@ const v3Hubs = [
     'barcode-scanner-field',
     'choice-cards',
     'segment-tabs',
-    'form-layouts',
     'admin-columns',
     'hold-confirm',
     'user-column',
 ]
 
 const hubExpectations = {
-    'schema-conditions': '.fff-playground-toolbar, [data-fff-related-hubs]',
-    'composition-recipes': '.fff-playground-toolbar',
+    'field-intelligence': '.fff-intelligence-overview',
     'select-field': '.fff-select-field, .fff-headless-select',
     'admin-columns': '.fff-progress-column, .fff-rating-column',
     'hold-confirm': '[data-fff-hold-confirm]',
     'user-column': '.fff-user-column',
 }
 
-test.describe('Flex Fields v3 playground hubs', () => {
+test.describe('Flex Fields catalog pages', () => {
 
-    for (const slug of v3Hubs) {
+    for (const slug of guidePages) {
         test(`${slug} loads without JS errors`, async ({ page }) => {
             const { assertClean } = trackConsoleErrors(page)
 

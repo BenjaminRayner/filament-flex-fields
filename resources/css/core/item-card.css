@@ -1,4 +1,12 @@
 /* ItemCard / ItemCardGroup / ItemCardStack — base layout (lazy item-card bundle) */
+.item-card, .item-card-group, .item-card-group-host { text-align: start; }
+.item-card:dir(rtl) .item-card__chevron svg { transform: rotate(180deg); }
+
+@media (prefers-reduced-motion: reduce) {
+    .item-card--pressable { transition: none; }
+    .item-card__ripple { animation: none; }
+}
+
 .item-card-group,
 .item-card-group-host {
     --item-card-group-radius: 1.25rem;
@@ -112,6 +120,11 @@
     display: flex;
     flex-direction: column;
     gap: 0;
+}
+
+.item-card-group--grid > .item-card-group__content > .fi-sc.fi-grid,
+.item-card-group--grid > .item-card-group__content > .fi-grid {
+    display: grid;
 }
 
 .item-card-group__content .fi-grid-col,
@@ -338,7 +351,8 @@
 }
 
 .item-card__action {
-    @apply ml-auto inline-flex shrink-0 items-center justify-end gap-2;
+    @apply inline-flex shrink-0 items-center justify-end gap-2;
+    margin-inline-start: auto;
     overflow: visible;
 }
 

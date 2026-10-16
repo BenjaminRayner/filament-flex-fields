@@ -6,15 +6,23 @@
         'fi-disabled': isHeadlessOptionDisabled(row.option),
     }"
     x-bind:data-value="headlessOptionValue(row.option)"
+    x-bind:data-fff-virt-key="row.key"
     role="option"
+    x-bind:id="headlessOptionDomId(row.key)"
     x-bind:aria-selected="isOptionSelected(headlessOptionValue(row.option)) ? 'true' : 'false'"
     x-bind:aria-disabled="isHeadlessOptionDisabled(row.option) ? 'true' : 'false'"
     x-bind:disabled="isHeadlessOptionDisabled(row.option)"
-    {{-- mousedown.prevent: select before search blur / click.outside can close the teleported panel --}}
-    x-on:mousedown.prevent="toggleOption(headlessOptionValue(row.option))"
-    x-on:mouseenter="comboboxHighlightedIndex = headlessOptionFlatIndex(headlessOptionValue(row.option))"
+    {{-- Preserve search focus on press; commit after the completed click so it cannot hit a modal backdrop. --}}
+    x-on:mousedown.prevent
+    x-on:click.stop.prevent="toggleOption(headlessOptionValue(row.option))"
+    x-on:pointermove="onHeadlessOptionPointerMove($event, row.key)"
 >
-    @if ($isUserSelectField)
+    @if ($field instanceof \Bjanczak\FilamentFlexFields\Filament\Forms\Components\CountryMapField)
+        <span class="fff-country-map-option-row">
+            <x-filament-flex-fields::selection-indicator x-bind:data-checked="isOptionSelected(headlessOptionValue(row.option)) ? 'true' : 'false'" />
+            <span class="fff-select-headless-option-label" x-html="optionDropdownLabel(row.option)"></span>
+        </span>
+    @elseif ($isUserSelectField)
         <template x-if="! isOptionSelectedInDropdown(headlessOptionValue(row.option))">
             <span x-html="optionDropdownLabel(row.option)"></span>
         </template>
@@ -36,6 +44,8 @@
                 </span>
             </span>
         </template>
+    @elseif (! ($field?->showsSelectionIndicator() ?? true))
+        <span class="fff-select-headless-option-label" x-html="optionDropdownLabel(row.option)"></span>
     @else
         <template x-if="! isOptionSelectedInDropdown(headlessOptionValue(row.option))">
             <span>

@@ -42,7 +42,21 @@ class RichEditorAttachmentPruner
             return new RichEditorAttachmentManifest(master: $masterPath);
         }
 
-        return RichEditorAttachmentManifest::fromArray($payload)
-            ?? new RichEditorAttachmentManifest(master: $masterPath);
+        $manifest = RichEditorAttachmentManifest::fromArray($payload);
+
+        if ($manifest === null || $manifest->master !== $masterPath) {
+            return new RichEditorAttachmentManifest(master: $masterPath);
+        }
+
+        $variants = array_filter($manifest->variants, function (string $path, string $name) use ($masterPath): bool {
+            if (! preg_match('/\A[a-zA-Z][a-zA-Z0-9_-]{0,63}\z/', $name)) {
+                return false;
+            }
+
+            return $path === RichEditorAttachmentPaths::variantPath($masterPath, $name)
+                || $path === RichEditorAttachmentPaths::variantPath($masterPath, $name, true);
+        }, ARRAY_FILTER_USE_BOTH);
+
+        return new RichEditorAttachmentManifest(master: $masterPath, variants: $variants);
     }
 }

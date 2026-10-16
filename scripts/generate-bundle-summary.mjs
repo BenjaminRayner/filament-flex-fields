@@ -1,12 +1,14 @@
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { readBundleMetrics } from './bundle-metrics.mjs';
+import './assets/report-module-duplication.mjs';
 
 const packageRoot = path.resolve(import.meta.dirname, '..');
 const metricsPath = path.join(packageRoot, 'resources/dist/bundle-metrics.json');
 const manifestPath = path.join(packageRoot, 'resources/dist/components/alpine-manifest.json');
-const assetsPhpPath = path.join(packageRoot, 'src/Support/FlexFieldAssets.php');
 const readmePath = path.join(packageRoot, 'README.md');
+const reportPath = path.join(packageRoot, '.internal/bundle-summary.md');
 
 const START_MARKER = '<!-- bundle-summary:start -->';
 const END_MARKER = '<!-- bundle-summary:end -->';
@@ -49,24 +51,6 @@ const FIELD_OVERRIDES = {
     'user-select': { jsEntry: 'select-field' },
 };
 
-function extractStylesheetDependencies(phpSource) {
-    const blockMatch = phpSource.match(/public const STYLESHEET_DEPENDENCIES = \[([\s\S]*?)\];/);
-
-    if (! blockMatch) {
-        throw new Error('Could not parse STYLESHEET_DEPENDENCIES from FlexFieldAssets.php');
-    }
-
-    /** @type {Record<string, string[]>} */
-    const dependencies = {};
-
-    for (const match of blockMatch[1].matchAll(/'([^']+)'\s*=>\s*\[([^\]]*)\]/g)) {
-        const component = match[1];
-        const deps = [...match[2].matchAll(/'([^']+)'/g)].map((dep) => dep[1]);
-        dependencies[component] = deps;
-    }
-
-    return dependencies;
-}
 
 function countProductionBundles(metrics) {
     return Object.keys(metrics.css ?? {})
@@ -201,15 +185,25 @@ function buildTable(metrics, manifest, stylesheetDependencies) {
 
 function updateReadme(table) {
     const readme = fs.readFileSync(readmePath, 'utf8');
+    const hasStart = readme.includes(START_MARKER);
+    const hasEnd = readme.includes(END_MARKER);
 
-    if (! readme.includes(START_MARKER) || ! readme.includes(END_MARKER)) {
-        throw new Error(`README.md is missing ${START_MARKER} / ${END_MARKER} markers.`);
+    // The product README opts in to this generated section. Metrics remain
+    // available in the internal report when its editorial layout omits it.
+    if (! hasStart && ! hasEnd) {
+        return false;
+    }
+
+    if (! hasStart || ! hasEnd || readme.indexOf(START_MARKER) >= readme.indexOf(END_MARKER)) {
+        throw new Error(`README.md has incomplete or reversed ${START_MARKER} / ${END_MARKER} markers.`);
     }
 
     const pattern = new RegExp(`${START_MARKER}[\\s\\S]*?${END_MARKER}`);
     const replacement = `${START_MARKER}\n${table}\n${END_MARKER}`;
 
     fs.writeFileSync(readmePath, readme.replace(pattern, replacement));
+
+    return true;
 }
 
 const metrics = readBundleMetrics(metricsPath);
@@ -219,11 +213,12 @@ if (! metrics) {
     process.exit(1);
 }
 
-const phpSource = fs.readFileSync(assetsPhpPath, 'utf8');
-const stylesheetDependencies = extractStylesheetDependencies(phpSource);
+const stylesheetDependencies = JSON.parse(execFileSync('php', ['scripts/export-asset-registry.php'], { cwd: packageRoot, encoding: 'utf8' })).stylesheet_dependencies;
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 const table = buildTable(metrics, manifest, stylesheetDependencies);
 
-updateReadme(table);
+const readmeUpdated = updateReadme(table);
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `# Bundle summary\n\n${table.replaceAll('](resources/dist/', '](../resources/dist/')}\n`);
 
-console.log(`Updated README bundle summary (${SHOWCASE_COMPONENTS.length} sample rows).`);
+console.log(`Updated .internal/bundle-summary.md (${SHOWCASE_COMPONENTS.length} sample rows); README ${readmeUpdated ? 'updated' : 'unchanged (no summary markers)'}.`);

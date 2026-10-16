@@ -95,13 +95,7 @@ final class ScheduleV2
             $overnight = (bool) ($interval['overnight'] ?? false) || $from >= $to;
 
             if ($overnight) {
-                if ($from < self::MINUTES_PER_DAY) {
-                    $segments[] = ['start' => $from, 'end' => self::MINUTES_PER_DAY];
-                }
-
-                if ($to > 0) {
-                    $segments[] = ['start' => 0, 'end' => $to];
-                }
+                $segments[] = ['start' => $from, 'end' => self::MINUTES_PER_DAY + $to];
 
                 continue;
             }

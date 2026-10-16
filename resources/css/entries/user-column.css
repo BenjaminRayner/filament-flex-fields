@@ -1,8 +1,8 @@
 @import "../utilities-baseline.css";
 @import "../base.css";
 
-@source "../../src/Filament/Tables/Columns/UserColumn.php";
-@source "../views/tables/columns/user-column-rich.blade.php";
-@source "../views/tables/columns/user-column-stack.blade.php";
+@source "../../../src/Filament/Tables/Columns/UserColumn.php";
+@source "../../views/tables/columns/user-column-rich.blade.php";
+@source "../../views/tables/columns/user-column-stack.blade.php";
 
 @import "../core/tables/user-column.css";

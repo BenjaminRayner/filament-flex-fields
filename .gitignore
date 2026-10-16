@@ -73,6 +73,7 @@ pnpm-debug.log*
 /remove_soft_radius.php
 
 # Maintainer-only docs — not for public GitHub (customer docs live in docs/)
+/.internal/
 /DEVELOPMENT.md
 /COMPONENTS.md
 

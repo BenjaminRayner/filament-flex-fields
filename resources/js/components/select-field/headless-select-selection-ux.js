@@ -30,46 +30,19 @@ function getAnimatedCheckTemplate() {
 
 export function scheduleCheckEnter(check) {
     cancelCheckEnter(check)
+    check.removeAttribute('data-check-exiting')
+    check.setAttribute('data-visible', 'true')
+
+    if (prefersReducedMotion()) return
+
+    // Keyframes always start from the undrawn stroke, even when Alpine creates
+    // the selected row with data-visible=true in the same rendering flush.
     check.setAttribute('data-check-animate', 'true')
-    check.setAttribute('data-visible', 'false')
-
-    if (prefersReducedMotion()) {
-        check.setAttribute('data-visible', 'true')
-        check.removeAttribute('data-check-animate')
-
-        return
-    }
-
-    const generation = (check.__fffCheckEnterGeneration ?? 0) + 1
-    check.__fffCheckEnterGeneration = generation
-
-    const outer = requestAnimationFrame(() => {
-        if (check.__fffCheckEnterGeneration !== generation) {
-            return
-        }
-
-        const inner = requestAnimationFrame(() => {
-            if (check.__fffCheckEnterGeneration !== generation) {
-                return
-            }
-
-            check.__fffCheckEnterRafs = null
-
-            if (check.isConnected) {
-                check.setAttribute('data-visible', 'true')
-            }
-
-            window.setTimeout(() => {
-                if (check.__fffCheckEnterGeneration === generation) {
-                    check.removeAttribute('data-check-animate')
-                }
-            }, CHECK_STROKE_TIMEOUT_MS)
-        })
-
-        check.__fffCheckEnterRafs = [inner]
-    })
-
-    check.__fffCheckEnterRafs = [outer]
+    const generation = check.__fffCheckEnterGeneration
+    check.__fffCheckEnterTimer = window.setTimeout(() => {
+        check.__fffCheckEnterTimer = null
+        if (check.__fffCheckEnterGeneration === generation) check.removeAttribute('data-check-animate')
+    }, CHECK_STROKE_TIMEOUT_MS)
 }
 
 function cancelCheckEnter(check) {
@@ -79,6 +52,8 @@ function cancelCheckEnter(check) {
 
     check.__fffCheckEnterGeneration = (check.__fffCheckEnterGeneration ?? 0) + 1
     check.removeAttribute('data-check-animate')
+    clearTimeout(check.__fffCheckEnterTimer)
+    check.__fffCheckEnterTimer = null
 
     const rafs = check.__fffCheckEnterRafs
 

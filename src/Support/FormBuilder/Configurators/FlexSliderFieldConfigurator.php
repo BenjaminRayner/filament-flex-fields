@@ -99,7 +99,21 @@ final class FlexSliderFieldConfigurator implements FieldConfigurator
         }
 
         if (array_key_exists('decimal_places', $config)) {
-            $field->decimalPlaces((int) $config['decimal_places']);
+            $field->decimalPlaces($config['decimal_places'] === null ? null : (int) $config['decimal_places']);
+        }
+
+        foreach (['icon_button' => 'iconButton', 'icon_button_active_icon' => 'iconButtonActiveIcon',
+            'icon_button_value' => 'iconButtonValue', 'icon_button_restore_value' => 'iconButtonRestoreValue',
+            'icon_button_position' => 'iconButtonPosition', 'icon_button_label' => 'iconButtonLabel', 'icon_button_active_label' => 'iconButtonActiveLabel', 'tooltips' => 'tooltips', 'thumb_style' => 'thumbStyle', 'value_placement' => 'valuePlacement', 'elastic' => 'elastic', 'haptics' => 'haptics',
+            'marks' => 'marks', 'start_icon' => 'startIcon', 'end_icon' => 'endIcon',
+            'stretch_limit' => 'stretchLimit', 'detent_distance' => 'detentDistance', 'large_step' => 'largeStep'] as $key => $method) {
+            if (array_key_exists($key, $config)) {
+                $value = $config[$key];
+                if (in_array($key, ['icon_button_value', 'icon_button_restore_value'], true) && is_numeric($value)) {
+                    $value += 0;
+                }
+                $field->{$method}($value);
+            }
         }
 
         return $field;

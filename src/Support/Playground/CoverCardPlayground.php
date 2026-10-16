@@ -41,6 +41,7 @@ class CoverCardPlayground
                         ->extraAttributes(['class' => 'fff-playground-variants fff-playground-variants--banners'])
                         ->schema([
                             CoverCard::make()
+                                ->fullWidthOnMobile()
                                 ->backgroundImage(self::PEXELS_COVER_IMAGE)
                                 ->backgroundColor('#0f172a')
                                 ->backgroundPosition('center')
@@ -61,6 +62,7 @@ class CoverCardPlayground
                                             ->send()),
                                 ),
                             CoverCard::make()
+                                ->fullWidthOnMobile()
                                 ->backgroundGradient('linear-gradient(90deg, rgb(15 23 42) 0%, rgb(30 58 138) 45%, rgb(14 116 144) 100%)')
                                 ->ratio('3:1')
                                 ->tone('light')
@@ -80,6 +82,7 @@ class CoverCardPlayground
                         ->extraAttributes(['class' => 'fff-playground-variants'])
                         ->schema([
                             CoverCard::make()
+                                ->fullWidthOnMobile()
                                 ->backgroundImage(self::YACHT_BANNER_IMAGE)
                                 ->backgroundColor('#0f172a')
                                 ->ratio('5:1')
@@ -103,6 +106,7 @@ class CoverCardPlayground
                         ->extraAttributes(['class' => 'fff-playground-variants'])
                         ->schema([
                             CoverCard::make()
+                                ->fullWidthOnMobile()
                                 ->backgroundImage(self::ROBOT_IMAGE)
                                 ->backgroundColor('#e4e4e7')
                                 ->ratio('3:4')
@@ -119,6 +123,7 @@ class CoverCardPlayground
                                             ->send()),
                                 ),
                             CoverCard::make()
+                                ->fullWidthOnMobile()
                                 ->backgroundImage(self::ROBOT_IMAGE)
                                 ->backgroundColor('#d4d4d8')
                                 ->ratio('4:3')
@@ -138,6 +143,7 @@ class CoverCardPlayground
                         ->extraAttributes(['class' => 'fff-playground-variants'])
                         ->schema([
                             CoverCard::make()
+                                ->fullWidthOnMobile()
                                 ->backgroundGradient('linear-gradient(135deg, rgb(76 29 149) 0%, rgb(190 24 93) 52%, rgb(251 146 60) 100%)')
                                 ->ratio('1:1')
                                 ->tone('light')
@@ -154,6 +160,7 @@ class CoverCardPlayground
                                             ->send()),
                                 ),
                             CoverCard::make()
+                                ->fullWidthOnMobile()
                                 ->backgroundColor('#f4f4f5')
                                 ->ratio('9:16')
                                 ->contentMaxWidth('16rem')

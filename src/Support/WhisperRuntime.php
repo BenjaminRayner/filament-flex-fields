@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support;
 
+use Bjanczak\FilamentFlexFields\Support\Media\WhisperRuntimeState;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
@@ -16,30 +18,30 @@ final class WhisperRuntime
 {
     public const LOCK_FILENAME = '.installed.json';
 
-    private static ?bool $installedOverride = null;
-
-    private static ?string $publicDirectoryOverride = null;
-
     public static function fakeInstalled(?bool $installed): void
     {
-        self::$installedOverride = $installed;
+        RequestState::configure(WhisperRuntimeState::class, static function (WhisperRuntimeState $state) use ($installed): void {
+            $state->installedOverride = $installed;
+        });
     }
 
     public static function usePublicDirectory(?string $directory): void
     {
-        self::$publicDirectoryOverride = $directory;
+        RequestState::configure(WhisperRuntimeState::class, static function (WhisperRuntimeState $state) use ($directory): void {
+            $state->publicDirectoryOverride = $directory;
+        });
     }
 
     public static function clearFakes(): void
     {
-        self::$installedOverride = null;
-        self::$publicDirectoryOverride = null;
+        RequestState::resolve(WhisperRuntimeState::class)->installedOverride = null;
+        RequestState::resolve(WhisperRuntimeState::class)->publicDirectoryOverride = null;
     }
 
     public static function publicDirectory(): string
     {
-        return self::$publicDirectoryOverride
-            ?? FlexFieldAssets::staticAssetsPublicDirectory().'/whisper';
+        return RequestState::resolve(WhisperRuntimeState::class)->publicDirectoryOverride
+            ?? FlexFieldAssets::staticAssetsPublicDirectory().'/whisper/'.WhisperRuntimeManifest::VERSION;
     }
 
     public static function lockPath(): string
@@ -54,8 +56,8 @@ final class WhisperRuntime
 
     public static function isInstalled(): bool
     {
-        if (self::$installedOverride !== null) {
-            return self::$installedOverride;
+        if (RequestState::resolve(WhisperRuntimeState::class)->installedOverride !== null) {
+            return RequestState::resolve(WhisperRuntimeState::class)->installedOverride;
         }
 
         return self::verify()['ok'];

@@ -49,7 +49,7 @@ export default function flexRichEditorPasteCleanupExtension() {
         return null
     }
 
-    const mode = window.__flexRichEditorPasteCleanupMode === 'aggressive'
+    const mode = new URL(import.meta.url).searchParams.get('fff-mode') === 'aggressive'
         ? 'aggressive'
         : 'standard'
 

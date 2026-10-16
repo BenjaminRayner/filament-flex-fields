@@ -9,6 +9,7 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\Plugins\Fle
 use Bjanczak\FilamentFlexFields\Support\FileUpload\FileUploadImageProcessor;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
 use Bjanczak\FilamentFlexFields\Support\Playground\FlexRichEditorPlayground;
+use Bjanczak\FilamentFlexFields\Support\RichEditor\Concerns\RegistersFlexRichEditorMediaConversions;
 use Bjanczak\FilamentFlexFields\Support\RichEditor\RichEditorAttachmentIdResolver;
 use Bjanczak\FilamentFlexFields\Support\RichEditor\RichEditorAttachmentPruner;
 use Bjanczak\FilamentFlexFields\Support\RichEditor\RichEditorAttachmentVariantGenerator;
@@ -18,6 +19,7 @@ use Filament\Forms\Components\RichEditor\RichEditorTool;
 use Filament\Forms\Components\RichEditor\ToolbarButtonGroup;
 use Filament\Support\Facades\FilamentIcon;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 
 function createFlexRichEditorTestJpeg(int $width, int $height): string
@@ -79,11 +81,9 @@ it('exposes word count and json badge toggles', function () {
 it('registers grouped toolbar buttons in default layout', function () {
     $groups = FlexRichEditor::make('body')->getFlexDefaultToolbarButtons();
 
-    expect(collect($groups)->flatten()->all())->toContain('clearFormatting', 'clearContent')
-        ->not->toContain('attachFiles', 'textColor', 'customBlocks', 'mergeTags')
-        ->and($groups[2][0])->toBeInstanceOf(FlexToolbarButtonGroup::class)
-        ->and($groups[3][0])->toBeInstanceOf(FlexToolbarButtonGroup::class)
-        ->and($groups[5][0])->toBeInstanceOf(FlexToolbarButtonGroup::class);
+    expect(collect($groups)->flatten()->all())->toContain('h1', 'h2', 'h3', 'attachFiles', 'clearFormatting', 'clearContent')
+        ->not->toContain('textColor', 'customBlocks', 'mergeTags')
+        ->and($groups)->toHaveCount(5);
 });
 
 it('exposes a full toolbar preset with attachments', function () {
@@ -93,23 +93,23 @@ it('exposes a full toolbar preset with attachments', function () {
         ->not->toContain('textColor', 'customBlocks', 'mergeTags');
 });
 
-it('registers gravity icons only for flex rich editor aliases', function () {
+it('registers Hugeicons only for flex rich editor aliases', function () {
     RichEditorGravityIcons::register();
 
     $nativeBold = FilamentIcon::resolve('forms:components.rich-editor.toolbar.bold');
     $nativeBoldName = is_string($nativeBold) ? $nativeBold : (string) $nativeBold;
 
-    expect(FilamentIcon::resolve('filament-flex-fields::flex-rich-editor.toolbar.clear-formatting'))->toBe('gravityui-eraser')
-        ->and(FilamentIcon::resolve('filament-flex-fields::flex-rich-editor.toolbar.clear-content'))->toBe('gravityui-trash-bin')
+    expect(FilamentIcon::resolve('filament-flex-fields::flex-rich-editor.toolbar.clear-formatting'))->toBe('hugeicons-eraser')
+        ->and(FilamentIcon::resolve('filament-flex-fields::flex-rich-editor.toolbar.clear-content'))->toBe('hugeicons-delete-02')
         ->and($nativeBoldName)->not->toStartWith('gravityui-');
 });
 
-it('applies gravity icons to flex extra tools and maps flex toolbar icons', function () {
+it('applies Hugeicons to flex extra tools and maps flex toolbar icons', function () {
     $extraTools = FlexRichEditor::getFlexExtraTools();
 
-    expect($extraTools[0]->getIcon())->toBe('gravityui-eraser')
-        ->and($extraTools[1]->getIcon())->toBe('gravityui-trash-bin')
-        ->and(RichEditorGravityIcons::iconForToolName('bold'))->toBe('gravityui-bold');
+    expect($extraTools[0]->getIcon())->toBe('hugeicons-eraser')
+        ->and($extraTools[1]->getIcon())->toBe('hugeicons-delete-02')
+        ->and(RichEditorGravityIcons::iconForToolName('bold'))->toBe('hugeicons-text-bold');
 });
 
 it('keeps native comparison extra tools without gravity icons', function () {
@@ -120,15 +120,15 @@ it('keeps native comparison extra tools without gravity icons', function () {
         ->and($tools[0]->getIcon())->toBeInstanceOf(Heroicon::class);
 });
 
-it('applies gravity icons to toolbar tools', function () {
-    expect(RichEditorGravityIcons::iconForToolName('undo'))->toBe('gravityui-arrow-rotate-left')
-        ->and(RichEditorGravityIcons::iconForToolName('redo'))->toBe('gravityui-arrow-rotate-right')
-        ->and(RichEditorGravityIcons::iconForToolName('bold'))->toBe('gravityui-bold')
-        ->and(RichEditorGravityIcons::iconForToolName('h1'))->toBe('gravityui-heading-1')
-        ->and(RichEditorGravityIcons::iconForToolName('blockquote'))->toBe('gravityui-quote-close')
-        ->and(RichEditorGravityIcons::iconForToolName('textColor'))->toBe('gravityui-palette')
-        ->and(RichEditorGravityIcons::iconForToolName('attachFiles'))->toBe('gravityui-picture')
-        ->and(RichEditorGravityIcons::iconForToolName('alignCenter'))->toBe('gravityui-bars-ascending-align-center');
+it('applies Hugeicons to toolbar tools', function () {
+    expect(RichEditorGravityIcons::iconForToolName('undo'))->toBe('hugeicons-undo-02')
+        ->and(RichEditorGravityIcons::iconForToolName('redo'))->toBe('hugeicons-redo-02')
+        ->and(RichEditorGravityIcons::iconForToolName('bold'))->toBe('hugeicons-text-bold')
+        ->and(RichEditorGravityIcons::iconForToolName('h1'))->toBe('hugeicons-heading-01')
+        ->and(RichEditorGravityIcons::iconForToolName('blockquote'))->toBe('hugeicons-quote-down')
+        ->and(RichEditorGravityIcons::iconForToolName('textColor'))->toBe('hugeicons-paint-board')
+        ->and(RichEditorGravityIcons::iconForToolName('attachFiles'))->toBe('hugeicons-image-01')
+        ->and(RichEditorGravityIcons::iconForToolName('alignCenter'))->toBe('hugeicons-text-align-center');
 });
 
 it('uses the flex rich editor tooltip theme without filament arrow', function () {
@@ -160,6 +160,9 @@ it('positions flex toolbar dropdown menus with fixed coordinates', function () {
 
 it('renders flex rich editor blade with filament alpine runtime', function () {
     $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-rich-editor-field.blade.php');
+    foreach (glob(__DIR__.'/../../resources/views/forms/components/partials/rich-editor/*.blade.php') as $partial) {
+        $blade .= file_get_contents($partial);
+    }
 
     expect($blade)
         ->toContain('fff-rich-editor')
@@ -170,8 +173,8 @@ it('renders flex rich editor blade with filament alpine runtime', function () {
         ->toContain("getAlpineComponentSrc('flex-rich-editor'")
         ->toContain("getAlpineComponentSrc('rich-editor', 'filament/forms')")
         ->toContain('richEditorSrc:')
-        ->toContain('flex-rich-editor-runtime-preload')
-        ->toContain('x-intersect:enter.once.margin.300px')
+        ->not->toContain('flex-rich-editor-runtime-preload')
+        ->not->toContain('x-intersect:enter.once.margin.300px')
         ->toContain('floatingToolbar::{{ $nodeName }}')
         ->toContain('fff-rich-editor__footer-stats')
         ->toContain('fff-rich-editor__bubble-menu')
@@ -179,7 +182,7 @@ it('renders flex rich editor blade with filament alpine runtime', function () {
         ->toContain('fi-fo-rich-editor-dropdown-tool-trigger')
         ->toContain('fff-rich-editor__toolbar-separator')
         ->not->toContain('fff-rich-editor-toolbar-scroll')
-        ->toContain('FormsIconAlias::')
+        ->not->toContain('FormsIconAlias::')
         ->not->toContain('fi-fo-rich-editor-custom-blocks-ctn')
         ->not->toContain('fi-fo-rich-editor-merge-tags-list')
         ->not->toContain('<script')
@@ -220,6 +223,9 @@ it('ships flex rich editor as a thin shell without bundling filament tip tap run
 
 it('loads stylesheet via blade partial', function () {
     $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-rich-editor-field.blade.php');
+    foreach (glob(__DIR__.'/../../resources/views/forms/components/partials/rich-editor/*.blade.php') as $partial) {
+        $blade .= file_get_contents($partial);
+    }
 
     expect($blade)->toContain("load-stylesheet', ['component' => 'rich-editor-field'");
 });
@@ -236,13 +242,14 @@ it('registers flex rich editor playground sections', function () {
     $components = $playground->components();
     $nativeToolbar = FlexRichEditor::make('_native')->getNativeComparisonToolbarButtons();
 
-    expect($components)->toHaveCount(4)
+    expect($components)->toHaveCount(3)
         ->and($playground->defaultState())->toHaveKeys([
-            'filament_rich_editor__native',
             'flex_rich_editor__basic',
             'flex_rich_editor__attachments',
             'flex_rich_editor__full_toolbar',
         ])
+        ->and($playground->defaultState())->not->toHaveKey('filament_rich_editor__native')
+        ->and(array_map(fn ($component) => $component->getExtraAttributes()['class'] ?? null, $components))->each->toBe('fff-playground-section')
         ->and($nativeToolbar[2][0])->toBeInstanceOf(ToolbarButtonGroup::class)
         ->and($nativeToolbar[2][0])->not->toBeInstanceOf(FlexToolbarButtonGroup::class);
 });
@@ -265,7 +272,7 @@ it('defines reference toolbar and bubble sizing tokens', function () {
     expect($css)
         ->toContain('invisible absolute')
         ->toContain('rounded-full')
-        ->toContain('--fff-rich-editor-icon-size: 1.25rem')
+        ->toContain('--fff-rich-editor-icon-size: 1.125rem')
         ->toContain('var(--fff-rich-editor-bubble-radius)')
         ->toContain('var(--fff-rich-editor-tool-bg-hover)')
         ->toContain('border: 0')
@@ -277,16 +284,16 @@ it('defines reference toolbar and bubble sizing tokens', function () {
         ->toContain('--fff-rich-editor-tooltip-z: 20')
         ->toContain('overflow-x-auto')
         ->toContain('overflow: hidden')
-        ->toContain('var(--fff-rich-editor-radius, var(--fff-global-radius, 0.75rem))')
+        ->toContain('var(--fff-rich-editor-radius, var(--fff-global-radius, 1rem))')
         ->toContain('var(--fff-rich-editor-border')
         ->toContain('z-[30]')
-        ->toContain('var(--fff-rich-editor-radius, var(--fff-global-radius, 0.75rem))')
+        ->toContain('var(--fff-rich-editor-radius, var(--fff-global-radius, 1rem))')
         ->toContain('.fi-fo-rich-editor-dropdown-tool-menu[x-cloak]')
         ->toContain('var(--fff-rich-editor-bubble-radius)')
         ->toContain('var(--fff-rich-editor-bubble-shadow)')
         ->toContain('fi-fo-rich-editor-dropdown-tool-chevron');
 
-    expect($css)->not->toContain('.fff-rich-editor__panels')
+    expect($css)->toContain('.fff-rich-editor__panels')
         ->not->toContain('.fff-rich-editor-custom-block-preview')
         ->not->toContain('.fi-fo-rich-editor-custom-block-btn');
 
@@ -303,6 +310,9 @@ it('defines reference toolbar and bubble sizing tokens', function () {
         ->toContain('display: none !important');
 
     $blade = file_get_contents(__DIR__.'/../../resources/views/forms/components/flex-rich-editor-field.blade.php');
+    foreach (glob(__DIR__.'/../../resources/views/forms/components/partials/rich-editor/*.blade.php') as $partial) {
+        $blade .= file_get_contents($partial);
+    }
 
     expect($blade)
         ->toContain('x-on:click.capture')
@@ -454,4 +464,110 @@ it('deletes removed rich editor attachments with all generated variants', functi
 
 it('enables orphan attachment pruning by default on flex rich editor', function () {
     expect(FlexRichEditor::make('body')->shouldPruneOrphanedRichEditorAttachments())->toBeTrue();
+});
+
+it('provides default WebP thumb and large image variants and allows opting out', function () {
+    $field = FlexRichEditor::make('body');
+    $variants = collect($field->getFlexRichEditorImageVariants())->keyBy('name');
+    expect($variants['thumb']->maxLongEdge)->toBe(250)->and($variants['thumb']->webp)->toBeTrue()
+        ->and($variants['large']->maxLongEdge)->toBe(1500)->and($variants['large']->master)->toBeTrue();
+    expect($field->imageVariants([])->getFlexRichEditorImageVariants())->toBe([]);
+});
+
+it('generates WebP variants through a stream-only remote disk', function () {
+    Storage::fake('remote');
+    $storage = Storage::disk('remote');
+    $storage->put('editor/photo.jpg', createFlexRichEditorTestJpeg(1800, 900));
+    $remote = Mockery::mock(Filesystem::class);
+    foreach (['readStream', 'exists', 'getVisibility', 'put', 'delete'] as $method) {
+        $remote->shouldReceive($method)->andReturnUsing(fn (...$arguments) => $storage->{$method}(...$arguments));
+    }
+    $manifest = (new RichEditorAttachmentVariantGenerator)->generate($remote, 'editor/photo.jpg', FlexRichEditor::make('body')->getFlexRichEditorImageVariants());
+    expect($manifest->master)->toBe('editor/photo.webp')
+        ->and($manifest->widths)->toBe(['master' => 1500, 'thumb' => 250])
+        ->and(mime_content_type($storage->path($manifest->variants['thumb'])))->toBe('image/webp');
+    $storage->assertMissing('editor/photo.jpg');
+});
+
+it('cleans partial variant publication while preserving the original on failure', function () {
+    Storage::fake('remote');
+    $storage = Storage::disk('remote');
+    $original = createFlexRichEditorTestJpeg(600, 300);
+    $storage->put('editor/photo.jpg', $original);
+    $remote = Mockery::mock(Filesystem::class);
+    foreach (['readStream', 'exists', 'getVisibility', 'delete'] as $method) {
+        $remote->shouldReceive($method)->andReturnUsing(fn (...$arguments) => $storage->{$method}(...$arguments));
+    }
+    $remote->shouldReceive('put')->andReturnUsing(fn ($path, $contents, $options = []) => str_ends_with($path, '.flex-variants.json') ? false : $storage->put($path, $contents, $options));
+    expect(fn () => (new RichEditorAttachmentVariantGenerator)->generate($remote, 'editor/photo.jpg', FlexRichEditor::make('body')->getFlexRichEditorImageVariants()))->toThrow(RuntimeException::class, 'manifest');
+    expect($storage->get('editor/photo.jpg'))->toBe($original)
+        ->and($storage->allFiles('editor'))->toBe(['editor/photo.jpg']);
+});
+
+it('rejects unsafe variant names, invalid dimensions and multiple master variants', function () {
+    expect(fn () => RichEditorImageVariant::make('../other'))->toThrow(InvalidArgumentException::class)
+        ->and(fn () => RichEditorImageVariant::make('thumb')->maxLongEdge(0))->toThrow(InvalidArgumentException::class)
+        ->and(fn () => RichEditorImageVariant::normalizeCollection(['one' => ['master' => true], 'two' => ['master' => true]]))->toThrow(InvalidArgumentException::class);
+});
+
+it('never deletes unrelated paths referenced by a tampered variant manifest', function () {
+    Storage::fake('public');
+    $disk = Storage::disk('public');
+    $disk->put('editor/photo.webp', 'image');
+    $disk->put('other/private.webp', 'unrelated');
+    $disk->put('editor/photo.flex-variants.json', json_encode(['master' => 'editor/photo.webp', 'variants' => ['thumb' => 'other/private.webp']]));
+    (new RichEditorAttachmentPruner)->deleteMastersWithVariants($disk, ['editor/photo.webp']);
+    $disk->assertExists('other/private.webp');
+    $disk->assertMissing('editor/photo.webp');
+});
+
+it('registers all spatie variants including the display master and respects queue selection', function () {
+    $model = new class
+    {
+        use RegistersFlexRichEditorMediaConversions;
+
+        public array $conversions = [];
+
+        public function configure(bool $queued): void
+        {
+            $this->registerFlexRichEditorMediaConversions([
+                'thumb' => ['max_long_edge' => 250, 'webp' => true],
+                'large' => ['max_long_edge' => 1500, 'master' => true, 'webp' => true],
+            ], $queued);
+        }
+
+        public function addMediaConversion(string $name): object
+        {
+            return $this->conversions[$name] = new class
+            {
+                public bool $queued = false;
+
+                public function __call(string $name, array $arguments): self
+                {
+                    return $this;
+                }
+
+                public function queued(): self
+                {
+                    $this->queued = true;
+
+                    return $this;
+                }
+
+                public function nonQueued(): self
+                {
+                    $this->queued = false;
+
+                    return $this;
+                }
+            };
+        }
+    };
+
+    $model->configure(true);
+    expect(array_keys($model->conversions))->toBe(['thumb', 'large'])
+        ->and($model->conversions['thumb']->queued)->toBeTrue()
+        ->and($model->conversions['large']->queued)->toBeTrue();
+    $model->configure(false);
+    expect($model->conversions['large']->queued)->toBeFalse();
 });

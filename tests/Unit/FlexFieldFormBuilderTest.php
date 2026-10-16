@@ -165,7 +165,7 @@ it('keeps dual handles when livewire state is still a scalar', function () {
                 'step' => 10,
                 'is_range' => true,
             ],
-            'default' => 0,
+            'default_value' => 0,
         ]),
     );
 

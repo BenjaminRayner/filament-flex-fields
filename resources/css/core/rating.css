@@ -162,3 +162,13 @@
     @apply outline-none;
     box-shadow: none;
 }
+
+.fff-rating.is-interactive .fff-rating__item:focus-visible {
+    outline: 2px solid var(--primary-500);
+    outline-offset: 3px;
+}
+
+.fff-rating__icon-clip:dir(rtl) {
+    left: auto;
+    right: 0;
+}

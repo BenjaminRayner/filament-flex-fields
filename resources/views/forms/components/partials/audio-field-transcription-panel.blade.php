@@ -1,5 +1,5 @@
 @php
-    use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+    use Bjanczak\FilamentFlexFields\Support\FlexIcon;
     use Filament\Support\Enums\IconSize;
 
     $settingsVisible = $settingsVisible ?? true;
@@ -59,7 +59,7 @@
                                     <span class="fff-audio-field__settings-item-hint">
                                         <span class="fff-audio-field__settings-item-hint-label" x-text="selectedModelLabel"></span>
                                         <span class="fff-audio-field__settings-item-chevron" aria-hidden="true">
-                                            {{ \Filament\Support\generate_icon_html(GravityIcon::ChevronRight, size: IconSize::ExtraSmall) }}
+                                            {{ \Filament\Support\generate_icon_html(FlexIcon::ChevronRight, size: IconSize::ExtraSmall) }}
                                         </span>
                                     </span>
                                 </button>
@@ -75,7 +75,7 @@
                                     <span class="fff-audio-field__settings-item-hint">
                                         <span class="fff-audio-field__settings-item-hint-label" x-text="selectedLanguageLabel"></span>
                                         <span class="fff-audio-field__settings-item-chevron" aria-hidden="true">
-                                            {{ \Filament\Support\generate_icon_html(GravityIcon::ChevronRight, size: IconSize::ExtraSmall) }}
+                                            {{ \Filament\Support\generate_icon_html(FlexIcon::ChevronRight, size: IconSize::ExtraSmall) }}
                                         </span>
                                     </span>
                                 </button>
@@ -91,44 +91,23 @@
                                     <span class="fff-audio-field__settings-item-hint">
                                         <span class="fff-audio-field__settings-item-hint-label" x-text="selectedTaskLabel"></span>
                                         <span class="fff-audio-field__settings-item-chevron" aria-hidden="true">
-                                            {{ \Filament\Support\generate_icon_html(GravityIcon::ChevronRight, size: IconSize::ExtraSmall) }}
+                                            {{ \Filament\Support\generate_icon_html(FlexIcon::ChevronRight, size: IconSize::ExtraSmall) }}
                                         </span>
                                     </span>
                                 </button>
 
-                                <div class="fff-audio-field__settings-item fff-audio-field__settings-item--switch" role="none">
-                                    <span class="fff-audio-field__settings-item-label" x-text="labels.transcription.multilingual"></span>
-                                    <div @class(['fff-switch', 'fff-switch--sm', 'fff-switch--inline'])>
-                                        <button
-                                            type="button"
-                                            class="fff-switch__control bg-gray-200 dark:bg-gray-700"
-                                            role="switch"
-                                            x-bind:aria-checked="sttMultilingual ? 'true' : 'false'"
-                                            x-bind:data-checked="sttMultilingual ? 'true' : 'false'"
-                                            x-bind:class="sttMultilingual ? 'bg-primary-600 dark:bg-primary-500' : 'bg-gray-200 dark:bg-gray-700'"
-                                            x-on:click="toggleSttMultilingual()"
-                                        >
-                                            <span class="fff-switch__thumb"></span>
-                                        </button>
+                                @foreach (['sttMultilingual'=>'multilingual','sttQuantized'=>'quantized'] as $property=>$labelKey)
+                                    @php($presentation = ['checked'=>true,'inline'=>true,'onClasses'=>['bg-primary-600','dark:bg-primary-500'],'offClasses'=>['bg-gray-200','dark:bg-gray-700'],'label'=>__('filament-flex-fields::default.audio.transcription_'.$labelKey),'disabled'=>false,'hasIcons'=>false])
+                                    <div class="fff-audio-field__settings-item fff-audio-field__settings-item--switch" role="none">
+                                        <span class="fff-audio-field__settings-item-label" x-text="labels.transcription.{{ $labelKey }}"></span>
+                                        @include('filament-flex-fields::partials.load-stylesheet', ['component'=>'switch','livewireKey'=>$getLivewireKey().'.'.$property])
+                                        <div class="fff-switch fff-switch--sm fff-switch--inline" x-fff-load
+                                            x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('switch', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
+                                            x-data="switchFormComponent({ getValue:()=>{{ $property }}, setValue:value=>{ {{ $property }}=value; ensureValidSttModel(); }, onClasses:@js($presentation['onClasses']),offClasses:@js($presentation['offClasses']) })">
+                                            <x-filament-flex-fields::switch-control :presentation="$presentation" />
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div class="fff-audio-field__settings-item fff-audio-field__settings-item--switch" role="none">
-                                    <span class="fff-audio-field__settings-item-label" x-text="labels.transcription.quantized"></span>
-                                    <div class="fff-switch fff-switch--sm fff-switch--inline">
-                                        <button
-                                            type="button"
-                                            class="fff-switch__control bg-gray-200 dark:bg-gray-700"
-                                            role="switch"
-                                            x-bind:aria-checked="sttQuantized ? 'true' : 'false'"
-                                            x-bind:data-checked="sttQuantized ? 'true' : 'false'"
-                                            x-bind:class="sttQuantized ? 'bg-primary-600 dark:bg-primary-500' : 'bg-gray-200 dark:bg-gray-700'"
-                                            x-on:click="toggleSttQuantized()"
-                                        >
-                                            <span class="fff-switch__thumb"></span>
-                                        </button>
-                                    </div>
-                                </div>
+                                @endforeach
                             </div>
                         </div>
 
@@ -146,7 +125,7 @@
                         >
                             <button type="button" class="fff-audio-field__settings-back" x-on:click="openSettingsView('root')">
                                 <span class="fff-audio-field__settings-item-chevron fff-audio-field__settings-item-chevron--back" aria-hidden="true">
-                                    {{ \Filament\Support\generate_icon_html(GravityIcon::ChevronLeft, size: IconSize::ExtraSmall) }}
+                                    {{ \Filament\Support\generate_icon_html(FlexIcon::ChevronLeft, size: IconSize::ExtraSmall) }}
                                 </span>
                                 <span x-text="labels.transcription.model_hint"></span>
                             </button>
@@ -164,7 +143,7 @@
                                     >
                                         <span x-text="model.label"></span>
                                         <span class="fff-audio-field__settings-item-indicator" x-show="sttModel === model.id" aria-hidden="true">
-                                            {{ \Filament\Support\generate_icon_html(GravityIcon::Check, size: IconSize::ExtraSmall) }}
+                                            {{ \Filament\Support\generate_icon_html(FlexIcon::Check, size: IconSize::ExtraSmall) }}
                                         </span>
                                     </button>
                                 </template>
@@ -185,7 +164,7 @@
                         >
                             <button type="button" class="fff-audio-field__settings-back" x-on:click="openSettingsView('root')">
                                 <span class="fff-audio-field__settings-item-chevron fff-audio-field__settings-item-chevron--back" aria-hidden="true">
-                                    {{ \Filament\Support\generate_icon_html(GravityIcon::ChevronLeft, size: IconSize::ExtraSmall) }}
+                                    {{ \Filament\Support\generate_icon_html(FlexIcon::ChevronLeft, size: IconSize::ExtraSmall) }}
                                 </span>
                                 <span x-text="labels.transcription.language_hint"></span>
                             </button>
@@ -207,7 +186,7 @@
                                             x-show="(sttLanguage ?? '') === (language.code ?? '')"
                                             aria-hidden="true"
                                         >
-                                            {{ \Filament\Support\generate_icon_html(GravityIcon::Check, size: IconSize::ExtraSmall) }}
+                                            {{ \Filament\Support\generate_icon_html(FlexIcon::Check, size: IconSize::ExtraSmall) }}
                                         </span>
                                     </button>
                                 </template>
@@ -228,7 +207,7 @@
                         >
                             <button type="button" class="fff-audio-field__settings-back" x-on:click="openSettingsView('root')">
                                 <span class="fff-audio-field__settings-item-chevron fff-audio-field__settings-item-chevron--back" aria-hidden="true">
-                                    {{ \Filament\Support\generate_icon_html(GravityIcon::ChevronLeft, size: IconSize::ExtraSmall) }}
+                                    {{ \Filament\Support\generate_icon_html(FlexIcon::ChevronLeft, size: IconSize::ExtraSmall) }}
                                 </span>
                                 <span x-text="labels.transcription.task_hint"></span>
                             </button>
@@ -245,7 +224,7 @@
                                 >
                                     <span x-text="labels.transcription.task_transcribe"></span>
                                     <span class="fff-audio-field__settings-item-indicator" x-show="sttTask === 'transcribe'" aria-hidden="true">
-                                        {{ \Filament\Support\generate_icon_html(GravityIcon::Check, size: IconSize::ExtraSmall) }}
+                                        {{ \Filament\Support\generate_icon_html(FlexIcon::Check, size: IconSize::ExtraSmall) }}
                                     </span>
                                 </button>
                                 <button
@@ -257,7 +236,7 @@
                                 >
                                     <span x-text="labels.transcription.task_translate"></span>
                                     <span class="fff-audio-field__settings-item-indicator" x-show="sttTask === 'translate'" aria-hidden="true">
-                                        {{ \Filament\Support\generate_icon_html(GravityIcon::Check, size: IconSize::ExtraSmall) }}
+                                        {{ \Filament\Support\generate_icon_html(FlexIcon::Check, size: IconSize::ExtraSmall) }}
                                     </span>
                                 </button>
                             </div>
@@ -275,7 +254,7 @@
                     x-bind:aria-haspopup="true"
                     x-bind:class="{ 'is-active': settingsOpen }"
                 >
-                    {{ \Filament\Support\generate_icon_html(GravityIcon::Gear, size: IconSize::ExtraSmall) }}
+                    {{ \Filament\Support\generate_icon_html(FlexIcon::Gear, size: IconSize::ExtraSmall) }}
                 </button>
             </div>
         @endif

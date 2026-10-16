@@ -6,11 +6,12 @@ namespace Bjanczak\FilamentFlexFields\Filament\Tables\Columns;
 
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\Concerns\EmitsFlexFieldTableColumnAssets;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldStylesheetQueue;
 use Bjanczak\FilamentFlexFields\Support\ProgressColumnRenderCache;
 use Closure;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\HtmlString;
 
 class ProgressColumn extends TextColumn
 {
@@ -26,11 +27,9 @@ class ProgressColumn extends TextColumn
     {
         parent::setUp();
 
-        FlexFieldStylesheetQueue::enqueueFor('progress-column');
-
         $this->html();
 
-        $this->formatStateUsing(fn (mixed $state, ProgressColumn $column): string => $column->formatProgressDisplay($state));
+        $this->formatStateUsing(fn (mixed $state, ProgressColumn $column): Htmlable => new HtmlString($column->formatProgressDisplay($state)));
     }
 
     public function progressSize(string|ControlSize|Closure $size): static

@@ -32,10 +32,18 @@ class DateTimeCalendar
     {
         $identifier = strtolower(trim($identifier));
 
-        return match ($identifier) {
+        $normalized = match ($identifier) {
             'gregorian', 'gregory' => 'gregory',
             'islamic' => 'islamic-civil',
             default => $identifier,
         };
+
+        if (! in_array($normalized, ['gregory', 'buddhist', 'coptic', 'ethiopic', 'ethioaa',
+            'hebrew', 'indian', 'islamic-civil', 'islamic-tbla', 'islamic-umalqura',
+            'japanese', 'persian', 'roc'], true)) {
+            throw new \InvalidArgumentException('Unsupported calendar system: '.$identifier);
+        }
+
+        return $normalized;
     }
 }

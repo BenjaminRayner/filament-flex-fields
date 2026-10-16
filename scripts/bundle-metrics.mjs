@@ -24,8 +24,20 @@ export function collectCssMetrics(cssRoot) {
 
 export function collectJsMetrics(componentsRoot) {
     const metrics = {};
+    const manifestPath = path.join(componentsRoot, 'alpine-manifest.json');
+    // Old content-addressed chunks intentionally survive a build for open pages.
+    // Measure the current deploy graph, never the accumulated release archive.
+    const manifest = fs.existsSync(manifestPath)
+        ? JSON.parse(fs.readFileSync(manifestPath, 'utf8')) : null;
+    if (manifest && (!Array.isArray(manifest.__entries__) || !Array.isArray(manifest.__shared_chunks__))) {
+        throw new Error('Invalid Alpine manifest: bundle metrics require entries and shared chunks.');
+    }
+    const files = manifest
+        ? [...new Set([...manifest.__entries__.map((entry) => `${entry}.js`), ...manifest.__shared_chunks__])]
+        : fs.readdirSync(componentsRoot).filter((entry) => entry.endsWith('.js'));
 
-    for (const file of fs.readdirSync(componentsRoot).filter((entry) => entry.endsWith('.js'))) {
+    for (const file of files) {
+        if (path.basename(file) !== file || !file.endsWith('.js')) throw new Error(`Invalid bundle filename: ${file}`);
         metrics[file] = fileSizeMetrics(path.join(componentsRoot, file));
     }
 

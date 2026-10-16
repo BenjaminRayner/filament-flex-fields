@@ -6,6 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Support\Schedule;
 
 use Bjanczak\FilamentFlexFields\Support\DateTime\ScheduleV2;
 use Closure;
+use DateTimeZone;
 
 final class ScheduleValidator
 {
@@ -39,7 +40,8 @@ final class ScheduleValidator
                 return;
             }
 
-            if (is_array($allowedTimezones) && ! in_array(trim($submittedTimezone), $allowedTimezones, true)) {
+            if (! in_array(trim($submittedTimezone), DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC), true)
+                || (is_array($allowedTimezones) && ! in_array(trim($submittedTimezone), $allowedTimezones, true))) {
                 $fail(__('validation.in', ['attribute' => __('filament-flex-fields::default.schedule.timezone')]));
 
                 return;
@@ -57,7 +59,27 @@ final class ScheduleValidator
                 return;
             }
 
-            $this->validateDay($day, $dayState, $fail);
+            $valid = true;
+            $this->validateDay($day, $dayState, function (string $message) use ($fail, &$valid): void {
+                $valid = false;
+                $fail($message);
+            });
+
+            if (! $valid) {
+                return;
+            }
+        }
+
+        $overlap = WeeklyScheduleIntervals::firstOverlap($dayStates, $days);
+
+        if ($overlap !== null) {
+            $fail(__('filament-flex-fields::default.schedule.validation.overlap', [
+                'day' => implode(' / ', array_map(static function (string $day): string {
+                    $label = __("filament-flex-fields::default.schedule.days.{$day}");
+
+                    return is_string($label) ? $label : $day;
+                }, $overlap)),
+            ]));
         }
     }
 
@@ -66,19 +88,30 @@ final class ScheduleValidator
      */
     public function validateDay(string $day, array $dayState, Closure $fail): void
     {
+        if (! in_array($dayState['enabled'] ?? false, [true, false, 0, 1, '0', '1'], true)
+            || (array_key_exists('slots', $dayState) && (! is_array($dayState['slots']) || ! array_is_list($dayState['slots'])))) {
+            $fail(__('filament-flex-fields::default.schedule.validation.invalid'));
+
+            return;
+        }
         $enabled = (bool) ($dayState['enabled'] ?? false);
         $slots = is_array($dayState['slots'] ?? null) ? $dayState['slots'] : [];
         $dayLabel = __("filament-flex-fields::default.schedule.days.{$day}");
-        $normalizer = new ScheduleNormalizer;
+        // Bound work before parsing even disabled days; retained slots are persisted too.
+        if (count($slots) > $this->maxSlots) {
+            $fail(__('filament-flex-fields::default.schedule.validation.max_slots', [
+                'day' => $dayLabel, 'count' => $this->maxSlots,
+            ]));
 
-        if (! $enabled) {
             return;
         }
 
         $normalizedSlots = [];
 
         foreach ($slots as $index => $slot) {
-            if (! is_array($slot)) {
+            if (! is_array($slot)
+                || ! in_array($slot['overnight'] ?? false, [true, false, 0, 1, '0', '1'], true)
+                || ! in_array($slot['type'] ?? 'slot', ['slot', 'break'], true)) {
                 $fail(__('filament-flex-fields::default.schedule.validation.invalid_slot', [
                     'day' => $dayLabel,
                     'slot' => $index + 1,
@@ -87,8 +120,8 @@ final class ScheduleValidator
                 return;
             }
 
-            $from = $normalizer->normalizeTime($slot['from'] ?? null);
-            $to = $normalizer->normalizeTime($slot['to'] ?? null);
+            $from = $this->submittedTime($slot['from'] ?? null);
+            $to = $this->submittedTime($slot['to'] ?? null);
 
             if ($from === null || $to === null) {
                 $fail(__('filament-flex-fields::default.schedule.validation.invalid_time', [
@@ -101,7 +134,8 @@ final class ScheduleValidator
 
             $overnight = ScheduleV2::slotIsOvernight($slot);
 
-            if (! $overnight && $this->timeToMinutes($from) >= $this->timeToMinutes($to)) {
+            if ($enabled && ((! $overnight && $this->timeToMinutes($from) >= $this->timeToMinutes($to))
+                || ($overnight && $this->timeToMinutes($from) < $this->timeToMinutes($to)))) {
                 $fail(__('filament-flex-fields::default.schedule.validation.from_before_to', [
                     'day' => $dayLabel,
                     'slot' => $index + 1,
@@ -117,19 +151,14 @@ final class ScheduleValidator
             ];
         }
 
+        if (! $enabled) {
+            return;
+        }
+
         if ($this->requireSlotsForEnabledDays && count($normalizedSlots) < $this->minSlots) {
             $fail(__('filament-flex-fields::default.schedule.validation.min_slots', [
                 'day' => $dayLabel,
                 'count' => $this->minSlots,
-            ]));
-
-            return;
-        }
-
-        if (count($normalizedSlots) > $this->maxSlots) {
-            $fail(__('filament-flex-fields::default.schedule.validation.max_slots', [
-                'day' => $dayLabel,
-                'count' => $this->maxSlots,
             ]));
 
             return;
@@ -140,6 +169,17 @@ final class ScheduleValidator
                 'day' => $dayLabel,
             ]));
         }
+    }
+
+    private function submittedTime(mixed $value): ?string
+    {
+        if (! is_string($value) || strlen($value) > 16
+            || preg_match('/^(\d{1,2}):(\d{2})$/D', trim($value), $match) !== 1
+            || (int) $match[1] > 23 || (int) $match[2] > 59) {
+            return null;
+        }
+
+        return sprintf('%02d:%02d', (int) $match[1], (int) $match[2]);
     }
 
     /**

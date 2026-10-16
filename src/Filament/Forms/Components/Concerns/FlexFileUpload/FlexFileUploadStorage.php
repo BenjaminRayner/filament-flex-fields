@@ -4,19 +4,22 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\FlexFileUpload;
 
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexFileUpload;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexImageUpload;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\FlexSpatieMediaLibraryFileUpload;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\VoiceNoteRecorderField;
-use Bjanczak\FilamentFlexFields\Support\Enterprise\ObservabilityHooks;
-use Bjanczak\FilamentFlexFields\Support\FileUpload\FileUploadImageProcessor;
+use Bjanczak\FilamentFlexFields\Support\Events\ActivityDispatcher;
+use Bjanczak\FilamentFlexFields\Support\Events\UploadFailed;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\FileUploadMetadata;
+use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\DiskUploadBridge;
+use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Lifecycle\UploadRecordLifecycle;
 use Bjanczak\FilamentFlexFields\Support\Media\FlexMedia;
 use Bjanczak\FilamentFlexFields\Support\Media\MediaCaptureOs;
 use Bjanczak\FilamentFlexFields\Support\Media\MediaCaptureTenantDiskResolver;
 use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaContext;
 use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaKind;
-use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaPayload;
 use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\MediaStorageDriver;
-use Bjanczak\FilamentFlexFields\Support\Media\Pipeline\Refs\DiskMediaRef;
+use Bjanczak\FilamentFlexFields\Support\Media\Spatie\SpatieUploadBridge;
 use Closure;
 use Filament\Forms\Components\BaseFileUpload;
 use Illuminate\Database\Eloquent\Model;
@@ -58,6 +61,8 @@ trait FlexFileUploadStorage
      * @var list<string>
      */
     protected array $flexBaselineFilePaths = [];
+
+    protected ?Closure $flexPendingReplacementCleanup = null;
 
     public function scopedDirectory(string|Closure $prefix = 'uploads'): static
     {
@@ -123,45 +128,6 @@ trait FlexFileUploadStorage
     {
         $this->flexMaxTotalSizeKb = $kilobytes;
 
-        $this->rule(static function (BaseFileUpload $component): Closure {
-            /** @var static $component */
-            $limit = $component->getMaxTotalSizeKb();
-
-            return static function (string $attribute, mixed $value, Closure $fail) use ($component, $limit): void {
-                if (blank($value) || $limit === null) {
-                    return;
-                }
-
-                $totalKb = 0;
-
-                foreach (Arr::wrap($value) as $file) {
-                    if ($file instanceof TemporaryUploadedFile) {
-                        $totalKb += $file->getSize() / 1024;
-
-                        continue;
-                    }
-
-                    if (! is_string($file)) {
-                        continue;
-                    }
-
-                    try {
-                        if ($component->getDisk()->exists($file)) {
-                            $totalKb += $component->getDisk()->size($file) / 1024;
-                        }
-                    } catch (\Throwable) {
-                        //
-                    }
-                }
-
-                if ($totalKb > $limit) {
-                    $fail(__('filament-flex-fields::default.file_upload.validation.max_total_size', [
-                        'max' => number_format($limit, 0),
-                    ]));
-                }
-            };
-        });
-
         return $this;
     }
 
@@ -179,13 +145,7 @@ trait FlexFileUploadStorage
         return $this;
     }
 
-    /**
-     * WARNING: This method deletes all files in the current upload directory that are not part
-     * of the current component's state upon saving.
-     *
-     * Do NOT use this with a shared static `directory()`, as it will delete files belonging
-     * to other records. Always use `scopedDirectory()` or a dynamic directory closure when enabling this.
-     */
+    /** Remove only abandoned members of this field's hydrated baseline, never scan a shared directory. */
     public function pruneOrphanedOnSave(bool|Closure $condition = true): static
     {
         $this->flexPruneOrphanedOnSave = $condition;
@@ -220,65 +180,11 @@ trait FlexFileUploadStorage
 
     public function persistUploadedFileWithFlexProcessing(TemporaryUploadedFile $file): ?string
     {
-        $payload = MediaPayload::fromTemporaryUploadedFile($file);
-        $context = $this->makeMediaIngressContext();
-
-        if (! FlexMedia::ingress()->passesPrePersistScan($payload, $context)) {
-            return null;
+        if ($this instanceof FlexSpatieMediaLibraryFileUpload) {
+            return app(SpatieUploadBridge::class)->save($this, $file);
         }
 
-        $storedPath = $this->saveUploadedFile($file);
-
-        if ($storedPath === null) {
-            ObservabilityHooks::record(ObservabilityHooks::EVENT_UPLOAD_FAIL, [
-                'field' => $this->getName(),
-                'reason' => 'persist_failed',
-                'adapter' => 'disk',
-                'correlation_id' => $context->correlationId,
-            ]);
-
-            return null;
-        }
-
-        if ($this->shouldOptimizeImages() || $this->shouldOptimizeImagesToWebp() || $this->shouldOptimizeImagesToAvif() || $this->getFlexMaxImageWidth() || $this->getFlexMaxImageHeight()) {
-            $processor = new FileUploadImageProcessor(
-                optimizeImages: $this->shouldOptimizeImages(),
-                optimizeImagesToWebp: $this->shouldOptimizeImagesToWebp(),
-                optimizeImagesToAvif: $this->shouldOptimizeImagesToAvif(),
-                maxImageWidth: $this->getFlexMaxImageWidth(),
-                maxImageHeight: $this->getFlexMaxImageHeight(),
-                stripExif: $this->shouldStripExif(),
-            );
-
-            $storedPath = $processor->process($this->getDisk(), $storedPath);
-        }
-
-        $ref = new DiskMediaRef($this->getDiskName(), $storedPath);
-
-        if (! $this->passesMediaCaptureVirusScan($storedPath)) {
-            FlexMedia::ingress()->reject($ref, $context);
-
-            return null;
-        }
-
-        $this->writeMetadataForStoredPath($storedPath, $file->getClientOriginalName(), $file);
-
-        if ($this->flexAfterPersistUploadedFileUsing instanceof Closure) {
-            $this->evaluate($this->flexAfterPersistUploadedFileUsing, [
-                'path' => $storedPath,
-                'file' => $file,
-            ]);
-        }
-
-        ObservabilityHooks::record(ObservabilityHooks::EVENT_UPLOAD_SUCCESS, [
-            'field' => $this->getName(),
-            'adapter' => 'disk',
-            'path' => $storedPath,
-            'correlation_id' => $context->correlationId,
-            'kind' => $context->kind->value,
-        ]);
-
-        return $storedPath;
+        return app(DiskUploadBridge::class)->save($this, $file);
     }
 
     protected function makeMediaIngressContext(): MediaContext
@@ -310,13 +216,10 @@ trait FlexFileUploadStorage
             return true;
         }
 
-        ObservabilityHooks::record(ObservabilityHooks::EVENT_UPLOAD_FAIL, [
-            'field' => $this->getName(),
-            'reason' => 'virus_scan',
-            'stage' => 'post_persist',
-            'path' => $storedPath,
-            'adapter' => 'disk',
-        ]);
+        app(ActivityDispatcher::class)->dispatch(new UploadFailed(
+            field: $this->getName(), adapter: 'disk', reason: 'virus_scan',
+            stage: 'post_persist', path: $storedPath,
+        ));
 
         return false;
     }
@@ -347,6 +250,9 @@ trait FlexFileUploadStorage
 
     public function registerFlexFileUploadHooks(): void
     {
+        if (! $this instanceof FlexFileUpload) {
+            throw new \LogicException('Disk hooks require FlexFileUpload; Spatie has its own owned bridge.');
+        }
         $this->applyMediaCaptureStorageDefaults();
         $this->afterStateHydrated(function (BaseFileUpload $component): void {
             /** @var static $component */
@@ -357,9 +263,16 @@ trait FlexFileUploadStorage
         $this->beforeStateDehydrated(function (BaseFileUpload $component): void {
             /** @var static $component */
             $component->saveUploadedFiles();
-            $component->deleteReplacedFilesFromDisk();
-            $component->pruneOrphanedFilesFromDirectory();
+            $component->prepareReplacementCleanup();
+            app(UploadRecordLifecycle::class)->track($component);
         }, true);
+
+        $this->saveRelationshipsUsing(static function (FlexFileUpload $component): void {
+            $record = $component->getRecord();
+            if ($record instanceof Model && $record->exists) {
+                app(UploadRecordLifecycle::class)->acceptIfReferenced($component, $record);
+            }
+        });
 
         $this->saveUploadedFileUsing(function (BaseFileUpload $component, TemporaryUploadedFile $file): ?string {
             /** @var static $component */
@@ -367,21 +280,8 @@ trait FlexFileUploadStorage
             return $component->persistUploadedFileWithFlexProcessing($file);
         });
 
-        $this->getUploadedFileUsing(function (BaseFileUpload $component, string $file, string|array|null $storedFileNames): ?array {
-            /** @var static $component */
-            $payload = $component->getUploadedFile($file, $storedFileNames);
-
-            if ($payload === null) {
-                return null;
-            }
-
-            $signedUrl = $component->resolveMediaCaptureSignedUrl($file);
-
-            if ($signedUrl !== null) {
-                $payload['url'] = $signedUrl;
-            }
-
-            return $payload;
+        $this->getUploadedFileUsing(function (FlexFileUpload $component, string $file, string|array|null $storedFileNames): array {
+            return app(DiskUploadBridge::class)->payload($component, $file, $storedFileNames);
         });
 
         $this->deleteUploadedFileUsing(function (BaseFileUpload $component, string $file): void {
@@ -435,6 +335,35 @@ trait FlexFileUploadStorage
         return $this->flexBaselineFilePaths;
     }
 
+    /** Prepare owned removals without deleting anything before the record accepts new state. */
+    public function prepareReplacementCleanup(): void
+    {
+        if (! $this->shouldDeleteReplacedFiles() && ! $this->shouldPruneOrphanedOnSave()) {
+            return;
+        }
+        $removed = array_values(array_diff($this->flexBaselineFilePaths, $this->normalizeFilePaths($this->getRawState())));
+        $snapshot = clone $this;
+        if (($record = $this->getRecord()) instanceof Model) {
+            $snapshot->model(clone $record);
+        }
+        $this->flexPendingReplacementCleanup = static function () use ($snapshot, $removed): void {
+            foreach ($removed as $path) {
+                $snapshot->deleteStoredPathWithVariants($path);
+            }
+        };
+    }
+
+    /** Invoke after the record commit (for example, from an after-save transaction callback). */
+    public function cleanupReplacedFilesAfterSave(): void
+    {
+        if ($this->flexPendingReplacementCleanup === null) {
+            return;
+        }
+        ($this->flexPendingReplacementCleanup)();
+        $this->flexPendingReplacementCleanup = null;
+        $this->snapshotBaselineFilePaths();
+    }
+
     public function deleteReplacedFilesFromDisk(): void
     {
         if (! $this->shouldDeleteReplacedFiles()) {
@@ -455,66 +384,20 @@ trait FlexFileUploadStorage
             return;
         }
 
-        $directory = trim((string) $this->getDirectory(), '/');
-
-        if ($directory === '') {
-            return;
-        }
-
-        $currentPaths = $this->normalizeFilePaths($this->getRawState());
-        $keep = array_fill_keys($currentPaths, true);
-
-        foreach ($currentPaths as $path) {
-            $thumb = $this->thumbVariantPathFor($path);
-
-            if ($thumb !== null) {
-                $keep[$thumb] = true;
-            }
-        }
-
-        $files = rescue(fn (): array => $this->getDisk()->allFiles($directory), [], report: false);
-
-        foreach ($files as $file) {
-            if (! isset($keep[$file])) {
-                $this->deleteStoredPathWithVariants($file);
-            }
+        // A directory prefix is not ownership. Only the hydrated baseline belongs to this field.
+        foreach (array_diff($this->flexBaselineFilePaths, $this->normalizeFilePaths($this->getRawState())) as $path) {
+            $this->deleteStoredPathWithVariants($path);
         }
     }
 
-    /**
-     * Delete a stored upload and its `_thumb.webp` sibling (if present).
-     *
-     * @return int Bytes freed
-     */
+    /** Delete explicit Media OS receipts; never infer or scan siblings. */
     public function deleteStoredPathWithVariants(string $path): int
     {
-        $disk = $this->getDisk();
-        $freed = 0;
-        $targets = [$path];
-        $thumb = $this->thumbVariantPathFor($path);
-
-        if ($thumb !== null) {
-            $targets[] = $thumb;
+        if ($this instanceof FlexSpatieMediaLibraryFileUpload) {
+            return app(SpatieUploadBridge::class)->delete($this, $path);
         }
 
-        foreach (array_values(array_unique($targets)) as $target) {
-            if (! $disk->exists($target)) {
-                continue;
-            }
-
-            $freed += (int) rescue(fn (): int => (int) $disk->size($target), 0, report: false);
-            rescue(fn () => $disk->delete($target), report: false);
-        }
-
-        if ($freed > 0 && $this->flexDeletedStoredFileUsing instanceof Closure) {
-            $this->evaluate($this->flexDeletedStoredFileUsing, [
-                'path' => $path,
-                'bytes' => $freed,
-                'bytesFreed' => $freed,
-            ]);
-        }
-
-        return $freed;
+        return app(DiskUploadBridge::class)->delete($this, $path);
     }
 
     protected function thumbVariantPathFor(string $path): ?string

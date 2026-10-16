@@ -61,6 +61,7 @@ export default function flexTimeSegmentsComponent({
         },
 
         init() {
+            if (!this.beginPickerInitialization()) return
             this.bindSelectMenuLifecycle()
 
             if (typeof this.getValue === 'function') {

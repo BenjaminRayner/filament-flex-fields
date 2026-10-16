@@ -127,11 +127,13 @@ function createRunner({
                     trackSound(playSound?.(startSound, playOptions))
                 }
             },
+
             playBurst: (playOptions = {}) => {
                 if (burstSound) {
                     trackSound(playSound?.(burstSound, playOptions))
                 }
             },
+
         })
 
         if (elapsed >= durationMs) {
@@ -381,6 +383,7 @@ registerTodoListCelebration('fireworks', {
                     fireworkInterval = api.fullscreen ? 4 : 10
                 }
             },
+
         })
     },
 })
@@ -484,6 +487,7 @@ registerTodoListCelebration('confetti', {
                     ctx.restore()
                 }
             },
+
         })
     },
 })
@@ -548,6 +552,7 @@ registerTodoListCelebration('sparkles', {
                     ctx.restore()
                 }
             },
+
         })
     },
 })
@@ -625,6 +630,7 @@ registerTodoListCelebration('streamers', {
                     ctx.restore()
                 }
             },
+
         })
     },
 })
@@ -697,6 +703,7 @@ registerTodoListCelebration('bloom', {
                     ctx.restore()
                 }
             },
+
         })
     },
 })

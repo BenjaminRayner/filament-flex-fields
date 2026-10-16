@@ -1,7 +1,9 @@
 @import "../utilities-baseline.css";
 @import "../base.css";
 
-@source "../../src/Filament/Forms/Components/NumberStepper.php";
-@source "../views/forms/components/number-stepper.blade.php";
+@source "../../../src/Filament/Forms/Components/NumberStepper.php";
+@source "../../../src/Filament/Forms/Components/Concerns/NumberStepper";
+@source "../../views/forms/components/number-stepper.blade.php";
+@source "../../views/forms/components/partials/number-stepper";
 
 @import "../components/number-stepper.css";

@@ -1,9 +1,9 @@
 @import "../utilities-baseline.css";
 @import "../base.css";
 
-@source "../views/forms/components/partials/user-select-avatar.blade.php";
-@source "../views/forms/components/partials/user-select-option.blade.php";
-@source "../views/tables/columns/user-column-rich.blade.php";
-@source "../views/tables/columns/user-column-stack.blade.php";
+@source "../../views/forms/components/partials/user-select-avatar.blade.php";
+@source "../../views/forms/components/partials/user-select-option.blade.php";
+@source "../../views/tables/columns/user-column-rich.blade.php";
+@source "../../views/tables/columns/user-column-stack.blade.php";
 
 @import "../components/user-display.css";

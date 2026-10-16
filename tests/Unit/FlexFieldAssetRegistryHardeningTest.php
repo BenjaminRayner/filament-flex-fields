@@ -4,22 +4,6 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
 
-it('keeps stylesheet dependency keys and targets in lazy registry', function (): void {
-    $lazy = FlexFieldAssets::LAZY_COMPONENT_STYLESHEETS;
-
-    foreach (array_keys(FlexFieldAssets::STYLESHEET_DEPENDENCIES) as $component) {
-        expect(in_array($component, $lazy, true))
-            ->toBeTrue("Stylesheet dependency key [{$component}] must be registered in LAZY_COMPONENT_STYLESHEETS.");
-    }
-
-    foreach (FlexFieldAssets::STYLESHEET_DEPENDENCIES as $dependencies) {
-        foreach ($dependencies as $target) {
-            expect(in_array($target, $lazy, true))
-                ->toBeTrue("Stylesheet dependency target [{$target}] must be registered in LAZY_COMPONENT_STYLESHEETS.");
-        }
-    }
-});
-
 it('registers segment-tabs lazy stylesheet with segment-control dependency', function (): void {
     expect(FlexFieldAssets::LAZY_COMPONENT_STYLESHEETS)->toContain('segment-tabs')
         ->and(FlexFieldAssets::stylesheetsFor('segment-tabs'))->toBe(['segment-control', 'segment-tabs'])
@@ -66,32 +50,6 @@ it('keeps stylesheet dependency graph acyclic with select-field teleported-menu 
         };
 
         expect(fn () => $walk($root))->not->toThrow(RuntimeException::class);
-    }
-});
-
-it('shares select-menu and combobox-engine alpine chunks between phone-field and select-field', function (): void {
-    $manifest = FlexFieldAssets::alpineManifest();
-    $phoneChunks = $manifest['phone-field'] ?? [];
-    $selectChunks = $manifest['select-field'] ?? [];
-
-    expect($phoneChunks)->toBeArray()->not->toBeEmpty()
-        ->and($selectChunks)->toBeArray()->not->toBeEmpty();
-
-    $phoneSelectMenu = collect($phoneChunks)->first(fn (string $chunk): bool => str_contains($chunk, 'select-menu'));
-    $selectSelectMenu = collect($selectChunks)->first(fn (string $chunk): bool => str_contains($chunk, 'select-menu'));
-    $selectCombobox = collect($selectChunks)->first(fn (string $chunk): bool => str_contains($chunk, 'combobox-engine'));
-
-    expect($phoneSelectMenu)->toBeString()
-        ->and($selectSelectMenu)->toBeString()
-        ->and($phoneSelectMenu)->toBe($selectSelectMenu)
-        ->and($selectCombobox)->toBeString();
-
-    // Phone may share select-menu without needing the full combobox-engine entry;
-    // when both list combobox-engine, the hashed chunk name must match.
-    $phoneCombobox = collect($phoneChunks)->first(fn (string $chunk): bool => str_contains($chunk, 'combobox-engine'));
-
-    if (is_string($phoneCombobox)) {
-        expect($phoneCombobox)->toBe($selectCombobox);
     }
 });
 

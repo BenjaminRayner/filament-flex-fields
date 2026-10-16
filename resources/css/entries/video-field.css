@@ -1,9 +1,12 @@
 @import "../utilities-baseline.css";
 @import "../base.css";
 
-@source "../../src/Filament/Forms/Components/VideoField.php";
-@source "../views/forms/components/video-field.blade.php";
-@source "../views/forms/components/partials/video-field-controls.blade.php";
-@source "../views/forms/components/partials/video-field-controls-compact.blade.php";
+@source "../../../src/Filament/Forms/Components/VideoField.php";
+@source "../../views/forms/components/video-field.blade.php";
+@source "../../views/forms/components/video/**/*.blade.php";
+@source "../../views/forms/components/partials/video-field-*.blade.php";
+@source "../../views/components/video-field-control-tip.blade.php";
 
 @import "../components/video-field.css";
+
+@import "../components/video/compact.css";

@@ -1,9 +1,10 @@
 import { loadTransformersRuntime } from './transformers-runtime.js'
+import { loadAudioBuffer } from '../audio/load-buffer.js'
 
 const STEREO_MIX_SCALING_FACTOR = Math.sqrt(2)
 const MODEL_LOAD_TIMEOUT_MS = 600_000
 
-/** @type {Map<string, Promise<import('@xenova/transformers').AutomaticSpeechRecognitionPipeline>>} */
+/** @type {Map<string, Promise<import('@huggingface/transformers').AutomaticSpeechRecognitionPipeline>>} */
 const pipelineCache = new Map()
 
 /**
@@ -59,27 +60,24 @@ export function audioBufferToWhisperSamples(audioBuffer) {
 /**
  * @param {string} url
  */
-export async function fetchAudioBuffer(url) {
-    const response = await fetch(url)
+export async function fetchAudioBuffer(url, options = {}) {
+    // Whisper expects 16 kHz samples regardless of the playback device rate.
+    return loadAudioBuffer(url, { ...options, sampleRate: 16000 })
+}
 
-    if (! response.ok) {
-        throw new Error(`audio_fetch_failed:${response.status}`)
-    }
-
-    const arrayBuffer = await response.arrayBuffer()
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext
-
-    if (! AudioContextClass) {
-        throw new Error('audio_context_unavailable')
-    }
-
-    const context = new AudioContextClass()
-
+function active(signal) {
+    if (signal?.aborted) throw new DOMException('Transcription cancelled', 'AbortError')
+}
+async function awaitConsumer(promise, signal) {
+    active(signal)
+    if (!signal) return promise
+    let abort
     try {
-        return await context.decodeAudioData(arrayBuffer.slice(0))
-    } finally {
-        await context.close()
-    }
+        return await Promise.race([promise, new Promise((_, reject) => {
+            abort = () => reject(new DOMException('Transcription cancelled', 'AbortError'))
+            signal.addEventListener('abort', abort, { once: true })
+        })])
+    } finally { signal.removeEventListener('abort', abort) }
 }
 
 /**
@@ -141,7 +139,7 @@ function createModelProgressHandler(onProgress) {
  * @param {(phase: string, detail?: { file?: string, progress?: number }) => void} [onProgress]
  */
 async function loadWhisperPipeline(modelId, quantized, runtimeModuleUrl, runtimeWasmBaseUrl, onProgress) {
-    const cacheKey = `${modelId}:${quantized ? 'q' : 'f'}`
+    const cacheKey = `${runtimeModuleUrl}:${runtimeWasmBaseUrl}:${modelId}:${quantized ? 'q' : 'f'}`
 
     if (pipelineCache.has(cacheKey)) {
         return pipelineCache.get(cacheKey)
@@ -150,7 +148,8 @@ async function loadWhisperPipeline(modelId, quantized, runtimeModuleUrl, runtime
     const promise = withTimeout(
         loadTransformersRuntime(runtimeModuleUrl, runtimeWasmBaseUrl).then(({ pipeline }) => (
             pipeline('automatic-speech-recognition', modelId, {
-                quantized,
+                dtype: quantized ? 'q8' : 'fp32',
+                device: 'wasm',
                 progress_callback: createModelProgressHandler(onProgress),
                 revision: modelId.includes('/whisper-medium') ? 'no_attentions' : 'main',
             })
@@ -183,20 +182,23 @@ async function loadWhisperPipeline(modelId, quantized, runtimeModuleUrl, runtime
  * @param {(phase: string, detail?: { file?: string, progress?: number }) => void} [onProgress]
  */
 export async function transcribeAudioUrl(url, options, onProgress) {
+    active(options.signal)
     onProgress?.('loading_model')
 
     const modelId = resolveWhisperModelId(options.model, options.multilingual, options.models)
-    const transcriber = await loadWhisperPipeline(
+    const transcriber = await awaitConsumer(loadWhisperPipeline(
         modelId,
         options.quantized,
         options.runtimeModuleUrl,
         options.runtimeWasmBaseUrl,
         onProgress,
-    )
+    ), options.signal)
+    active(options.signal)
 
     onProgress?.('loading_audio')
 
-    const audioBuffer = await fetchAudioBuffer(url)
+    const audioBuffer = await fetchAudioBuffer(url, { signal: options.signal })
+    active(options.signal)
     const audio = audioBufferToWhisperSamples(audioBuffer)
 
     onProgress?.('transcribing_phase')
@@ -212,7 +214,8 @@ export async function transcribeAudioUrl(url, options, onProgress) {
         language: options.multilingual && options.language ? options.language : null,
     }
 
-    const result = await transcriber(audio, generateOptions)
+    const result = await awaitConsumer(transcriber(audio, generateOptions), options.signal)
+    active(options.signal)
 
     if (typeof result === 'string') {
         return result.trim()

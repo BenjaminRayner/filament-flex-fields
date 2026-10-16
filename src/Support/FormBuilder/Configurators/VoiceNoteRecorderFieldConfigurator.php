@@ -60,6 +60,16 @@ final class VoiceNoteRecorderFieldConfigurator implements FieldConfigurator
         array $config,
         bool $applyDirectoryDefault,
     ): VoiceNoteRecorderField|VoiceNoteSpatieRecorderField {
+        if (array_key_exists('store_waveform_in', $config)) {
+            $field->storeWaveformIn($config['store_waveform_in']);
+        }
+        if (array_key_exists('audio_bits_per_second', $config)) {
+            $field->audioBitsPerSecond($config['audio_bits_per_second']);
+        }
+        if (array_key_exists('confirm_deletion', $config)) {
+            $field->confirmDeletion($config['confirm_deletion']);
+        }
+
         if (array_key_exists('max_duration', $config)) {
             $field->maxDuration((int) $config['max_duration']);
         }

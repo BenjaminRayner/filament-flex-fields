@@ -211,24 +211,20 @@ describe('bubble choice radial morph', () => {
         assert.equal(strokeWidthFactor(0, true), 0)
     })
 
-    it('wires morph helpers on the alpine component', () => {
-        const component = bubbleChoiceFormComponent({
-            state: ['forest'],
-            options: [{ value: 'forest', label: 'Forest', image: '/x.jpg', imageMode: 'background' }],
-            disabled: false,
-            maxItems: null,
-            selectedShape: 'scallop',
-        })
-
-        component.seedMorphProgress()
-        assert.equal(component.selectionMorphProgress('forest'), 1)
-        assert.equal(component.selectionStrokeWidth('forest'), STROKE_WIDTH_MAX)
-        assert.equal(component.bubbleClipPath('forest'), 'var(--fff-bubble-choice-clip-scallop)')
-        assert.equal(component.bubbleClipPath('missing'), 'var(--fff-bubble-choice-clip-circle)')
-        assert.equal(component.bubbleButtonStyle({ value: 'forest', label: 'Forest' }).clipPath, 'var(--fff-bubble-choice-clip-scallop)')
-        assert.equal('clipPath' in component.bubbleFaceStyle({ value: 'forest', label: 'Forest' }), false)
-        assert.equal(component.selectionStrokePath('forest').startsWith('M'), true)
-        assert.equal(component.isSelectionMorphing('forest'), false)
-        assert.equal(component.selectionStrokeStyle({ value: 'forest', label: 'Forest' }).transform, 'scale(1.02)')
+    it('uses bounded selection state and honors a zero maximum', () => {
+        const component = bubbleChoiceFormComponent({ state: [], options: [{value: 'a', label: 'A'}], maxItems: 0 })
+        component.toggle('a')
+        assert.deepEqual(component.state, [])
+        component.destroy()
+        component.toggle('a')
+        assert.deepEqual(component.state, [])
     })
+})
+
+it('handles one-column packing and zero fringe without NaN', () => {
+    const layout = mergeLayoutOptions({numCols: 1, fringeWidth: 0, xRadius: 0, yRadius: 0, cornerRadius: 0})
+    const rows = buildBubbleRows([{value: 'a'}, {value: 'b'}], 1)
+    assert.equal(rows[0][0].option.value, 'a')
+    assert.equal(rows[1][0].option.value, 'b')
+    for (const row of rows.keys()) for (const value of Object.values(getBubbleSize(layout, rows, row, 0, 10, 10))) assert.ok(Number.isFinite(value))
 })

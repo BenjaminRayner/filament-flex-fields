@@ -10,6 +10,7 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\UserSelect\Co
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\UserSelect\HasUserSelectCollaborators;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\UserSelect\InteractsWithUserSelectPresentation;
 
+/** People are a typed data/presentation adapter. Select owns the field and overlay lifecycle. */
 class UserSelect extends SelectField
 {
     use ConfiguresUserSelectColumns;
@@ -18,29 +19,25 @@ class UserSelect extends SelectField
     use HasUserSelectCollaborators;
     use InteractsWithUserSelectPresentation;
 
-    protected string $view = 'filament-flex-fields::forms.components.user-select';
+    public function getAssetComponent(): string
+    {
+        return 'user-select';
+    }
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->richOptions()->allowHtml()->searchable()->chevronIcon('hugeicons-unfold-more');
+    }
 
-        $this->richOptions();
-        $this->allowHtml();
-
-        $this->getOptionLabelsUsing(function (UserSelect $component): array {
-            if (! $component->isMultiple()) {
-                return [];
-            }
-
-            $state = $component->getState();
-
-            if (! is_array($state)) {
-                return [];
-            }
-
-            return $component->resolveOptionLabelsForValues($state);
-        });
-
-        $this->configureModelBindingsIfNeeded();
+    public function __clone(): void
+    {
+        parent::__clone();
+        // Repositories are owned by this field, never its prototype or another tenant's field.
+        $this->runtimeState = null;
+        $this->recordMapper = null;
+        $this->queryEngine = null;
+        $this->shapeResolver = null;
+        $this->optionPresenter = null;
     }
 }

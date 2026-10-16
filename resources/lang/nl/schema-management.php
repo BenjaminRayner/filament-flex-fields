@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'navigation_plural' => 'Veldgroepen',
+    'model_singular' => 'Veldgroep',
+    'group' => 'Groep',
+    'sections' => 'Secties',
+    'sections_description' => 'Optionele indelingssecties om formuliervelden te groeperen.',
+    'section_id' => 'Sectie-ID',
+    'fields_schema' => 'Veldschema',
+    'fields_description' => 'Velddefinities voor formulieren, tabellen en detailoverzichten.',
+    'fields' => 'Velden',
+    'section' => 'Sectie',
+    'required' => 'Verplicht',
+    'encrypted' => 'Opgeslagen gegevens versleutelen',
+    'help_text' => 'Helptekst',
+    'tenant_id' => 'Tenant-ID',
+    'tenant' => 'Tenant',
+    'tenant_help' => 'Optionele tenantsleutel. Laat leeg voor een globale groep.',
+    'name' => 'Naam',
+    'slug' => 'Slug',
+    'order' => 'Volgorde',
+    'label' => 'Label',
+    'type' => 'Type',
+    'sort' => 'Sorteervolgorde',
+    'description' => 'Beschrijving',
+    'placeholder' => 'Placeholdertekst',
+    'width' => 'Breedte',
+    'updated_at' => 'Bijgewerkt op',
+    'section_type_section' => 'Sectie',
+    'section_type_fieldset' => 'Veldgroep',
+    'section_type_headless' => 'Zonder container',
+];

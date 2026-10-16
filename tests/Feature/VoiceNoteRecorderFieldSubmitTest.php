@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\VoiceNoteRecorderField;
 use Bjanczak\FilamentFlexFields\Tests\Support\TestableTranslatableForm;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -33,7 +35,7 @@ it('accepts uploaded audio using filament file upload state shape', function () 
             ->directory('voice-notes'),
     ];
 
-    $file = UploadedFile::fake()->create('voice-note.webm', 100, 'audio/webm');
+    $file = UploadedFile::fake()->createWithContent('voice-note.wav', 'RIFF'.pack('V', 36 + 1600).'WAVEfmt '.pack('VvvVVvv', 16, 1, 1, 8000, 16000, 2, 16).'data'.pack('V', 1600).str_repeat(chr(0), 1600));
     $fileKey = (string) Str::uuid();
 
     $livewire = Livewire::test(TestableTranslatableForm::class)
@@ -55,7 +57,7 @@ it('persists uploaded voice note to disk on form dehydrate', function () {
             ->directory('voice-notes'),
     ];
 
-    $file = UploadedFile::fake()->create('voice-note.webm', 100, 'audio/webm');
+    $file = UploadedFile::fake()->createWithContent('voice-note.wav', 'RIFF'.pack('V', 36 + 1600).'WAVEfmt '.pack('VvvVVvv', 16, 1, 1, 8000, 16000, 2, 16).'data'.pack('V', 1600).str_repeat(chr(0), 1600));
     $fileKey = (string) Str::uuid();
 
     $livewire = Livewire::test(TestableTranslatableForm::class)
@@ -69,7 +71,7 @@ it('persists uploaded voice note to disk on form dehydrate', function () {
     $storedPath = $field->getState();
 
     expect($storedPath)->toBeString()
-        ->and($storedPath)->toEndWith('.webm');
+        ->and($storedPath)->toEndWith('.wav');
 
     Storage::disk('public')->assertExists($storedPath);
 });
@@ -83,7 +85,7 @@ it('deletes persisted voice note from disk through delete uploaded file api', fu
             ->directory('voice-notes'),
     ];
 
-    $file = UploadedFile::fake()->create('voice-note.webm', 100, 'audio/webm');
+    $file = UploadedFile::fake()->createWithContent('voice-note.wav', 'RIFF'.pack('V', 36 + 1600).'WAVEfmt '.pack('VvvVVvv', 16, 1, 1, 8000, 16000, 2, 16).'data'.pack('V', 1600).str_repeat(chr(0), 1600));
     $fileKey = (string) Str::uuid();
 
     $livewire = Livewire::test(TestableTranslatableForm::class)
@@ -103,3 +105,17 @@ it('deletes persisted voice note from disk through delete uploaded file api', fu
     Storage::disk('public')->assertMissing($storedPath);
     expect($field->getState())->toBeNull();
 });
+
+it('confirms deletion through a scoped Filament action without using reserved event arguments', function () {
+    TestableTranslatableForm::$formSchema = [VoiceNoteRecorderField::make('voice_note')];
+    $request = (string) Str::uuid();
+    Livewire::test(VoiceNoteActionForm::class)
+        ->call('mountAction', 'deleteVoiceNote', ['request' => $request], ['schemaComponent' => 'form.voice_note'])
+        ->call('callMountedAction')
+        ->assertDispatched('fff-voice-delete-confirmed', request: $request, fieldKey: 'form.voice_note');
+});
+
+class VoiceNoteActionForm extends TestableTranslatableForm implements HasActions
+{
+    use InteractsWithActions;
+}

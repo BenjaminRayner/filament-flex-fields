@@ -1,0 +1,84 @@
+---
+title: "Use an extension outside panels"
+description: "Enable FLEX in your Blade and Livewire layout without starting Alpine twice."
+---
+
+In a panel, register `FilamentFlexFieldsPlugin` on that panel. Panels without the
+plugin receive no FLEX startup scripts, core stylesheet or FLEX render hooks.
+Setting `filament-flex-fields.enabled` to `false` also disables those emissions.
+
+For a standalone Blade layout, enable FLEX explicitly with the `runtime` component.
+Use these positions once in your layout; keep the startup phase before Alpine starts:
+
+```blade
+<!doctype html>
+<html>
+    <head>
+        <x-filament-flex-fields::runtime phase="head-start" />
+        @filamentStyles
+        <x-filament-flex-fields::runtime phase="head-end" />
+        <x-filament-flex-fields::runtime phase="styles-after" />
+        @livewireStyles
+    </head>
+    <body>
+        {{ $slot }}
+
+        <x-filament-flex-fields::runtime phase="body-end" />
+        <x-filament-flex-fields::runtime phase="scripts-before" />
+        @filamentScripts
+        @livewireScripts
+        <x-filament-flex-fields::runtime phase="scripts-after" />
+    </body>
+</html>
+```
+
+The layout still uses the installed Filament/Livewire scripts; do not start a second
+Alpine instance. If your layout already includes these native directives, retain
+them once and place the FLEX phases around them. A script stack must not start
+Alpine before `scripts-before`. If you need CSS in the head for initially visible
+components, render/buffer their content before the head or explicitly prepare their
+critical styles using the existing `critical` assets API.
+
+The first `head-start` enables this response's standalone context before
+`@filamentStyles`. A layout which does not use that phase can enable it from trusted
+application PHP before rendering styles:
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Assets\Rendering\RuntimeRenderContext;
+
+app(RuntimeRenderContext::class)->enableStandalone();
+```
+
+Supported positions are `head-start`, `head-end`, `styles-after`, `body-end`,
+`scripts-before` and `scripts-after`. Unknown positions fail explicitly. Repeating
+a document phase or directly including a startup partial does not duplicate its
+script tag. Livewire updates omit initial-document startup tags. Each rendered
+field, cell and entry still emits its own independent asset consumer; this layout
+deduplication never suppresses a child's assets.
+
+Standalone intent cannot enable FLEX in a panel which has not registered the plugin,
+or override global disablement. Intent and emitted tags reset with each Laravel
+request/job scope. The `runtime` component emits FLEX's own fragments and does not
+invoke render hooks belonging to other plugins.
+
+An external family's registered field/display/entry class is recognized during
+initial native schema layout preparation, including subclasses. You do not need
+to copy a FLEX wrapper class or view namespace. Dormant schemas remain deferred.
+Using a native Filament class directly as a surface does not claim every instance
+of that class: mark only your own rendered instance explicitly. Custom renderers without family metadata can retain the explicit
+`data-fff-component` marker and public assets boundary.
+
+Include your compiled assets in the Composer package and load your views from your provider. During application deployment, publish the registered assets:
+
+```bash
+php artisan fff:assets:publish
+```
+
+For a simple legacy registration, FLEX publishes the registered local files. Keep
+shared CSS under one owner and declare complete resource directories explicitly.
+This path does not discover split imports or create immutable release directories.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

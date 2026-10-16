@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
+use Bjanczak\FilamentFlexFields\Concerns\ColorPicker\ConfiguresColorPicker;
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldFocusOutline;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
+use Bjanczak\FilamentFlexFields\Support\ColorPicker\ColorValue;
+use Bjanczak\FilamentFlexFields\Support\ColorPicker\PickerConfiguration;
+use Bjanczak\FilamentFlexFields\Support\Select\Configuration\PickerConfiguration as Config;
 use Closure;
 use Filament\Forms\Components\Concerns\CanBeReadOnly;
 use Filament\Forms\Components\Field;
-use InvalidArgumentException;
 
 class FlexColorPickerField extends Field
 {
     use CanBeReadOnly;
+    use ConfiguresColorPicker;
     use HasControlSize;
     use HasFieldFocusOutline;
     use HasFieldRounding;
@@ -33,266 +37,87 @@ class FlexColorPickerField extends Field
 
     protected string $view = 'filament-flex-fields::forms.components.flex-color-picker-field';
 
-    protected string|Closure $layout = self::LAYOUT_ADVANCED;
-
     protected string|Closure $variant = 'primary';
-
-    protected string|Closure $format = self::FORMAT_HEX;
-
-    protected bool|Closure $alphaEnabled = false;
-
-    protected bool|Closure $eyedropperEnabled = true;
-
-    protected int|Closure $gridColumns = 17;
-
-    protected int|Closure $gridRows = 11;
-
-    /**
-     * @var list<string>|Closure|null
-     */
-    protected array|Closure|null $gridColors = null;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->default(null);
-
-        $this->rule(function (FlexColorPickerField $component): Closure {
+        $this->rule(function (self $component): Closure {
             return function (string $attribute, mixed $value, Closure $fail) use ($component): void {
                 if ($value === null || $value === '') {
-                    if ($component->isRequired()) {
-                        $fail(__('validation.required', ['attribute' => $component->getLabel()]));
-                    }
-
                     return;
                 }
-
-                if (! is_string($value)) {
-                    $fail(__('filament-flex-fields::default.validation.flex_color_picker.invalid'));
-
-                    return;
-                }
-
-                if (! $component->isValidColorString($value)) {
-                    $fail(__('filament-flex-fields::default.validation.flex_color_picker.invalid'));
+                if (! ColorValue::valid($value, $component->isAlphaEnabled())) {
+                    $fail(__('filament-flex-fields::color-picker.invalid'));
                 }
             };
         });
     }
 
-    public function layout(string|Closure $layout): static
+    public function variant(string|Closure $value): static
     {
-        $this->layout = $layout;
-
-        return $this;
-    }
-
-    public function variant(string|Closure $variant): static
-    {
-        $this->variant = $variant;
+        $this->variant = $value;
 
         return $this;
     }
 
     public function getVariant(): string
     {
-        $variant = (string) $this->evaluate($this->variant);
-
-        if (! in_array($variant, ['primary', 'secondary', 'flat'], true)) {
-            throw new InvalidArgumentException("Flex color picker variant [{$variant}] is not supported.");
-        }
-
-        return $variant;
+        return Config::choice($this->evaluate($this->variant), ['primary', 'secondary', 'soft', 'flat'], 'color.variant');
     }
 
-    public function hex(): static
+    /** @return array<string, mixed> */
+    public function getPickerConfiguration(): array
     {
-        return $this->format(self::FORMAT_HEX);
-    }
-
-    public function rgb(): static
-    {
-        return $this->format(self::FORMAT_RGB);
-    }
-
-    public function hsl(): static
-    {
-        return $this->format(self::FORMAT_HSL);
-    }
-
-    public function rgba(): static
-    {
-        return $this->format(self::FORMAT_RGBA);
-    }
-
-    public function format(string|Closure $format): static
-    {
-        $this->format = $format;
-
-        return $this;
-    }
-
-    public function alpha(bool|Closure $enabled = true): static
-    {
-        $this->alphaEnabled = $enabled;
-
-        return $this;
-    }
-
-    public function eyedropper(bool|Closure $enabled = true): static
-    {
-        $this->eyedropperEnabled = $enabled;
-
-        return $this;
-    }
-
-    public function gridColumns(int|Closure $columns): static
-    {
-        $this->gridColumns = $columns;
-
-        return $this;
-    }
-
-    public function gridRows(int|Closure $rows): static
-    {
-        $this->gridRows = $rows;
-
-        return $this;
-    }
-
-    /**
-     * @param  list<string>|Closure|null  $colors
-     */
-    public function gridColors(array|Closure|null $colors): static
-    {
-        $this->gridColors = $colors;
-
-        return $this;
+        return PickerConfiguration::resolve(array_map(fn (mixed $value): mixed => $this->evaluate($value), $this->colorPickerOptions));
     }
 
     public function getLayout(): string
     {
-        $layout = (string) $this->evaluate($this->layout);
-
-        if (! in_array($layout, [self::LAYOUT_ADVANCED, self::LAYOUT_GRID], true)) {
-            throw new InvalidArgumentException("Flex color picker layout [{$layout}] is not supported.");
-        }
-
-        return $layout;
+        return $this->getPickerConfiguration()['layout'];
     }
 
     public function getFormat(): string
     {
-        $format = (string) $this->evaluate($this->format);
+        $format = $this->getPickerConfiguration()['format'];
 
-        if (! in_array($format, [self::FORMAT_HEX, self::FORMAT_RGB, self::FORMAT_HSL, self::FORMAT_RGBA], true)) {
-            throw new InvalidArgumentException("Flex color picker format [{$format}] is not supported.");
-        }
-
-        if ($format === self::FORMAT_RGBA && ! $this->isAlphaEnabled()) {
-            return self::FORMAT_RGB;
-        }
-
-        return $format;
+        return ! $this->isAlphaEnabled() && in_array($format, ['rgba', 'hsla'], true) ? substr($format, 0, -1) : $format;
     }
 
     public function isAlphaEnabled(): bool
     {
-        return (bool) $this->evaluate($this->alphaEnabled);
+        return $this->getPickerConfiguration()['alphaEnabled'];
     }
 
     public function isEyedropperEnabled(): bool
     {
-        return (bool) $this->evaluate($this->eyedropperEnabled);
+        return $this->getPickerConfiguration()['eyedropperEnabled'];
     }
 
     public function getGridColumns(): int
     {
-        return max(1, (int) $this->evaluate($this->gridColumns));
+        return $this->getPickerConfiguration()['gridColumns'];
     }
 
     public function getGridRows(): int
     {
-        return max(1, (int) $this->evaluate($this->gridRows));
+        return $this->getPickerConfiguration()['gridRows'];
     }
 
-    /**
-     * @return list<string>|null
-     */
+    /** @return list<string>|null */
     public function getGridColors(): ?array
     {
-        $colors = $this->evaluate($this->gridColors);
-
-        if ($colors === null) {
-            return null;
-        }
-
-        return array_values(array_map(
-            fn (mixed $color): string => strtoupper((string) $color),
-            $colors,
-        ));
+        return $this->getPickerConfiguration()['gridColors'];
     }
 
     public function isValidColorString(?string $value): bool
     {
-        $input = trim((string) $value);
-
-        if ($input === '') {
-            return true;
-        }
-
-        if (preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $input) === 1) {
-            return true;
-        }
-
-        if (preg_match('/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*([\d.]+))?\s*\)$/', $input, $matches) === 1) {
-            return $this->channelsAreValid((int) $matches[1], (int) $matches[2], (int) $matches[3])
-                && (! isset($matches[4]) || $this->alphaIsValid((float) $matches[4]));
-        }
-
-        if (preg_match('/^hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+))?\s*\)$/', $input, $matches) === 1) {
-            $hue = (float) $matches[1];
-            $saturation = (float) $matches[2];
-            $lightness = (float) $matches[3];
-
-            return $hue >= 0
-                && $hue <= 360
-                && $saturation >= 0
-                && $saturation <= 100
-                && $lightness >= 0
-                && $lightness <= 100
-                && (! isset($matches[4]) || $this->alphaIsValid((float) $matches[4]));
-        }
-
-        return false;
+        return $value === null || trim($value) === '' || ColorValue::valid($value, $this->isAlphaEnabled());
     }
 
-    /**
-     * @return list<string>
-     */
+    /** @return list<string> */
     public function getWrapperClasses(): array
     {
-        return [
-            'fff-flex-color-picker-field',
-            'fff-flex-text-input-field',
-            'fff-flex-color-picker-field--'.$this->getSize(),
-            'fff-flex-text-input-field--'.$this->getSize(),
-            'fff-flex-color-picker-field--'.$this->getVariant(),
-            'fff-flex-text-input-field--'.$this->getVariant(),
-            'fff-rounding-'.$this->getRounding(),
-        ];
-    }
-
-    protected function channelsAreValid(int $red, int $green, int $blue): bool
-    {
-        return $red >= 0 && $red <= 255
-            && $green >= 0 && $green <= 255
-            && $blue >= 0 && $blue <= 255;
-    }
-
-    protected function alphaIsValid(float $alpha): bool
-    {
-        return $alpha >= 0 && $alpha <= 1;
+        return ['fff-flex-color-picker-field', 'fff-flex-text-input-field', 'fff-flex-color-picker-field--'.$this->getSize(), 'fff-rounding-'.$this->getRounding()];
     }
 }

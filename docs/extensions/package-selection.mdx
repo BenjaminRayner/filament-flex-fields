@@ -1,0 +1,93 @@
+---
+title: "Choose alternative packages"
+description: "Select between two complete packages explicitly and avoid provider-order conflicts."
+---
+
+Duplicate component IDs are rejected by default. When two packages deliberately
+provide alternative implementations of the same namespace, your application can
+choose one whole package explicitly. This is a boot-time decision: the preferred
+and replaced packages must both use the collection APIs and must both be present.
+There is no automatic fallback to whichever provider boots first or last.
+
+Declare the decision in an application service provider before FLEX completes its
+boot collection. Supply the exact `ComponentPackage` contracts used by the two
+providers. For example, when both packages ship portable manifests:
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Assets\Manifest\AssetManifestCompiler;
+use Bjanczak\FilamentFlexFields\Support\Assets\Manifest\AssetPackage;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentRegistrar;
+use Bjanczak\FilamentFlexFields\Support\Components\Contracts\ComponentPackage;
+use Bjanczak\FilamentFlexFields\Support\Components\Registration\ComponentPackageSelection;
+
+public function boot(ComponentRegistrar $components): void
+{
+    $installedPackage = static function (
+        string $directory,
+        string $version,
+    ): ComponentPackage {
+        $manifest = (new AssetManifestCompiler)->load(
+            $directory.'/resources/asset-manifest.json',
+        );
+
+        return new ComponentPackage(
+            assets: new AssetPackage(
+                $manifest,
+                $directory.'/resources/dist/'.$manifest->release,
+            ),
+            namespace: 'acme-rating',
+            version: $version,
+        );
+    };
+
+    $components->selectPackage(new ComponentPackageSelection(
+        preferred: $installedPackage(
+            base_path('vendor/your-company/rating'), '2.0.0',
+        ),
+        replaced: $installedPackage(
+            base_path('vendor/acme/rating'), '1.0.0',
+        ),
+    ));
+}
+```
+
+Use the installed directories and semantic versions of your actual providers.
+Only those two exact package installations are considered. The preferred package
+must retain every replaced component identity, component kind and logical family.
+Both candidates must declare complete semantic families. Additional surfaces in
+the preferred package are allowed; its complete dependency, renderer and asset
+graph still has to compile normally. The losing package contributes no component,
+CSS, entry, lazy resource or helper to that graph. Files from either Composer
+installation are left intact.
+
+The selection rejects missing candidates, changed releases/source installations,
+changed semantic contracts, duplicate definitions within either candidate,
+partial replacements, third-party collisions and multiple choices for one
+namespace. A failed collection does not change the live registry or discard
+pending registrations; a missing candidate can be collected before retrying.
+Selection cannot replace built-in identities, a graph already committed with
+`registerFamily()`, or a frozen registry. It is not a method for changing running
+browser instances. Upgrading a single package remains Composer's responsibility.
+
+Configuration/value versions may change in a replacement. Selection does not
+migrate saved data or waive its validation: use the explicit snapshot/migration
+[workflow](/docs/extensions/migrations) and handle incompatible saved versions before rendering them.
+Application code remains responsible for deciding which installed author to trust.
+A valid manifest/hash proves byte identity, not trusted authorship.
+
+After successful collection, inspect the applied decisions:
+
+```php
+$decisions = app(ComponentRegistrar::class)->appliedPackageSelections();
+```
+
+The report contains namespace, package identities, semantic/ABI versions and
+release hashes. It includes neither local installation paths nor field values.
+Before successful collection it is empty. One selection per namespace and at most
+128 selections are supported; pending collection is bounded to 8192 registrations.
+No selection resolver runs while individual fields, columns or entries render.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

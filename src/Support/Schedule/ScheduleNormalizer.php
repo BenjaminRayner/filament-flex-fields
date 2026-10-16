@@ -10,7 +10,7 @@ final class ScheduleNormalizer
 {
     /**
      * @param  list<string>  $days
-     * @return array{timezone?: string, days: array<string, array{enabled: bool, slots: list<array{from: string, to: string}>}>}
+     * @return array{timezone?: string, days: array<string, array{enabled: bool, slots: list<array{from: string, to: string, type: string, overnight?: bool}>}>}
      */
     public function normalize(mixed $state, array $days, ?string $defaultTimezone = null): array
     {
@@ -47,7 +47,7 @@ final class ScheduleNormalizer
 
     /**
      * @param  array<string, mixed>  $dayState
-     * @return array{enabled: bool, slots: list<array{from: string, to: string, type: string}>}
+     * @return array{enabled: bool, slots: list<array{from: string, to: string, type: string, overnight?: bool}>}
      */
     public function normalizeDay(array $dayState): array
     {

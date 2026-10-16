@@ -1,6 +1,7 @@
 ---
 title: "ItemCard"
 description: List row for settings, navigation, and mixed action layouts with leading visuals and trailing controls.
+icon: "square-user-round"
 ---
 
 [← Back to Table of Contents](/docs/index)
@@ -24,11 +25,11 @@ Modern list row or standalone card for settings screens, navigation menus, and m
 
 ```php
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\ItemCard;
-use Filament\Support\Icons\Heroicon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 
 ItemCard::make('Language')
     ->description('Choose your preferred language')
-    ->icon(Heroicon::GlobeAlt)
+    ->icon(FlexIcon::Globe)
     ->chevron()
     ->pressable();
 ```
@@ -40,13 +41,22 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SwitchField;
 
 ItemCard::make('Dark mode')
     ->description('Use dark theme across the app')
-    ->icon(Heroicon::Moon)
+    ->icon(FlexIcon::Moon)
     ->schema([
         SwitchField::make('dark_mode')->inline()->size('sm'),
     ]);
 ```
 
 ---
+
+Rows containing a trailing schema remain containers, even with `pressable(true)`,
+so a switch, select or button cannot accidentally activate a surrounding button.
+Nested fields retain their own state, configuration and validation. Native
+Filament actions retain authorization, confirmation and modal behavior.
+
+Ripple effects are loaded only for pressable rows and respect reduced-motion
+preferences. RTL follows the page direction or `extraAttributes(['dir' => 'rtl'])`.
+Repeated action rows should have distinct non-inheritable `key()` values.
 
 ### Context: `standalone` vs `group`
 
@@ -71,15 +81,19 @@ All methods accept `Closure` unless noted.
 
 | Method | Type | Default | Description |
 |--------|------|---------|-------------|
+| `heading(string\|Htmlable\|Closure $text)` | Setup | `null` | Card title. |
+| `description(string\|Htmlable\|Closure $text)` | Setup | `null` | Text below the title. |
+| `context(string\|Closure $context)` | Setup | `'auto'` | `auto`, `group` or `standalone`. Shortcuts: `inGroup()` and `standalone()`. |
 | `variant(string\|Closure $variant)` | Setup | `'default'` | `default`, `secondary`, `tertiary`, `outline`, `transparent`. |
-| `icon(mixed $icon)` | Setup | `null` | Leading icon (Heroicon, Gravity, etc.). |
-| `image(string\|Closure $url)` | Setup | `null` | Leading media image (overrides icon). |
+| `icon(mixed $icon)` | Setup | `null` | Leading icon (FLEX/Hugeicons, Filament icons or trusted HTML). |
+| `image(string\|Closure $url)` | Setup | `null` | Safe HTTPS or local leading image (overrides icon). Unsafe URLs are ignored. HTTP images require the application's media opt-in. |
 | `imageShape(string\|Closure $shape)` | Setup | `'rounded'` | Crop shape: `circle` or `rounded`. |
 | `imageAlt(string\|Closure $alt)` | Setup | `heading` | Alternative text for the leading image. |
 | `chevron(bool\|Closure $on)` | Setup | `false` | Show a trailing chevron indicator. |
-| `pressable(bool\|Closure $on)` | Setup | `auto` | Enable hover/ripple effects (auto-enabled if chevron/url set). |
+| `pressable(bool\|Closure $on)` | Setup | `auto` | Enable hover/ripple effects (auto-enabled by a chevron, URL, row action or pressable parent group). |
 | `pressableAction(Action\|Closure $action)` | Setup | `null` | Action to trigger when the entire row is clicked. |
-| `url(string\|Closure $url)` | Setup | `null` | URL to navigate to on row click. |
+| `url(string\|Closure $url)` | Setup | `null` | Safe HTTP(S), relative, `mailto:` or `tel:` navigation URL. Executable schemes and unsafe addresses are ignored. |
+| `openUrlInNewTab(bool\|Closure $on = true)` | Setup | `false` | Open navigation in a new tab with `noopener noreferrer`. |
 | `schema(array\|Closure $components)` | Setup | `[]` | Trailing slot components (fields, actions). |
 
 #### Public helper methods
@@ -109,6 +123,8 @@ ItemCard::make('Alex Rivera')
 #### Destructive action row
 
 ```php
+use Bjanczak\FilamentFlexFields\Filament\Actions\Action;
+
 ItemCard::make('Delete account')
     ->description('Permanently remove your account and all data')
     ->schema([
@@ -131,10 +147,10 @@ ItemCard::make('Delete account')
 | `item-card--context-{standalone\|group}` | Layout context modifier |
 | `item-card--pressable` | Interactive state modifier |
 | `item-card--form-panel` | Vertical form layout modifier |
-| `item-card-icon` | Leading visual container |
-| `item-card-content` | Title and description container |
-| `item-card-action` | Trailing schema container |
-| `item-card-chevron` | Chevron indicator wrapper |
+| `item-card__icon` | Leading visual container |
+| `item-card__content` | Title and description container |
+| `item-card__action` | Trailing schema container |
+| `item-card__chevron` | Chevron indicator wrapper |
 
 ---
 
@@ -150,6 +166,6 @@ ItemCard::make('Delete account')
 
 ### Playground
 
-Grouped layouts and hold-confirm actions: `/admin/flex-fields-playground/item-card-group`.
+Grouped layouts and hold-confirm actions: `/admin/flex-fields/item-card-group`.
 
 ---

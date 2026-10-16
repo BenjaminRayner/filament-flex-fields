@@ -21,6 +21,8 @@ function makeHost(overrides = {}) {
         scheduleMenuPositionAfterLayout() {},
         syncDropdownOverflowChrome() {},
         _syncFromEngine() {},
+        queueSelectLayoutRefresh() {},
+        invalidateVirtualRowProjection() { this._virtualFlatRows = [] },
         _engine: createComboboxEngine({
             options: [],
             searchable: true,

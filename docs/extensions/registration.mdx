@@ -1,0 +1,71 @@
+---
+title: "Register your extension"
+description: "Register typed definitions and local outputs during service-provider boot."
+---
+
+Register the family in your package service provider's `boot()` method, after FLEX has registered its services. Supply the built local files that your package ships.
+
+Register catalog recommendations through `FlexCatalog::registerPlugin()` in the
+same provider-boot phase. Both component collection and catalog registration freeze
+after providers have booted. A request or queue job cannot add recommendations to
+the process registry. Catalog services remain lazy on pages that do not use them.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentRegistrar;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentRegistration;
+
+public function boot(ComponentRegistrar $components): void
+{
+    $components->registerFamily([
+        new ComponentRegistration(
+            new ComponentDefinition(
+                id: 'acme-rating-field',
+                kind: ComponentKind::Field,
+                stylesFrom: ['acme-rating-display'],
+                entry: 'acme-rating-field',
+            ),
+            entryPath: __DIR__.'/../resources/dist/rating.js',
+        ),
+        new ComponentRegistration(
+            new ComponentDefinition(
+                id: 'acme-rating-column',
+                kind: ComponentKind::Column,
+                stylesFrom: ['acme-rating-display'],
+            ),
+        ),
+        new ComponentRegistration(
+            new ComponentDefinition(
+                id: 'acme-rating-entry',
+                kind: ComponentKind::Entry,
+                stylesFrom: ['acme-rating-display'],
+            ),
+        ),
+        new ComponentRegistration(
+            new ComponentDefinition(
+                id: 'acme-rating-display',
+                kind: ComponentKind::Display,
+                styles: ['acme-rating-display'],
+            ),
+            styles: [
+                'acme-rating-display' =>
+                    __DIR__.'/../resources/dist/rating.css',
+            ],
+        ),
+    ]);
+}
+```
+
+The shared display may be declared last. FLEX checks the complete family before committing its registration. An invalid file, duplicate identity, missing dependency, dependency cycle or asset collision rejects the family without registering its earlier members. Registration supports up to 128 members per family. Use the [package generator](/docs/extensions/generate-package) and [asset build](/docs/extensions/build) to prepare the classes and files.
+
+<Note>
+Use a unique vendor prefix. Extensions cannot replace built-in aliases, shared JavaScript chunks, global styles, registered asset identities or the official FLEX badge.
+</Note>
+
+For a single surface, `register($definition, styles: [...], entryPath: ...)` uses the same validation.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

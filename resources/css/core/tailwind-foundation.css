@@ -1,0 +1,22 @@
+/* Shared Tailwind state used by @apply in lazy CSS, outside literal utility scans.
+ * Keep these exact vendor initializers in core, not dummy utility classes.
+ */
+@property --tw-ordinal { syntax: "*"; inherits: false; }
+@property --tw-slashed-zero { syntax: "*"; inherits: false; }
+@property --tw-numeric-figure { syntax: "*"; inherits: false; }
+@property --tw-numeric-spacing { syntax: "*"; inherits: false; }
+@property --tw-numeric-fraction { syntax: "*"; inherits: false; }
+@property --tw-duration { syntax: "*"; inherits: false; }
+
+@layer properties {
+    @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color: rgb(from red r g b)))) {
+        *, ::before, ::after, ::backdrop {
+            --tw-ordinal: initial;
+            --tw-slashed-zero: initial;
+            --tw-numeric-figure: initial;
+            --tw-numeric-spacing: initial;
+            --tw-numeric-fraction: initial;
+            --tw-duration: initial;
+        }
+    }
+}

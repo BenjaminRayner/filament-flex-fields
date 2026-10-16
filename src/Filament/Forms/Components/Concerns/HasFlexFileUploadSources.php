@@ -8,7 +8,7 @@ use Bjanczak\FilamentFlexFields\Enums\FileUploadSource;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\FileUploadImportConstraints;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\FileUploadImportException;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\FileUploadRemoteImporter;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\UploadAdmission;
 use Closure;
 use Filament\Forms\Components\BaseFileUpload;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
@@ -165,9 +165,9 @@ trait HasFlexFileUploadSources
     public function getUploadSourceTabIcon(FileUploadSource $source): string
     {
         return match ($source) {
-            FileUploadSource::File => GravityIcon::CloudArrowUpIn,
-            FileUploadSource::Url => GravityIcon::Globe,
-            FileUploadSource::Webcam => GravityIcon::Camera,
+            FileUploadSource::File => 'hugeicons-upload-01',
+            FileUploadSource::Url => 'hugeicons-link-01',
+            FileUploadSource::Webcam => 'hugeicons-camera-smile-02',
         };
     }
 
@@ -238,7 +238,7 @@ trait HasFlexFileUploadSources
     #[Renderless]
     public function importUploadedFileFromUrl(string $url): array
     {
-        if (! $this->shouldAllowUrlUpload()) {
+        if ($this->isDisabled() || ! $this->shouldAllowUrlUpload()) {
             throw ValidationException::withMessages([
                 $this->flexFileUploadValidationKey() => __('filament-flex-fields::default.file_upload.sources.url_disabled'),
             ]);
@@ -261,7 +261,16 @@ trait HasFlexFileUploadSources
             ]);
         }
 
-        return $this->formatAlternateSourceStagingPayload($file);
+        try {
+            // Validate inspected bytes with the same native per-file rules as local uploads.
+            app(UploadAdmission::class)->validate($this, $file);
+
+            return $this->formatAlternateSourceStagingPayload($file);
+        } catch (\Throwable $error) {
+            rescue(fn () => app(FileUploadRemoteImporter::class)->discardStagedFile($file), report: false);
+
+            throw $error;
+        }
     }
 
     #[ExposedLivewireMethod]
@@ -276,6 +285,8 @@ trait HasFlexFileUploadSources
 
         $file = TemporaryUploadedFile::createFromLivewire($stagingFilename);
 
+        // Revalidate at commit; a request must not bypass rules by submitting a staging name.
+        app(UploadAdmission::class)->validate($this, $file);
         $this->mergeTemporaryUpload($file);
     }
 
@@ -289,7 +300,7 @@ trait HasFlexFileUploadSources
 
         $file = TemporaryUploadedFile::createFromLivewire($stagingFilename);
 
-        rescue(fn () => $file->delete(), report: false);
+        rescue(fn () => app(FileUploadRemoteImporter::class)->discardStagedFile($file), report: false);
     }
 
     /**
@@ -403,9 +414,12 @@ trait HasFlexFileUploadSources
             'isPreviewable' => $this->isPreviewable(),
             'shouldAppendFiles' => $this->shouldAppendFiles(),
             'isDisabled' => $this->isDisabled(),
+            'uploadingMessage' => $this->getUploadingMessage(),
             'webcamFacingMode' => $this->isAvatar() ? 'user' : 'environment',
+            'cameraMaxPixels' => min($this->getImageLimits()->sourcePixels, $this->getImageLimits()->outputPixels, intdiv($this->getImageLimits()->workingBytes, 32)),
             'webcamModalId' => 'fff-webcam-upload-'.$this->getId(),
             'labels' => [
+                'cameraControls' => __('filament-flex-fields::default.file_upload.sources.webcam_controls'),
                 'urlPlaceholder' => __('filament-flex-fields::default.file_upload.sources.url_placeholder'),
                 'urlOpen' => __('filament-flex-fields::default.file_upload.sources.url_open'),
                 'urlImport' => __('filament-flex-fields::default.file_upload.sources.url_import'),
@@ -416,6 +430,7 @@ trait HasFlexFileUploadSources
                 'webcamCapture' => __('filament-flex-fields::default.file_upload.sources.webcam_capture'),
                 'webcamStarting' => __('filament-flex-fields::default.file_upload.sources.webcam_starting'),
                 'webcamUnavailable' => __('filament-flex-fields::default.file_upload.sources.webcam_unavailable'),
+                'webcamCaptureFailed' => __('filament-flex-fields::default.file_upload.sources.webcam_capture_failed'),
                 'webcamPermissionDenied' => __('filament-flex-fields::default.file_upload.sources.webcam_permission_denied'),
                 'webcamFlipCamera' => __('filament-flex-fields::default.file_upload.sources.webcam_flip_camera'),
                 'webcamFlashOn' => __('filament-flex-fields::default.file_upload.sources.webcam_flash_on'),

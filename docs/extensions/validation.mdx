@@ -1,0 +1,104 @@
+---
+title: "Validate values outside a form"
+description: "Apply field-owned rules, preserve protected values and reject forged submission shapes."
+---
+
+Use `FieldValueSubmission` when your API, import or background job accepts field
+values. Declare writable paths and Laravel rules in trusted PHP. A request cannot
+select a rule class, callback or component renderer.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Values\Submission\FieldValueContract;
+use Bjanczak\FilamentFlexFields\Support\Values\Submission\FieldValueSubmission;
+
+$contracts = [
+    new FieldValueContract('profile.alt', ['nullable', 'string', 'max:160']),
+    new FieldValueContract('tags', ['nullable', 'array', 'max:20']),
+    new FieldValueContract('preferences', ['nullable', 'array:newsletter']),
+    new FieldValueContract('enabled', ['required', 'boolean']),
+    new FieldValueContract('private_note', ['nullable', 'string', 'max:1000'],
+        encrypted: true),
+];
+
+$prepared = app(FieldValueSubmission::class)->prepare(
+    values: $request->input('flex_fields', []),
+    contracts: $contracts,
+    authorize: fn (FieldValueContract $field): bool =>
+        $fieldPolicy->canEdit($actor, $record, $field->path),
+);
+```
+
+`$fieldPolicy` is your application policy. Resolve the actor, record, tenant and
+create/edit operation on the server. The authorization callback must return a
+boolean. A denied submitted field throws `AuthorizationException`; an undeclared
+path throws `InvalidArgumentException`; invalid values throw Laravel's
+`ValidationException`. Missing optional fields remain absent. `null`, `false`,
+empty lists and numeric strings retain their original types.
+
+Rules run against the complete submitted payload, so Laravel rules such as
+`required_if` can refer to other fields. Use `array:allowed,key,names` for structured
+values: declaring a field path does not automatically authorize every key inside
+that field. Supply a typed Laravel validation rule for a custom component's value,
+including option ownership or tenant constraints. Declaring `array` or `string`
+alone does not verify which database records a value may reference.
+
+The method returns prepared values and never saves a record. It also does not
+inherit a field's UI rules automatically. Share your trusted value rules between
+your component adapter and submission contract when both accept the same data.
+Hidden, disabled and readonly UI settings do not replace the write policy.
+
+## Preserve fields outside the current submission
+
+Apply prepared fields to existing values explicitly. This avoids erasing values
+owned by another component or an extension that is temporarily unavailable.
+
+```php
+use Illuminate\Support\Arr;
+
+foreach ($contracts as $contract) {
+    if (Arr::has($prepared, $contract->path)) {
+        $record->setFlexFieldValue(
+            $contract->path,
+            data_get($prepared, $contract->path),
+        );
+    }
+}
+
+$record->save();
+```
+
+Authorize the record and query it within the correct tenant scope before this
+operation. If saving several records or combining values with schema publication,
+wrap the operation in your application's database transaction. For competing
+updates to a record, use your application's locking or revision policy.
+
+`FieldValueSubmission` encrypts accepted plaintext after validation. Text resembling
+a stored encrypted envelope is still treated as submitted text and encrypted again.
+`FieldValueWriter` and `HasFlexFields` remain storage APIs: they preserve existing
+ciphertext and do not automatically perform request authorization or business-rule
+validation. Keep submission contracts and storage definitions consistent about
+which paths require encryption.
+
+## Data limits
+
+| Boundary | Limit |
+| --- | --- |
+| Submitted or stored JSON-compatible values | 8 MiB of JSON data, 32,768 nodes, depth 60 |
+| Value exchange envelope | 8 MiB including envelope metadata |
+| Submission contract | 256 fields; 128 rules per field |
+| Storage path | 1,024 bytes; 60 literal segments; no wildcard, empty segment or reserved object-property segment |
+| Built-in schema payload/exchange | 2 MiB; 16,384 nodes; depth 32 |
+| Built-in schema fields/sections | 256 fields; 128 sections |
+
+The reserved path segments are `__proto__`, `constructor` and `prototype`. JSON escaping counts toward byte limits. Encryption increases the storage size;
+the complete prepared storage payload must still fit its limit. Store large files
+through Media OS rather than embedding file contents in these JSON values.
+
+These are distinct from the existing family configuration/exchange limits. Family
+schemas continue to use the installed family's typed configuration contract and
+reject unknown configuration or value versions.
+
+## Continue reading
+
+[Submission pipeline](/docs/extensions/submission) · [Saved values](/docs/extensions/saved-values)
+

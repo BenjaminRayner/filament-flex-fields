@@ -59,8 +59,8 @@
     transition:
         transform var(--fff-overlay-sheet-enter-duration) var(--fff-overlay-sheet-ease);
     /* iOS sheets must not use glass — samples page gray at the bottom edge. */
-    backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    backdrop-filter: none;
     background: #ffffff;
     box-shadow: none;
     contain: layout paint;

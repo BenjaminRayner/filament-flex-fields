@@ -1,0 +1,73 @@
+---
+title: "Typed configuration"
+description: "Declare accepted values, defaults, choices, bounds and override behavior."
+---
+
+A `ConfigurationSchema` defines the options your family accepts. Unknown names,
+incorrect types and values outside the declared bounds are rejected before they
+reach your renderer. Configuration contains JSON data, not PHP callbacks or class
+names selected by a saved schema.
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationOption;
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationSchema;
+use Bjanczak\FilamentFlexFields\Support\Components\Configuration\ConfigurationType;
+
+$configuration = new ConfigurationSchema([
+    'maxLength' => new ConfigurationOption(
+        ConfigurationType::Integer,
+        default: 80,
+        min: 1,
+        max: 500,
+    ),
+    'size' => new ConfigurationOption(
+        ConfigurationType::String,
+        default: 'medium',
+        choices: ['small', 'medium', 'large'],
+    ),
+    'caption' => new ConfigurationOption(
+        ConfigurationType::String,
+        nullable: true,
+        max: 200,
+    ),
+    'languages' => new ConfigurationOption(
+        ConfigurationType::List,
+        default: ['en'],
+        items: ConfigurationType::String,
+        max: 10,
+    ),
+    'enabled' => new ConfigurationOption(
+        ConfigurationType::Boolean,
+        default: true,
+    ),
+    'enforcePolicy' => new ConfigurationOption(
+        ConfigurationType::Boolean,
+        default: true,
+        locked: true,
+    ),
+]);
+```
+
+Supported types are `Boolean`, `Integer`, `Number`, `String`, `List` and `Map`.
+`min`/`max` measure numeric values, string characters or collection items.
+`items` optionally constrains every list/map value to a supported type. `required`
+requires an option to exist after applying defaults and layers. `nullable` permits
+an explicit `null`. A nullable option defaults to `null`; a non-nullable option
+without a non-null default remains absent until supplied.
+
+Layers replace options in this order: library defaults, package defaults,
+application defaults, panel defaults, instance options and explicitly mapped child
+options. Maps and lists replace as a whole. Missing options inherit; `false`,
+`null` and `[]` do not fall back to an earlier truthy value. A locked option must
+keep its declared default in every layer. It is an additional configuration guard;
+your adapter's authorization and application save policy remain necessary.
+
+The contract accepts at most 128 options. Each data map is bounded to 64 KiB,
+4096 nodes and 16 nested levels. Contract metadata uses the same limits. Family
+schema metadata has a shared 4 MiB compilation budget. These bounds also apply to
+package defaults and application-provided configuration.
+
+## Continue reading
+
+[Configuration reference](/docs/extensions/configuration-reference) · [Saved values](/docs/extensions/saved-values)
+

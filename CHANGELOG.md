@@ -5,7 +5,62 @@ All notable changes to `filament-flex-fields` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [4.0.0] - Unreleased
+
+A major rebuild of FLEX Fields. Every component has been rewritten, alongside the
+shared asset runtime, picker engine, media workflows and component catalog. This
+release expands configuration and integrations across the library; it is not
+limited to the new components listed below. Version 4.0 is in development and has
+not yet been publicly released.
+
+### Added
+
+- **Font Select** — searchable Google Fonts metadata, category and subset filters, variable-font restrictions, virtualized previews and an option to keep selected labels in the system font. Preview requests load only the required text glyphs; shared ownership releases unused picker fonts without removing application fonts. PHP helpers support using saved font selections outside the picker.
+- **Typed value and CSV transport** — preserve null, booleans, numbers and structured values through storage and transfer, with explicit legacy and spreadsheet profiles and streaming export rows.
+- **Compiled formulas and conditions** — reuse parsed expressions, recalculate affected descendants when inputs change, and validate bounded condition trees, dependencies and formula cycles before use.
+- **Laravel monitoring events** — component mounts, searches, uploads, retention and barcode captures integrate with standard Laravel listeners and queues instead of a separate package listener registry.
+
+### Changed
+
+- **Component architecture** — fields, displays, table columns, actions and shared primitives declare typed definitions. CSS reuse, complete composition and optional instance capabilities have separate ownership contracts; custom component packages use the same registration model.
+- **Asset loading and first render** — active instances share dependency plans and browser resources, while retaining independent ownership. Required styles are prepared before reveal; inactive tabs, wizard steps, collapsed sections and closed modals activate on demand.
+- **Livewire and nested-modal lifecycle** — rebuilt initialization, navigation, observer reconnection and teardown. Closing a child retains resources used by its parent or the underlying page; loading failures expose retry controls rather than leaving indefinitely hidden fields.
+- **Build and publication** — portable package manifests, dependency-aware JavaScript chunks and content-versioned resources replace application-generated asset registries. Prebuilt CSS, JavaScript and declared media resources are published through one atomic publication path.
+- **Select engine** — rebuilt state, option projection, rich/list/grid rendering, keyboard navigation and ARIA behavior. Virtual windows and paginated results share consistent geometry; desktop dropdowns and mobile sheets use the same ownership and positioning system.
+- **Asynchronous selection** — cancellable search, stale-response protection, bounded caches, structured retry/cooldown states, cascading dependencies and selected-label recovery after native create/edit actions.
+- **User Select** — scoped record lookup, batched selected-label resolution, relationship-key handling, stable query ordering and separate caches for display projections and full selected records.
+- **Country, Phone, Timezone and Currency** — shared catalog transport, localized names and search, explicit restriction policies and canonical submitted values. Country and Phone share local SVG flags; phone formatting and validation use libphonenumber, while currency conversion preserves decimal precision.
+- **Icon Picker and icon system** — indexed catalog search, bounded SVG batches, configurable libraries, virtualized list/grid modes, preview retries and viewport-aware positioning. FLEX controls now use Hugeicons through `janczakb/blade-hugeicons`; text-input icon selections can also be cleared.
+- **Flex Text Input and Textarea** — rebuilt editing, autosizing, suggestions, emoji, browser dictation and action controls. Password strength uses four animated segments and aligned requirement indicators; verification-code entry and color swatches have rebuilt keyboard and visual behavior.
+- **Color Picker** — rewritten color conversion, validation and popover lifecycle, with configurable formats, opacity, palettes, inline/swatches/sliders layouts and shared input controls. Nested format selectors and map color controls use the common picker infrastructure.
+- **Date, time and schedules** — calendar selection and shared overlay behavior now have separate owners. Refined range transitions, period controls and schedule configuration; weekly validation handles overnight intervals and the Sunday/Monday boundary.
+- **Progress and display components** — rebuilt Progress Bar and Progress Circle rendering, sizes, text proportions and half-circle layouts. Added configurable segmented circle presentations with legends and active-segment feedback.
+- **Rich Editor** — consistent Hugeicons toolbar, localized tool/action defaults, accessible editor labeling and a redesigned playground without the native-editor comparison.
+- **File Upload** — redesigned list/grid presentation, compact and full headers, smaller grid sizing, upload/pause/retry feedback and configurable file-click actions. Grid actions use a contextual menu, while reordering remains a drag interaction.
+- **Image editing and previews** — refined crop/adjust layouts, image proportions and modal geometry. Configurable thumbnail and viewer conversions support existing storage conventions; documentation covers custom filenames, related gallery records, multiple galleries and migration from existing upload systems.
+- **Signatures** — rebuilt responsive toolbars, preview/document modals and table-column presentation, with consistent icons, configurable exports and stroke-based replay for supported signature data.
+- **Audio, video, voice and barcode controls** — rebuilt media presentation, capture/resource cleanup and shared integration boundaries. Optional Whisper transcription uses Transformers.js 4 with a versioned, integrity-checked installer, independently of normal playback.
+- **Maps and address search** — rebuilt point, marker, address, zone and country-map interfaces. Shared provider loading, cancellable search, bounded geocoding caches, canonical coordinates and controlled external-state updates replace duplicated loading and state paths.
+- **Zone editing and country maps** — configurable polygon/circle/rectangle editing, undo/redo, resize/translation validation, snapping, collision policies and dimension units. Country maps support bounded zoom, pan, keyboard controls, tooltips and reduced-motion preferences.
+- **Configuration and localization** — declared previously hidden defaults and corrected nested default inheritance. Eight language catalogs cover component UI; retained field/tool/action defaults resolve against the current locale without replacing application-provided labels.
+- **Playground and extension discovery** — redesigned discovery/detail pages, official categories, type/source filters, extension presentation metadata and localized information. Related field and column examples share component families instead of duplicate catalog pages.
+- **Documentation and component previews** — expanded PHP configuration and migration examples, separate map guides, RTL guidance and Asset Manager documentation, with recorded demonstrations and static sharing images. Mintlify changelog and archive pages now generate from this file.
+
+### Security
+
+- **Submitted data and storage boundaries** — strengthened scoped option/record validation, structured-value rejection, schema mutation handling and encrypted-field writes. Hidden or inactive fields retain their storage encryption policy; malformed recognized ciphertext fails explicitly.
+- **Remote media and resource safety** — validated remote destinations and redirects, pinned DNS/TLS transport, bounded response bodies, MIME inspection, replayable temporary streams and cleanup after processing failures. Listener failures are isolated from component results; dependency audits run in CI.
+
+### Removed
+
+- Removed the obsolete v2-to-v3 upgrade command, auto-upgrade helpers, application-side registry/icon-manifest generators, and the package-specific monitoring registry, SIEM bridge and `enterprise` configuration.
+
+### Upgrade notes
+
+- Replace `ObservabilityHooks`, `ObservabilityState`, `SiemBridge` and `enterprise` settings with Laravel event listeners. See [Monitoring & operations](docs/sre-runbook.md#data-handling-and-migration).
+- Applications using optional browser Whisper transcription must reinstall its runtime with `php artisan fff:whisper:install` after upgrading.
+- Review custom component definitions, asset integrations and existing typed/encrypted values before upgrading; some legacy representations require an explicit migration decision.
+- Follow [Updating FLEX Fields](docs/updating.md) and [Media migration](docs/media-ingress-migration.md) for publication, worker and storage integration steps.
 
 ## [3.1.19] - 2026-09-17
 
@@ -270,7 +325,7 @@ Flex Fields **3.0** is a major release: manage custom fields from the admin pane
 - **Secure media and signatures** — optional virus scanning and quarantine for uploads; Spatie Media Library integration; voice-note and barcode capture metadata; credit-card fields that never store full card numbers when tokenization is required; signature fields with legal timestamp seals, audit metadata, ink validation, and optional download (SVG or WebP).
 - **Translatable fields** — improved locale tabs for many languages, correct text direction per locale on the input, and smoother RTL behaviour.
 - **Rich admin columns** — table columns for progress, status chips, signature previews, and map pins, sized to match your panel density.
-- **Upgrade guide** — [v2 to v3 migration notes](docs/upgrade-v2-to-v3.md) for teams moving from Flex Fields 2.x.
+- **Upgrade guide** — [current update workflow](docs/updating.md) for teams moving from Flex Fields 2.x.
 
 ### Improved
 
@@ -720,7 +775,7 @@ Quality, security, accessibility, and test hardening for **LinkPreviewField** an
 
 ### Changed
 
-- `MapPickerField` / `AddressAutocompleteField` blades document `wire:ignore` + `$entangle` + `wire:key` remount strategy in [shared-concepts.md](docs/shared-concepts.md).
+- `MapPickerField` / `AddressAutocompleteField` blades document `wire:ignore` + `$entangle` + `wire:key` remount strategy. Current guidance: [Tabs, modals & Livewire](docs/assets/lifecycle.md).
 - README compare table, differentiation summary, geo proxy & audit bullets, country registry mention, and CI test counts updated.
 
 ## [2.3.0] - 2026-06-09

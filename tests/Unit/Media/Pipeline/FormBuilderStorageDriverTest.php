@@ -6,6 +6,7 @@ use Bjanczak\FilamentFlexFields\Data\FlexFieldDefinition;
 use Bjanczak\FilamentFlexFields\Enums\FieldType;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexFileUpload;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\FlexSpatieMediaLibraryFileUpload;
+use Bjanczak\FilamentFlexFields\Support\FileUpload\Presentation\UploadLayout;
 use Bjanczak\FilamentFlexFields\Support\FormBuilder\Handlers\MediaFieldTypeHandler;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
@@ -41,6 +42,19 @@ it('builds FlexFileUpload when storage_driver is disk', function () {
     ), 'contract');
 
     expect($field)->toBeInstanceOf(FlexFileUpload::class);
+});
+
+it('applies presentation settings through the public schema configuration', function (): void {
+    $field = (new MediaFieldTypeHandler)->make(new FlexFieldDefinition(
+        slug: 'gallery', label: 'Gallery', type: FieldType::Image,
+        config: ['upload_layout' => 'grid', 'grid_columns' => 4, 'avatar_size' => 'sm'],
+    ), 'gallery');
+
+    expect($field)->toBeInstanceOf(FlexFileUpload::class);
+    $presentation = $field->getUploadPresentation();
+    expect($presentation->layout)->toBe(UploadLayout::Grid)
+        ->and($presentation->gridColumns)->toBe(4)
+        ->and($presentation->avatarSize)->toBe(96);
 });
 
 it('honors deprecated use_spatie_media_library alias when storage_driver omitted', function () {

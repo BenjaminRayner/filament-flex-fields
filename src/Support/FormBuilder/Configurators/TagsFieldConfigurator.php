@@ -72,8 +72,19 @@ final class TagsFieldConfigurator implements FieldConfigurator
             $field->showTagCount((bool) $config['show_tag_count']);
         }
 
-        if ($field instanceof FlexSpatieTagsField && array_key_exists('spatie_tag_type', $config)) {
-            $field->type($config['spatie_tag_type']);
+        if ($field instanceof FlexSpatieTagsField) {
+            if (array_key_exists('spatie_tag_type', $config)) {
+                $field->type($config['spatie_tag_type']);
+            }
+            if (array_key_exists('spatie_tag_locale', $config)) {
+                $field->tagLocale($config['spatie_tag_locale']);
+            }
+            if (array_key_exists('spatie_tag_fallback_locale', $config)) {
+                $field->tagFallbackLocale($config['spatie_tag_fallback_locale']);
+            }
+            if (array_key_exists('spatie_tag_search_limit', $config)) {
+                $field->tagSearchLimit($config['spatie_tag_search_limit']);
+            }
         }
 
         return $field;

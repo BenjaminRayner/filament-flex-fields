@@ -1,0 +1,56 @@
+# Codex — index only original source (PHP, Blade, unminified JS, tests, scripts).
+# Syntax: gitignore.
+
+# --- Dependencies (Composer / npm) ---
+/vendor/
+/node_modules/
+bower_components/
+composer.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+npm-debug.log*
+yarn-error.log*
+
+# --- Translations ---
+/resources/lang/
+/lang/
+**/lang/
+*.po
+*.mo
+*.pot
+
+# --- Minified / built / vendored frontend ---
+/resources/dist/
+**/*.min.js
+**/*.min.cjs
+**/*.min.mjs
+**/*.min.css
+**/*.map
+**/*.wasm
+
+# --- Static / generated media ---
+/art/
+/resources/dist/assets/
+/coverage/
+/build/
+/.phpunit.cache/
+/.nyc_output/
+/test-results/
+/playwright-report/
+/artifacts/
+/reference/
+/.reference/
+/DEMO/
+/scratch/
+
+# --- Tooling dumps / secrets ---
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+.idea/
+.vscode/
+.cursor/
+.codex/

@@ -112,11 +112,14 @@ export function createHeadlessComboboxSsrHandoffMixin() {
         },
 
         markHeadlessDisplayReady() {
-            if (this.displayReady || ! this._engine || ! this.canShowHydratedTrigger()) {
+            const host = this._pickerHostElement ?? this.$el
+            if (! this._engine || ! this.canShowHydratedTrigger()) {
+                host?.setAttribute?.('data-fff-select-handoff', this._engine ? 'waiting-label' : 'waiting-engine')
                 return
             }
 
             this.displayReady = true
+            host?.setAttribute?.('data-fff-select-handoff', 'attached')
             this.ensureHeadlessSsrHandoff()
         },
 
@@ -130,8 +133,9 @@ export function createHeadlessComboboxSsrHandoffMixin() {
                 return
             }
 
-            const shell = this.$el?.closest?.('.fff-select-field__shell--headless')
-                ?? this.$el?.closest?.('.fff-select-field__shell')
+            const host = this._pickerHostElement ?? this.$el
+            const shell = host?.closest?.('.fff-select-field__shell--headless')
+                ?? host?.closest?.('.fff-select-field__shell')
 
             if (! shell) {
                 return

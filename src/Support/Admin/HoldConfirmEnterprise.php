@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Admin;
 
+use Bjanczak\FilamentFlexFields\Support\Confirmation\ConfirmationOptions;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
+
 final class HoldConfirmEnterprise
 {
     /** Default hold duration for bulk destructive table actions (ms). */
@@ -27,20 +30,18 @@ final class HoldConfirmEnterprise
     /** Alpine / DOM event fired when hold progress reaches 100%. */
     public const string EVENT_HOLD_COMPLETE = 'fff-hold-complete';
 
-    private static bool $requiresAuditReason = false;
-
-    private static ?int $bulkHoldMs = null;
-
     /**
-     * Get or set the global default for requiring an audit reason on destructive holds.
+     * Get or set the current scope default for requiring an audit reason on destructive holds.
      */
     public static function requiresAuditReason(?bool $required = null): bool
     {
         if ($required !== null) {
-            self::$requiresAuditReason = $required;
+            RequestState::configure(HoldConfirmState::class, static function (HoldConfirmState $state) use ($required): void {
+                $state->requiresAuditReason = $required;
+            });
         }
 
-        return self::$requiresAuditReason;
+        return RequestState::resolve(HoldConfirmState::class)->requiresAuditReason;
     }
 
     /**
@@ -49,10 +50,15 @@ final class HoldConfirmEnterprise
     public static function bulkHoldMs(?int $milliseconds = null): int
     {
         if (func_num_args() === 1) {
-            self::$bulkHoldMs = $milliseconds;
+            if ($milliseconds !== null) {
+                ConfirmationOptions::milliseconds($milliseconds, 'Bulk hold duration', 200);
+            }
+            RequestState::configure(HoldConfirmState::class, static function (HoldConfirmState $state) use ($milliseconds): void {
+                $state->bulkHoldMs = $milliseconds;
+            });
         }
 
-        return self::$bulkHoldMs ?? self::DEFAULT_BULK_HOLD_MS;
+        return RequestState::resolve(HoldConfirmState::class)->bulkHoldMs ?? self::DEFAULT_BULK_HOLD_MS;
     }
 
     /**

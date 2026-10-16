@@ -10,6 +10,27 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 
+it('renders an accessible document preview with a real empty state instead of an empty image', function (): void {
+    TestableSignatureForm::$formSchema = [SignatureField::make('signature')->pdfPreview()];
+    $html = Livewire::test(TestableSignatureForm::class)->html(false);
+    expect($html)->toContain('fff-signature__dialog--document', 'aria-labelledby=', 'aria-describedby=', 'No signature yet', 'x-if="signaturePreviewUrl"')
+        ->not->toContain('<img src=""');
+});
+
+it('groups signature actions separately from ink choices and omits empty read-only toolbars', function (): void {
+    TestableSignatureForm::$formSchema = [
+        SignatureField::make('signature')->downloadable(SignatureField::DOWNLOAD_SVG),
+        SignatureField::make('readonly')->readOnly(),
+    ];
+    $html = Livewire::test(TestableSignatureForm::class)->html(false);
+    $document = new DOMDocument;
+    @$document->loadHTML($html);
+    $xpath = new DOMXPath($document);
+    expect($xpath->query('//*[@role="group"][@aria-label="Signature actions"][not(ancestor::dialog)]')->length)->toBe(1)
+        ->and($xpath->query('//*[contains(concat(" ",normalize-space(@class)," ")," fff-signature__pens ")][not(ancestor::dialog)]')->length)->toBe(1)
+        ->and($xpath->query('//*[@role="group"][@aria-label="Signature actions"][not(ancestor::dialog)]//button')->length)->toBe(6);
+});
+
 beforeEach(function (): void {
     TestableSignatureForm::$formSchema = [];
     Storage::fake('local');
@@ -30,7 +51,9 @@ it('renders signature field shell and alpine configuration', function (): void {
         ->toContain('validationMessages')
         ->toContain('minStrokes')
         ->toContain('fff-signature__validation')
-        ->toContain('modulepreload');
+        ->toContain('fff-signature__baseline')
+        ->toContain('selectPenColor')
+        ->toContain('canRedo');
 });
 
 it('fails server validation when required signature is empty', function (): void {

@@ -75,24 +75,13 @@ it('uses headless runtime for async search fields', function (): void {
     expect($field->shouldUseHeadlessEngine())->toBeTrue();
 });
 
-it('rejects native(true) combined with searchable multiple or html', function (): void {
-    expect(fn () => SelectField::make('status')->searchable()->native(true))
-        ->toThrow(InvalidArgumentException::class);
-
-    expect(fn () => SelectField::make('status')->multiple()->native(true))
-        ->toThrow(InvalidArgumentException::class);
-
-    expect(fn () => SelectField::make('status')->allowHtml()->native(true))
-        ->toThrow(InvalidArgumentException::class);
-
-    expect(fn () => SelectField::make('status')->native(true)->searchable())
-        ->toThrow(InvalidArgumentException::class);
-
-    expect(fn () => SelectField::make('status')->native(true)->multiple())
-        ->toThrow(InvalidArgumentException::class);
-
-    expect(fn () => SelectField::make('status')->native(true)->allowHtml())
-        ->toThrow(InvalidArgumentException::class);
+it('uses enhanced renderer for native selects with search multiple or HTML regardless of call order', function () {
+    foreach (['searchable', 'multiple', 'allowHtml'] as $method) {
+        $first = SelectField::make('status')->{$method}()->native(true);
+        $second = SelectField::make('status')->native(true)->{$method}();
+        expect($first->shouldUseHeadlessEngine())->toBeTrue()
+            ->and($second->shouldUseHeadlessEngine())->toBeTrue();
+    }
 });
 
 it('allows native(true) for plain single selects', function (): void {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\IconColumn;
+use Bjanczak\FilamentFlexFields\Support\Catalog\FlexCatalog;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundRegistry;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldStylesheetQueue;
 use Bjanczak\FilamentFlexFields\Support\IconColumnRenderCache;
 use Bjanczak\FilamentFlexFields\Support\Playground\IconColumnPlayground;
 
@@ -75,11 +75,11 @@ it('caches identical icon renders within the same request', function () {
     expect(IconColumnRenderCache::entries())->toHaveCount(1);
 });
 
-it('registers icon column playground after icon picker in registry', function () {
+it('groups icon column examples with the icon picker', function () {
     $definitions = FlexFieldsPlaygroundRegistry::definitions();
 
-    expect($definitions['icon-column']['sort'])
-        ->toBeGreaterThan($definitions['icon-picker-field']['sort']);
+    expect($definitions)->not->toHaveKey('icon-column')->toHaveKey('icon-picker-field')
+        ->and(app(FlexCatalog::class)->groupedEntriesFor('icon-picker-field')['icon-column']['demoClass'])->toBe(IconColumnPlayground::class);
 });
 
 it('renders icon column playground demo rows', function () {
@@ -99,12 +99,4 @@ it('does not load stylesheets from table column blade partial', function () {
     $blade = file_get_contents(__DIR__.'/../../resources/views/tables/columns/icon-column.blade.php');
 
     expect($blade)->not->toContain('load-stylesheet');
-});
-
-it('registers table column stylesheets during column setup', function () {
-    FlexFieldStylesheetQueue::reset();
-
-    IconColumn::make('menu_icon');
-
-    expect(FlexFieldStylesheetQueue::registered())->toBe(['icon-column']);
 });

@@ -15,6 +15,7 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\ConfiguresSlu
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\GeneratesSlugFromSource;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\InteractsWithSlugTranslatableTitle;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\ResolvesSlugStatePaths;
+use Bjanczak\FilamentFlexFields\Support\Slug\SlugRenderState;
 use Bjanczak\FilamentFlexFields\Support\Translations;
 use Closure;
 use Filament\Forms\Components\Concerns\CanBeReadOnly;
@@ -25,6 +26,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Livewire\Attributes\Renderless;
 
+/** Slug domain state; the input and command strip use shared FLEX primitives. */
 class SlugField extends Field
 {
     use CanBeReadOnly;
@@ -46,88 +48,37 @@ class SlugField extends Field
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->default('');
-
-        $this->afterStateHydrated(function (SlugField $component, mixed $state): void {
+        $this->afterStateHydrated(function (self $component, mixed $state): void {
             $component->state($component->normalizeSlug(is_string($state) ? $state : ''));
         });
+        $this->dehydrateStateUsing(function (self $component, mixed $state): ?string {
+            $value = $component->normalizeSlug(is_string($state) ? $state : '');
 
-        $this->dehydrateStateUsing(function (SlugField $component, mixed $state): ?string {
-            if ($state === null || $state === '') {
-                return null;
-            }
-
-            $normalized = $component->normalizeSlug((string) $state);
-
-            return $normalized === '' ? null : $normalized;
+            return $value === '' ? null : $value;
         });
-
-        $this->applySlugUniqueValidation();
-
-        $this->afterStateUpdated(function (SlugField $component, mixed $state): void {
-            if (! $component->slugAfterStateUpdated instanceof Closure) {
-                return;
+        $this->afterStateUpdated(function (self $component, mixed $state): void {
+            if ($component->slugValueUpdated !== null) {
+                $component->evaluate($component->slugValueUpdated, ['state' => is_string($state) ? $component->normalizeSlug($state) : $state]);
             }
-
-            $resolvedState = is_string($state)
-                ? $component->normalizeSlug($state)
-                : $state;
-
-            $component->evaluate($component->slugAfterStateUpdated, ['state' => $resolvedState]);
         });
-
-        $this->rule(function (SlugField $component, Get $get): Closure {
+        $this->rule(function (self $component, Get $get): Closure {
             return function (string $attribute, mixed $value, Closure $fail) use ($component, $get): void {
-                if ($component->shouldUseInlineEditing()) {
-                    $pendingField = $component->getInlineEditPendingFieldName();
-
-                    if ((bool) $get($pendingField)) {
-                        $fail(__('filament-flex-fields::default.validation.slug.inline_edit_pending'));
-
-                        return;
-                    }
-                }
-
-                if ($value === null || $value === '') {
-                    if ($component->isRequired()) {
-                        $fail(__('validation.required', ['attribute' => $component->getLabel()]));
-                    }
+                $pending = $component->getInlineEditPendingStatePath();
+                if ($pending !== null && (bool) $get($pending, isAbsolute: true)) {
+                    $fail(Translations::get('filament-flex-fields::default.validation.slug.inline_edit_pending'));
 
                     return;
                 }
-
-                if (! is_string($value)) {
-                    $fail(__('filament-flex-fields::default.validation.slug.invalid'));
-
-                    return;
-                }
-
-                $normalized = $component->normalizeSlug($value);
-
-                if ($normalized === '' && ! ($component->allowsHomepageSlug() && trim($value) === '/')) {
-                    $fail(__('filament-flex-fields::default.validation.slug.invalid'));
-
-                    return;
-                }
-
-                if ($component->allowsHomepageSlug() && $normalized === '/') {
-                    return;
-                }
-
-                $pattern = $component->getRegex();
-
-                if ($pattern !== '' && ! preg_match($pattern, $normalized)) {
-                    $fail(__('filament-flex-fields::default.validation.slug.pattern'));
+                $error = $component->validateSlugValue($value);
+                if ($error !== null) {
+                    $fail($error);
                 }
             };
         });
     }
 
-    /**
-     * Convenience schema: title field, auto-update flag, and slug field in one call.
-     *
-     * @param  array<int, string|Closure>|Closure  $titleRules
+    /** @param array<int, string|Closure>|Closure $titleRules
      * @param  array<int, string|Closure>|Closure  $slugRules
      */
     public static function withTitle(
@@ -140,122 +91,109 @@ class SlugField extends Field
         ?Closure $slugConfigurator = null,
     ): FusedGroup {
         return TitleSlugField::make(
-            fieldTitle: $fieldTitle,
-            fieldSlug: $fieldSlug,
-            titleField: $titleField,
-            titleRules: $titleRules,
-            slugRules: $slugRules,
-            titleAutofocus: $titleAutofocus,
-            slugConfigurator: $slugConfigurator,
+            fieldTitle: $fieldTitle, fieldSlug: $fieldSlug, titleField: $titleField,
+            titleRules: $titleRules, slugRules: $slugRules, titleAutofocus: $titleAutofocus, slugConfigurator: $slugConfigurator,
         );
     }
 
-    /**
-     * @return array<string, mixed>
-     */
+    public function getSlugRenderState(): SlugRenderState
+    {
+        return SlugRenderState::from($this);
+    }
+
+    /** @return array<string, mixed> */
     public function getAlpineConfiguration(): array
     {
-        $recordSlug = $this->getRecordSlug();
-        $currentSlug = null;
-
-        if ($this->isRootMounted()) {
-            $state = $this->getState();
-            $currentSlug = is_string($state) ? $this->normalizeSlug($state) : null;
-        }
-
-        $resolvedVisitUrl = $this->canVisitLink() && (filled($currentSlug) || filled($recordSlug))
-            ? $this->getFullPermalinkUrl($currentSlug ?? $recordSlug ?? '')
-            : null;
+        $current = $this->isRootMounted() ? $this->getState() : $this->getRecordSlug();
+        $slug = $this->normalizeSlug(is_string($current) ? $current : '');
+        $autoPath = $this->getAutoUpdateDisabledStatePath();
+        $disabledAuto = $autoPath !== null && $this->isRootMounted()
+            ? (bool) data_get($this->getLivewire(), $autoPath, $this->getInitialAutoSyncDisabled()) : $this->getInitialAutoSyncDisabled();
 
         return [
-            'sourcePath' => $this->getSourceStatePath(),
-            'sourceLive' => $this->isSourceLive(),
-            'separator' => $this->getSeparator(),
-            'maxLength' => $this->getMaxSlugLength(),
-            'urlHost' => $this->isUrlHostVisible() ? $this->getUrlHost() : null,
-            'urlPath' => $this->isUrlPathVisible() ? $this->getUrlPath() : null,
-            'urlPostfix' => $this->getSlugLabelPostfix(),
-            'urlHostVisible' => $this->isUrlHostVisible(),
+            'statePath' => $this->resolveOwnStatePath(), 'initialSlug' => $slug,
+            'sourcePath' => $this->getSourceStatePath(), 'sourceLive' => $this->isSourceLive(),
+            'separator' => $this->getSeparator(), 'maxLength' => $this->getMaxSlugLength(),
+            'urlHost' => $this->getUrlHost(), 'urlPath' => $this->getUrlPath(), 'urlPostfix' => $this->getSlugLabelPostfix(),
+            'urlHostVisible' => $this->isUrlHostVisible(), 'urlPathVisible' => $this->isUrlPathVisible(),
             'permalinkPreview' => $this->hasPermalinkPreview() && $this->hasUrlContext(),
-            'visitUrl' => $resolvedVisitUrl,
-            'showVisitLink' => $this->shouldShowVisitLink(),
-            'canVisitLink' => $this->canVisitLink(),
-            'showCopyButton' => $this->shouldShowCopyButton(),
-            'showRegenerateButton' => $this->shouldShowRegenerateButton(),
-            'showActionButtonLabels' => $this->shouldShowActionButtonLabels(),
-            'autoUpdateDisabledPath' => $this->getAutoUpdateDisabledStatePath(),
-            'inlineEditPendingPath' => $this->getInlineEditPendingStatePath(),
-            'inlineEditing' => $this->shouldUseInlineEditing(),
-            'autoGenerate' => $this->shouldAutoGenerate(),
-            'preserveOnEdit' => $this->shouldPreserveSlugOnEdit(),
-            'initialAutoSyncDisabled' => $this->getInitialAutoSyncDisabled(),
-            'allowHomepage' => $this->allowsHomepageSlug(),
-            'slugReadOnly' => $this->isSlugReadOnly(),
-            'debounceMs' => $this->getDebounceMilliseconds(),
-            'recordSlug' => $recordSlug,
-            'selfHealingPermalink' => $this->usesSelfHealingPermalink(),
-            'permalinkRecordKey' => $this->getPermalinkRecordKey(),
+            'visitUrl' => $this->canVisitLink() ? $this->getFullPermalinkUrl($slug) : null,
+            'customVisitUrl' => $this->hasCustomVisitUrl() || $this->usesSelfHealingPermalink(), 'showVisitLink' => $this->shouldShowVisitLink(),
+            'canVisitLink' => $this->canVisitLink(), 'showCopyButton' => $this->shouldShowCopyButton(),
+            'showRegenerateButton' => $this->shouldShowRegenerateButton(), 'showActionButtonLabels' => $this->shouldShowActionButtonLabels(),
+            'autoUpdateDisabledPath' => $autoPath, 'inlineEditPendingPath' => $this->getInlineEditPendingStatePath(),
+            'inlineEditing' => $this->shouldUseInlineEditing(), 'autoGenerate' => $this->shouldAutoGenerate(),
+            'preserveOnEdit' => $this->shouldPreserveSlugOnEdit(), 'initialAutoSyncDisabled' => $disabledAuto,
+            'allowHomepage' => $this->allowsHomepageSlug(), 'slugReadOnly' => $this->isSlugReadOnly(),
+            'disabled' => $this->isRootMounted() ? $this->isDisabled() : (bool) $this->evaluate($this->isDisabled), 'debounceMs' => $this->getDebounceMilliseconds(), 'recordSlug' => $this->getRecordSlug(),
+            'selfHealingPermalink' => $this->usesSelfHealingPermalink(), 'permalinkRecordKey' => $this->getPermalinkRecordKey(),
             'selfHealingSeparator' => $this->getSelfHealingSeparator(),
-            'placeholder' => $this->getPlaceholder() ?? __('filament-flex-fields::default.slug.placeholder'),
-            'labels' => $this->getUiLabels(),
-            'serverGenerate' => $this->shouldUseServerSideGeneration(),
+            'placeholder' => $this->getPlaceholder() ?? Translations::get('filament-flex-fields::default.slug.placeholder'),
+            'labels' => $this->getUiLabels(), 'serverGenerate' => $this->shouldUseServerSideGeneration(),
             'slugSourceLocale' => $this->usesTranslatableTitle() ? $this->getSlugSourceLocale() : null,
             'componentKey' => $this->isRootMounted() ? $this->getKey() : null,
-            'liveUniqueValidation' => $this->shouldValidateSlugUniquenessLive(),
+            'liveUniqueValidation' => $this->shouldValidateSlugUniquenessLive(), 'validateOnConfirm' => $this->requiresServerDraftValidation(),
             'uniqueTakenMessage' => $this->getSlugUniqueValidationMessage(),
         ];
     }
 
     #[ExposedLivewireMethod]
     #[Renderless]
-    public function generateSlugPreview(string $source): string
+    public function generateSlugPreview(string $source, bool $force = false): string
     {
-        return $this->generateSlugFromSource($source);
+        abort_if($this->isDisabled() || $this->isSlugReadOnly(), 403);
+        abort_if(strlen($source) > 65536, 422);
+
+        return $this->generateSlugFromSource($source, force: $force);
     }
 
-    /**
-     * @return array{available: bool, message: string|null}
-     */
+    /** @return array{available: bool, message: string|null} */
     #[ExposedLivewireMethod]
     #[Renderless]
     public function checkSlugAvailability(string $slug): array
     {
+        abort_if(strlen($slug) > 65536, 422);
+
         return $this->checkSlugUniqueness($slug);
     }
 
-    /**
-     * @return array<string, string>
-     */
-    public function getUiLabels(): array
+    /** @return array{valid: bool, slug: string, message: string|null, url: string|null} */
+    #[ExposedLivewireMethod]
+    #[Renderless]
+    public function validateSlugDraft(string $value): array
     {
-        return [
-            'auto' => Translations::get('filament-flex-fields::default.slug.badge_auto'),
-            'custom' => Translations::get('filament-flex-fields::default.slug.badge_custom'),
-            'permalink' => $this->getPermalinkLabel(),
-            'edit' => Translations::get('filament-flex-fields::default.slug.edit'),
-            'confirm' => Translations::get('filament-flex-fields::default.slug.confirm'),
-            'cancel' => Translations::get('filament-flex-fields::default.slug.cancel'),
-            'reset' => Translations::get('filament-flex-fields::default.slug.reset'),
-            'regenerate' => Translations::get('filament-flex-fields::default.slug.regenerate'),
-            'copy' => Translations::get('filament-flex-fields::default.slug.copy'),
-            'copied' => Translations::get('filament-flex-fields::default.slug.copied'),
-            'visit' => $this->getVisitLinkLabel(),
-            'changed' => Translations::get('filament-flex-fields::default.slug.changed'),
-        ];
+        abort_if($this->isDisabled() || $this->isSlugReadOnly(), 403);
+        abort_if(strlen($value) > 65536, 422);
+        $slug = $this->normalizeSlug($value);
+        $message = $this->validateSlugValue($slug, $this->shouldValidateSlugUniquenessLive());
+
+        return ['valid' => $message === null, 'slug' => $slug, 'message' => $message, 'url' => $message === null ? $this->getFullPermalinkUrl($slug) : null];
     }
 
-    /**
-     * @return list<string>
-     */
+    #[ExposedLivewireMethod]
+    #[Renderless]
+    public function resolveSlugPermalink(string $slug): ?string
+    {
+        abort_if(strlen($slug) > 65536, 422);
+
+        return $this->getFullPermalinkUrl($slug);
+    }
+
+    /** @return array<string, string> */
+    public function getUiLabels(): array
+    {
+        $labels = [];
+        foreach (['auto' => 'badge_auto', 'custom' => 'badge_custom', 'edit' => 'edit', 'confirm' => 'confirm', 'cancel' => 'cancel', 'reset' => 'reset', 'regenerate' => 'regenerate', 'copy' => 'copy', 'copied' => 'copied', 'changed' => 'changed', 'error' => 'operation_error', 'copyError' => 'copy_error'] as $key => $translation) {
+            $labels[$key] = Translations::get('filament-flex-fields::default.slug.'.$translation);
+        }
+
+        return [...$labels, 'permalink' => $this->getPermalinkLabel(), 'visit' => $this->getVisitLinkLabel()];
+    }
+
+    /** @return list<string> */
     public function getWrapperClasses(): array
     {
-        return [
-            'fff-slug-field-field',
-            'fff-flex-text-input-field',
-            'fff-slug-field-field--'.$this->getSize(),
-            'fff-flex-text-input-field--'.$this->getSize(),
-            'fff-slug-field-field--'.$this->getVariant(),
-            'fff-rounding-'.$this->getRounding(),
-        ];
+        return ['fff-slug-field-field', 'fff-flex-text-input-field', 'fff-slug-field-field--'.$this->getSize(),
+            'fff-flex-text-input-field--'.$this->getSize(), 'fff-slug-field-field--'.$this->getVariant(), 'fff-rounding-'.$this->getRounding()];
     }
 }

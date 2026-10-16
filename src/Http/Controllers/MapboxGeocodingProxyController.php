@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Http\Controllers;
 
 use Bjanczak\FilamentFlexFields\Support\Geocoding\GeocodingOs;
+use Bjanczak\FilamentFlexFields\Support\Location\Coordinates;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -22,11 +23,26 @@ class MapboxGeocodingProxyController extends Controller
             'language' => ['nullable', 'string', 'max:16'],
             'limit' => ['nullable', 'integer', 'min:1', 'max:10'],
             'autocomplete' => ['nullable', 'boolean'],
+            'bbox' => ['nullable', 'array', 'size:4'],
+            'bbox.*' => ['numeric'],
+            'proximity' => ['nullable', 'array', 'size:2'],
+            'proximity.*' => ['numeric'],
             'types' => ['nullable', 'string', 'max:128'],
-            'countries' => ['nullable', 'array'],
-            'countries.*' => ['string', 'size:2'],
+            'countries' => ['nullable', 'array', 'max:250'],
+            'countries.*' => ['string', 'size:2', 'regex:/^[A-Za-z]{2}$/D'],
             'street_addresses_only' => ['nullable', 'boolean'],
+            'require_street_number' => ['nullable', 'boolean'],
         ]);
+
+        try {
+            $validated['bbox'] = Coordinates::bounds($validated['bbox'] ?? null);
+            if ($validated['bbox'] !== null && $validated['bbox'][0] >= $validated['bbox'][2]) {
+                throw new \InvalidArgumentException('Search bounding box cannot wrap.');
+            }
+            $validated['proximity'] = isset($validated['proximity']) ? Coordinates::pair($validated['proximity']) : null;
+        } catch (\InvalidArgumentException) {
+            throw ValidationException::withMessages(['geocode' => [__('filament-flex-fields::location.validation.invalid_geometry')]]);
+        }
 
         return response()->json(
             GeocodingOs::provider()->search($validated),
@@ -42,9 +58,10 @@ class MapboxGeocodingProxyController extends Controller
             'lat' => ['required', 'numeric', 'between:-90,90'],
             'language' => ['nullable', 'string', 'max:16'],
             'types' => ['nullable', 'string', 'max:128'],
-            'countries' => ['nullable', 'array'],
-            'countries.*' => ['string', 'size:2'],
+            'countries' => ['nullable', 'array', 'max:250'],
+            'countries.*' => ['string', 'size:2', 'regex:/^[A-Za-z]{2}$/D'],
             'street_addresses_only' => ['nullable', 'boolean'],
+            'require_street_number' => ['nullable', 'boolean'],
         ]);
 
         return response()->json(

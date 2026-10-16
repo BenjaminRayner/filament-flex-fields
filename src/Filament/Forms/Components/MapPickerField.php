@@ -6,131 +6,86 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldFocusOutline;
+use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
 use Bjanczak\FilamentFlexFields\Concerns\InteractsWithGeocodedAddress;
-use Closure;
+use Bjanczak\FilamentFlexFields\Concerns\Location\ComposesLocationSearch;
+use Bjanczak\FilamentFlexFields\Concerns\Location\ConfiguresFeatureEditor;
+use Bjanczak\FilamentFlexFields\Concerns\Location\ConfiguresLocationMap;
+use Bjanczak\FilamentFlexFields\Concerns\Location\ConfiguresMapExperiences;
+use Bjanczak\FilamentFlexFields\Concerns\Location\InteractsWithFeatureEvents;
+use Bjanczak\FilamentFlexFields\Concerns\Location\InteractsWithMapGeometry;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\MapPicker\ConfiguresMapPicker;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\MapPicker\NormalizesMapPickerState;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\MapPicker\PresentsMapPicker;
 use Filament\Forms\Components\Concerns\CanBeReadOnly;
 use Filament\Forms\Components\Field;
 
 class MapPickerField extends Field
 {
     use CanBeReadOnly;
+    use ComposesLocationSearch;
+    use ConfiguresFeatureEditor;
+    use ConfiguresLocationMap;
+    use ConfiguresMapExperiences;
+    use ConfiguresMapPicker;
     use HasControlSize;
     use HasFieldFocusOutline;
+    use HasFieldRounding;
+    use InteractsWithFeatureEvents;
     use InteractsWithGeocodedAddress;
+    use InteractsWithMapGeometry;
+    use NormalizesMapPickerState;
+    use PresentsMapPicker {
+        PresentsMapPicker::defaultFocusOutline insteadof HasFieldFocusOutline;
+    }
 
     /**
      * @var list<string>
      */
-    public const array ALL_FIELDS = [
-        'lat',
-        'lng',
-        'street',
-        'city',
-        'region',
-        'postcode',
-        'country',
-        'country_name',
-        'place_name',
-    ];
+    public const array ALL_FIELDS = ['lat', 'lng', 'street', 'city', 'region', 'postcode', 'country', 'country_name', 'place_name'];
 
     protected string $view = 'filament-flex-fields::forms.components.map-picker-field';
 
-    /**
-     * @var array{0: float, 1: float}|Closure
-     */
-    protected array|Closure $defaultCenter = [52.2297, 21.0122];
-
-    protected int|Closure $defaultZoom = 12;
-
-    protected bool|Closure $searchable = true;
+    public function getLocationComponentId(): string
+    {
+        return 'map-picker';
+    }
 
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->geocodedAddressFields = ['lat', 'lng', 'street', 'city', 'postcode', 'country', 'place_name'];
+        $this->setUpMapGeometry();
+        $this->setUpFeatureEvents();
+        $this->rule(function (self $component): \Closure {
+            return function (string $attribute, mixed $value, \Closure $fail) use ($component): void {
+                try {
+                    $point = $component->getMapSelectionMode() === 'point';
+                    if (! $point) {
+                        if ($value !== null && ! is_array($value)) {
+                            throw new \InvalidArgumentException('Expected a feature collection.');
+                        }
+                        $message = $component->getMapValidationMessage($value ?? []);
+                    } else {
+                        $state = $component->hydrateToCanonical($value);
+                        $hasValue = $component->hasAnyStoredValue($state);
+                        if ($component->isRequired() && ! $hasValue) {
+                            $fail(__('validation.required', ['attribute' => $component->getLabel()]));
 
-        $this->setUpGeocodedAddress();
-    }
-
-    /**
-     * @param  array{0: float, 1: float}|Closure  $center
-     */
-    public function defaultCenter(array|Closure $center): static
-    {
-        $this->defaultCenter = $center;
-
-        return $this;
-    }
-
-    public function defaultZoom(int|Closure $zoom): static
-    {
-        $this->defaultZoom = $zoom;
-
-        return $this;
-    }
-
-    public function searchable(bool|Closure $condition = true): static
-    {
-        $this->searchable = $condition;
-
-        return $this;
-    }
-
-    /**
-     * @return array{0: float, 1: float}
-     */
-    public function getDefaultCenter(): array
-    {
-        $center = $this->evaluate($this->defaultCenter);
-
-        if (! is_array($center) || count($center) < 2) {
-            return [52.2297, 21.0122];
-        }
-
-        return [(float) $center[0], (float) $center[1]];
-    }
-
-    public function getDefaultZoom(): int
-    {
-        return max(1, min(22, (int) $this->evaluate($this->defaultZoom)));
-    }
-
-    public function isSearchable(): bool
-    {
-        return (bool) $this->evaluate($this->searchable);
-    }
-
-    /**
-     * @return list<string>
-     */
-    protected function geocodedAddressFieldKeys(): array
-    {
-        return self::ALL_FIELDS;
-    }
-
-    protected function geocodedAddressTranslationKey(): string
-    {
-        return 'map_picker';
-    }
-
-    protected function shouldInferPlaceNameFromCoordinates(): bool
-    {
-        return true;
-    }
-
-    protected function defaultFocusOutline(): bool
-    {
-        return true;
-    }
-
-    /**
-     * @return array<string, bool>
-     */
-    public function getWrapperClasses(): array
-    {
-        return [
-            'fff-map-picker-field' => true,
-        ];
+                            return;
+                        }
+                        if (! $hasValue) {
+                            return;
+                        }
+                        $message = $component->getValidationMessage($state) ?? $component->getMapValidationMessage($state);
+                    }
+                    if ($message !== null) {
+                        $fail($message);
+                    }
+                } catch (\InvalidArgumentException) {
+                    $fail(__('filament-flex-fields::location.validation.invalid_geometry'));
+                }
+            };
+        });
     }
 }

@@ -2,12 +2,16 @@
 
 declare(strict_types=1);
 
+use Bjanczak\FilamentFlexFields\Data\FlexFieldDefinition;
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
+use Bjanczak\FilamentFlexFields\Enums\FieldType;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexSlider;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundBuilder;
+use Bjanczak\FilamentFlexFields\Support\FlexFieldFormBuilder;
 use Bjanczak\FilamentFlexFields\Support\Playground\FlexSliderPlayground;
+use Bjanczak\FilamentFlexFields\Tests\Support\TestableNumberStepperForm;
 use Filament\Forms\Components\Slider\Enums\PipsMode;
 use Filament\Support\RawJs;
+use Livewire\Livewire;
 
 it('exposes flex slider configuration via fluent api', function () {
     $field = FlexSlider::make('volume')
@@ -70,8 +74,8 @@ it('registers flex slider playground variants', function () {
     ]);
 });
 
-it('merges flex slider default state into playground builder', function () {
-    $state = app(FlexFieldsPlaygroundBuilder::class)->defaultState();
+it('provides independent flex slider demo default state', function () {
+    $state = app(FlexSliderPlayground::class)->defaultState();
 
     expect($state)->toHaveKey('flex_slider__md');
 });
@@ -365,4 +369,128 @@ it('renders density-only pips between labeled positions', function () {
             'label' => null,
             'size' => 'normal',
         ]);
+});
+
+it('keeps requested pip positions exact unless step alignment is enabled', function () {
+    $field = FlexSlider::make('slider')->range(0, 100)->step(10)
+        ->pips(PipsMode::Positions)->pipsValues([0, 25, 100]);
+    $labels = collect($field->getServerRenderedPips())->whereNotNull('label')->values();
+    expect($labels[1])->toMatchArray(['ratio' => 0.25, 'label' => '25']);
+
+    $field->steppedPips();
+    $labels = collect($field->getServerRenderedPips())->whereNotNull('label')->values();
+    expect($labels[1])->toMatchArray(['ratio' => 0.3, 'label' => '30']);
+
+    $field->steppedPips(false)->pipsMode(PipsMode::Values)->pipsValues([0, 25, 100]);
+    $labels = collect($field->getServerRenderedPips())->whereNotNull('label')->values();
+    expect($labels[1])->toMatchArray(['ratio' => 0.25, 'label' => '25']);
+});
+
+it('configures both thumb styles with the same elastic icons and marks', function () {
+    foreach (['pill', 'circle'] as $style) {
+        $field = FlexSlider::make('volume')->range(0, 100)->default(64)->thumbStyle($style)->elastic()->haptics()
+            ->startIcon('hugeicons-volume-low')->endIcon('hugeicons-volume-high')->largeStep(10)
+            ->valuePlacement('header')->marks([0, ['value' => 50, 'label' => '50%'], 100]);
+        expect($field->getThumbStyle())->toBe($style)->and($field->hasElasticMotion())->toBeTrue()
+            ->and($field->getMarks()[1])->toBe(['value' => 50.0, 'ratio' => 0.5, 'label' => '50%'])
+            ->and($field->getLargeStep())->toBe(10.0);
+    }
+});
+
+it('rejects forged slider shapes and gaps before saving through a real form', function () {
+    $form = TestableNumberStepperForm::class;
+    $form::$formSchema = [FlexSlider::make('slider')->range(0, 100)->step(1)->default(50)];
+    foreach ([true, 'bad', ['nested' => [50]], 101, -1, 1.5, '1e999', 9007199254740992] as $value) {
+        Livewire::test($form)->set('data.slider', $value)->call('save')->assertHasErrors(['data.slider']);
+    }
+    Livewire::test($form)->set('data.slider', '64')->call('save')->assertHasNoErrors();
+    $form::$formSchema = [FlexSlider::make('slider')->range(0, 100)->default([20, 80])->rangeHandles()->minDifference(10)->maxDifference(70)];
+    foreach ([[90, 10], [20, 25], [0, 100], [[20], 80], [10, 50, 70]] as $value) {
+        Livewire::test($form)->set('data.slider', $value)->call('save')->assertHasErrors();
+    }
+    Livewire::test($form)->set('data.slider', [20, 80])->call('save')->assertHasNoErrors();
+});
+
+it('rejects invalid bounds motion and marks at configuration time', function () {
+    foreach ([fn () => FlexSlider::make('x')->range(100, 0), fn () => FlexSlider::make('x')->step(0), fn () => FlexSlider::make('x')->stretchLimit(INF), fn () => FlexSlider::make('x')->thumbStyle('wrong')] as $create) {
+        expect(fn () => $create()->getSliderRuntimeConfiguration())->toThrow(InvalidArgumentException::class);
+    }
+    expect(fn () => FlexSlider::make('x')->marks([101])->getMarks())->toThrow(InvalidArgumentException::class);
+});
+
+it('renders rolling numbers in the header and enabled tooltip without losing server value', function () {
+    $form = TestableNumberStepperForm::class;
+    $form::$formSchema = [FlexSlider::make('slider')->range(0, 100)->default(64)->showValue()->valuePlacement('header')->elastic()->tooltips()->suffix('%')];
+    $html = Livewire::test($form)->html();
+    expect(substr_count($html, '<number-flow '))->toBe(2)
+        ->and($html)->toContain('64%');
+});
+
+it('renders independent generic icon buttons and validates target restore configuration', function () {
+    $form = TestableNumberStepperForm::class;
+    $form::$formSchema = [FlexSlider::make('slider')->range(0, 100)->default(64)
+        ->iconButton('hugeicons-volume-high')->iconButtonActiveIcon('hugeicons-volume-off')
+        ->iconButtonLabel('Mute')->iconButtonActiveLabel('Restore volume')->iconButtonRestoreValue(30)];
+    $html = Livewire::test($form)->html();
+    expect($html)->toContain('fff-flex-slider__icon-button', 'toggleIconButton()', 'Restore volume');
+    expect(fn () => FlexSlider::make('range')->rangeHandles()->default([20, 80])->iconButton('hugeicons-volume-high')->getSliderRuntimeConfiguration())->toThrow(InvalidArgumentException::class);
+    expect(fn () => FlexSlider::make('x')->iconButton('hugeicons-volume-high')->iconButtonRestoreValue(101)->getSliderRuntimeConfiguration())->toThrow(InvalidArgumentException::class);
+    expect(fn () => FlexSlider::make('x')->iconButton('hugeicons-volume-high')->iconButtonValue(50)->iconButtonRestoreValue(50)->getSliderRuntimeConfiguration())->toThrow(InvalidArgumentException::class);
+    expect(fn () => FlexSlider::make('x')->iconButton('hugeicons-volume-high')->iconButtonPosition('other')->getSliderRuntimeConfiguration())->toThrow(InvalidArgumentException::class);
+    $field = FlexSlider::make('x')->range(0, 100)->iconButton('hugeicons-sun-03')->iconButtonValue(100)->iconButtonPosition('end');
+    expect($field->getIconButtonConfiguration())->toMatchArray(['value' => 100.0, 'restoreValue' => 50.0, 'position' => 'end']);
+});
+
+it('keeps ordinary side icons inert and buttons disabled in server-rendered markup', function () {
+    $form = TestableNumberStepperForm::class;
+    $form::$formSchema = [FlexSlider::make('slider')->default(30)->startIcon('hugeicons-volume-low')->endIcon('hugeicons-volume-high')];
+    $html = Livewire::test($form)->html();
+    expect($html)->not->toContain('fff-flex-slider__icon-button')->and($html)->toContain('data-slider-start-icon', 'data-slider-end-icon');
+    $form::$formSchema = [FlexSlider::make('slider')->default(30)->disabled()->iconButton('hugeicons-volume-high')];
+    $html = Livewire::test($form)->html();
+    expect($html)->toMatch('/<button\s[^>]*fff-flex-slider__icon-button[^>]*\sdisabled(?:\s|>)/s');
+});
+
+it('configures generic button options through literal definitions', function () {
+    $definition = FlexFieldDefinition::fromArray([
+        'slug' => 'brightness',
+        'label' => 'Brightness',
+        'type' => FieldType::FlexSlider->value,
+        'config' => [
+            'icon_button' => 'hugeicons-sun-03',
+            'icon_button_active_icon' => 'hugeicons-sun-03',
+            'icon_button_value' => '100',
+            'icon_button_restore_value' => '30',
+            'icon_button_position' => 'end',
+            'icon_button_label' => 'Maximum brightness',
+            'icon_button_active_label' => 'Restore brightness',
+        ],
+    ]);
+    $field = (new FlexFieldFormBuilder)->makeComponent($definition);
+    expect($field)->toBeInstanceOf(FlexSlider::class)
+        ->and($field->getIconButtonConfiguration())->toMatchArray([
+            'value' => 100.0, 'restoreValue' => 30.0, 'position' => 'end',
+            'label' => 'Maximum brightness', 'activeLabel' => 'Restore brightness',
+        ]);
+});
+
+it('admits numeric optional slider schema settings without accepting forged shapes', function () {
+    $make = fn (array $config) => FlexFieldDefinition::fromArray([
+        'slug' => 'speed', 'label' => 'Speed', 'type' => FieldType::FlexSlider->value,
+        'config' => ['min' => 0, 'max' => 100, ...$config],
+    ]);
+    $definition = $make([
+        'icon_button' => 'hugeicons-volume-high',
+        'icon_button_value' => 0, 'icon_button_restore_value' => 50.5, 'large_step' => 10,
+    ]);
+    expect($definition->config['icon_button_value'])->toBe(0)
+        ->and($definition->config['icon_button_restore_value'])->toBe(50.5)
+        ->and($definition->config['large_step'])->toBe(10);
+
+    foreach (['icon_button_value', 'icon_button_restore_value', 'large_step'] as $key) {
+        foreach ([true, [], ['value' => 10], 'not a number'] as $invalid) {
+            expect(fn () => $make([$key => $invalid]))->toThrow(InvalidArgumentException::class);
+        }
+        expect(fn () => $make([$key => INF]))->toThrow(UnexpectedValueException::class);
+    }
 });

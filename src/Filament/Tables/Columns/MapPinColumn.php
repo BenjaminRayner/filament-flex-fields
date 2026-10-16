@@ -6,12 +6,14 @@ namespace Bjanczak\FilamentFlexFields\Filament\Tables\Columns;
 
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Tables\Columns\Concerns\EmitsFlexFieldTableColumnAssets;
-use Bjanczak\FilamentFlexFields\Support\FlexFieldStylesheetQueue;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
+use Bjanczak\FilamentFlexFields\Support\Location\Coordinates;
 use Bjanczak\FilamentFlexFields\Support\MapPinColumnRenderCache;
 use Closure;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\HtmlString;
 
 class MapPinColumn extends TextColumn
 {
@@ -27,11 +29,9 @@ class MapPinColumn extends TextColumn
     {
         parent::setUp();
 
-        FlexFieldStylesheetQueue::enqueueFor('map-pin-column');
-
         $this->html();
 
-        $this->formatStateUsing(fn (mixed $state, MapPinColumn $column): string => $column->formatMapPinDisplay($state));
+        $this->formatStateUsing(fn (mixed $state, MapPinColumn $column): Htmlable => new HtmlString($column->formatMapPinDisplay($state)));
     }
 
     public function pinSize(string|ControlSize|Closure $size): static
@@ -75,7 +75,7 @@ class MapPinColumn extends TextColumn
     {
         $icon = $this->evaluate($this->pinIcon);
 
-        return filled($icon) ? (string) $icon : GravityIcon::MapPin;
+        return filled($icon) ? (string) $icon : FlexIcon::MapPin;
     }
 
     /**
@@ -88,10 +88,24 @@ class MapPinColumn extends TextColumn
         }
 
         if (is_array($state)) {
-            $label = trim((string) ($state['label'] ?? $state['address'] ?? $state['name'] ?? ''));
+            $label = '';
+            foreach (['label', 'address', 'name', 'place_name', 'street'] as $key) {
+                if (is_string($state[$key] ?? null) && trim($state[$key]) !== '') {
+                    $label = trim($state[$key]);
+                    break;
+                }
+            }
+            $point = null;
+            if (isset($state['lat'], $state['lng'])) {
+                try {
+                    $point = Coordinates::pair([$state['lng'], $state['lat']]);
+                } catch (\InvalidArgumentException) {
+                    // Invalid coordinates must not become a maps URL.
+                }
+            }
 
-            if ($label === '' && isset($state['lat'], $state['lng'])) {
-                $label = sprintf('%s, %s', $state['lat'], $state['lng']);
+            if ($label === '' && $point !== null) {
+                $label = sprintf('%s, %s', $point[1], $point[0]);
             }
 
             if ($label === '') {
@@ -100,8 +114,8 @@ class MapPinColumn extends TextColumn
 
             $coordinates = null;
 
-            if (isset($state['lat'], $state['lng']) && is_numeric($state['lat']) && is_numeric($state['lng'])) {
-                $coordinates = sprintf('%s,%s', $state['lat'], $state['lng']);
+            if ($point !== null) {
+                $coordinates = sprintf('%s,%s', $point[1], $point[0]);
             }
 
             return [

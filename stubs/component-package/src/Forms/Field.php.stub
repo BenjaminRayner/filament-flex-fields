@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{NAMESPACE}}\Forms;
+
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\CompositeField;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+
+class {{CLASS}}Field extends CompositeField
+{
+    protected string $view = '{{PREFIX}}::field';
+
+    protected string $assetComponent = '{{PREFIX}}-field';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->schema([FlexTextInput::make('text')->label('Text')->maxLength(120)]);
+    }
+}

@@ -1,5 +1,5 @@
-@if (request()->is('*flex-fields-playground*'))
-    <script>
+@if (\Bjanczak\FilamentFlexFields\Support\FlexFieldAssets::isPlaygroundRequest())
+    <script @if (($deliveryNonce = app(\Bjanczak\FilamentFlexFields\Support\Assets\Delivery\AssetDeliveryContext::class)->nonce()) !== null) nonce="{{ $deliveryNonce }}" @endif>
         window.FffPlaygroundTheme = (() => {
             const storageKey = 'fff-playground-dark-mode';
 

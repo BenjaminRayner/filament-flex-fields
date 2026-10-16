@@ -4,6 +4,7 @@
  * Usage: node scripts/audit-components.mjs [--json]
  */
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -621,9 +622,9 @@ function collectBladeStylesheetRefs() {
 }
 
 function main() {
-    const assetsPhp = read(path.join(ROOT, 'src/Support/FlexFieldAssets.php'));
-    const lazyList = parsePhpStringList(assetsPhp, 'LAZY_COMPONENT_STYLESHEETS');
-    const deps = parsePhpAssocList(assetsPhp, 'STYLESHEET_DEPENDENCIES');
+    const registry = JSON.parse(execFileSync('php', ['scripts/export-asset-registry.php'], { cwd: ROOT, encoding: 'utf8' }));
+    const lazyList = registry.lazy_stylesheets;
+    const deps = registry.stylesheet_dependencies;
     const manifest = JSON.parse(read(path.join(DIST_JS, 'alpine-manifest.json')) || '{}');
 
     const names = discoverPhpComponents();

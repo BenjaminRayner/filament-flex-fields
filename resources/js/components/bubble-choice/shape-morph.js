@@ -1,3 +1,5 @@
+import { scallopRadii } from './geometry.js'
+
 /**
  * Radial circle ↔ scallop morph (lerp radius per angle — no spin) + stroke timing.
  */
@@ -49,90 +51,6 @@ export function strokeWidthFactor(progress, selecting) {
     return Math.pow(p, 3.4)
 }
 
-export function sampleSvgGeometry(el, count) {
-    if (! el || typeof el.getTotalLength !== 'function' || typeof el.getPointAtLength !== 'function') {
-        return null
-    }
-
-    const length = el.getTotalLength()
-
-    if (! Number.isFinite(length) || length <= 0) {
-        return null
-    }
-
-    const points = []
-
-    for (let i = 0; i < count; i += 1) {
-        const point = el.getPointAtLength((i / count) * length)
-        points.push({ x: point.x, y: point.y })
-    }
-
-    return points
-}
-
-function normalizeAngle(angle) {
-    let a = angle
-
-    while (a <= -Math.PI) {
-        a += Math.PI * 2
-    }
-
-    while (a > Math.PI) {
-        a -= Math.PI * 2
-    }
-
-    return a
-}
-
-/**
- * Build a dense radius table indexed by uniform angle (starts at -PI/2 = top).
- * Uses nearest-neighbor blend in polar space — no loop rotation / spin.
- */
-export function radiiFromPathPoints(points, angleCount = MORPH_ANGLE_COUNT) {
-    if (! points?.length) {
-        return Array.from({ length: angleCount }, () => CIRCLE_RADIUS)
-    }
-
-    const polar = points.map((point) => {
-        const dx = point.x - 0.5
-        const dy = point.y - 0.5
-
-        return {
-            angle: Math.atan2(dy, dx),
-            radius: Math.hypot(dx, dy) || CIRCLE_RADIUS,
-        }
-    }).sort((a, b) => a.angle - b.angle)
-
-    // Close the loop for interpolation
-    const loop = [
-        ...polar,
-        { angle: polar[0].angle + Math.PI * 2, radius: polar[0].radius },
-        { angle: polar[polar.length - 1].angle - Math.PI * 2, radius: polar[polar.length - 1].radius },
-    ].sort((a, b) => a.angle - b.angle)
-
-    const radii = []
-
-    for (let i = 0; i < angleCount; i += 1) {
-        const angle = normalizeAngle(-Math.PI / 2 + (i / angleCount) * Math.PI * 2)
-        let lo = loop[0]
-        let hi = loop[loop.length - 1]
-
-        for (let j = 0; j < loop.length - 1; j += 1) {
-            if (angle >= loop[j].angle && angle <= loop[j + 1].angle) {
-                lo = loop[j]
-                hi = loop[j + 1]
-                break
-            }
-        }
-
-        const span = hi.angle - lo.angle || 1
-        const t = (angle - lo.angle) / span
-        radii.push(lo.radius + (hi.radius - lo.radius) * t)
-    }
-
-    return radii
-}
-
 export function circleRadii(angleCount = MORPH_ANGLE_COUNT, radius = CIRCLE_RADIUS) {
     return Array.from({ length: angleCount }, () => radius)
 }
@@ -180,18 +98,10 @@ export function circleStrokePathD(angleCount = MORPH_ANGLE_COUNT, radius = CIRCL
     return pointsToPathD(radiiToPoints(circleRadii(angleCount, radius)))
 }
 
-export function resolveMorphRadii(documentRef = typeof document !== 'undefined' ? document : null) {
-    const circle = circleRadii()
-    let scallop = circle
+const sharedRadii = Object.freeze({ circle: Object.freeze(circleRadii()), scallop: scallopRadii })
 
-    const scallopEl = documentRef?.getElementById?.('fff-bubble-choice-geom-scallop')
-    const sampled = sampleSvgGeometry(scallopEl, Math.max(MORPH_ANGLE_COUNT * 2, 240))
-
-    if (sampled) {
-        scallop = radiiFromPathPoints(sampled, MORPH_ANGLE_COUNT)
-    }
-
-    return { circle, scallop }
+export function resolveMorphRadii() {
+    return sharedRadii
 }
 
 export function morphPointsAt(progress, morphRadii) {

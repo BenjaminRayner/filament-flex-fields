@@ -1,13 +1,124 @@
 ---
 title: "TimezoneField"
 description: Searchable IANA timezone picker with browser detection and UTC offset display.
+icon: "globe"
+"canonical": "https://flex-fields.bjanczak.com/docs/timezonefield"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/timezone-field.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "TimezoneField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/timezone-field-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/timezone-field-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/timezone-field.webp"
+"twitter:image:alt": "TimezoneField in the FLEX Fields playground"
 ---
+
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/timezonefield#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/timezonefield",
+      "name": "TimezoneField",
+      "description": "Searchable IANA timezone picker with browser detection and UTC offset display.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/timezonefield#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/timezonefield#article",
+      "url": "https://flex-fields.bjanczak.com/docs/timezonefield",
+      "headline": "TimezoneField",
+      "description": "Searchable IANA timezone picker with browser detection and UTC offset display.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/timezonefield#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/timezone-field-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/timezone-field-motion.mp4#video",
+      "name": "TimezoneField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of TimezoneField in the FLEX Fields playground for Filament. Searchable IANA timezone picker with browser detection and UTC offset display.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/timezone-field.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT5.417S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/timezone-field-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/timezonefield#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/timezone-field-motion.mp4"
+  poster="/art/previews/timezone-field.webp"
+  width="1920"
+  height="1080"
+  aria-label="TimezoneField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/timezone-field-motion.mp4">Watch the TimezoneField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
 ### Summary
 
-Searchable IANA timezone picker with a **Gravity UI clock** icon on the trigger and in menu rows. Stores a single timezone identifier string. Display labels are **city, country** (`Warsaw, Poland` / `Warszawa, Polska`), not generic names like “Poland Time”.
+Searchable IANA timezone picker with a **Hugeicons clock** icon on the trigger and in menu rows. Stores a single timezone identifier string. Display labels are **city, country** (`Warsaw, Poland` / `Warszawa, Polska`), not generic names like “Poland Time”.
 
 | | |
 |---|---|
@@ -166,7 +277,7 @@ TimezoneField::make('event_timezone')
 
 ### Playground
 
-`/admin/flex-fields-playground/timezone-field`
+`/admin/flex-fields/timezone-field`
 
 See [Playground](/docs/index#playground) for setup.
 
@@ -177,7 +288,7 @@ See [Playground](/docs/index#playground) for setup.
 | Component | When to use instead |
 |-----------|---------------------|
 | [CountryField](/docs/countryfield) | For picking a country instead of a specific timezone |
-| [FlexDateTimePicker](/docs/flexdatetimepicker) | For picking a date/time with optional timezone support |
+| [FlexDateTimePicker](/docs/date-and-time-fields) | For picking a date/time with optional timezone support |
 | [SelectField](/docs/selectfield) | For a generic dropdown if IANA identifiers aren't needed |
 
 ---

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Support\Countries;
 use Bjanczak\FilamentFlexFields\Support\PhoneCountries;
+use Bjanczak\FilamentFlexFields\Support\Select\Catalog\PickerCatalogState;
 
 it('exposes a complete iso country list separate from phone regions', function () {
     $isoCodes = Countries::allCodes();
@@ -11,7 +12,9 @@ it('exposes a complete iso country list separate from phone regions', function (
 
     expect(count($isoCodes))->toBeGreaterThan(count($phoneCodes))
         ->and($isoCodes)->toContain('PL', 'US', 'AQ', 'TF', 'UM')
-        ->and(array_diff($phoneCodes, $isoCodes))->toBe([]);
+        ->and(array_values(array_diff($phoneCodes, $isoCodes)))->toBe(['AC', 'TA', 'XK'])
+        ->and($isoCodes)->toHaveCount(249)
+        ->and($isoCodes)->not->toContain('AC', 'DG', 'EA', 'IC', 'TA', 'XK');
 });
 
 it('resolves country names and flags from translations', function () {
@@ -64,23 +67,19 @@ it('PhoneCountries::metadata caches country names correctly per locale', functio
 });
 
 it('lazily resolves and caches country metadata on demand', function () {
-    $cacheProperty = new ReflectionProperty(Countries::class, 'metadataCache');
-    $cacheProperty->setAccessible(true);
-    $cacheProperty->setValue(null, []);
-
+    $cache = app(PickerCatalogState::class);
+    $cache->clear();
     $metadata = Countries::metadata(['PL']);
     expect($metadata)->toHaveCount(1)
-        ->and($cacheProperty->getValue(null)[app()->getLocale()])->toHaveKey('PL')
-        ->and($cacheProperty->getValue(null)[app()->getLocale()])->not->toHaveKey('US');
+        ->and($cache->countryMetadata[app()->getLocale()])->toHaveKey('PL')
+        ->and($cache->countryMetadata[app()->getLocale()])->not->toHaveKey('US');
 });
 
 it('lazily resolves and caches phone country metadata on demand', function () {
-    $cacheProperty = new ReflectionProperty(PhoneCountries::class, 'metadataCache');
-    $cacheProperty->setAccessible(true);
-    $cacheProperty->setValue(null, []);
-
+    $cache = app(PickerCatalogState::class);
+    $cache->clear();
     $metadata = PhoneCountries::metadata(['PL']);
     expect($metadata)->toHaveCount(1)
-        ->and($cacheProperty->getValue(null)[app()->getLocale()])->toHaveKey('PL')
-        ->and($cacheProperty->getValue(null)[app()->getLocale()])->not->toHaveKey('US');
+        ->and($cache->phoneMetadata[app()->getLocale()])->toHaveKey('PL')
+        ->and($cache->phoneMetadata[app()->getLocale()])->not->toHaveKey('US');
 });

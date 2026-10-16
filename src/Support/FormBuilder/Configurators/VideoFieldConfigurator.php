@@ -105,6 +105,13 @@ final class VideoFieldConfigurator implements FieldConfigurator
             $field->playbackRates($config['playback_rates']);
         }
 
+        if (array_key_exists('preview_source', $config)) {
+            $field->previewSource($config['preview_source']);
+        }
+        if (array_key_exists('preview_thumbnails', $config)) {
+            $field->previewThumbnails($config['preview_thumbnails']);
+        }
+
         if (array_key_exists('quality_options', $config)) {
             $field->qualityOptions($config['quality_options']);
         }

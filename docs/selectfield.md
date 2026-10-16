@@ -1,26 +1,143 @@
 ---
 title: "SelectField"
 description: Filament v5 Select with virtualized lists, async Livewire search, rich option rows, multi-select chips, create-option flows, and a mobile bottom sheet — full native Select API.
+icon: "list-filter"
+"canonical": "https://flex-fields.bjanczak.com/docs/selectfield"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/select-field.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "SelectField in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/select-field-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/select-field-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/select-field.webp"
+"twitter:image:alt": "SelectField in the FLEX Fields playground"
 ---
 
-![SelectField mobile bottom sheet](/art/drawer-mobile.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/selectfield#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/selectfield",
+      "name": "SelectField",
+      "description": "Filament v5 Select with virtualized lists, async Livewire search, rich option rows, multi-select chips, create-option flows, and a mobile bottom sheet — full native Select API.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/selectfield#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/selectfield#article",
+      "url": "https://flex-fields.bjanczak.com/docs/selectfield",
+      "headline": "SelectField",
+      "description": "Filament v5 Select with virtualized lists, async Livewire search, rich option rows, multi-select chips, create-option flows, and a mobile bottom sheet — full native Select API.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/selectfield#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/select-field-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/select-field-motion.mp4#video",
+      "name": "SelectField — FLEX Fields demonstration",
+      "description": "A recorded demonstration of SelectField in the FLEX Fields playground for Filament. Filament v5 Select with virtualized lists, async Livewire search, rich option rows, multi-select chips, create-option flows, and a mobile bottom sheet — full native Select API.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/select-field.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT7.683S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/select-field-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/selectfield#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/select-field-motion.mp4"
+  poster="/art/previews/select-field.webp"
+  width="1920"
+  height="1080"
+  aria-label="SelectField — FLEX Fields demonstration"
+>
+  <a href="/art/previews/select-field-motion.mp4">Watch the SelectField demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
 [← Back to Table of Contents](/docs/index)
 
 ### Summary
 
-Production-ready Filament **Select** for large catalogs and rich UX: pill trigger, **virtualized option lists**, **async / paginated Livewire search**, rich rows (avatar, badge, description), grid layouts, multi-select chips, create-option / smart suggest, and a **mobile bottom sheet** (drag handle, sheet search, checkmarks). Extends Filament `Select` — **all native Select APIs remain available**.
+Select one value or build a searchable multiselect with chips, checklists, images and descriptions. Large local catalogs use **virtualized lists**; remote catalogs can load **one page at a time**. On small screens, the dropdown becomes a **bottom sheet**.
+
+<CardGroup cols={3}>
+  <Card title="Choose the presentation" icon="palette" href="#configuration-api">Sizes, surfaces, rich rows, grids and custom views.</Card>
+  <Card title="Work with large catalogs" icon="layers" href="#large-catalogs-and-virtualization">Local virtualization or paginated server search.</Card>
+  <Card title="Save valid selections" icon="shield-check" href="#validation-rules">Allowed values, limits, relationships and database casts.</Card>
+</CardGroup>
 
 | | |
 |---|---|
 | **Class** | `Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField` |
 | **Extends** | `Filament\Forms\Components\Select` |
 | **State type** | `string\|int\|null` (single) · `array` (multiple) |
-| **Model cast** | `'category_id' => 'integer'` · `'tags' => 'json'` (multiple) |
+| **Model cast** | Optional integer cast for numeric keys · `'tags' => 'array'` for a JSON multiselect column |
 | **FieldType** | `select` (use `multiple` in config for multi-select) |
 | **Playground** | `select-field` slug in Flex Fields playground |
 
 Works with all standard Filament field APIs: `required()`, `disabled()`, `hidden()`, `live()`, `afterStateUpdated()`, validation rules, etc.
+
+This guide covers the FLEX-specific configuration methods and practical Select workflows. Shared form, schema and action methods remain available through inheritance; see the [Filament Select reference](https://filamentphp.com/docs/5.x/forms/select) for the wider inherited API.
 
 ---
 
@@ -37,13 +154,13 @@ SelectField::make('framework')
         'laravel' => [
             'label' => 'Laravel',
             'description' => 'The PHP Framework for Web Artisans',
-            'icon' => 'heroicon-o-bolt',
-            'badge' => 'v11',
+            'icon' => 'hugeicons-flash',
+            'badge' => 'Framework',
         ],
         'livewire' => [
             'label' => 'Livewire',
             'description' => 'Full-stack framework for Laravel',
-            'icon' => 'heroicon-o-sparkles',
+            'icon' => 'hugeicons-sparkles',
         ],
     ])
     ->searchable()
@@ -93,7 +210,7 @@ SelectField::make('recipients')
     ]);
 ```
 
-The dropdown row renders the full two-line layout; chips and `triggerLabel` use the compact `chipLabel` text.
+The dropdown row renders the full two-line layout; selected chips use the compact `chipLabel` text.
 
 #### Custom value (`optionView()`)
 
@@ -114,10 +231,13 @@ SelectField::make('user_id')
         ],
     ])
     ->optionView('my-app.select.user-option')
-    ->optionTriggerView('my-app.select.user-trigger'); // optional
+    ->optionTriggerView('my-app.select.user-trigger') // optional
+    ->optionViewData(['showEmail' => true]);
 ```
 
 Each view receives `$option`, `$layout` (`list`, `trigger`, `grid`, `chip`), `$field`, `$value`, `$label`, `$description`, and any data from `optionViewData()`.
+
+Here the custom views can read `$showEmail`. Pass a closure to `optionViewData()` when that extra data depends on the current record or form. Your custom view is responsible for displaying its own markup; keep application text escaped with Blade's `{{ }}` output.
 
 Use `richListTriggerDisplay()` to keep the full list row (avatar + name + email) in the closed trigger instead of the compact trigger layout.
 
@@ -130,10 +250,11 @@ SelectField::make('assignee_id')
 Closure form — return HTML, `Htmlable`, `View`, or a nested view name:
 
 ```php
-->optionView(fn (array $option, string $layout): string => view('my-app.select.user-option', [
-    'option' => $option,
-    'layout' => $layout,
-])->render())
+SelectField::make('user_id')
+    ->optionView(fn (array $option, string $layout): string => view('my-app.select.user-option', [
+        'option' => $option,
+        'layout' => $layout,
+    ])->render());
 ```
 
 `optionView()` automatically enables `allowHtml()` and sanitizes output through the package HTML sanitizer.
@@ -154,7 +275,8 @@ SelectField::make('states')
     ]);
 ```
 
-On **single**-select fields this is a no-op (`shouldKeepSelectedOptionsInDropdown()` stays `false`).
+On **single**-select fields this setting has no effect.
+
 ---
 
 ### State & validation
@@ -185,7 +307,9 @@ SelectField::make('category_id')
 | Rule | When |
 |------|------|
 | `nullable` | Always (unless `required()`) |
-| Package static-option check (equivalent to `Rule::in`) | Applied automatically on `setUp` when `options()` is configured, `allowCreateOption()` is **off**, and the field is **not** using `relationship()` / `getSearchResultsUsing()` (Filament already validates those). Rejects free-text keys that are not in the option list. When `allowCreateOption()` is **on**, created string keys are intentional — the package skips this check (and Filament’s label probe); validate shape/length in the app if needed (see [Smart suggest](#smart-suggest-recentoptions-suggestedoptions-allowcreateoption)). |
+| Selection shape | A single selection must be a scalar option identity. A multiselect must be a list of unique string/integer identities; duplicate identities, named indexes, nested values, booleans and floats in a list are rejected on the server. Backed enum identities remain supported. |
+| Allowed values | Static options reject unknown and disabled keys. Relationships and custom label resolvers use Filament's selected-option validation. |
+| Inline creation | `allowCreateOption()` accepts new identities but keeps the selection-shape check. Add rules for the allowed text, length and item count. |
 | `required` | When `->required()` |
 | `array` + `min:N` | When `->minItems(N)` on a multi-select |
 | `array` + `max:N` | When `->maxItems(N)` on a multi-select |
@@ -194,7 +318,7 @@ SelectField::make('category_id')
 
 ### Configuration API
 
-All methods accept `Closure` unless noted.
+The signatures below show which settings accept closures. Closures use Filament's utility injection where supported.
 
 | Method | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -203,6 +327,7 @@ All methods accept `Closure` unless noted.
 | `chipColor(string\|Closure $chipColor)` | Setup | `'neutral'` | Color for multi-select chips |
 | `keepSelectedOptionsInDropdown(bool\|Closure $condition = true)` | Setup | `false` | Multi-select: keep selected options in the dropdown with checkmarks (checklist) instead of removing them |
 | `richOptions(bool\|Closure $condition = true)` | Setup | auto | Force rich option rendering |
+| `optionDescriptionPosition(string\|Closure $position)` | Presentation | `below` | Put secondary text below the label or in a trailing column with `trailing` |
 | `optionView(string\|Closure $view)` | Setup | — | Custom Blade (or Closure) per option row and trigger |
 | `optionTriggerView(string\|Closure\|null $view)` | Setup | — | Optional separate view for closed trigger / chips |
 | `optionViewData(array\|Closure $data)` | Setup | `[]` | Extra data passed into every option view |
@@ -215,9 +340,29 @@ All methods accept `Closure` unless noted.
 | `allowCreateOption(bool\|Closure $condition = true)` | Setup | `false` | Inline “Create …” row from search (sets state to the string; **no** PHP create callback — see [Smart suggest](#smart-suggest-recentoptions-suggestedoptions-allowcreateoption) / [Create option: inline vs modal](#create-option-inline-vs-modal-which-api)) |
 | `entityMentions(bool\|Closure $condition = true, string\|Closure $trigger = '@')` | Setup | `false` | Async people/entity picker; type the trigger in search or on the closed trigger |
 | `clearable(bool\|Closure $condition = true)` | Setup | auto | Show clear button (×); also updates `selectablePlaceholder()` |
-| `dropdownAlign(string\|Closure $align)` | Setup | auto | Align dropdown: `start`, `end` |
+| `dropdownAlign(string\|Closure $align)` | Setup | `start` (`end` for `item-card`) | Align dropdown to the logical start or end of the field |
 | `size(string\|ControlSize\|Closure $size)` | Setup | `'md'` | Control size: `sm`, `md`, `lg` |
 | `rounding(string\|Closure\|null $rounding)` | Setup | config | Border radius token |
+| `focusOutline(bool\|Closure $condition = true)` | Setup | `false` | Enables the optional focus outline on this field |
+| `optionGroupSeparators(bool\|Closure $condition = true)` | Presentation | `true` | Dividers between option groups |
+| `disabledOptions(array\|Closure $keys)` | Selection | `[]` | Disable particular keys; combines with `disableOptionWhen()` |
+| `selectionIndicator(bool\|Closure $condition = true)` | Presentation | `true` | Show the selected-row indicator |
+| `plainTrigger(bool\|Closure $condition = true)` | Presentation | `false` | Plain trigger presentation for compact composed controls |
+| `chevronIcon(string\|BackedEnum\|Htmlable\|Closure\|null $icon)` | Icons | Configured Hugeicon | Dropdown icon; `null` restores the default |
+| `clearIcon(string\|BackedEnum\|Htmlable\|Closure\|null $icon)` | Icons | Configured Hugeicon | Clear-selection icon |
+| `selectedOptionCheckIcon(string\|BackedEnum\|Htmlable\|Closure\|null $icon)` | Icons | Configured Hugeicon | Selected/checklist icon |
+| `menuMaxHeight(int\|Closure\|null $pixels)` | Geometry | Automatic | Limit the menu height: 80–1200 px; `null` restores automatic sizing |
+| `dropdownMinWidth(int\|Closure $pixels)` | Geometry | `288` | Minimum desktop panel width: 120–600 px, constrained by the viewport |
+| `virtualizeThreshold(int\|Closure $items)` | Performance | `100` | Start virtualizing at 1–100,000 projected rows |
+| `virtualRowHeight(int\|Closure $pixels)` | Performance | `36` | Initial list-row height estimate: 1–512 px; actual rows are measured |
+| `virtualWindowSize(int\|Closure $items)` | Performance | `50` | Initial window estimate: 1–500; the measured viewport and overscan determine the mounted rows |
+| `paginatedSearchResults(bool\|Closure $condition = true)` | Search | `false` | Enable paginated dynamic results |
+| `searchResultsPageSize(int\|Closure $size = 50)` | Search | `50` | Requested rows per page; maximum comes from `select.max_page_size` (1000 by default) |
+| `getSearchResultsPageUsing(?Closure $callback)` | Search | `null` | Return `items`, next `cursor` and `hasMore` |
+| `searchCacheContextUsing(?Closure $callback)` | Search | `null` | Include tenant/policy/provider revision in this field's request-cache identity |
+| `dependsOn(string\|array $paths, Closure $resolveOptions)` | Dependencies | None | Resolve options from one or several other field values |
+| `resetOnDependencyChange(bool\|Closure $condition = true)` | Dependencies | `false` | Clear the dependent selection immediately when a parent changes, without waiting for the server |
+
 
 #### `variant()`
 
@@ -233,8 +378,8 @@ Use `grid` for a multi-column visual picker:
 ```php
 SelectField::make('theme')
     ->options([
-        'light' => ['label' => 'Light', 'icon' => 'heroicon-o-sun'],
-        'dark' => ['label' => 'Dark', 'icon' => 'heroicon-o-moon'],
+        'light' => ['label' => 'Light', 'icon' => 'hugeicons-sun-01'],
+        'dark' => ['label' => 'Dark', 'icon' => 'hugeicons-moon-02'],
     ])
     ->optionLayout('grid');
 ```
@@ -257,6 +402,38 @@ For RTL layouts, set `extraAttributes(['dir' => 'rtl'])` on the field — the te
 
 Works with `entityMentions()` — type `@` in the inline search input or press `@` on the closed trigger to start a mention query.
 
+#### Field label, accent and rounding
+
+Keep the label inside the field and choose its surface, accent and corner shape independently:
+
+```php
+SelectField::make('status')
+    ->label('Status')
+    ->options(['draft' => 'Draft', 'published' => 'Published'])
+    ->inlineFieldLabel()
+    ->variant('secondary')
+    ->color('primary')
+    ->size('lg')
+    ->rounding('full')
+    ->focusOutline();
+```
+
+`inlineFieldLabel(false)` restores the outer label. `color(null)` restores the default accent. `rounding(null)` uses the global `ui.field_rounding` setting; `rounding('full')` creates a pill. `focusOutline()` enables the optional outer focus outline and defaults to off.
+
+#### Secondary text beside the option label
+
+```php
+SelectField::make('plan')
+    ->options([
+        'starter' => ['label' => 'Starter', 'description' => '$19 / month'],
+        'team' => ['label' => 'Team', 'description' => '$49 / month'],
+    ])
+    ->richOptions()
+    ->optionDescriptionPosition('trailing');
+```
+
+The default `below` places the description beneath the label. `trailing` puts it at the logical end of the row, including RTL layouts. This configures the shared rich-option renderer; custom `optionView()` markup controls its own layout.
+
 #### Smart suggest (`recentOptions`, `suggestedOptions`, `allowCreateOption`)
 
 Pin curated rows at the top of the dropdown and optionally allow creating a new value from the current search:
@@ -271,7 +448,7 @@ SelectField::make('project_id')
 
 Requires `searchable()`. When the query has **no exact label match**, a **Create “…”** row appears at the top of the list (label from `filament-flex-fields::default.select_field.smart_suggest.create`). Choosing that row commits the trimmed search string as the field value — **same string for both value and label**. No modal opens and **no PHP callback runs at click time**.
 
-Created string keys are **intentional state**. With `allowCreateOption()` on, the package does **not** apply its static-option `Rule::in`-equivalent (and skips Filament’s “must resolve a label” probe), so a POSTed create string can pass server validation. Constrain shape and length yourself:
+With `allowCreateOption()` enabled, a new text value does not have to match an existing option. The server still validates the selection structure. Add application rules for the text and its length:
 
 ```php
 SelectField::make('slug')
@@ -300,44 +477,23 @@ SelectField::make('labels')
 | Dropdown | Create row when search ≠ any option label | Same; created values become chips |
 | Server / DB | Not created automatically; package does not block the new string key | Same |
 
-Persist or insert in the database yourself — typically on form save, or immediately with `live()` + `afterStateUpdated()`:
+Persist created values after your form has been validated. Inline creation changes the field value; it does not insert a database record. This example limits each label and the number of selections:
 
 ```php
-// Single — state is the new label string (or an existing option key).
-SelectField::make('tag')
-    ->searchable()
-    ->options(fn (): array => Tag::query()->pluck('name', 'name')->all())
-    ->allowCreateOption()
-    ->live()
-    ->afterStateUpdated(function (?string $state): void {
-        if (blank($state)) {
-            return;
-        }
-
-        Tag::query()->firstOrCreate(['name' => $state]);
-    });
-
-// Multiple — state is a list of strings; create any missing tags.
-SelectField::make('tags')
+SelectField::make('labels')
     ->multiple()
     ->searchable()
-    ->options(fn (): array => Tag::query()->pluck('name', 'name')->all())
+    ->options(['Laravel' => 'Laravel', 'PHP' => 'PHP'])
     ->allowCreateOption()
-    ->live()
-    ->afterStateUpdated(function (?array $state): void {
-        foreach ($state ?? [] as $name) {
-            if (filled($name)) {
-                Tag::query()->firstOrCreate(['name' => $name]);
-            }
-        }
-    });
+    ->maxItems(20)
+    ->nestedRecursiveRules(['string', 'max:80']);
 ```
 
-If you need a **numeric id** in state (e.g. `tag_id`) after insert, create the row in `afterStateUpdated` and `$set` the new key — or prefer the modal path below when the new record needs more than one field.
+In your application's save action, authorize the operation and persist the validated labels within the transaction used for the form. If you need a numeric model key, prefer the modal flow below.
 
 #### Create option: inline vs modal (which API?)
 
-Two different create flows exist. Do not mix their mental models:
+Choose inline creation for a text value, or a modal for a record with its own fields and validation:
 
 | | Inline smart suggest | Filament modal create |
 |--|--|--|
@@ -347,22 +503,60 @@ Two different create flows exist. Do not mix their mental models:
 | On confirm | Sets state to that string (client) | Runs `createOptionUsing` on the server; return value becomes the selected option key |
 | Best for | Free-text tags, one-field labels, quick add | Eloquent / relationship records with validation and multiple attributes |
 
-Modal example (also works without `relationship()` when you maintain `options()` yourself):
+<Tabs>
+  <Tab title="Name only">
+    A create modal does not require extra fields. This example asks only for a name, validates it and returns the new author's key. `Author` is your application's model.
 
 ```php
+use App\Models\Author;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
+
+SelectField::make('author_id')
+    ->relationship(name: 'author', titleAttribute: 'name')
+    ->searchable()
+    ->createOptionForm([
+        FlexTextInput::make('name')
+            ->required()
+            ->maxLength(120),
+    ])
+    ->createOptionUsing(fn (array $data): int => Author::create([
+        'name' => $data['name'],
+    ])->getKey());
+```
+
+    The model must allow creation with only `name` (including any required database columns). The newly created record becomes the selected option.
+  </Tab>
+  <Tab title="Additional fields">
+    Add any FLEX fields and schema layouts your record needs. Each field keeps its own validation. This example adds an email address and widens the modal.
+
+```php
+use App\Models\Author;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+use Filament\Actions\Action;
+
 SelectField::make('author_id')
     ->relationship(name: 'author', titleAttribute: 'name')
     ->searchable()
     ->preload()
     ->createOptionForm([
-        TextInput::make('name')->required(),
-        TextInput::make('email')->email()->required(),
+        FlexTextInput::make('name')
+            ->required()
+            ->maxLength(120),
+        FlexTextInput::make('email')
+            ->email()
+            ->required()
+            ->maxLength(254),
     ])
     ->createOptionUsing(fn (array $data): int => Author::create($data)->getKey())
     ->createOptionAction(fn (Action $action) => $action->modalWidth('3xl'));
 ```
 
-Playground: **Smart suggest · create option** on `/select-field` shows inline single + multiple next to the modal form demo.
+    `createOptionForm()` also accepts a closure for a dynamic schema. Without `relationship()`, maintain `options()` and resolve newly created labels with `getOptionLabelUsing()`. Authorize record creation in your application's create callback or action before persisting data.
+  </Tab>
+</Tabs>
+
+Use the inline flow for free-text values. Use a modal when a new record needs validated fields, permissions or a database-generated key.
 
 #### Entity mentions (`entityMentions()`)
 
@@ -372,7 +566,6 @@ Async people/entity picker triggered with `@` in the closed trigger, inline sear
 SelectField::make('assignees')
     ->multiple()
     ->searchable()
-    ->inlineSearch()
     ->entityMentions(trigger: '@')
     ->getSearchResultsUsing(fn (string $search): array => User::query()
         ->where('name', 'like', "%{$search}%")
@@ -381,7 +574,7 @@ SelectField::make('assignees')
         ->all());
 ```
 
-Selected mention chips render with the `@` prefix and `fff-select-entity-mention-chip` styling. Playground: **Entity mentions** on `/select-field`. See also [Upgrade v2 → v3](/docs/upgrade-v2-to-v3).
+Selected mention chips show the mention prefix. Use `getOptionLabelsUsing()` to resolve saved selections in a multiselect, or `getOptionLabelUsing()` for a single selection.
 
 ---
 
@@ -392,13 +585,13 @@ Selected mention chips render with the `@` prefix and `fff-select-entity-mention
 ```php
 SelectField::make('user_id')
     ->label('Assignee')
-    ->options(User::all()->mapWithKeys(fn ($user) => [
+    ->options(fn (): array => User::query()->orderBy('name')->limit(50)->get()->mapWithKeys(fn ($user) => [
         $user->id => [
             'label' => $user->name,
             'description' => $user->email,
             'image' => $user->avatar_url,
         ],
-    ]))
+    ])->all())
     ->searchable()
     ->inlineSearch()
     ->variant('soft');
@@ -414,7 +607,7 @@ Section::make('Metadata')
             ->relationship('tags', 'name')
             ->chipColor('success')
             ->preload(),
-    ])
+    ]);
 ```
 
 ---
@@ -471,6 +664,7 @@ SelectField::make('character')
     ->searchable()
     ->paginatedSearchResults()
     ->searchResultsPageSize(20)
+    ->getOptionLabelUsing(fn (string $value): ?string => Character::find($value)?->name)
     ->getSearchResultsPageUsing(function (string $search, ?string $cursor, int $pageSize): array {
         [$items, $nextCursor, $hasMore] = CharacterRepository::search($search, $cursor, $pageSize);
 
@@ -482,9 +676,22 @@ SelectField::make('character')
     });
 ```
 
-The trigger shows a loading indicator while the first page loads or while a new query is debounced. A footer spinner appears while additional pages load.
+Define `CharacterRepository::search()` in your application. Each item contains a stable `value` and its display `label`. Rich rows may also contain `description`, `image`, `icon` and `disabled`. For example, the final page can return:
 
-Closure-based `options()` still lazy-load on first open (`select__dynamic_options` in the playground).
+```php
+return [
+    'items' => [
+        ['value' => 'luke', 'label' => 'Luke Skywalker'],
+        ['value' => 'leia', 'label' => 'Leia Organa'],
+    ],
+    'cursor' => null,
+    'hasMore' => false,
+];
+```
+
+When more pages exist, return `hasMore => true` and a nonempty next cursor. Keep that cursor opaque, stable and advancing; never return the previous cursor. Return at most `$pageSize` option records. Group records may use `['label' => 'Group name', 'options' => [...]]`; their option leaves share the same page-size limit. The selected-label resolver must authorize and resolve the same catalog. The trigger shows a loading indicator while the first page loads or while a new query is debounced. A footer spinner appears while additional pages load.
+
+Closure-based `options()` are resolved when the menu opens. A saved selection may need a label before opening: provide `getOptionLabelUsing()` or `getOptionLabelsUsing()` rather than fetching an entire catalog just to display its selected value.
 
 > **Pagination note:** true “load more” paging requires `getSearchResultsPageUsing()`. Without it, the field may still call a non-paginated search callback and will set `hasMore=false` after the first page so the client does not spin forever.
 
@@ -507,7 +714,12 @@ Closure-based `options()` still lazy-load on first open (`select__dynamic_option
 | `size` | `size()` |
 | `inline_search` | `inlineSearch()` (ignored when `multiple` is true) |
 | `keep_selected_options_in_dropdown` | `keepSelectedOptionsInDropdown()` (no-op unless multiple) |
-| `rich_options` / `option_view` / `option_layout` / `chip_color` / … | matching SelectField methods |
+| `rich_options`, `rich_list_trigger_display` | `richOptions()`, `richListTriggerDisplay()` |
+| `option_view`, `option_trigger_view`, `option_layout` | Custom views and list/grid presentation |
+| `chip_color`, `color` | Chip and control accent colors |
+| `dropdown_align` | `dropdownAlign()` |
+| `chevron_icon`, `clear_icon` | Trigger icons |
+| `disabled` | `disabled()` |
 
 **PHP-only (not configured from Studio):** async search (`getSearchResultsUsing()`, `getSearchResultsPageUsing()`, `paginatedSearchResults()`), `relationship()`, `dependsOn()`, create/edit option modals, and other Livewire search contracts. Wire those on the field in PHP.
 
@@ -517,9 +729,9 @@ Closure-based `options()` still lazy-load on first open (`select__dynamic_option
 
 ### Playground
 
-`/admin/flex-fields-playground/select-field`
+`/admin/flex-fields/select-field`
 
-See [Playground](/docs/index#playground) for setup.
+Open the [live Select demo](https://demo.bjanczak.com/admin/flex-fields-playground/select-field), or follow [Installation](/docs/installation) to enable the local playground.
 
 ---
 
@@ -534,13 +746,14 @@ See [Playground](/docs/index#playground) for setup.
 | Filament API | Support | Notes |
 |--------------|---------|-------|
 | `options([...])` / `options(fn)` | Yes | Static payload or `getOptionsForJs` on open (closures deferred until open) |
-| `native(false)` | Always on | Headless JS select; `setUp()` forces non-native. `native(true)` with `searchable()` / `multiple()` / `allowHtml()` throws `InvalidArgumentException` |
+| `native(false)` / `native(true)` | Yes | FLEX dropdown by default. `native(true)` uses an HTML select for a plain single selection; search, multiple, rich/HTML options and other enhanced features use the FLEX renderer. Fluent call order does not change the decision |
 | `searchable()` / `searchable(bool\|Closure)` / `searchable(['col', …])` | Yes | Client filter or relationship SQL columns |
 | `getSearchResultsUsing()` + `getOptionLabelUsing()` | Yes | Async search + label hydrate; required for valid-option validation |
 | `getOptionLabelsUsing()` (multiple) | Yes | Same as Filament multi-select |
 | `loadingMessage()` | Yes | Skeleton / loading empty state |
 | `searchingMessage()` | Yes | While debounced search is in flight |
-| `searchPrompt()` | Yes | Before the user types a query |
+| `searchPrompt()` | Yes | Search-input placeholder for local and server lists, inline search and the mobile sheet. Defaults to the active Filament translation |
+| `searchLabels()` / `searchValues()` | Yes | Choose whether local search matches labels, option keys or both |
 | `noSearchResultsMessage()` | Yes | Including static searchable lists |
 | `noOptionsMessage()` | Yes | Empty list / preload with no rows |
 | `searchDebounce()` | Yes | Default 1000 ms (same as Filament) |
@@ -579,10 +792,32 @@ SelectField::make('status')
         'reviewing' => 'Reviewing',
         'published' => 'Published',
     ]);
-// Always a JavaScript select (native HTML5 select is not used).
+// The FLEX dropdown is the default; use native(true) for a plain HTML select.
 ```
 
 #### Searching & custom messages
+
+Every searchable dropdown receives a translated placeholder by default (`Start typing to search...` in English). Use `searchPrompt()` to replace the search text. `placeholder()` separately controls the closed field when no option is selected; it does not replace the dropdown's search placeholder.
+
+```php
+SelectField::make('country')
+    ->options(['pl' => 'Poland', 'us' => 'United States'])
+    ->searchable()
+    ->placeholder('Choose a country')
+    ->searchPrompt('Find a country…');
+```
+
+The same setting works with remote results and `inlineSearch()`, including the mobile search header. A closure may supply a context-dependent prompt. An explicitly empty `searchPrompt('')` hides the text intentionally.
+
+To search by keys as well as labels:
+
+```php
+SelectField::make('country_code')
+    ->options(['PL' => 'Poland', 'US' => 'United States'])
+    ->searchable()
+    ->searchLabels()
+    ->searchValues();
+```
 
 ```php
 SelectField::make('author_id')
@@ -646,14 +881,14 @@ SelectField::make('author_id')
     ->searchable(['name', 'email'])
     ->preload()
     ->createOptionForm([
-        TextInput::make('name')->required(),
-        TextInput::make('email')->email()->required(),
+        FlexTextInput::make('name')->required(),
+        FlexTextInput::make('email')->email()->required(),
     ])
     ->createOptionUsing(fn (array $data): int => Author::create($data)->getKey())
     ->createOptionAction(fn (Action $action) => $action->modalWidth('3xl'))
     ->editOptionForm([
-        TextInput::make('name')->required(),
-        TextInput::make('email')->email()->required(),
+        FlexTextInput::make('name')->required(),
+        FlexTextInput::make('email')->email()->required(),
     ])
     ->updateOptionUsing(function (array $data, Schema $schema): void {
         $schema->getRecord()?->update($data);
@@ -678,7 +913,7 @@ SelectField::make('technology')
     ->disableOptionWhen(fn (string $value): bool => $value === 'published')
     ->prefix('https://')
     ->suffix('.com')
-    ->suffixIcon(Heroicon::GlobeAlt)
+    ->suffixIcon('hugeicons-globe-02')
     ->suffixIconColor('success')
     ->position('bottom'); // or 'top'
 
@@ -689,25 +924,33 @@ SelectField::make('feedback')
 #### Cascading options (`dependsOn`)
 
 ```php
+use Filament\Schemas\Components\Utilities\Set;
+
 SelectField::make('country')
     ->live()
-    // Avoid remorphing the whole form (freezes sibling fields for seconds on large pages).
-    ->skipRenderAfterStateUpdated()
-    ->options([...])
+    ->options(['pl' => 'Poland', 'us' => 'United States'])
     ->afterStateUpdated(fn (Set $set) => $set('region', null));
 
 SelectField::make('region')
+    ->resetOnDependencyChange()
     ->dependsOn('country', fn (?string $country): array => match ($country) {
         'pl' => ['mz' => 'Mazowieckie'],
+        'us' => ['ca' => 'California', 'tx' => 'Texas'],
         default => [],
     })
     ->searchable()
     ->placeholder('Pick a country first');
 ```
 
-Until the parent has a value, the region list is correctly empty. Options refetch when the dropdown opens after the parent changes.
+Until the parent has a value, the region list is correctly empty. Choosing Poland → Mazowieckie and then changing the country to United States clears the region immediately through `resetOnDependencyChange()`. The next region list contains California and Texas.
 
-On large schemas, prefer `skipRenderAfterStateUpdated()` or `partiallyRenderComponentsAfterStateUpdated([...])` on the parent — a full Livewire morph is what makes Region feel “blocked”, not the Region trigger itself.
+`dependsOn()` refreshes dependent choices; it does not decide whether an existing selection should be preserved. Enable `resetOnDependencyChange()` on the child for an immediate browser reset, including a non-clearable field. It clears a single selection to `null` and a multiselect to `[]`. It is off by default so dependencies that only change labels or ordering do not unexpectedly clear data.
+
+Keep the parent's explicit PHP reset callback for server-driven state updates and the server-side form lifecycle. For a dependent multiselect, use `$set('region', [])` instead of `null`. Server-side Select validation also rejects a submitted region that is not in the current country's allowed options. A client reset is not a replacement for validation or authorization.
+
+Use `dependsOn(['country', 'service'], fn (?string $country, ?string $service): array => ...)` for several dependencies; callback arguments follow the path order. Paths are relative to the field's schema, including repeater items. Reset a child's previous selection when it no longer belongs to the parent's allowed choices.
+
+If only particular fields need a refresh, use Filament's partial-render configuration for those fields. Skip rendering only when no other visible content depends on the changed value.
 
 ---
 
@@ -723,34 +966,186 @@ On large schemas, prefer `skipRenderAfterStateUpdated()` or `partiallyRenderComp
 
 ---
 
-### CSS classes (reference)
+### Large catalogs and virtualization
 
-| Class | Role |
-|-------|------|
-| `fff-select-field` | Root wrapper |
-| `fff-select-field--{sm\|md\|lg}` | Size modifier |
-| `fff-select-field--{variant}` | Visual variant |
-| `fff-select-field--layout-{list\|grid}` | Option layout |
-| `fff-select-field--chips-{color}` | Multi-select chip color |
-| `fff-select-field--inline-field-label` | Inline label active |
-| `fff-select-field--inline-search` | Inline search active |
-| `fff-select-entity-mention-chip` | Mention chip styling (multi-select) |
-| `fff-select-entity-mention__highlight` | Mention match highlight in dropdown |
+<Tabs>
+  <Tab title="Local catalog">
+    Use `options()` when the catalog is already available locally. Virtualization reduces mounted rows; it does not avoid sending the catalog to the browser.
 
----
+```php
+SelectField::make('product_code')
+    ->options($productOptions)
+    ->searchable()
+    ->virtualizeThreshold(100)
+    ->virtualRowHeight(40)
+    ->virtualWindowSize(50)
+    ->menuMaxHeight(360);
+```
 
-### Performance
+    `$productOptions` is an application-provided key/label map. The default threshold is 100 projected rows. Rows are measured as they appear, and the visible window follows the viewport. A grid uses measured grid-row geometry as well.
 
-| Mechanism | What it does |
-|-----------|--------------|
-| **Lazy CSS** | Loads `select-field` styles only when the field renders |
-| **JS Transformation** | Efficiently prepares rich options for the frontend component |
-| **Search Cache** | Memoizes search results to reduce server round-trips |
-| **Virtualized rows** | Flat and grouped lists virtualize from 100 visible rows (~50-row window) |
-| **Paginated search** | `paginatedSearchResults()` appends pages via scroll sentinel |
+    `optionsLimit(50)` caps the display of a small nonvirtualized result set. Once virtualization is active, the full matching collection stays navigable; the mounted window controls the DOM budget.
+  </Tab>
+  <Tab title="Remote catalog">
+    Use `getSearchResultsUsing()` with a bounded database query for server search, or `getSearchResultsPageUsing()` for cursor pagination. Pagination limits transferred results; virtualization limits mounted rows. They can work together.
 
-### Destroy / morph cleanup
+```php
+use App\Models\Product;
 
-Headless Select tears down cleanly when Alpine destroys the component: cancel in-flight relationship search, unbind menu listeners, release teleported overlay / sheet scroll-lock, and unregister from the flex-dropdown coordinator.
+SelectField::make('product_id')
+    ->searchable()
+    ->searchDebounce(250)
+    ->getSearchResultsUsing(fn (string $search): array => Product::query()
+        ->where('name', 'like', "%{$search}%")
+        ->limit(50)
+        ->pluck('name', 'id')
+        ->all())
+    ->getOptionLabelUsing(
+        fn (string $value): ?string => Product::find($value)?->name,
+    );
+```
 
-Livewire morph can remove a field node before Alpine finishes `destroy()` (modal / slide-over close, navigate). The teleported menu layer also hooks `Livewire.hook('morph.updating')` for emergency overlay cleanup so orphan menus and body scroll-locks do not stick.
+    Apply the same authorization and tenant scope to search and selected-label queries. The search debounce applies to fetching results, not to opening the menu.
+  </Tab>
+</Tabs>
+
+#### Menu dimensions
+
+```php
+SelectField::make('category')
+    ->options(['news' => 'News', 'events' => 'Events'])
+    ->dropdownMinWidth(320)
+    ->menuMaxHeight(400)
+    ->dropdownAlign('start');
+```
+
+Menus fit within the viewport. Automatic placement chooses above or below the trigger according to available space. `position('top')` and `position('bottom')` request a particular side. Width and height settings are bounded; unsupported values produce a configuration error rather than an oversized panel. On mobile, the sheet owns its own responsive layout.
+
+#### Search limits and cache
+
+Publish/configure `config/filament-flex-fields.php` when you need different limits:
+
+```php
+'select' => [
+    'max_page_size' => 1000,
+    'max_page_bytes' => 1048576,
+    'max_search_bytes' => 4096,
+    'max_search_characters' => 512,
+    'search_cache_entries' => 64,
+    'search_cache_bytes' => 4194304,
+    'search_rate_limit_per_minute' => 60,
+],
+```
+
+The server cache belongs to one field and one request. It avoids repeated provider work within that request; it is not a cross-request cache. Cache identities include the field, record, configured dependencies and provider. For context that can change within a request, supply its revision:
+
+```php
+SelectField::make('category_id')
+    ->relationship('category', 'name')
+    ->searchable()
+    ->searchCacheContextUsing(fn (): array => [
+        'tenant' => auth()->user()?->tenant_id,
+        'locale' => app()->getLocale(),
+    ]);
+```
+
+This adds cache context; it does not apply tenant authorization to the query. Changing `options()` invalidates the field's request cache. `invalidateSelectSearchCache()` is available when your application changes a provider's result within the same request.
+
+Page payloads must be JSON-compatible and remain within the configured size. Cursors must progress: repeated/cyclic cursors and malformed responses are rejected. On a failed load, already displayed options remain available and the menu provides retry feedback.
+
+### Icons and compact controls
+
+```php
+SelectField::make('status')
+    ->options(['draft' => 'Draft', 'published' => 'Published'])
+    ->chevronIcon('hugeicons-unfold-more')
+    ->clearIcon('hugeicons-cancel-01')
+    ->selectedOptionCheckIcon('hugeicons-tick-02');
+```
+
+Icons use the package's shared icon rendering. Passing `null` to an icon setter restores its configured default.
+
+```php
+SelectField::make('density')
+    ->options(['comfortable' => 'Comfortable', 'compact' => 'Compact'])
+    ->plainTrigger()
+    ->selectionIndicator(false)
+    ->clearable(false);
+```
+
+Use `plainTrigger()` when embedding a small select inside another control. `selectionIndicator(false)` removes the selected-row marker without changing the selected value.
+
+### Keyboard, mobile and RTL
+
+| Interaction | Result |
+|---|---|
+| Enter or Space on the trigger | Open the menu |
+| Arrow Down / Arrow Up | Open or navigate selectable rows |
+| Home / End on the noneditable trigger | Move to the first / last selectable row |
+| Enter while navigating | Select the active row |
+| Escape | Close and return to the control |
+| Typing in search | Filter local options or request server results |
+| Clear selection | Reset the value when clearing is allowed |
+
+Home and End inside a text input retain their normal caret behavior. Disabled rows cannot be selected. Multi-select checklists remain open while items are toggled; chips can be removed individually.
+
+On narrow viewports, the menu becomes a sheet with its own search area. Open lists respond to window resizing and use touch-sized rows. The menu carries the field's writing direction:
+
+```php
+SelectField::make('city')
+    ->options(['riyadh' => 'الرياض', 'jeddah' => 'جدة'])
+    ->searchable()
+    ->extraAttributes(['dir' => 'rtl'])
+    ->dropdownAlign('end');
+```
+
+### Saving selections to your database
+
+Save a single selection to a suitable scalar column. The option key is saved, not its display label. A multiselect without a relationship can be saved in a JSON column with an array cast:
+
+```php
+protected function casts(): array
+{
+    return [
+        'labels' => 'array',
+    ];
+}
+```
+
+For `relationship('tags', 'name')->multiple()`, Filament saves the relationship; a JSON column is unnecessary. `pivotData()` can supply additional pivot attributes. Always authorize related records in your application.
+
+Use the form's validated state when saving. For a constrained multiselect:
+
+```php
+SelectField::make('permissions')
+    ->options(['read' => 'Read', 'write' => 'Write', 'publish' => 'Publish'])
+    ->multiple()
+    ->required()
+    ->minItems(1)
+    ->maxItems(2)
+    ->maxItemsMessage('Choose up to two permissions.');
+```
+
+Minimum counts are checked on submit; maximum counts are checked on the server and block additional picks in the menu. A disabled control does not replace server authorization.
+
+### Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="The menu opens, but search results take time">
+    Server search uses `searchDebounce()` (1000 ms by default) before sending a request. Lower it deliberately, for example to 250 ms. Bound database queries and check their indexes. Remote results also depend on network and server response time.
+  </Accordion>
+  <Accordion title="An existing selection shows its key instead of its label">
+    For remote options, provide `getOptionLabelUsing()` for a single value or `getOptionLabelsUsing()` for a multiselect. These resolvers must also be able to resolve saved records outside the current result page.
+  </Accordion>
+  <Accordion title="A previously selected value fails validation">
+    Check whether the option is now disabled, no longer belongs to the dependent catalog, or is excluded by your relationship scope. Reset invalid child selections when their parent changes.
+  </Accordion>
+  <Accordion title="A new label is rejected">
+    `allowCreateOption()` accepts a new text identity; `createOptionForm()` creates a record through a validated modal. Use the flow that matches your database column. Additional application rules still apply.
+  </Accordion>
+  <Accordion title="Only some JSON builder settings are available">
+    The builder configuration table lists the supported declarative keys. Callbacks, relationships, pagination and dependencies belong in PHP. Do not assume every fluent method has a JSON key.
+  </Accordion>
+</AccordionGroup>
+
+For shared loading behavior, see [Asset loading](/docs/asset-loading).

@@ -1,0 +1,63 @@
+---
+title: "Build forms, tables and infolists"
+description: "Render declared family schemas through the matching builder and request context."
+---
+
+```php
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilyRenderContext;
+use Bjanczak\FilamentFlexFields\Support\Components\Schema\FamilySchemaDefinition;
+use Bjanczak\FilamentFlexFields\Support\FlexFieldFormBuilder;
+use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldInfolistBuilder;
+use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldTableBuilder;
+use Illuminate\Support\Facades\Auth;
+
+$definition = new FamilySchemaDefinition(
+    family: 'acme-name-family',
+    slug: 'contact_name',
+    label: 'Contact name',
+    config: ['maxLength' => 120],
+    configurationVersion: 2,
+    isRequired: true,
+);
+
+$context = new FamilyRenderContext(
+    ownerKey: 'customer-form:'.$customer->getKey(),
+    statePathPrefix: 'attributes',
+    locale: 'pl',
+    applicationDefaults: ['maxLength' => 150],
+    panelDefaults: ['maxLength' => 130],
+    userKey: Auth::check() ? (string) Auth::id() : null,
+    tenantId: (string) $tenant->getKey(),
+);
+
+$field = app(FlexFieldFormBuilder::class)->makeComponent(
+    $definition,
+    familyContext: $context,
+);
+
+$column = app(FlexFieldTableBuilder::class)->makeColumn(
+    $definition,
+    'attributes',
+    $context,
+);
+
+$entry = app(FlexFieldInfolistBuilder::class)->makeEntry(
+    $definition,
+    'attributes',
+    $context,
+);
+```
+
+Use `build()` for lists. Built-in `FlexFieldDefinition` and `FamilySchemaDefinition`
+can coexist in those lists. The built-in `FieldType` enum remains unchanged.
+Table and infolist values read the selected record state path. Your adapter may
+configure its usual formatting callback. Set context defaults for the family being
+rendered; other families reject unknown option names. Supply a distinct stable
+`ownerKey` when the same logical definition appears in several forms. Locale and
+theme are available to your adapter/factory; they do not mutate global application
+locale or theme.
+
+## Continue reading
+
+[Extension guides](/docs/extensions) · [Definition and registration reference](/docs/extensions/definition-reference)
+

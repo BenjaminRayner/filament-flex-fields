@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{NAMESPACE}}\Infolists;
+
+use {{NAMESPACE}}\Support\DisplayValue;
+use Bjanczak\FilamentFlexFields\Filament\Concerns\EmitsFlexDisplayAssets;
+use Filament\Infolists\Components\Entry;
+
+class {{CLASS}}Entry extends Entry
+{
+    use EmitsFlexDisplayAssets;
+
+    protected string $view = '{{PREFIX}}::entry';
+
+    protected function flexDisplayComponentId(): string
+    {
+        return '{{PREFIX}}-entry';
+    }
+
+    public function getDisplayValue(): string
+    {
+        return DisplayValue::text($this->getState());
+    }
+}

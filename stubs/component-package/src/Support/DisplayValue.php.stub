@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{NAMESPACE}}\Support;
+
+final class DisplayValue
+{
+    public static function text(mixed $value): string
+    {
+        $value = is_array($value) ? ($value['text'] ?? null) : $value;
+
+        return is_string($value) ? $value : '';
+    }
+}

@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Concerns;
 
+use Bjanczak\FilamentFlexFields\Support\Rating\RatingValue;
+
 trait CalculatesRatingFill
 {
-    /**
-     * @return list<int>
-     */
+    /** @return list<int> */
     public function getItemIndexes(): array
     {
-        return range(1, $this->getMax());
+        return range(1, RatingValue::assertMaximum($this->getMax()));
     }
 
     public function getFillPercentageForValue(float|int|null $value, int $index): float
     {
-        if ($value === null) {
-            return 0;
-        }
-
-        return max(0, min(1, ((float) $value) - ($index - 1)));
+        return RatingValue::fill($value, $index);
     }
 }

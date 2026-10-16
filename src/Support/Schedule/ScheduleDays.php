@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Schedule;
 
+use InvalidArgumentException;
+
 final class ScheduleDays
 {
     /** @var list<string> */
@@ -11,6 +13,20 @@ final class ScheduleDays
 
     /** @var list<string> */
     public const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri'];
+
+    /**
+     * @param  list<string>  $days
+     * @return list<string>
+     */
+    public static function ordered(array $days, int $start): array
+    {
+        if (! in_array($start, [0, 1], true)) {
+            throw new InvalidArgumentException('Schedule weekStartsOn must be 0 (Sunday) or 1 (Monday).');
+        }
+        $week = $start === 0 ? ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] : self::ALL;
+
+        return array_values(array_intersect($week, $days));
+    }
 
     /**
      * @param  list<string>  $days

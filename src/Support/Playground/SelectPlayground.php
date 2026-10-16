@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
-use Bjanczak\FilamentFlexFields\Support\GravityIcon;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
+use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -21,8 +20,6 @@ class SelectPlayground
     public function defaultState(): array
     {
         return [
-            'select__filament' => 'published',
-            'select__filament_html' => 'published',
             'select__long_labels' => 'enterprise_agreement',
             'select__basic' => 'published',
             'select__searchable' => 'tailwind',
@@ -79,6 +76,7 @@ class SelectPlayground
             'select__custom_trigger_icons' => 'published',
             'select__custom_check_icon' => ['california', 'texas'],
             'select__scale_10k' => null,
+            'select__scale_grid' => null,
             'select__cascade_country' => 'us',
             'select__cascade_region' => null,
             'select__rtl' => 'riyadh',
@@ -89,6 +87,10 @@ class SelectPlayground
             'select__create_single' => null,
             'select__create_multiple' => ['laravel'],
             'select__create_with_sections' => 'tailwind',
+            'select__native_plain' => 'published',
+            'select__native_search' => 'tailwind',
+            'select__native_multiple' => ['laravel', 'alpine'],
+            'select__native_html' => 'published',
         ];
     }
 
@@ -238,21 +240,21 @@ class SelectPlayground
             'basic' => [
                 'label' => 'Basic',
                 'description' => 'Essential features only',
-                'icon' => GravityIcon::Star,
+                'icon' => FlexIcon::Star,
                 'badge' => 'Free',
                 'badge_color' => 'success',
             ],
             'pro' => [
                 'label' => 'Pro',
                 'description' => 'Advanced analytics and support',
-                'icon' => GravityIcon::Thunderbolt,
+                'icon' => FlexIcon::Thunderbolt,
                 'badge' => 'Popular',
                 'badge_color' => 'primary',
             ],
             'enterprise' => [
                 'label' => 'Enterprise',
                 'description' => 'Custom SLA and onboarding',
-                'icon' => GravityIcon::OfficeBadge,
+                'icon' => FlexIcon::OfficeBadge,
                 'badge' => 'New',
                 'badge_color' => 'warning',
             ],
@@ -261,15 +263,15 @@ class SelectPlayground
         $richIconTitleOptions = [
             'basic' => [
                 'label' => 'Basic',
-                'icon' => GravityIcon::Star,
+                'icon' => FlexIcon::Star,
             ],
             'pro' => [
                 'label' => 'Pro',
-                'icon' => GravityIcon::Thunderbolt,
+                'icon' => FlexIcon::Thunderbolt,
             ],
             'enterprise' => [
                 'label' => 'Enterprise',
-                'icon' => GravityIcon::OfficeBadge,
+                'icon' => FlexIcon::OfficeBadge,
             ],
         ];
 
@@ -291,37 +293,37 @@ class SelectPlayground
         $themeOptions = [
             'default' => [
                 'label' => 'Default',
-                'icon' => GravityIcon::Palette,
+                'icon' => FlexIcon::Palette,
                 'badge_color' => 'primary',
             ],
             'sky' => [
                 'label' => 'Sky',
-                'icon' => GravityIcon::Cloud,
+                'icon' => FlexIcon::Cloud,
                 'badge_color' => 'primary',
             ],
             'mint' => [
                 'label' => 'Mint',
-                'icon' => GravityIcon::MagicWand,
+                'icon' => FlexIcon::MagicWand,
                 'badge_color' => 'success',
             ],
             'rose' => [
                 'label' => 'Rose',
-                'icon' => GravityIcon::Heart,
+                'icon' => FlexIcon::Heart,
                 'badge_color' => 'danger',
             ],
             'amber' => [
                 'label' => 'Amber',
-                'icon' => GravityIcon::Sun,
+                'icon' => FlexIcon::Sun,
                 'badge_color' => 'warning',
             ],
             'slate' => [
                 'label' => 'Slate',
-                'icon' => GravityIcon::Moon,
+                'icon' => FlexIcon::Moon,
                 'badge_color' => 'neutral',
             ],
             'violet' => [
                 'label' => 'Violet',
-                'icon' => GravityIcon::Flask,
+                'icon' => FlexIcon::Flask,
                 'badge_color' => 'primary',
             ],
             'ocean' => [
@@ -342,16 +344,6 @@ class SelectPlayground
                 ->description('Core SelectField demos: search, multi-select, rich options, grid layout, dynamic loading, and Filament parity.')
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
-                    Select::make('select__filament')
-                        ->label('Filament Select (original)')
-                        ->helperText('Standardowy Filament Select — JS dropdown (native(false)), bez stylów SelectField.')
-                        ->options($statusOptions)
-                        ->native(false),
-                    Select::make('select__filament_html')
-                        ->label('Filament HTML native')
-                        ->helperText('Prawdziwy element <select> w przeglądarce (native). Porównaj z JS dropdown powyżej i SelectField poniżej.')
-                        ->options($statusOptions)
-                        ->native(),
                     SelectField::make('select__long_labels')
                         ->label('Long option labels')
                         ->helperText('Closed trigger truncates to one line; dropdown can grow wider for long option labels.')
@@ -364,6 +356,7 @@ class SelectPlayground
                     SelectField::make('select__searchable')
                         ->label('Searchable technologies')
                         ->options($techOptions)
+                        ->searchPrompt('Search technologies…')
                         ->searchable(),
                     SelectField::make('select__multiple')
                         ->label('Multiple genres (wrap demo)')
@@ -434,7 +427,8 @@ class SelectPlayground
                         ->searchable()
                         ->searchResultsPageSize(12)
                         ->paginatedSearchResults()
-                        ->getSearchResultsPageUsing(fn (string $search, ?string $cursor, int $pageSize): array => $this->paginatedCharacterSearch($search, $cursor, $pageSize)),
+                        ->getSearchResultsPageUsing(fn (string $search, ?string $cursor, int $pageSize): array => $this->paginatedCharacterSearch($search, $cursor, $pageSize))
+                        ->getOptionLabelUsing(fn (string $value): ?string => $this->characterOptions()[$value] ?? null),
                     SelectField::make('select__disabled_options')
                         ->label('Disabled options')
                         ->helperText('Published is disabled via disableOptionWhen() — visible but not selectable.')
@@ -444,11 +438,7 @@ class SelectPlayground
                     SelectField::make('select__dynamic_options')
                         ->label('Dynamic options loading')
                         ->helperText('options(fn…) — options load when the dropdown opens; centered spinner + translated loading label.')
-                        ->options(function () use ($statusOptions): array {
-                            usleep(400_000);
-
-                            return $statusOptions;
-                        })
+                        ->options(fn (): array => $statusOptions)
                         ->default('published')
                         ->searchable(),
                     SelectField::make('select__truncate_labels')
@@ -502,18 +492,6 @@ class SelectPlayground
                         ->label('Required status')
                         ->options($statusOptions)
                         ->required(),
-                    PlaygroundCodeSnippet::make(<<<'PHP'
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
-
-SelectField::make('status')
-    ->label('Status')
-    ->options([
-        'draft' => 'Draft',
-        'published' => 'Published',
-    ])
-    ->searchable()
-    ->placeholder('Choose status');
-PHP),
                 ]),
             Section::make('SelectField — Sizes & surfaces')
                 ->description('Track sizes, multi-select chip sizes, rich option density, surface variants, and the item-card trigger.')
@@ -613,14 +591,6 @@ PHP),
                         ->options($statusOptions)
                         ->variant('item-card')
                         ->columnSpanFull(),
-                    PlaygroundCodeSnippet::make(<<<'PHP'
-SelectField::make('theme')
-    ->size('sm')
-    ->variant('secondary');
-
-SelectField::make('row')
-    ->variant('item-card');
-PHP),
                 ]),
             Section::make('SelectField — Configuration API')
                 ->description('Every SelectField setup method from the docs: search UX, clear/placeholder, affixes, colors, rounding, focus outline, dropdown alignment, and custom icons.')
@@ -701,7 +671,7 @@ PHP),
                             SelectField::make('select__prefix_icon')
                                 ->label('Prefix icon (inline)')
                                 ->helperText('prefixIcon(..., isInline: true) — leading icon inside the trigger shell.')
-                                ->prefixIcon(GravityIcon::Globe, isInline: true)
+                                ->prefixIcon(FlexIcon::Globe, isInline: true)
                                 ->options($techOptions)
                                 ->searchable(),
                         ]),
@@ -770,10 +740,10 @@ PHP),
                         ->schema([
                             SelectField::make('select__custom_trigger_icons')
                                 ->label('Custom chevron & clear icons')
-                                ->helperText('chevronIcon() + clearIcon() — override default Gravity UI trigger icons.')
+                                ->helperText('chevronIcon() + clearIcon() — override default Hugeicons trigger icons.')
                                 ->options($statusOptions)
-                                ->chevronIcon(GravityIcon::CircleChevronDown)
-                                ->clearIcon(GravityIcon::CircleXmark),
+                                ->chevronIcon(FlexIcon::CircleChevronDown)
+                                ->clearIcon(FlexIcon::CircleXmark),
                             SelectField::make('select__custom_check_icon')
                                 ->label('Custom checklist check icon')
                                 ->helperText('selectedOptionCheckIcon() — used in keepSelectedOptionsInDropdown() rows.')
@@ -781,18 +751,9 @@ PHP),
                                 ->multiple()
                                 ->searchable()
                                 ->keepSelectedOptionsInDropdown()
-                                ->selectedOptionCheckIcon(GravityIcon::SealCheck)
+                                ->selectedOptionCheckIcon(FlexIcon::SealCheck)
                                 ->chipColor('neutral'),
                         ]),
-                    PlaygroundCodeSnippet::make(<<<'PHP'
-SelectField::make('tech')
-    ->options($options)
-    ->searchable()
-    ->inlineSearch()
-    ->clearable()
-    ->prefixIcon(GravityIcon::Magnifier)
-    ->dropdownAlign('end');
-PHP),
                 ]),
             Section::make('Smart suggest · create option')
                 ->description('Headless combobox allowCreateOption() — type a label that is not in the list, then pick the create row to commit it as the value (inline, no modal).')
@@ -828,10 +789,10 @@ PHP),
                         ])
                         ->searchable()
                         ->createOptionForm([
-                            TextInput::make('name')
+                            FlexTextInput::make('name')
                                 ->label('Name')
                                 ->required(),
-                            TextInput::make('code')
+                            FlexTextInput::make('code')
                                 ->label('Code')
                                 ->required(),
                         ])
@@ -859,14 +820,6 @@ PHP),
                         ->recentOptions(['livewire', 'alpine'])
                         ->suggestedOptions(['tailwind', 'laravel'])
                         ->columnSpanFull(),
-                    PlaygroundCodeSnippet::make(<<<'PHP'
-SelectField::make('tag')
-    ->options($existingTags)
-    ->searchable()
-    ->allowCreateOption()
-    ->recentOptions(['laravel', 'filament'])
-    ->suggestedOptions(['tailwindcss']);
-PHP),
                 ]),
             Section::make('Scale · cascading · RTL')
                 ->description('Virtualized 10k options, dependsOn() cascading selects, and dir=rtl previews (dropdown search vs inlineSearch).')
@@ -878,6 +831,24 @@ PHP),
                         ->options(fn (): array => $this->tenThousandOptions())
                         ->searchable()
                         ->placeholder('Search option…'),
+                    SelectField::make('select__scale_grid')
+                        ->label('1k grid options (virtualized)')
+                        ->helperText('Rich grid uses the same full option collection; only visible grid rows are mounted. Keyboard navigation resolves row offsets after measuring cells.')
+                        ->options(function (): array {
+                            $options = [];
+                            for ($index = 1; $index <= 1000; $index++) {
+                                $options['grid_'.$index] = [
+                                    'label' => 'Theme '.str_pad((string) $index, 4, '0', STR_PAD_LEFT),
+                                    'icon' => FlexIcon::Palette,
+                                ];
+                            }
+
+                            return $options;
+                        })
+                        ->optionLayout('grid')
+                        ->richOptions()
+                        ->searchable()
+                        ->placeholder('Search theme…'),
                     Grid::make(['default' => 1, 'lg' => 2])
                         ->extraAttributes(['class' => 'fff-playground-variants'])
                         ->schema([
@@ -895,7 +866,8 @@ PHP),
                                 ->searchable(),
                             SelectField::make('select__cascade_region')
                                 ->label('Region (dependsOn)')
-                                ->helperText('Options refetch when the dropdown opens after the country changes. Empty until a country is chosen is expected.')
+                                ->helperText('Changing country immediately clears the region. Options load on open; the server validates the selected region against the current country.')
+                                ->resetOnDependencyChange()
                                 ->dependsOn('select__cascade_country', fn (?string $country): array => match ($country) {
                                     'us' => [
                                         'ca' => 'California',
@@ -958,55 +930,37 @@ PHP),
                                 ->options($this->arabicCityOptions())
                                 ->searchable()
                                 ->clearable()
-                                ->prefixIcon(GravityIcon::Magnifier)
+                                ->prefixIcon(FlexIcon::Magnifier)
                                 ->dropdownAlign('end')
                                 ->extraAttributes(['dir' => 'rtl']),
                         ]),
-                    PlaygroundCodeSnippet::make(<<<'PHP'
-SelectField::make('region')
-    ->dependsOn('country', fn (?string $country): array => match ($country) {
-        'pl' => ['mz' => 'Mazowieckie', 'wp' => 'Wielkopolskie'],
-        default => [],
-    })
-    ->searchable();
-
-SelectField::make('city')
-    ->options($arabicCities)
-    ->searchable()
-    ->inlineSearch()
-    ->clearable()
-    ->extraAttributes(['dir' => 'rtl']);
-PHP),
                 ]),
-            Section::make('SelectField — Forbidden / colliding configs')
-                ->description('These combinations throw at configure time (or soft no-op). Shown as documentation only — demos above never call them.')
+            Section::make('SelectField — Native API compatibility')
+                ->description('Native HTML for a plain single select; search, multiple and HTML automatically use the Flex Fields renderer, independent of fluent call order.')
                 ->extraAttributes(['class' => 'fff-playground-section'])
                 ->schema([
-                    PlaygroundCodeSnippet::make(<<<'PHP'
-// Throws InvalidArgumentException — native HTML <select> cannot be searchable/multiple/HTML.
-SelectField::make('status')
-    ->options($status)
-    ->native(true)
-    ->searchable(); // conflict
-
-// Soft no-op: inlineSearch() is ignored when multiple() is set.
-SelectField::make('tags')
-    ->options($tags)
-    ->multiple()
-    ->inlineSearch();
-
-// Paginated search without getSearchResultsPageUsing(): first page only, hasMore=false
-// (never unbounded full-fetch + slice). Prefer:
-SelectField::make('users')
-    ->searchable()
-    ->paginatedSearchResults()
-    ->getSearchResultsUsing(fn (string $search): array => /* capped */)
-    ->getSearchResultsPageUsing(fn (string $search, ?string $cursor, int $pageSize): array => [
-        'items' => [],
-        'cursor' => null,
-        'hasMore' => false,
-    ]);
-PHP),
+                    Grid::make(['default' => 1, 'md' => 2])
+                        ->schema([
+                            SelectField::make('select__native_plain')
+                                ->label('Native plain')
+                                ->options($statusOptions)
+                                ->native(true),
+                            SelectField::make('select__native_search')
+                                ->label('Native + search')
+                                ->options($techOptions)
+                                ->native(true)
+                                ->searchable(),
+                            SelectField::make('select__native_multiple')
+                                ->label('Multiple + native')
+                                ->options($techOptions)
+                                ->multiple()
+                                ->native(true),
+                            SelectField::make('select__native_html')
+                                ->label('Native + HTML')
+                                ->options(['draft' => '<strong>Draft</strong>', 'published' => '<strong>Published</strong>'])
+                                ->native(true)
+                                ->allowHtml(),
+                        ]),
                 ]),
         ];
     }
@@ -1050,12 +1004,10 @@ PHP),
         ];
     }
 
-    /**
-     * @return array{items: list<array{value: string, label: string}>, cursor: ?string, hasMore: bool}
-     */
-    private function paginatedCharacterSearch(string $search, ?string $cursor, int $pageSize): array
+    /** @return array<string, string> */
+    private function characterOptions(): array
     {
-        $catalog = [
+        return [
             'luke' => 'Luke Skywalker',
             'leia' => 'Leia Organa',
             'han' => 'Han Solo',
@@ -1098,6 +1050,14 @@ PHP),
             'baze' => 'Baze Malbus',
             'bodhi' => 'Bodhi Rook',
         ];
+    }
+
+    /**
+     * @return array{items: list<array{value: string, label: string}>, cursor: ?string, hasMore: bool}
+     */
+    private function paginatedCharacterSearch(string $search, ?string $cursor, int $pageSize): array
+    {
+        $catalog = $this->characterOptions();
 
         $needle = mb_strtolower(trim($search));
 

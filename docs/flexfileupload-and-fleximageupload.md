@@ -1,571 +1,408 @@
 ---
-title: "FlexFileUpload & FlexImageUpload"
+title: "FLEX File Upload"
+description: "Add file lists, image grids, avatars, URL imports and camera capture to your forms."
+icon: "upload"
+"canonical": "https://flex-fields.bjanczak.com/docs/flexfileupload-and-fleximageupload"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/file-upload-list.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "FLEX File Upload in the FLEX Fields playground"
+"og:video": "https://flex-fields.bjanczak.com/art/previews/file-upload-list-motion.mp4"
+"og:video:secure_url": "https://flex-fields.bjanczak.com/art/previews/file-upload-list-motion.mp4"
+"og:video:type": "video/mp4"
+"og:video:width": "1920"
+"og:video:height": "1080"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/file-upload-list.webp"
+"twitter:image:alt": "FLEX File Upload in the FLEX Fields playground"
 ---
 
-![FlexFileUpload](/art/sc-31.webp)
+{/* flex-component-media:start */}
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://flex-fields.bjanczak.com/#organization",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "logo": "https://flex-fields.bjanczak.com/art/docs-logo-light.svg",
+      "sameAs": [
+        "https://github.com/janczakb/filament-flex-fields"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://flex-fields.bjanczak.com/#website",
+      "name": "FLEX Fields",
+      "url": "https://flex-fields.bjanczak.com/",
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://flex-fields.bjanczak.com/docs/flexfileupload-and-fleximageupload#webpage",
+      "url": "https://flex-fields.bjanczak.com/docs/flexfileupload-and-fleximageupload",
+      "name": "FLEX File Upload",
+      "description": "Add file lists, image grids, avatars, URL imports and camera capture to your forms.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flexfileupload-and-fleximageupload#article"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://flex-fields.bjanczak.com/docs/flexfileupload-and-fleximageupload#article",
+      "url": "https://flex-fields.bjanczak.com/docs/flexfileupload-and-fleximageupload",
+      "headline": "FLEX File Upload",
+      "description": "Add file lists, image grids, avatars, URL imports and camera capture to your forms.",
+      "inLanguage": "en",
+      "mainEntityOfPage": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flexfileupload-and-fleximageupload#webpage"
+      },
+      "publisher": {
+        "@id": "https://flex-fields.bjanczak.com/#organization"
+      },
+      "video": {
+        "@id": "https://flex-fields.bjanczak.com/art/previews/file-upload-list-motion.mp4#video"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://flex-fields.bjanczak.com/art/previews/file-upload-list-motion.mp4#video",
+      "name": "FLEX File Upload — FLEX Fields demonstration",
+      "description": "A recorded demonstration of FLEX File Upload in the FLEX Fields playground for Filament. Add file lists, image grids, avatars, URL imports and camera capture to your forms.",
+      "thumbnailUrl": [
+        "https://flex-fields.bjanczak.com/art/previews/file-upload-list.webp"
+      ],
+      "uploadDate": "2026-10-16T03:10:31+02:00",
+      "duration": "PT3.117S",
+      "contentUrl": "https://flex-fields.bjanczak.com/art/previews/file-upload-list-motion.mp4",
+      "width": 1920,
+      "height": 1080,
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://flex-fields.bjanczak.com/docs/flexfileupload-and-fleximageupload#article"
+      }
+    }
+  ]
+}).replace(/</g, '\u003c')}
+</script>
 
-[← Back to Table of Contents](/docs/index)
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  preload="metadata"
+  className="w-full aspect-video rounded-xl"
+  src="/art/previews/file-upload-list-motion.mp4"
+  poster="/art/previews/file-upload-list.webp"
+  width="1920"
+  height="1080"
+  aria-label="FLEX File Upload — FLEX Fields demonstration"
+>
+  <a href="/art/previews/file-upload-list-motion.mp4">Watch the FLEX File Upload demonstration (MP4).</a>
+</video>
+{/* flex-component-media:end */}
 
+FLEX File Upload provides a responsive file picker, list/grid layouts and circular avatars. Configure storage, validation, image processing and optional metadata editing for each field. Local, URL and camera files share the same permanent Media OS storage lifecycle.
 
-### Summary
+For database persistence, custom gallery tables and existing files, use [models, galleries and migration recipes](/docs/file-upload-models-and-migration).
 
-Styled Filament file upload with security defaults, MIME presets, upload summaries, optional metadata sidecars, image optimization hooks, scoped per-user directories, and opt-in **webcam capture** / **URL import** tabs *(v2.6.1)*.
+## Choose a field
 
-| | |
-|---|---|
-| **FlexFileUpload** | `Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexFileUpload` |
-| **FlexImageUpload** | `Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexImageUpload` (extends `FlexFileUpload`, `imagesOnly()` preset) |
-| **State type** | `string\|array\|null` — stored path(s) on disk |
-| **FieldType** | `file` → `FlexFileUpload`, `image` → `FlexImageUpload` |
-| **Extends** | `Filament\Forms\Components\FileUpload` |
+| Class | Storage / purpose |
+| --- | --- |
+| `FlexFileUpload` | Laravel disk paths; documents or your chosen formats |
+| `FlexImageUpload` | Image-oriented disk field; its recommended preset selects images |
+| `FlexSpatieMediaLibraryFileUpload` | Optional Spatie relationship; owned Media UUIDs |
 
-### Basic usage
-
-#### Avatar (image)
-
-```php
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexImageUpload;
-
-FlexImageUpload::make('avatar')
-    ->label('Profile photo')
-    ->withRecommendedDefaults()
-    ->avatar()
-    ->imageEditor()
-    ->circleCropper()
-    ->disk('public')
-    ->directory('avatars')
-    ->maxFiles(1)
-    ->optimizeImages()
-    ->maxImageWidth(512)
-    ->maxImageHeight(512);
-```
-
-#### Single document
+Imports:
 
 ```php
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexFileUpload;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexImageUpload;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\FlexSpatieMediaLibraryFileUpload;
+```
 
+## One document
+
+```php
 FlexFileUpload::make('contract')
-    ->label('Contract PDF')
+    ->label('Contract')
     ->withRecommendedDefaults()
-    ->documentsOnly()
+    ->acceptedFileTypes(['application/pdf'])
     ->disk('local')
     ->directory('contracts')
-    ->maxFiles(1)
+    ->required();
+```
+
+`withRecommendedDefaults()` configures a 5 MiB per-file limit, create-form path authorization, removal/replacement cleanup, open/download actions and focus outline. For `FlexFileUpload` it selects document formats; for `FlexImageUpload` it selects images. Override individual settings afterward.
+
+## Image gallery
+
+```php
+FlexImageUpload::make('photos')
+    ->withRecommendedDefaults()
+    ->multiple()
+    ->uploadLayout('grid')
+    ->gridColumns(4)
+    ->maxFiles(12)
+    ->reorderable();
+```
+
+Grid tiles default to 116 × 116 px, 24 px corners and a 2 px border. Images show previews; other formats show a file-type icon and filename. Actual transfer progress uses a matching percentage and rounded border. After completion, the percentage transitions to the delete action. Upload failures show a red border and retry action.
+
+## File list
+
+```php
+FlexFileUpload::make('attachments')
+    ->withRecommendedDefaults()
+    ->multiple()
+    ->uploadLayout('list')
+    ->maxFiles(5)
+    ->uploadSummary()
+    ->remainingSlotsLabel();
+```
+
+## Grid sizes and action menu
+
+```php
+FlexImageUpload::make('photos')->multiple()->uploadLayout('grid')
+    ->gridSize('sm')->gridActions('menu')->fileClickPreview();
+```
+
+Choose 116px `md` or 96px `sm` tiles. Secondary actions can stay below, animate inside on hover/focus, or appear in the ellipsis menu. Menu items follow enabled features; preview can open by clicking an image. [All grid and viewer options](/docs/file-upload-api#grid-sizes-and-actions).
+
+## Compact list
+
+```php
+FlexFileUpload::make('attachments')->multiple()->uploadLayout('compact');
+```
+
+`compactList()` is also available for the compact list presentation.
+
+## Avatar
+
+```php
+FlexImageUpload::make('avatar')
+    ->withRecommendedDefaults()
+    ->avatar()
+    ->avatarSize('md')
+    ->imageEditor()
+    ->circleCropper()
+    ->disk('public')
+    ->directory('avatars');
+```
+
+The empty avatar shows a centered image icon. File actions depend on its loading, transfer, success, failure and editing state. `avatar()` takes precedence over an explicitly configured file layout.
+
+| Avatar size | Diameter |
+| --- | --- |
+| `sm` | 96 px |
+| `md` | 128 px |
+| `lg` | 160 px |
+| Integer | 64–512 px |
+
+```php
+use Bjanczak\FilamentFlexFields\Support\FileUpload\Presentation\AvatarSize;
+
+FlexImageUpload::make('avatar')->imagesOnly()->avatar()->avatarSize(AvatarSize::Large);
+```
+
+## Image editor
+
+Enable editing for avatar, grid or list images with `imageEditor()`. The edit action
+appears only for supported images that are ready to edit. It is hidden during
+loading, transfer, pause, failure and removal, and when the field is disabled.
+
+```php
+FlexImageUpload::make('photos')
+    ->multiple()
+    ->uploadLayout('grid')
+    ->imageEditor()
+    ->imageEditorAspectRatios([null, '16:9', '4:3', '1:1'])
+    ->imageEditorViewportWidth('1920')
+    ->imageEditorViewportHeight('1080');
+```
+
+Use `circleCropper()` for a circular avatar crop. Other images support free cropping,
+configured aspect ratios, quarter-turn rotation and horizontal/vertical flipping.
+The editor includes brightness, warmth, contrast, exposure, highlights, shadows,
+fade, saturation, vibrance, clarity, sharpness and vignette. Reset restores the
+original crop and adjustments. Save shows a busy indicator while exporting.
+
+A stored image opens from its original file, even when its attachment preview uses
+a small conversion. Interactive adjustments use a smaller preview for responsiveness;
+Save renders the original resolution before applying your crop and output resizing.
+On touch screens, use the crop handles, drag the image, pinch to zoom and move the
+adjustment slider. Keyboard input also works on the slider.
+
+With `instantUpload(false)`, the edited image waits for your upload action. The
+previous server association remains until that new transfer succeeds. With automatic
+transfer, it starts immediately. Configured file metadata follows the replacement.
+Media OS creates the configured conversions from the edited bytes when the form
+saves; queued conversions show the original until the worker finishes. Spatie
+uses the conversions registered on your model and the same configured queue.
+
+Raster editing exports a still frame for animated images. It does not preserve all
+EXIF metadata. Cross-origin storage must allow the browser to fetch the authorized
+original through its CORS policy. Editor pixel and memory limits follow your Media
+OS image limits; extremely large images can be rejected before adjustment/export.
+
+## Automatic or manual transfer
+
+```php
+FlexFileUpload::make('attachments')->multiple()->instantUpload(false);
+```
+
+Selection uploads immediately by default. With `instantUpload(false)`, files wait for Upload or the enclosing form submission. Pending files are transferred before that form continues. Without an enclosing form, use Upload explicitly. URL import and camera confirmation process their files immediately.
+
+Transfer completion means the file reached temporary storage. Permanent storage and record acceptance occur in the save lifecycle. Thumbnail jobs may finish afterward.
+
+## Parallel transfers
+
+```php
+FlexFileUpload::make('attachments')->multiple()->maxParallelUploads(3);
+```
+
+This permits up to three simultaneous transfers in that field. It is independent of `maxFiles()` and worker-job concurrency.
+
+## Pause and resume
+
+```php
+FlexFileUpload::make('attachments')
+    ->multiple()->uploadLayout('grid')->pausable();
+```
+
+Lists and grids support individual pause/resume and a field-level queue control. Pausing the queue also holds newly added files. Paused files must be resumed before submitting the form. Avatar mode does not expose this pause toolbar.
+
+**Resume currently restarts a whole-file request. It does not continue from the last uploaded byte.** Use this option when request restart is acceptable; chunk/offset resumable transport is not included.
+
+## Drag to reorder
+
+```php
+FlexFileUpload::make('attachments')
+    ->multiple()->uploadLayout('list')->reorderable();
+```
+
+Both grid tiles and list rows support animated drag sorting, including existing attachments. Keyboard sorting is available on handles/focusable tiles; Escape cancels a drag. Reduced-motion preferences remove transitions. Disk fields save the ordered path array; Spatie fields integrate with native media ordering.
+
+## Presentation options
+
+```php
+FlexFileUpload::make('attachments')
+    ->variant('secondary')
+    ->dropzoneLabel('Drop your project files here')
+    ->emptyStateHint('Use the signed final documents.')
     ->showFileIcon()
     ->uploadSummary()
     ->requireReplaceConfirmation();
 ```
 
-#### Multiple files with total size guard
+Variants: `primary`, `secondary`, `flat`. The built-in description displays declared formats and limits. Use `emptyStateHint()` for rules that cannot be inferred, such as organization-specific content requirements.
+
+Custom tile size:
 
 ```php
-FlexFileUpload::make('attachments')
-    ->withRecommendedDefaults()
-    ->multiple()
-    ->maxFiles(5)
-    ->maxTotalSizeKb(10240)
-    ->remainingSlotsLabel()
-    ->uploadSummary()
-    ->disk('local')
-    ->directory('inquiries/attachments');
+FlexImageUpload::make('photos')
+    ->imagesOnly()->multiple()->uploadLayout('grid')
+    ->gridTileSize(160)->gridColumns(3);
 ```
 
-#### Metadata sidecar
+Tile sizes are 80–320 px; columns are 1–8. Tiles wrap to fit narrow containers without stretching.
 
-Stores original filename, MIME, size, and image dimensions in a sibling state path:
+## Model state
+
+A single disk field stores a relative path or null. A multiple disk field stores an ordered array of paths; use an array cast for the model attribute:
 
 ```php
-FlexFileUpload::make('scan')
-    ->withRecommendedDefaults()
-    ->storeMetadataIn('scan_meta')
-    ->disk('local')
-    ->directory('scans');
-// $data['scan_meta'] => ['original_name' => '...', 'mime' => '...', 'size' => ..., 'width' => ...]
-```
-
-#### Webcam & URL import
-
-You can extend the default upload dropzone with additional input methods. The following example adds both a camera capture tab and a remote URL import tab:
-
-```php
-FlexImageUpload::make('vehicle_photo')
-    ->label('Vehicle Photo')
-    ->withRecommendedDefaults()
-    ->imagesOnly()
-    ->allowWebcamUpload() // Enables the native device camera tab
-    ->allowUrlUpload()    // Enables the remote URL download tab
-    ->optimizeImages()
-    ->maxImageWidth(1920)
-    ->maxImageHeight(1080)
-    ->disk('public')
-    ->directory('vehicle-photos');
-```
-
-### Configuration API
-
-#### `withRecommendedDefaults()` / `applyRecommendedSecurityDefaults()`
-
-Applies recommended security and UX defaults: `createFormStrategy()`, `deleteFileOnRemove()`, `deleteReplacedFiles()`, `maxSize(5120)` (5 MB), `downloadable()`, `openable()`, and `focusOutline()`.
-
-```php
-FlexFileUpload::make('attachment')
-    ->withRecommendedDefaults();
-```
-
-#### `documentsOnly()`
-
-Sets the accepted file types to typical document formats (PDF, Word, Excel, PowerPoint, Text, etc.).
-
-```php
-FlexFileUpload::make('resume')
-    ->documentsOnly();
-```
-
-#### `imagesOnly()`
-
-Sets the accepted file types to image formats (JPEG, PNG, GIF, WebP, SVG, etc.).
-
-```php
-FlexImageUpload::make('photo')
-    ->imagesOnly();
-```
-
-#### `spreadsheetsOnly()`
-
-Sets the accepted file types to spreadsheets (CSV, XLS, XLSX).
-
-```php
-FlexFileUpload::make('report')
-    ->spreadsheetsOnly();
-```
-
-#### `allowedExtensions(array $extensions)`
-
-Restricts uploads to a custom array of file extensions.
-
-```php
-FlexFileUpload::make('scan')
-    ->allowedExtensions(['pdf', 'jpg', 'png']);
-```
-
-#### `rejectExecutableFiles(bool|Closure $condition = true)`
-
-Blocks dangerous executable extensions (such as `.php`, `.sh`, `.bat`, etc.) and raises a validation error.
-
-```php
-FlexFileUpload::make('attachment')
-    ->rejectExecutableFiles();
-```
-
-#### `scopedDirectory(string|Closure $prefix = 'uploads')`
-
-Configures dynamic per-user scoped subdirectories: `{prefix}/{user_id}/...`.
-
-```php
-FlexFileUpload::make('document')
-    ->scopedDirectory('user-files');
-```
-
-#### `allowWebcamUpload(bool|Closure $condition = true)`
-
-Adds a new "Camera" tab to the upload component, allowing users to directly capture photos using their device's native camera. It supports dynamic front/back camera toggling (`environment` vs `user` facing), torch/flash control (if supported by hardware), and gives the user a chance to review/retake the photo before injecting it into the queue.
-
-*Note: Since it uses the `navigator.mediaDevices.getUserMedia` browser API, this feature requires a secure context (HTTPS) to function correctly. It perfectly integrates with `imagesOnly()` and Filament's `optimizeImages()` configurations.*
-
-```php
-FlexImageUpload::make('inspection_photo')
-    ->label('Vehicle Damage Photo')
-    ->imagesOnly()
-    ->multiple()
-    ->maxFiles(3)
-    ->allowWebcamUpload() // Enables the camera tab
-    ->optimizeImages()
-    ->maxImageWidth(1920)
-    ->maxImageHeight(1080);
-```
-
-#### `allowUrlUpload(bool|Closure $condition = true)`
-
-Adds a new "URL" tab to the upload component, allowing users to paste a direct link to a file. The file is fetched **server-side**, validated against SSRF rules (localhost, private IPs, and metadata hostnames are rejected), staged as a temporary preview, then injected into the FilePond queue as a native `File`. Nothing is written to the field disk until form save.
-
-```php
-FlexFileUpload::make('attachment')
-    ->label('Import Asset')
-    ->withRecommendedDefaults()
-    ->allowUrlUpload() // Enables the remote URL import tab
-    ->disk('public')
-    ->directory('imported-assets');
-```
-
-> **Security:** URL import is disabled unless you call `allowUrlUpload()`. Unsafe URLs are blocked before any server fetch runs.
-
-#### `createFormStrategy(bool|Closure $condition = true)`
-
-Prevents file path tampering by deferring disk storage until form submission.
-
-```php
-FlexFileUpload::make('file')
-    ->createFormStrategy();
-```
-
-#### `storeMetadataIn(string|Closure $statePath)`
-
-Saves uploaded file metadata (original filename, MIME type, file size, image dimensions) to a separate database column or state path.
-
-```php
-FlexFileUpload::make('document')
-    ->storeMetadataIn('document_metadata');
-```
-
-#### `maxTotalSizeKb(int|Closure $kilobytes)`
-
-Sets a maximum total file size limit in kilobytes across all uploaded files (useful for multiple file uploads).
-
-```php
-FlexFileUpload::make('attachments')
-    ->multiple()
-    ->maxTotalSizeKb(10240); // 10 MB total limit
-```
-
-#### `remainingSlotsLabel(bool|Closure $condition = true)`
-
-Displays a remaining slots label (e.g. "2 slots remaining") when `maxFiles` is set.
-
-```php
-FlexFileUpload::make('gallery')
-    ->multiple()
-    ->maxFiles(5)
-    ->remainingSlotsLabel();
-```
-
-#### `minImageDimensions(int $width, int $height)`
-
-Validates that uploaded images meet minimum width and height constraints.
-
-```php
-FlexImageUpload::make('banner')
-    ->minImageDimensions(1200, 400);
-```
-
-#### `maxImageDimensions(int $width, int $height)`
-
-Validates that uploaded images do not exceed maximum width and height constraints.
-
-```php
-FlexImageUpload::make('thumbnail')
-    ->maxImageDimensions(800, 600);
-```
-
-#### `deleteFileOnRemove(bool|Closure $condition = true)`
-
-Deletes files from storage when they are removed from the form UI.
-
-```php
-FlexFileUpload::make('document')
-    ->deleteFileOnRemove();
-```
-
-#### `deleteReplacedFiles(bool|Closure $condition = true)`
-
-Deletes old files from storage when they are replaced by new uploads.
-
-```php
-FlexFileUpload::make('document')
-    ->deleteReplacedFiles();
-```
-
-#### `pruneOrphanedOnSave(bool|Closure $condition = true)`
-
-Removes old, unreferenced files from the upload directory when saving the model.
-
-> **Warning**
-> **Do not use this with a shared static `directory()`** (e.g., `->directory('gallery')`). This method deletes ALL files in the specified directory that do not belong to the current record. Using it on a shared directory will cause you to lose files from other records! You must use this method in combination with `->scopedDirectory()` or a closure that provides a unique directory per record.
-
-```php
-FlexFileUpload::make('gallery')
-    ->scopedDirectory('galleries')
-    ->pruneOrphanedOnSave();
-```
-
-#### `uploadSummary(bool|Closure $condition = true)`
-
-Displays a summary block below the file list containing count and total file size.
-
-```php
-FlexFileUpload::make('attachments')
-    ->multiple()
-    ->uploadSummary();
-```
-
-#### `emptyStateHint(string|Closure $hint)`
-
-Sets a custom hint text displayed inside the dropzone when it is empty.
-
-```php
-FlexFileUpload::make('avatar')
-    ->emptyStateHint('Drag your avatar here...');
-```
-
-#### `dropzoneLabel(string|Closure $label)`
-
-Overrides the main dropzone label text.
-
-```php
-FlexFileUpload::make('invoice')
-    ->dropzoneLabel('Upload invoice (PDF)');
-```
-
-#### `requireReplaceConfirmation(bool|Closure $condition = true)`
-
-Asks the user for confirmation before replacing an already uploaded file.
-
-```php
-FlexFileUpload::make('document')
-    ->requireReplaceConfirmation();
-```
-
-#### `compactList(bool|Closure $condition = true)`
-
-Renders a denser, more compact layout for the uploaded files list.
-
-```php
-FlexFileUpload::make('attachments')
-    ->multiple()
-    ->compactList();
-```
-
-#### `showFileIcon(bool|Closure $condition = true)`
-
-Displays a descriptive file type icon in the uploaded files list.
-
-```php
-FlexFileUpload::make('attachments')
-    ->multiple()
-    ->showFileIcon();
-```
-
-#### `variant(string|Closure $variant)`
-
-Sets the visual design variant (`primary`, `secondary`, or `flat`).
-
-```php
-FlexFileUpload::make('document')
-    ->variant('flat');
-```
-
-#### `optimizeImages(bool|Closure $condition = true)`
-
-Resizes and compresses images to optimize page weight (requires GD or Imagick).
-
-```php
-FlexImageUpload::make('photo')
-    ->optimizeImages();
-```
-
-#### `optimizeImagesToWebp(bool|Closure $condition = false)`
-
-Converts optimized image files to the WebP format.
-
-```php
-FlexImageUpload::make('photo')
-    ->optimizeImagesToWebp();
-```
-
-#### `maxImageWidth(int|Closure $width)` / `maxImageHeight(int|Closure $height)`
-
-Sets maximum image width and height boundaries for client-side resizing.
-
-```php
-FlexImageUpload::make('photo')
-    ->maxImageWidth(1920)
-    ->maxImageHeight(1080);
-```
-
-#### `stripExif(bool|Closure $condition = true)`
-
-Strips EXIF metadata from uploaded images on save.
-
-```php
-FlexImageUpload::make('photo')
-    ->stripExif();
-```
-
-### Inherited Filament `FileUpload` API
-
-`disk()`, `directory()`, `visibility()`, `multiple()`, `maxFiles()`, `minFiles()`, `maxSize()`, `acceptedFileTypes()`, `imageEditor()`, `avatar()`, `downloadable()`, `openable()`, `previewable()`, `deletable()`, standard validation — all work unchanged.
-
-### FlexField schema config
-
-| Config key | Maps to |
-|------------|---------|
-| `disk` | `disk()` |
-| `directory` | `directory()` |
-| `visibility` | `visibility()` |
-| `multiple` | `multiple()` |
-| `max_size_kb` / `max_size` | `maxSize()` |
-| `max_files` / `min_files` | `maxFiles()` / `minFiles()` |
-| `max_total_size_kb` | `maxTotalSizeKb()` |
-| `accepted_types` | `acceptedFileTypes()` |
-| `documents_only` | `documentsOnly()` |
-| `images_only` | `imagesOnly()` |
-| `variant` | `variant()` |
-| `size` | `size()` |
-| `store_metadata_in` | `storeMetadataIn()` |
-| `scoped_directory` | `scopedDirectory()` |
-| `optimize_images` | `optimizeImages()` |
-| `max_image_width` / `max_image_height` | `maxImageWidth()` / `maxImageHeight()` |
-| `allow_webcam_upload` | `allowWebcamUpload()` |
-| `allow_url_upload` | `allowUrlUpload()` |
-| `storage_driver` | `'disk'` (default) or `'spatie'` — preferred |
-| `use_spatie_media_library` | Deprecated alias of `storage_driver=spatie` |
-| `media_collection` | Spatie `collection()` |
-| `conversion` | Spatie `conversion()` |
-| `conversions_disk` | Spatie `conversionsDisk()` |
-| `responsive_images` | Spatie `responsiveImages()` |
-| `custom_properties` | Spatie `customProperties()` |
-
-### Security
-
-| Concern | Behaviour |
-|---------|-----------|
-| **Executable uploads** | `rejectExecutableFiles()` blocks dangerous extensions (`.php`, `.sh`, …). |
-| **URL import SSRF** | Server-side fetch rejects localhost, loopback, private/link-local IPs, `.local` / `.internal` hostnames, and cloud metadata endpoints before download. |
-| **Webcam capture** | Requires HTTPS (`getUserMedia` secure context). Not offered for `documentsOnly()` uploads. |
-| **Deferred disk writes** | `createFormStrategy()` (included in `withRecommendedDefaults()`) prevents path tampering until form save. |
-
-### CSS classes
-
-| Class | Meaning |
-|-------|---------|
-| `fff-flex-file-upload` | Root wrapper |
-| `fff-flex-file-upload--{primary\|secondary\|flat}` | Variant |
-| `fff-flex-file-upload--{sm\|md\|lg}` | Size |
-
-### Implementation notes
-
-- Requires Livewire temporary uploads; configure `FILESYSTEM_DISK` and disk credentials.
-- Webcam capture requires HTTPS. URL import rejects unsafe remote URLs before server fetch.
-- Playground examples under **File upload** in Flex Fields Playground (File / Camera / URL tabs).
-- **Spatie Media Library** — full walkthrough (conversions, S3, FormBuilder, create-form timing): [Media Ingress](/docs/media-capture-os). Quick start below.
-
----
-
-### Spatie Media Library (file / image fields)
-
-Use when you need Media Library UUIDs, collections, and **named conversions** (`thumb`, `medium`, …). Disk `FlexFileUpload` only stores one path (+ optional resize/optimize) — it does **not** run Spatie conversions.
-
-```bash
-composer require spatie/laravel-medialibrary filament/spatie-laravel-media-library-plugin
-```
-
-#### Model — define conversions (full Spatie API)
-
-```php
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-
-class Product extends Model implements HasMedia
+protected function casts(): array
 {
-    use InteractsWithMedia;
-
-    public function registerMediaCollections(): void
-    {
-        $this->addMediaCollection('gallery')->useDisk('s3');
-    }
-
-    public function registerMediaConversions(?Media $media = null): void
-    {
-        $this->addMediaConversion('thumb')->width(200)->height(200)->nonQueued();
-        $this->addMediaConversion('medium')->width(800)->format('webp');
-        $this->addMediaConversion('large')->fit(\Spatie\Image\Enums\Fit::Max, 2000, 2000);
-    }
+    return ['photos' => 'array'];
 }
 ```
 
-Flex Fields does not limit `registerMediaConversions()` — Spatie runs it after upload.
+Configure your model's normal fillable/save policy. Spatie fields manage a media relationship and do not require an equivalent path-array column.
 
-#### Form field
+## Continue configuring
 
-```php
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexFileUpload;
-use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\FlexSpatieMediaLibraryFileUpload;
+- [Validation, disks, filenames and cleanup](/docs/file-upload-storage-and-validation)
+- [Image conversions, avatars, URL and camera](/docs/file-upload-images-and-sources)
+- [Optional information editor and translations](/docs/file-upload-metadata)
+- [PHP events, save hooks and recovery](/docs/file-upload-events-and-recovery)
+- [Complete field configuration reference](/docs/file-upload-api)
+- [Media OS storage service](/docs/media-capture-os)
 
-// Factory sugar (returns FlexSpatieMediaLibraryFileUpload)
-FlexFileUpload::spatie('gallery')
-    ->collection('gallery')
-    ->disk('s3')
-    ->conversion('thumb')      // preview in the form UI
-    ->responsiveImages()
-    ->multiple()
-    ->reorderable()
-    ->withRecommendedDefaults();
+## Continue configuring your field
 
-// Same as:
-FlexSpatieMediaLibraryFileUpload::make('gallery')
-    ->collection('gallery')
-    ->conversion('thumb');
-```
+<CardGroup cols={2}>
+  <Card title="Storage and validation" icon="shield-check" href="/docs/file-upload-storage-and-validation">Choose accepted formats, limits, naming, disks and cleanup.</Card>
+  <Card title="Images and sources" icon="images" href="/docs/file-upload-images-and-sources">Configure conversions, default avatars, URL import and capture.</Card>
+  <Card title="Metadata editor" icon="file-pen-line" href="/docs/file-upload-metadata">Choose exactly which fields and languages your users can edit.</Card>
+  <Card title="Events and recovery" icon="workflow" href="/docs/file-upload-events-and-recovery">React to storage, acceptance, errors and interrupted operations.</Card>
+</CardGroup>
 
-#### Disk vs Spatie for the same UX sources
 
-Webcam / URL import go through the same Flex sources layer; choose driver at construction:
+### Camera controls and upload feedback
 
-```php
-// One optimized file on S3 (no Spatie thumbs)
-FlexImageUpload::make('photo')
-    ->allowWebcamUpload()
-    ->allowUrlUpload()
-    ->optimizeImages()
-    ->maxImageWidth(1920)
-    ->disk('s3')
-    ->directory('photos');
+With `->allowWebcamUpload()`, the camera opens in a dedicated view with a shutter,
+mirror mode and a composition grid. Available devices can switch cameras; torch
+appears only when the selected camera supports it. Review the photo before using
+it, or retake it. Closing the camera, hiding the page or reviewing a capture stops
+the live stream. Device permission is requested only when opening the camera.
 
-// Spatie UUID + model conversions
-FlexFileUpload::spatie('photo')
-    ->collection('gallery')
-    ->conversion('thumb')
-    ->disk('s3');
-```
+The capture frame is 4:5 on phones and 16:9 on desktop. The saved photo uses the
+same centered crop as the preview, retaining pixel density within your configured
+Media OS limits. The sensor's native photo is used when supported; otherwise the
+current video frame is captured. Mirror mode applies to the saved photo too.
 
-#### FormBuilder
+Controls appear only when the selected camera and browser expose support:
 
-```php
-'config' => [
-    'storage_driver' => 'spatie',
-    'media_collection' => 'gallery',
-    'conversion' => 'thumb',
-    'responsive_images' => true,
-    'disk' => 's3',
-],
-```
+- Zoom presets, a zoom slider and two-finger zoom.
+- Torch for continuous illumination, separately from photo flash modes.
+- Exposure modes, compensation, exposure time and ISO.
+- White balance modes and color temperature.
+- Focus modes and focus distance.
+- Hardware brightness, contrast, saturation, sharpness, frame rate, pan/tilt and
+  background blur where available.
+- Native photo resolution, flash and red-eye reduction where supported.
 
-See [Media Ingress](/docs/media-capture-os) for tenant disks, AV, quarantine, create-form Spatie timing, and Rich Editor Spatie attachments.
+Switching cameras refreshes the available settings. A rejected setting shows an
+error while keeping the live preview usable. There is no standard browser night-mode
+switch; available exposure and ISO controls can be used instead. Browser support
+varies, including on iOS.
 
----
+Camera files obey your byte, pixel and working-memory limits. If a default sensor
+photo exceeds the pixel limit with flash off, capture can use the admitted video
+frame. Explicit oversized resolution or flash requests show an error rather than
+quietly changing those choices. A sensor photo needing no crop or mirror retains
+its original encoded bytes; processed JPEG/WebP uses maximum encoder quality.
 
-### Playground
+Native Filament submit buttons show the upload message and remain disabled while
+any field is transferring files. Customize the message with
+`->uploadingMessage('Uploading photos…')`. Manual queues upload through the shared
+submission barrier; paused files must be resumed first. Background conversions are
+separate from transfer and do not hold the submit button after files are uploaded.
+A custom HTML button needs its own loading presentation.
 
-Slug: **`file-upload`**
+The editor keeps original pixel dimensions unless cropping or a configured resize
+changes them. Interactive adjustment uses a small preview; full-resolution output
+is generated on Save. JPEG/WebP use maximum browser encoder quality and are still
+reencoded. PNG encoding preserves raster pixels; canvas editing does not preserve
+every EXIF or color-profile attribute. Large images remain subject to configured
+Media OS pixel and working-memory limits.
 
-| Demo tab | Shows |
-|----------|-------|
-| File | Documents, summaries, metadata sidecar |
-| Camera | Webcam capture (HTTPS) |
-| URL | Remote import with SSRF protection |
 
-`/admin/flex-fields-playground/file-upload` — see [Playground](/docs/index#playground).
+## Compact picker header and file clicks
 
----
-
-### Related components
-
-| Component | When to use instead |
-|-----------|---------------------|
-| [VideoField](/docs/videofield) | Video-specific upload and preview |
-| [AudioField](/docs/audiofield) | Audio recording and playback |
-| [SignatureField](/docs/signaturefield) | Drawn signature SVG, not file upload |
-| [FlexImageUpload](/docs/flexfileupload-and-fleximageupload) | Same component with `imagesOnly()` preset |
-
----
+Use `compactHeader()` with either `uploadLayout('list')` or `uploadLayout('grid')` to hide the large file artwork while keeping requirements and Select files. `maxFiles()` also disables adding once a multiple field reaches its active slot limit. `fileClickAction()` runs a trusted PHP callback when a completed file is clicked; `fileClickUrl()` resolves a custom destination. See [configuration and complete examples](/docs/file-upload-api#click-an-uploaded-file).

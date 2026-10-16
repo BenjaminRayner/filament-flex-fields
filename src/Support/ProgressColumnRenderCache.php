@@ -4,28 +4,30 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support;
 
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
+use Bjanczak\FilamentFlexFields\Support\Runtime\ScopedRenderCache;
 use Closure;
 
+/** Compatibility API over the bounded request-owned render cache. */
 final class ProgressColumnRenderCache
 {
-    /** @var array<string, string> */
-    private static array $cache = [];
-
+    /** @param Closure(): string $callback */
     public static function remember(string $key, Closure $callback): string
     {
-        return self::$cache[$key] ??= $callback();
+        return RequestState::resolve(ScopedRenderCache::class)->remember(self::class, $key, $callback);
     }
 
     public static function flush(): void
     {
-        self::$cache = [];
+        RequestState::resolve(ScopedRenderCache::class)->flush(self::class);
     }
 
-    /**
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     public static function entries(): array
     {
-        return self::$cache;
+        /** @var array<string, string> $entries */
+        $entries = RequestState::resolve(ScopedRenderCache::class)->entries(self::class);
+
+        return $entries;
     }
 }

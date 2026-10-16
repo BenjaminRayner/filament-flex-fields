@@ -1,0 +1,132 @@
+---
+title: "JavaScript SDK reference"
+description: "Every public ABI 1 export, resource-scope option, subscription option and custom-surface lifecycle method."
+---
+
+Import from `@bjanczak/flex-fields/sdk/v1` using the public esbuild adapter. The
+installed FLEX runtime provides the shared implementation. These APIs own resources;
+they do not create application authorization or save a record automatically.
+
+## Public exports
+
+| Export | Usage |
+| --- | --- |
+| `sdkABI` | Supported protocol number, currently `1`. |
+| `createResourceScope(options)` | Per-instance effects, cancellation and cleanup. |
+| `createOwnedSubscriptions(options)` | Bounded named subscription channels. |
+| `createLifecycleEvents(options)` | Validated notification/guard declarations. |
+| `isMountedFactoryReady(element)` | Check completed mounted-factory initialization. |
+| `isAssetElementActive(element, options)` | Check active tab/modal/wizard/section ownership, not below-fold visibility. |
+| `waitForAssetActivation(element, { signal })` | Wait until active; disconnected or aborted owners resolve `false`. |
+| `createAssetSurface(root, options)` | Prepare an independently owned custom dialog or drawer. |
+| `createAppearanceNamespace(namespace)` | Generate isolated CSS/font/motion names and owner-derived SVG IDs. |
+
+## createResourceScope()
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `signal` | None | Abort this signal to dispose the entire scope. |
+| `limit` | `4096` | Simultaneously retained effect budget, integer 1–65536. |
+| `onCleanupError` | No-op | Observe failed cleanup without blocking later cleanups. |
+| `onEffectError` | `onCleanupError` | Observe asynchronous/synchronous owned-effect failures. |
+
+```javascript
+import { createResourceScope } from '@bjanczak/flex-fields/sdk/v1';
+
+const effects = createResourceScope({ limit: 100 });
+const stop = effects.listen(button, 'click', handleClick);
+const cancel = effects.timeout(refreshPreview, 200);
+
+// Release one effect, or everything this instance owns.
+stop();
+cancel();
+effects.dispose();
+```
+
+Supply your actual `button`, `handleClick` and `refreshPreview`. Dispose in your
+factory's `destroy()`; partial initialization failure must dispose its scope too.
+
+| Scope API | Purpose |
+| --- | --- |
+| `defer(cleanup)` | Register an arbitrary cleanup; returns an idempotent release function. |
+| `listen(target, event, callback, options)` | Add and own an event listener. |
+| `timeout(callback, milliseconds)` | Own a one-shot timer; bookkeeping clears when it completes. |
+| `interval(callback, milliseconds)` | Own a repeating timer. |
+| `frame(callback)` | Own one animation frame. |
+| `trackObserver(observer)` | Disconnect a supplied observer when released. |
+| `trackWorker(worker)` | Terminate a supplied worker when released. |
+| `trackStream(stream)` | Stop supplied stream tracks when released. |
+| `objectUrl(blob)` | Return `{ url, revoke }`; revoke on release/disposal. |
+| `dispose()` | Release every owned effect; repeated disposal is safe. |
+| `disposed` / `signal` | Check lifetime or pass cancellation to asynchronous work. |
+| `snapshot()` | Read resource count and disposed state without exposing values. |
+
+A scope owns the supplied resources; do not track a shared worker here if other
+instances still need it. Disposal cannot interrupt already running code. Check the
+owner before publishing asynchronous results.
+
+## createOwnedSubscriptions()
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `names` | Required | Declared unique channel names. |
+| `limit` | `4096` | Maximum retained subscription groups. |
+| `reportFailure` | No-op | Observe callback failures with channel/context information. |
+
+`subscribe({ channel: callback })` returns a release function.
+`notify(channel, args = [], context = {})` sends notifications;
+`protectedBy(channel, args = [], context = {})` checks vetoes.
+Use `createLifecycleEvents()` for the documented public guard convention where
+`true` permits and `false` prevents your operation. `dispose()` removes all groups;
+`snapshot()` reports retained subscription information.
+
+## createLifecycleEvents()
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `events` | Required | Name → `{ kind, validate }` declarations. |
+| `signal` | None | Lifetime of the whole event owner. |
+| `limit` | `4096` | Maximum retained subscription registrations. |
+| `onError` | No-op | Receive bounded `{ name, reason }` diagnostics. |
+
+Each declaration uses `kind: 'notification'` or `'guard'`, and `validate(payload)`
+must return a synchronous boolean. `subscribe(name, callback, { signal })` owns one
+subscription. `notify(name, detail)` dispatches a notification;
+`allow(name, detail)` checks guards. Guards must return strict synchronous booleans.
+Invalid payloads, errors, asynchronous guards and recursive dispatch do not permit
+an operation. Payload snapshots are shallow; validate and preserve nested data.
+See [events](/docs/extensions/events) for a complete example.
+
+## createAssetSurface()
+
+| Option | Meaning |
+| --- | --- |
+| `signal` | Optional caller lifetime; abort to dispose the surface. |
+| `parent` | Optional public parent handle for nested/suspended surfaces. |
+
+```javascript
+import { createAssetSurface } from '@bjanczak/flex-fields/sdk/v1';
+
+const surface = await createAssetSurface(dialogElement);
+const ready = await surface.activate();
+if (ready && surface.ready) dialogElement.hidden = false;
+
+// When the surface closes permanently:
+surface.dispose();
+```
+
+`activate()` prepares/resumes; `suspend()` retains parent assets; `close()` releases
+this surface and its children but keeps the handle reusable; `dispose()` permanently
+releases the registration. Read `state` and `ready` without assuming a previous
+resolved activation is still current.
+
+The fuller [custom-surface guide](/docs/extensions/surfaces) shows hide/reopen,
+suspension, nested surfaces, interruption and readiness failures. The API owns
+assets; you own the dialog's presentation, focus behavior and accessible controls.
+
+## Appearance helpers
+
+Use `createAppearanceNamespace('acme-summary')`, then `token(name)`, `font(name)`,
+`keyframe(name)` or `svgId(instance, name)`. PHP's `AppearanceNamespace` generates
+the same names from identical UTF-8 inputs. The helper does not inject a stylesheet
+or acquire a font; declare and publish those resources through your package.

@@ -7,7 +7,7 @@
     $extraInputAttributeBag = $getExtraInputAttributeBag();
     $canSelectPlaceholder = $canSelectPlaceholder();
     $isAutofocused = $isAutofocused();
-    $isDisabled = $isDisabled();
+    $isDisabled = $field->isSelectControlDisabled();
     $isMultiple = $isMultiple();
     $isReorderable = $isReorderable();
     $isSearchable = $isSearchable();
@@ -20,7 +20,7 @@
     $isConcealed = $isConcealed();
     $usesRichOptionHtml = $usesRichOptionHtml();
     $optionLayout = $getOptionLayout();
-    $isHtmlAllowed = $isHtmlAllowed || $usesRichOptionHtml;
+    $isHtmlAllowed = $isHtmlAllowed() || $usesRichOptionHtml;
     $isNative = (! ($isSearchable || $isMultiple || $isHtmlAllowed) && $isNative());
     $isPrefixInline = $isPrefixInline();
     $isSuffixInline = $isSuffixInline();
@@ -51,6 +51,10 @@
     $initialTriggerBadges = $field->getInitialTriggerBadges();
     $isInitialTriggerPlaceholder = blank($state);
     $isUserSelectField = method_exists($field, 'renderUserOption');
+    $initialUserSelectDisplay = $isUserSelectField && $isMultiple ? $field->getInitialUserSelectDisplay() : null;
+    $initialMultipleTriggerHtml = $initialUserSelectDisplay['triggerHtml'] ?? null;
+    $userSelectTagsHtml = $initialUserSelectDisplay['tagsHtml'] ?? null;
+    $initialSelectedUserEntriesForJs = $isUserSelectField ? $field->getInitialSelectedUserEntriesForJs() : [];
     $chipRemoveIconHtml = view('filament-flex-fields::forms.components.partials.tag-pill-remove-icon')->render();
     $tagRemoveIconHtml = $isUserSelectField
         ? $chipRemoveIconHtml
@@ -79,25 +83,14 @@
     data-fff-lazy-alpine-mount="select-field"
 >
     @if (! $isNative)
-        @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'select-field',
+                @include('filament-flex-fields::partials.load-stylesheet', ['component' => $field->getAssetComponent(),
         'livewireKey' => $getLivewireKey(),
     ])
 
-        @once
-            <link
-                rel="modulepreload"
-                href="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('select-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-                as="script"
-                crossorigin
-            />
-        @endonce
 
-        @if ($isUserSelectField)
-            @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'user-select',
-        'livewireKey' => $getLivewireKey(),
-    ])
-        @endif
+
     @endif
+    {{ $field->getSelectCatalogMarkup() }}
     <x-filament::input.wrapper
         :disabled="$isDisabled"
         :inline-prefix="$isPrefixInline"

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor;
 
-use Filament\Forms\Components\RichEditor\ToolbarButtonGroup;
 use Illuminate\Support\Js;
+use Illuminate\View\ComponentAttributeBag;
 
-class FlexToolbarButtonGroup extends ToolbarButtonGroup
+class FlexToolbarButtonGroup extends LocalizedToolbarButtonGroup
 {
     public function toEmbeddedHtml(): string
     {
@@ -48,7 +48,10 @@ class FlexToolbarButtonGroup extends ToolbarButtonGroup
         $xEffect = e($triggerEffectJs);
         $xInit = e($this->buildMenuPositionInit());
         $wrapperClass = 'fi-fo-rich-editor-dropdown-tool'.($isTextual ? ' fi-fo-rich-editor-dropdown-tool-textual' : '');
-        $chevronSvg = '<svg class="fi-fo-rich-editor-dropdown-tool-chevron" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        $chevronSvg = \Filament\Support\generate_icon_html(
+            'hugeicons-arrow-down-01',
+            attributes: new ComponentAttributeBag(['class' => 'fi-fo-rich-editor-dropdown-tool-chevron']),
+        )?->toHtml() ?? '';
 
         ob_start(); ?>
 

@@ -9,59 +9,81 @@ use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\TranslatableTab;
 use Bjanczak\FilamentFlexFields\Support\Translatable\TranslatableLocaleDirection;
 use Bjanczak\FilamentFlexFields\Support\Translatable\TranslatableTabState;
+use Bjanczak\FilamentFlexFields\Support\Translations;
+use Closure;
 use Filament\Forms\Components\Field;
 
 trait ProvidesTranslatablePresets
 {
+    protected ?TranslatableDirectionScope $translatableDirectionScope = null;
+
+    protected bool $translatableEmptyBadge = false;
+
+    protected ?string $translatableEmptyBadgeLabel = null;
+
+    protected bool|Closure $translatableBorderedPanels = false;
+
     public function directionByLocale(TranslatableDirectionScope $scope = TranslatableDirectionScope::Auto): static
     {
-        return $this->modifyFieldsUsing(function (Field $field, string $locale) use ($scope): void {
-            TranslatableLocaleDirection::applyToField($field, $locale, $scope);
-        });
+        $this->translatableDirectionScope = $scope;
+        $this->clearCachedChildSchemas();
+
+        return $this;
     }
 
     public function emptyBadgeWhenAllFieldsAreEmpty(?string $emptyLabel = null): static
     {
-        $emptyLabel ??= (string) config('filament-flex-fields.translatable.empty_badge_label', 'empty');
+        $this->translatableEmptyBadge = true;
+        $this->translatableEmptyBadgeLabel = $emptyLabel;
+        // Children inherit this unless a template declares its own binding policy.
+        $this->live(debounce: 250);
+        $this->clearCachedChildSchemas();
 
-        return $this->modifyTabsUsing(function (TranslatableTab $tab) use ($emptyLabel): void {
-            $tab
-                ->badgeColor(function (TranslatableTab $component, callable $get): ?string {
-                    return TranslatableTabState::tabHasAnyFieldValue($component, $get) ? null : 'warning';
-                })
-                ->badge(function (TranslatableTab $component, callable $get) use ($emptyLabel): ?string {
-                    return TranslatableTabState::tabHasAnyFieldValue($component, $get) ? null : $emptyLabel;
-                });
-        });
+        return $this;
     }
 
     public function activeTabWithValue(): static
     {
-        return $this->activeTab(function (callable $get, TranslatableFields $component): int {
-            return TranslatableTabState::resolveActiveTabWithValue($component, $get);
-        });
+        return $this->activeTab(fn (callable $get, TranslatableFields $component): int => TranslatableTabState::resolveActiveTabWithValue($component, $get));
     }
 
-    /**
-     * Recommended defaults for production forms.
-     */
     public function withRecommendedDefaults(?string $emptyBadgeLabel = null): static
     {
-        return $this
-            ->directionByLocale()
-            ->emptyBadgeWhenAllFieldsAreEmpty($emptyBadgeLabel)
-            ->activeTabWithValue();
+        return $this->directionByLocale()->emptyBadgeWhenAllFieldsAreEmpty($emptyBadgeLabel)->activeTabWithValue();
     }
 
-    /**
-     * Wrap tab panels in a bordered card (off by default — fields render flush).
-     */
-    public function borderedPanels(bool $condition = true): static
+    public function borderedPanels(bool|Closure $condition = true): static
     {
-        if ($condition) {
-            $this->extraAttributes(['class' => 'fff-translatable-fields--bordered'], merge: true);
-        }
+        $this->translatableBorderedPanels = $condition;
 
         return $this;
+    }
+
+    public function hasBorderedPanels(): bool
+    {
+        return (bool) $this->evaluate($this->translatableBorderedPanels);
+    }
+
+    protected function configureLocaleTab(TranslatableTab $tab): void
+    {
+        if (! $this->translatableEmptyBadge) {
+            return;
+        }
+        $tab->badge(fn (TranslatableTab $component, callable $get): ?string => TranslatableTabState::tabHasAnyFieldValue($component, $get) ? null : $this->resolveEmptyBadgeLabel())
+            ->badgeColor(fn (TranslatableTab $component, callable $get): ?string => TranslatableTabState::tabHasAnyFieldValue($component, $get) ? null : 'warning');
+    }
+
+    protected function resolveEmptyBadgeLabel(): string
+    {
+        $configured = $this->translatableEmptyBadgeLabel ?? config('filament-flex-fields.translatable.empty_badge_label');
+
+        return is_string($configured) ? $configured : Translations::get('filament-flex-fields::default.translatable.empty');
+    }
+
+    protected function configureLocaleField(Field $field, string $locale): void
+    {
+        if ($this->translatableDirectionScope !== null) {
+            TranslatableLocaleDirection::applyToField($field, $locale, $this->translatableDirectionScope);
+        }
     }
 }

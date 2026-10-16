@@ -103,7 +103,7 @@ it('maps duration and time range field types to dedicated components', function 
     expect($duration)->toBeInstanceOf(FlexDurationField::class)
         ->and($duration->shouldShowSeconds())->toBeTrue()
         ->and($timeRange)->toBeInstanceOf(FlexTimeRangeField::class)
-        ->and($timeRange->getAlpineConfiguration()['minValue'])->toBe('08:00');
+        ->and($timeRange->getAlpineConfiguration()['minValue'])->toBe('08:00:00');
 });
 
 it('maps month and year field types to picker components', function () {

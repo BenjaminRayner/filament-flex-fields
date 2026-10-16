@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\ProgressCircle;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
 use Bjanczak\FilamentFlexFields\Support\Playground\ProgressCirclePlayground;
@@ -108,7 +109,8 @@ it('renders lazy stylesheet include in progress circle blade', function () {
         ->toContain('fff-progress-circle__fill')
         ->toContain('fff-progress-circle__below-label')
         ->toContain('trackGradientId')
-        ->toContain('fff-progress-circle__paused-ghost');
+        ->toContain('fff-progress-circle__paused-icon')
+        ->not->toContain('fff-progress-circle__paused-ghost');
 });
 
 it('generates unique svg gradient ids for anonymous progress circles', function () {
@@ -210,3 +212,70 @@ it('rejects unsupported content layouts', function () {
         ->contentLayout('below')
         ->getContentLayout();
 })->throws(InvalidArgumentException::class);
+
+it('rejects non finite progress values and gap angles', function (float $value): void {
+    expect(fn () => ProgressCircle::make()->value($value)->getProgressRatio())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => ProgressCircle::make()->max($value)->getMax())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => ProgressCircle::make()->gapAngle($value)->getGapAngle())->toThrow(InvalidArgumentException::class);
+})->with([INF, -INF, NAN]);
+
+it('clamps endpoints and keeps long centered descriptions outside the ring', function (): void {
+    expect(ProgressCircle::make()->value(-50)->getProgressRatio())->toBe(0.0)
+        ->and(ProgressCircle::make()->value(150)->getProgressRatio())->toBe(1.0)
+        ->and(ProgressCircle::make()->label('A longer description that needs a readable line')->hasBelowLabel())->toBeTrue();
+});
+
+it('converts the legacy gradient API into actual SVG stops', function (): void {
+    expect(ProgressCircle::make()->gradientStroke('linear-gradient(90deg, #6366f1, #ec4899)')->getGradientStops())->toBe(['#6366f1', '#ec4899'])
+        ->and(fn () => ProgressCircle::make()->gradientStroke('url(https://invalid.test)')->getGradientStops())->toThrow(InvalidArgumentException::class);
+});
+
+it('rejects CSS declaration injection in configured progress paint', function (): void {
+    expect(fn () => ProgressCircle::make()->color('rgb(1 2 3);position:fixed')->getColor())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => ProgressCircle::make()->gradientFrom('rgb(1 2 3);display:none')->getGradientFrom())->toThrow(InvalidArgumentException::class);
+});
+
+it('renders channel shares with deterministic rounded sector geometry', function (): void {
+    $circle = ProgressCircle::make()->variant('breakdown')->segments([
+        ['label' => 'Search', 'value' => 11400, 'color' => '#a3e635'],
+        ['label' => 'Social', 'value' => 7620],
+        ['label' => 'Email', 'value' => 3180],
+        ['label' => 'Affiliates', 'value' => 2680],
+    ]);
+    $data = $circle->getPresentation();
+    expect($data['breakdown']->total)->toBe(24880.0)
+        ->and($data['breakdown']->activeIndex)->toBe(0)
+        ->and($data['value'])->toBe('46%')
+        ->and($data['label'])->toBe('Search')
+        ->and($data['breakdown']->segments)->toHaveCount(4);
+    foreach ($data['breakdown']->segments as $segment) {
+        expect($segment['path'])->toStartWith('M ')->toEndWith(' Z')->not->toContain('NAN', 'INF');
+    }
+    expect($circle->activeSegment(1)->getPresentation()['label'])->toBe('Social');
+});
+
+it('handles an empty channel set and zero or tiny channel values without invalid paths', function (): void {
+    $empty = ProgressCircle::make()->variant('breakdown')->getPresentation();
+    expect($empty['value'])->toBe('0%')->and($empty['breakdown']->activeIndex)->toBeNull();
+    $data = ProgressCircle::make()->variant('breakdown')->segments([
+        ['label' => 'Zero', 'value' => 0], ['label' => 'Tiny', 'value' => 0.00001], ['label' => 'Main', 'value' => 1000],
+    ])->getPresentation();
+    expect($data['breakdown']->segments[0]['path'])->toBe('')
+        ->and($data['breakdown']->segments[1]['path'])->not->toContain('NAN', 'INF');
+});
+
+it('rejects malformed channel data, invalid index and unsafe colors', function (): void {
+    expect(fn () => ProgressCircle::make()->variant('breakdown')->segments([['label' => 'Bad', 'value' => -1]])->getPresentation())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => ProgressCircle::make()->variant('breakdown')->segments([['label' => 'Bad', 'value' => INF]])->getPresentation())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => ProgressCircle::make()->variant('breakdown')->segments([['label' => 'Bad', 'value' => 1, 'color' => 'rgb(1 2 3);display:none']])->getPresentation())->toThrow(InvalidArgumentException::class)
+        ->and(fn () => ProgressCircle::make()->variant('breakdown')->activeSegment(1)->getPresentation())->toThrow(InvalidArgumentException::class);
+});
+
+it('supports validated tiny sizes and keeps their labels outside the ring', function (): void {
+    $circle = ProgressCircle::make()->size(fn () => 'xs')->label('Done')->showValue(fn () => false);
+    expect($circle->getSize())->toBe('xs')
+        ->and($circle->hasBelowLabel())->toBeTrue()
+        ->and($circle->getPresentation()['showValue'])->toBeFalse()
+        ->and(ProgressCircle::make()->size(ControlSize::Sm)->getSize())->toBe('sm')
+        ->and(fn () => ProgressCircle::make()->size('invalid')->getSize())->toThrow(InvalidArgumentException::class);
+});

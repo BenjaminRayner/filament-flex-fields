@@ -69,3 +69,8 @@ it('returns sequential item indexes based on max', function () {
 
     expect($field->getItemIndexes())->toBe([1, 2, 3, 4]);
 });
+
+it('rejects excessive rating item counts in fixed and dynamic configuration', function (): void {
+    expect(fn () => RatingField::make('score')->max(101))->toThrow(InvalidArgumentException::class)
+        ->and(fn () => RatingField::make('score')->max(fn (): int => 101)->getMax())->toThrow(InvalidArgumentException::class);
+});

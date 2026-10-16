@@ -34,7 +34,7 @@
     max-width: none !important;
 }
 
-.fff-date-time-field .fff-flex-text-input__shell {
+.fff-date-time-field .fff-date-time-field__shell {
     display: inline-flex;
     align-items: center;
     width: auto;
@@ -44,7 +44,7 @@
     vertical-align: top;
 }
 
-.fff-date-time-field--date:has(.fff-date-time-field__suffix) .fff-flex-text-input__shell {
+.fff-date-time-field--date:has(.fff-date-time-field__suffix) .fff-date-time-field__shell {
     width: 16rem;
     min-width: 16rem;
 }
@@ -53,7 +53,7 @@
     --fff-date-time-range-shell-width: 22rem;
 }
 
-.fff-date-time-field--dateRange:has(.fff-date-time-field__suffix) .fff-flex-text-input__shell {
+.fff-date-time-field--dateRange:has(.fff-date-time-field__suffix) .fff-date-time-field__shell {
     width: var(--fff-date-time-range-shell-width);
     min-width: var(--fff-date-time-range-shell-width);
 }
@@ -62,7 +62,7 @@
     --fff-date-time-datetime-shell-width: 24rem;
 }
 
-.fff-date-time-field--dateTime:has(.fff-date-time-field__suffix) .fff-flex-text-input__shell {
+.fff-date-time-field--dateTime:has(.fff-date-time-field__suffix) .fff-date-time-field__shell {
     width: var(--fff-date-time-datetime-shell-width);
     min-width: var(--fff-date-time-datetime-shell-width);
 }
@@ -71,12 +71,12 @@
     --fff-date-time-datetime-shell-width: 25rem;
 }
 
-.fff-date-time-field--month:has(.fff-date-time-field__suffix) .fff-flex-text-input__shell {
+.fff-date-time-field--month:has(.fff-date-time-field__suffix) .fff-date-time-field__shell {
     width: 11rem;
     min-width: 11rem;
 }
 
-.fff-date-time-field--month.fff-date-time-field--textual-month:has(.fff-date-time-field__suffix) .fff-flex-text-input__shell {
+.fff-date-time-field--month.fff-date-time-field--textual-month:has(.fff-date-time-field__suffix) .fff-date-time-field__shell {
     width: fit-content;
     min-width: calc(
         var(--fff-date-time-month-ch, 9) * 1ch
@@ -88,7 +88,7 @@
     max-width: 100%;
 }
 
-.fff-date-time-field--month.fff-date-time-field--textual-month:has([data-segment-part='year']):has(.fff-date-time-field__suffix) .fff-flex-text-input__shell {
+.fff-date-time-field--month.fff-date-time-field--textual-month:has([data-segment-part='year']):has(.fff-date-time-field__suffix) .fff-date-time-field__shell {
     min-width: calc(
         var(--fff-date-time-month-ch, 9) * 1ch
         + 2.75rem
@@ -109,20 +109,20 @@
     overflow: visible;
 }
 
-.fff-date-time-field--date.fff-date-time-field--textual-month-long:has(.fff-date-time-field__suffix) .fff-flex-text-input__shell,
-.fff-date-time-field--dateTime.fff-date-time-field--textual-month-long:has(.fff-date-time-field__suffix) .fff-flex-text-input__shell {
+.fff-date-time-field--date.fff-date-time-field--textual-month-long:has(.fff-date-time-field__suffix) .fff-date-time-field__shell,
+.fff-date-time-field--dateTime.fff-date-time-field--textual-month-long:has(.fff-date-time-field__suffix) .fff-date-time-field__shell {
     width: fit-content;
     min-width: 16rem;
     max-width: 100%;
 }
 
-.fff-date-time-field--date.fff-date-time-field--textual-month-short:has(.fff-date-time-field__suffix) .fff-flex-text-input__shell {
+.fff-date-time-field--date.fff-date-time-field--textual-month-short:has(.fff-date-time-field__suffix) .fff-date-time-field__shell {
     width: auto;
     min-width: 14rem;
     max-width: 100%;
 }
 
-.fff-date-time-field--year:has(.fff-date-time-field__suffix) .fff-flex-text-input__shell {
+.fff-date-time-field--year:has(.fff-date-time-field__suffix) .fff-date-time-field__shell {
     width: 9rem;
     min-width: 9rem;
 }
@@ -133,7 +133,7 @@
     width: 100%;
     min-width: 0;
     gap: 0;
-    padding: var(--fff-flex-text-input-p);
+    padding: 0;
     font-size: var(--fff-flex-text-input-text-size);
     color: var(--fff-flex-text-input-text, rgb(24 24 27));
 }

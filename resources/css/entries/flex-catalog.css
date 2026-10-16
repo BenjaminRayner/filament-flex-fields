@@ -1,0 +1,8 @@
+@import "../utilities-baseline.css";
+@import "../base.css";
+
+@source "../../views/catalog/**/*.blade.php";
+@source "../../views/pages/flex-fields-playground-index.blade.php";
+@source "../../views/pages/flex-catalog-plugin.blade.php";
+
+@import "../catalog/catalog.css";

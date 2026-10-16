@@ -1,0 +1,8 @@
+.fff-{{PREFIX}}-value {
+    display: inline-block;
+    max-inline-size: 100%;
+    overflow-wrap: anywhere;
+    color: var(--fff-ext-{{PREFIX}}--token-color, inherit);
+    border-radius: var(--fff-ext-{{PREFIX}}--token-radius, var(--fff-global-radius, .75rem));
+}
+.fff-{{PREFIX}}-field { min-inline-size: 0; }
