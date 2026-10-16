@@ -7,7 +7,7 @@
                 'fff-select-item-card-ssr__value',
                 'is-placeholder' => blank($state),
             ])>{{ $itemCardInitialTriggerLabel }}</span>
-            <span class="fff-select-item-card-ssr__chevron" aria-hidden="true"></span>
+            <span class="fff-select-item-card-ssr__chevron" aria-hidden="true">{!! $chevronIconHtml !!}</span>
         </div>
     @endif
 
@@ -90,6 +90,7 @@
                         @endif
                     </span>
                 @endif
+                <span class="fff-select-trigger-chevron" aria-hidden="true">{!! $chevronIconHtml !!}</span>
             </span>
 
             @if ($field->isClearable() && filled($state) && ! $isMultiple && ! $isDisabled)

@@ -6,7 +6,7 @@
                 <div class="fff-flex-text-input fff-flex-text-input--sm fff-flex-text-input--primary fff-rounding-xl">
                     <x-filament-flex-fields::text-input.shell :prefix-icon="\Bjanczak\FilamentFlexFields\Support\FlexIcon::Clock" :actions-framed="false">
                         <button type="button" class="fff-dt-clock__trigger" data-clock-trigger aria-haspopup="listbox" aria-expanded="false" aria-label="{{ $configuration['labels'][$label] }}"></button>
-                        <x-slot:actions><span class="fff-flex-text-input__action-item"><span class="fff-flex-text-input__action-btn" aria-hidden="true"><x-filament::icon :icon="\Bjanczak\FilamentFlexFields\Support\FlexIcon::ChevronDown" class="fff-flex-text-input__action-icon" /></span></span></x-slot:actions>
+                        <x-slot:actions><span class="fff-flex-text-input__action-item"><span class="fff-flex-text-input__action-btn" aria-hidden="true"><x-filament::icon :icon="\Bjanczak\FilamentFlexFields\Support\FlexIcon::CircleChevronDown" stroke-width="2" class="fff-flex-text-input__action-icon" /></span></span></x-slot:actions>
                     </x-filament-flex-fields::text-input.shell>
                 </div>
                 @if ($configuration['timeGranularity'] === 'second')

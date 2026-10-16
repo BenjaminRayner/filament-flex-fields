@@ -91,13 +91,7 @@ export function createConsumerGraph(options = {}) {
             ?? null
     }
 
-    const resolveConsumerInstanceId = (el) => {
-        if (!el) {
-            return null
-        }
-
-        const base = readConsumerId(el) ?? readConsumerComponent(el)
-
+    const resolveElementIdentity = (el, base) => {
         if (!base) {
             return null
         }
@@ -113,6 +107,9 @@ export function createConsumerGraph(options = {}) {
         }
         return identity.id
     }
+
+    const resolveConsumerInstanceId = (el) => el
+        ? resolveElementIdentity(el, readConsumerId(el) ?? readConsumerComponent(el)) : null
 
     const acquireResources = (instanceId, componentId, requirements) => {
         if (!instanceId || !componentId) return
@@ -182,7 +179,7 @@ export function createConsumerGraph(options = {}) {
             return null
         }
 
-        const instanceId = resolveConsumerInstanceId(el)
+        const instanceId = resolveElementIdentity(el, readConsumerId(el) ?? componentId)
 
         if (!instanceId) {
             return null
@@ -231,10 +228,12 @@ export function createConsumerGraph(options = {}) {
         // their ancestor index, including markers whose consumer attribute vanished.
         const scoped = root.nodeType === 1 ? owners.within(root) : owners.ids()
 
-        const elements = [
-            ...(root.matches?.('[data-fff-asset-consumer]') ? [root] : []),
-            ...root.querySelectorAll('[data-fff-asset-consumer]'),
-        ]
+        const elements = root.querySelectorAll('[data-fff-asset-consumer]')
+
+        if (root.matches?.('[data-fff-asset-consumer]') && isConsumerActive(root)) {
+            const instanceId = registerElement(root)
+            if (instanceId) connected.add(instanceId)
+        }
 
         for (const el of elements) {
             if (!isConsumerActive(el)) {

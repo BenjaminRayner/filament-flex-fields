@@ -3,3 +3,11 @@
 .fi-fo-field-wrp:has([data-validation-error]) .fff-address-autocomplete .fff-flex-text-input__shell {
     border-color: var(--fff-field-error-border, #dc2626);
 }
+
+/* Match the Select affix: a plain icon, .5rem from the logical end in every size. */
+.fff-address-autocomplete .fff-location-select .fff-flex-text-input__row { padding-inline-end: .5rem; }
+.fff-address-autocomplete .fff-location-select__clear { flex-basis: var(--fff-flex-text-input-icon-size); color: #a1a1aa; }
+.fff-address-autocomplete .fff-location-select__clear > svg { width: var(--fff-flex-text-input-icon-size) !important; height: var(--fff-flex-text-input-icon-size) !important; }
+.fff-address-autocomplete .fff-location-select__clear:hover { color: var(--fff-input-text); }
+.dark .fff-address-autocomplete .fff-location-select__clear { color: #71717a; }
+.dark .fff-address-autocomplete .fff-location-select__clear:hover { color: var(--fff-input-text); }

@@ -17,7 +17,8 @@ import { observeDomAssets } from './resources/js/runtime/lifecycle/dom-assets-ob
 import { createResourceScope } from './resources/js/runtime/lifecycle/resource-scope.js'
 import { createLivewireAdapter } from './resources/js/runtime/filament/livewire-adapter.js'
 import { withFactoryReadiness } from './resources/js/runtime/alpine/factory-readiness.js'
-window.fixture = { Alpine, graph: createConsumerGraph, transactions: createDomTransactions, activate: waitForAssetActivation, runtime: createFlexFieldAssetInjector, observe: observeDomAssets, scope: createResourceScope, adapter: createLivewireAdapter, factory: withFactoryReadiness }
+import { isAssetElementActive } from './resources/js/runtime/lifecycle/asset-activation.js'
+window.fixture = { Alpine, graph: createConsumerGraph, transactions: createDomTransactions, activate: waitForAssetActivation, active: isAssetElementActive, runtime: createFlexFieldAssetInjector, observe: observeDomAssets, scope: createResourceScope, adapter: createLivewireAdapter, factory: withFactoryReadiness }
 window.frames = async () => { await new Promise(requestAnimationFrame); await new Promise(requestAnimationFrame) }
 window.marker = (parent, styles = []) => {
  const el = document.createElement('span'); el.hidden = true; el.dataset.fffAssetBatch = ''; el.dataset.fffAssetConsumer = 'probe'; el.dataset.fffAssetConsumerId = 'same-ssr-key'; el.dataset.fffStylesheets = JSON.stringify(styles); el.dataset.fffChunks = '[]'; parent.append(el); return el
@@ -45,6 +46,21 @@ try {
     page.on('pageerror', error => errors.push(error.message))
     await page.goto(`http://127.0.0.1:${server.address().port}/`, { waitUntil: 'domcontentloaded' })
     await page.waitForFunction(() => window.fixture)
+    await page.evaluate(() => {
+        const owner = document.createElement('section'); document.body.append(owner)
+        const el = marker(owner)
+        for (const [attribute, value] of [['hidden', ''], ['aria-hidden', 'true'], ['data-fff-asset-active', 'false'],
+            ['class', 'hidden'], ['class', 'invisible'], ['style', 'display: none !important'], ['style', 'visibility: hidden']]) {
+            owner.setAttribute(attribute, value)
+            if (fixture.active(el)) throw Error(`Hidden owner activated: ${attribute}=${value}`)
+            owner.removeAttribute(attribute)
+            if (!fixture.active(el)) throw Error(`Restored owner stayed inactive: ${attribute}`)
+        }
+        owner.setAttribute('style', 'display: grid; visibility: visible')
+        if (!fixture.active(el)) throw Error('Visible styled owner was suspended')
+        owner.remove()
+    })
+    proofs.push('native activation re-reads hidden/ARIA/explicit state, both hidden classes and inline CSS including !important; restoring each declaration activates without stale visibility caches')
     const measurements = await page.evaluate(() => {
         const measurements = []
         for (const count of [100, 1000, 5000]) {

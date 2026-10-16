@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-10-16T08:14:06.688Z",
+  "generatedAt": "2026-10-16T09:16:28.794Z",
   "css": {
     "address-autocomplete.css": {
-      "bytes": 866,
-      "kb": 0.85,
-      "gzipKb": 0.4
+      "bytes": 1501,
+      "kb": 1.47,
+      "gzipKb": 0.51
     },
     "asset-diagnostics.css": {
       "bytes": 2539,
@@ -92,9 +92,9 @@
       "gzipKb": 1.09
     },
     "date-value-presentation.css": {
-      "bytes": 3613,
-      "kb": 3.53,
-      "gzipKb": 0.96
+      "bytes": 3922,
+      "kb": 3.83,
+      "gzipKb": 1.01
     },
     "dual-listbox.css": {
       "bytes": 10654,
@@ -147,9 +147,9 @@
       "gzipKb": 2.16
     },
     "flex-date-time-field.css": {
-      "bytes": 32349,
-      "kb": 31.59,
-      "gzipKb": 4.28
+      "bytes": 32637,
+      "kb": 31.87,
+      "gzipKb": 4.32
     },
     "flex-file-upload.css": {
       "bytes": 46326,
@@ -227,8 +227,8 @@
       "gzipKb": 1.93
     },
     "location-controls.css": {
-      "bytes": 5141,
-      "kb": 5.02,
+      "bytes": 5171,
+      "kb": 5.05,
       "gzipKb": 1.32
     },
     "map-picker-dropdown.css": {
@@ -332,9 +332,9 @@
       "gzipKb": 0.77
     },
     "select-field.css": {
-      "bytes": 121197,
-      "kb": 118.36,
-      "gzipKb": 14.45
+      "bytes": 120314,
+      "kb": 117.49,
+      "gzipKb": 14.21
     },
     "selection-indicator.css": {
       "bytes": 1647,
@@ -539,9 +539,9 @@
       "gzipKb": 5.12
     },
     "flex-core-runtime.js": {
-      "bytes": 70575,
-      "kb": 68.92,
-      "gzipKb": 22.65
+      "bytes": 70602,
+      "kb": 68.95,
+      "gzipKb": 22.7
     },
     "flex-date-picker.js": {
       "bytes": 12223,
@@ -621,7 +621,7 @@
     "icon-picker-field.js": {
       "bytes": 6129,
       "kb": 5.99,
-      "gzipKb": 2.6
+      "gzipKb": 2.59
     },
     "image-choice-cards.js": {
       "bytes": 552,
@@ -676,7 +676,7 @@
     "price-range.js": {
       "bytes": 7556,
       "kb": 7.38,
-      "gzipKb": 3.14
+      "gzipKb": 3.15
     },
     "progress-circle-breakdown.js": {
       "bytes": 726,
@@ -763,7 +763,7 @@
       "kb": 0.47,
       "gzipKb": 0.29
     },
-    "flex-fields-audio-3XDTQRNG.js": {
+    "flex-fields-audio-YYSOPIGB.js": {
       "bytes": 7567,
       "kb": 7.39,
       "gzipKb": 3.18
@@ -803,7 +803,7 @@
       "kb": 0.63,
       "gzipKb": 0.4
     },
-    "flex-fields-choice-cards-effects-UZARIBXI.js": {
+    "flex-fields-choice-cards-effects-FQUD5HJB.js": {
       "bytes": 5212,
       "kb": 5.09,
       "gzipKb": 2.16
@@ -813,7 +813,7 @@
       "kb": 0.27,
       "gzipKb": 0.2
     },
-    "flex-fields-choice-lists-presentation-IWXJPRJ3.js": {
+    "flex-fields-choice-lists-presentation-TWFXWSIG.js": {
       "bytes": 3857,
       "kb": 3.77,
       "gzipKb": 1.58
@@ -823,9 +823,9 @@
       "kb": 0.58,
       "gzipKb": 0.38
     },
-    "flex-fields-combobox-engine-LQPJJMXU.js": {
-      "bytes": 9843,
-      "kb": 9.61,
+    "flex-fields-combobox-engine-D42A64ER.js": {
+      "bytes": 9851,
+      "kb": 9.62,
       "gzipKb": 3.94
     },
     "flex-fields-components-segments-runtime-66KI3FPY.js": {
@@ -833,7 +833,7 @@
       "kb": 4.82,
       "gzipKb": 1.86
     },
-    "flex-fields-components-select-field-headless-combobox-livewire-search-WBT72YJD.js": {
+    "flex-fields-components-select-field-headless-combobox-livewire-search-EYDNGYKS.js": {
       "bytes": 23585,
       "kb": 23.03,
       "gzipKb": 6.14
@@ -1003,7 +1003,7 @@
       "kb": 2.45,
       "gzipKb": 1.1
     },
-    "flex-fields-flex-alpine-load-gate-S4HQOC32.js": {
+    "flex-fields-flex-alpine-load-gate-3RJHSUE3.js": {
       "bytes": 7391,
       "kb": 7.22,
       "gzipKb": 2.92
@@ -1133,7 +1133,7 @@
       "kb": 0.96,
       "gzipKb": 0.51
     },
-    "flex-fields-runtime-alpine-boundary-fallback-4J6RIGKH.js": {
+    "flex-fields-runtime-alpine-boundary-fallback-GEOSDIKP.js": {
       "bytes": 764,
       "kb": 0.75,
       "gzipKb": 0.41
@@ -1158,10 +1158,10 @@
       "kb": 1.17,
       "gzipKb": 0.62
     },
-    "flex-fields-runtime-assets-asset-demand-7BJ5PNCI.js": {
-      "bytes": 9857,
-      "kb": 9.63,
-      "gzipKb": 3.76
+    "flex-fields-runtime-assets-asset-demand-KC5USAC2.js": {
+      "bytes": 9967,
+      "kb": 9.73,
+      "gzipKb": 3.79
     },
     "flex-fields-runtime-assets-asset-link-store-CHVNSHJY.js": {
       "bytes": 20945,
@@ -1173,10 +1173,10 @@
       "kb": 5.82,
       "gzipKb": 2.48
     },
-    "flex-fields-runtime-filament-activation-mutation-WTR4D47G.js": {
-      "bytes": 5730,
-      "kb": 5.6,
-      "gzipKb": 2.18
+    "flex-fields-runtime-filament-activation-mutation-25GJKZCZ.js": {
+      "bytes": 5978,
+      "kb": 5.84,
+      "gzipKb": 2.26
     },
     "flex-fields-runtime-filament-presentation-segment-FH5L3ECJ.js": {
       "bytes": 170,
@@ -1193,7 +1193,7 @@
       "kb": 0.22,
       "gzipKb": 0.16
     },
-    "flex-fields-runtime-lifecycle-lifecycle-events-TP35DSAF.js": {
+    "flex-fields-runtime-lifecycle-lifecycle-events-RNSY5R42.js": {
       "bytes": 4561,
       "kb": 4.45,
       "gzipKb": 1.98
@@ -1258,10 +1258,10 @@
       "kb": 3.92,
       "gzipKb": 1.8
     },
-    "flex-fields-select-trigger-2UZQ4DBM.js": {
-      "bytes": 74632,
-      "kb": 72.88,
-      "gzipKb": 18.76
+    "flex-fields-select-trigger-IEEIKS4X.js": {
+      "bytes": 74812,
+      "kb": 73.06,
+      "gzipKb": 18.81
     },
     "flex-fields-shared-2GRLTSXG.js": {
       "bytes": 730,

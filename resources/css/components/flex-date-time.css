@@ -643,3 +643,6 @@
 [dir='rtl'] .fff-date-time-field__month-label {
     @apply text-center;
 }
+
+.fff-date-time-field__suffix .fff-flex-text-input__disclosure-icon [stroke] { stroke-width: 2; }
+.fff-date-time-field .fff-date-time-field__suffix .fff-flex-text-input__disclosure-icon { width: var(--fff-flex-text-input-icon-size) !important; height: var(--fff-flex-text-input-icon-size) !important; }

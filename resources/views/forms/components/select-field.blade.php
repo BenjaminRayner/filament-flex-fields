@@ -2,7 +2,8 @@
     use Filament\Support\Enums\IconSize;
 
     $fieldWrapperView = $getFieldWrapperView();
-    $clearIconHtml = \Filament\Support\generate_icon_html($field->getClearIcon(), size: IconSize::ExtraSmall)?->toHtml() ?? '';
+    $clearIconHtml = \Filament\Support\generate_icon_html($field->getClearIcon(), attributes: new \Illuminate\View\ComponentAttributeBag(['stroke-width' => 2]), size: IconSize::ExtraSmall)?->toHtml() ?? '';
+    $chevronIconHtml = \Filament\Support\generate_icon_html($field->getChevronIcon(), attributes: new \Illuminate\View\ComponentAttributeBag(['stroke-width' => 2]), size: IconSize::ExtraSmall)?->toHtml() ?? '';
     $selectedOptionCheckIconHtml = \Filament\Support\generate_icon_html($field->getSelectedOptionCheckIcon(), size: IconSize::Small)?->toHtml() ?? '';
     $extraInputAttributeBag = $getExtraInputAttributeBag();
     $canSelectPlaceholder = $canSelectPlaceholder();
@@ -82,14 +83,9 @@
     class="fi-fo-select-wrp fff-select-field-wrapper fi-fixed-positioning-context"
     data-fff-lazy-alpine-mount="select-field"
 >
-    @if (! $isNative)
-                @include('filament-flex-fields::partials.load-stylesheet', ['component' => $field->getAssetComponent(),
+    @include('filament-flex-fields::partials.load-stylesheet', ['component' => $field->getAssetComponent(),
         'livewireKey' => $getLivewireKey(),
     ])
-
-
-
-    @endif
     {{ $field->getSelectCatalogMarkup() }}
     <x-filament::input.wrapper
         :disabled="$isDisabled"
@@ -167,6 +163,7 @@
                     @endif
                 @endforeach
             </select>
+            <span class="fff-select-native-chevron" aria-hidden="true">{!! $chevronIconHtml !!}</span>
         @else
             @include('filament-flex-fields::forms.components.partials.select-field-headless')
         @endif

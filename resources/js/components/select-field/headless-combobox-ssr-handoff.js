@@ -1,8 +1,14 @@
 import { findHeadlessOptionRecord } from './headless-select-options.js'
-import { resolveHeadlessBoundState } from './headless-select-state.js'
+import { hasHeadlessInitialSelection, resolveHeadlessBoundState } from './headless-select-state.js'
 
 export function createHeadlessComboboxSsrHandoffMixin() {
     return {
+        hasClearableSelection() {
+            if (!this.clearable || this.disabled) return false
+            // Keep the server-rendered affordance stable before engine hydration.
+            return this._engine ? this.isTriggerLabelSelected()
+                : hasHeadlessInitialSelection(resolveHeadlessBoundState(this.state, this.initialState, this.multiple), this.multiple)
+        },
         syncClearablePresentation() {
             if (this.multiple || ! this.clearable) {
                 return

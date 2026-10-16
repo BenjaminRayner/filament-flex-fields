@@ -123,7 +123,7 @@ final class FlexIcon
 
     public const string Person = 'hugeicons-user';
 
-    public const string CircleChevronDown = 'hugeicons-arrow-down-01';
+    public const string CircleChevronDown = 'hugeicons-circle-arrow-down-01';
 
     public const string CircleXmark = 'hugeicons-cancel-circle';
 

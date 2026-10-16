@@ -16,7 +16,7 @@
                     </span>
                 </button>
             @else
-            <div class="fi-select-input-ctn" x-bind:class="{ 'fi-select-input-ctn-clearable': clearable && state && !disabled }">
+            <div @class(['fi-select-input-ctn', 'fi-select-input-ctn-clearable' => $field->isClearable() && filled($initialName) && ! $locked]) x-bind:class="{ 'fi-select-input-ctn-clearable': hasClearableSelection() }">
                 <button type="button" id="{{ $controlId }}" class="fi-select-input-btn" x-ref="headlessTrigger" data-fff-open-trigger
                     aria-label="{{ $getLabel() }}" aria-haspopup="listbox" aria-expanded="false"
                     @disabled($locked) x-bind:disabled="disabled" x-bind:aria-expanded="comboboxOpen" x-bind:aria-controls="menuDomId + '-listbox'"
@@ -25,11 +25,12 @@
                         <span class="fff-icon-select__preview" x-html="iconHtml">{!! $initialHtml !!}</span>
                         <span class="fff-icon-select__name" x-text="iconLabel || placeholder">{{ $initialName ?: $placeholder }}</span>
                     </span></span>
+                    <span class="fff-select-trigger-chevron" aria-hidden="true"><x-filament::icon :icon="$field->getChevronIcon()" stroke-width="2" /></span>
                 </button>
                 @if ($field->isClearable())
-                    <button type="button" class="fi-select-input-value-remove-btn" x-cloak x-show="state && !disabled"
+                    <button type="button" class="fi-select-input-value-remove-btn" @if (blank($initialName) || $locked) style="display:none" @endif x-show="hasClearableSelection()"
                         x-on:click.stop="clearSelection()" aria-label="{{ __('filament-flex-fields::default.icon_picker.clear') }}">
-                        <x-filament::icon :icon="$field->getClearIcon()" />
+                        <x-filament::icon :icon="$field->getClearIcon()" stroke-width="2" />
                     </button>
                 @endif
             </div>

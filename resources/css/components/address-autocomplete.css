@@ -1,4 +1,4 @@
-/* The address owner styles only details/messages. Its Select child owns the control/menu. */
+/* The address owner styles its plain clear affix and details/messages. Its Select child owns the control/menu. */
 @import './address-autocomplete/surface.css';
 @import './address-autocomplete/details.css';
 @import './address-autocomplete/messages.css';

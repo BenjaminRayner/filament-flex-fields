@@ -53,7 +53,7 @@
                     @endif
                     @if ($calendar && $configuration['showCalendarButton'] && ! $configuration['inline'])
                         <span class="fff-flex-text-input__action-item fff-date-disclosure" aria-hidden="true">
-                            <x-filament::icon :icon="FlexIcon::ChevronDown" class="fff-flex-text-input__action-icon fff-flex-text-input__disclosure-icon" />
+                            <x-filament::icon :icon="FlexIcon::CircleChevronDown" stroke-width="2" class="fff-flex-text-input__action-icon fff-flex-text-input__disclosure-icon" />
                         </span>
                     @endif
                 </x-slot:actions>

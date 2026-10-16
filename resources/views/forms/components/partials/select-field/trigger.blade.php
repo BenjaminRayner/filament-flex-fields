@@ -7,7 +7,7 @@
             x-ref="headlessTriggerCtn"
             @if ($field->isClearable() && ! $isMultiple && ! $isDisabled)
                 x-bind:class="{
-                    'fi-select-input-ctn-clearable': clearable && isTriggerLabelSelected(),
+                    'fi-select-input-ctn-clearable': hasClearableSelection(),
                 }"
             @endif
         >
@@ -168,7 +168,9 @@
                 @endif
 
                 @if ($isItemCardVariant && ! $isMultiple)
-                    <span class="fff-select-item-card-trigger__chevron" aria-hidden="true"></span>
+                    <span class="fff-select-item-card-trigger__chevron" aria-hidden="true">{!! $chevronIconHtml !!}</span>
+                @else
+                    <span class="fff-select-trigger-chevron" aria-hidden="true">{!! $chevronIconHtml !!}</span>
                 @endif
 
                 <span
@@ -185,7 +187,8 @@
                 <button
                     type="button"
                     class="fi-select-input-value-remove-btn"
-                    x-show="isTriggerLabelSelected()"
+                    @if (blank($state)) style="display:none" @endif
+                    x-show="hasClearableSelection()"
                     x-on:click.stop="clearSelection()"
                     x-bind:aria-label="'Clear selection'"
                 >

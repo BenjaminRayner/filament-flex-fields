@@ -57,8 +57,14 @@ export function readAssetUrlLists(element) {
     if (!element || typeof element !== 'object') return { stylesheets: [], chunks: [] }
     const baseURI = element.ownerDocument?.baseURI ?? globalThis.document?.baseURI ?? 'http://localhost/'
     const cached = inlineListsFor(element)
-    return { stylesheets: inlineUrls(element, 'data-fff-stylesheets', cached, baseURI),
-        chunks: inlineUrls(element, 'data-fff-chunks', cached, baseURI) }
+    const stylesheets = inlineUrls(element, 'data-fff-stylesheets', cached, baseURI)
+    const chunks = inlineUrls(element, 'data-fff-chunks', cached, baseURI)
+    // The weak marker cache may reuse the pair only after both current raw
+    // attributes and the current base URI have passed the readers above.
+    if (cached.projection?.stylesheets !== stylesheets || cached.projection?.chunks !== chunks) {
+        cached.projection = Object.freeze({ stylesheets, chunks })
+    }
+    return cached.projection
 }
 
 export function assetBatchesIn(root) {

@@ -86,6 +86,7 @@
             'searchPlaceholder' => $placeholder,
             'locationLabelExpression' => 'selectedLabel',
             'clearLocationExpression' => 'clearAddress()',
+            'minimalClear' => true,
         ])
 
         @if ($showDetails)

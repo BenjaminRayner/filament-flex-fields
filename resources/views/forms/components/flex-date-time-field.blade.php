@@ -207,7 +207,7 @@
                             @disabled($isDisabled || $isReadOnly)
                         >
                             <x-filament::icon
-                                :icon="FlexIcon::ChevronDown"
+                                :icon="FlexIcon::CircleChevronDown" stroke-width="2"
                                 class="fff-flex-text-input__action-icon fff-flex-text-input__disclosure-icon"
                             />
                         </button>

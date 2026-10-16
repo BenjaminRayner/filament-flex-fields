@@ -2,9 +2,11 @@
 [data-fff-date-presentation].has-value-motion .fff-date-value { display:flex; color:var(--fff-input-text); font-size:var(--fff-flex-text-input-text-size); font-weight:400; line-height:1.5; }
 [data-fff-date-presentation].has-value-motion .fff-flex-text-input__input { color:transparent; caret-color:transparent; }
 [data-fff-civil-date] .fff-flex-text-input__leading-icon svg [stroke],
+[data-fff-civil-date] .fff-date-disclosure svg [stroke],
 [data-clock-input-row] .fff-flex-text-input__leading-icon svg [stroke],
 [data-clock-input-row] [data-clock-seconds] svg [stroke],
 [data-clock-input-row] .fff-date-disclosure svg [stroke],
+.fff-dt-clock .fff-flex-text-input__action-icon [stroke],
 .fff-dt-clock .fff-flex-text-input__leading-icon svg [stroke] { stroke-width:2; }
 [data-fff-date-presentation] .fff-date-disclosure { display:grid; place-items:center; pointer-events:none; }
 [data-fff-civil-date]:has(input[readonly][aria-haspopup="dialog"]):not(.is-disabled):not(.is-read-only) .fff-flex-text-input__shell,
@@ -29,3 +31,5 @@
 @media (pointer:coarse) { [data-fff-civil-date] .fff-date-segments { font-size:max(16px,var(--fff-flex-text-input-text-size)); } }
 [data-fff-civil-date] .fff-date-segments { text-align:start; }
 
+/* Shared Select disclosure glyph and weight; calendar navigation arrows stay directional. */
+[data-fff-date-presentation] .fff-flex-text-input__action-group .fff-date-disclosure > svg { width: var(--fff-flex-text-input-icon-size) !important; height: var(--fff-flex-text-input-icon-size) !important; }

@@ -80,7 +80,7 @@
     --fff-select-search-bg: rgb(255 255 255 / 0.55);
     --fff-select-search-border: rgb(228 228 231);
     --fff-select-search-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
-    --fff-select-chevron-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22%23a1a1aa%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M2.5%208a5.5%205.5%200%201%201%2011%200%205.5%205.5%200%200%201-11%200M1%208a7%207%200%201%201%2014%200A7%207%200%200%201%201%208m5.03-1.28a.75.75%200%200%200-1.06%201.06l2.5%202.5a.75.75%200%200%200%201.06%200l2.5-2.5a.75.75%200%201%200-1.06-1.06L8%208.69z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E");
+    --fff-select-chevron-color: rgb(161 161 170);
     --fff-select-affix-icon-size: 1rem;
     --fff-select-affix-end: 0.5rem;
     --fff-select-affix-gap: 0.25rem;
@@ -182,7 +182,7 @@
     --fff-select-shadow: none;
     --fff-select-px: 0;
     --fff-select-value-label: var(--item-card-group-title, var(--fff-select-text));
-    --fff-select-chevron-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22%2318181b%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M2.5%208a5.5%205.5%200%201%201%2011%200%205.5%205.5%200%200%201-11%200M1%208a7%207%200%201%201%2014%200A7%207%200%200%201%201%208m5.03-1.28a.75.75%200%200%200-1.06%201.06l2.5%202.5a.75.75%200%200%200%201.06%200l2.5-2.5a.75.75%200%201%200-1.06-1.06L8%208.69z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E");
+    --fff-select-chevron-color: rgb(24 24 27);
     --fff-select-affix-icon-size: 0.875rem;
     --fff-select-trigger-icon-size: 1rem;
 }
@@ -244,7 +244,7 @@
     flex-shrink: 0;
     width: var(--fff-select-affix-icon-size);
     height: var(--fff-select-affix-icon-size);
-    background-image: var(--fff-select-chevron-icon);
+    background-image: none;
     background-repeat: no-repeat;
     background-position: center;
     background-size: var(--fff-select-affix-icon-size) var(--fff-select-affix-icon-size);
@@ -375,7 +375,7 @@
     padding-inline-end: var(--fff-select-trigger-padding-end);
     font-size: var(--fff-select-text-size);
     line-height: 1.25;
-    background-image: var(--fff-select-chevron-icon);
+    background-image: none;
     background-repeat: no-repeat;
     background-position: right var(--fff-select-affix-end) center;
     background-size: var(--fff-select-affix-icon-size) var(--fff-select-affix-icon-size);
@@ -747,7 +747,7 @@
     font-size: var(--fff-select-text-size);
     padding-inline-start: var(--fff-select-px);
     padding-inline-end: var(--fff-select-trigger-padding-end);
-    background-image: var(--fff-select-chevron-icon);
+    background-image: none;
     background-repeat: no-repeat;
     background-position: right var(--fff-select-affix-end) center;
     background-size: var(--fff-select-affix-icon-size) var(--fff-select-affix-icon-size);
@@ -3561,7 +3561,7 @@ body > .fi-dropdown-panel.fff-select-dropdown-panel {
 }
 
 .dark .fff-select-field {
-    --fff-select-chevron-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22%2371717a%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M2.5%208a5.5%205.5%200%201%201%2011%200%205.5%205.5%200%200%201-11%200M1%208a7%207%200%201%201%2014%200A7%207%200%200%201%201%208m5.03-1.28a.75.75%200%200%200-1.06%201.06l2.5%202.5a.75.75%200%200%200%201.06%200l2.5-2.5a.75.75%200%201%200-1.06-1.06L8%208.69z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E");
+    --fff-select-chevron-color: rgb(113 113 122);
 }
 
 .dark .fff-select-field .fi-select-input-value-remove-btn {
@@ -3590,7 +3590,7 @@ body > .fi-dropdown-panel.fff-select-dropdown-panel {
     --fff-select-border-width: 0;
     --fff-select-shadow: none;
     --fff-select-value-label: var(--item-card-group-title, rgb(244 244 245));
-    --fff-select-chevron-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22%23f4f4f5%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M2.5%208a5.5%205.5%200%201%201%2011%200%205.5%205.5%200%200%201-11%200M1%208a7%207%200%201%201%2014%200A7%207%200%200%201%201%208m5.03-1.28a.75.75%200%200%200-1.06%201.06l2.5%202.5a.75.75%200%200%200%201.06%200l2.5-2.5a.75.75%200%201%200-1.06-1.06L8%208.69z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E");
+    --fff-select-chevron-color: rgb(244 244 245);
 }
 
 .dark .fi-input-wrp.fff-select-field--item-card,
@@ -3708,3 +3708,46 @@ mark.fff-select-entity-mention__highlight {
 /* Pagination status paints over the tail; loading never changes scroll extent. */
 .fff-select-pagination-tail { position:relative; flex:none; height:1px; }
 .fff-select-pagination-tail .fff-select-load-more { position:absolute; inset-inline:0; inset-block-end:0; background:var(--fff-select-menu-bg, #fff); pointer-events:none; }
+
+/* Trigger icons share their real PHP-rendered SVG in SSR, native and hydrated controls. */
+.fff-select-field .fff-select-trigger-ssr__btn,
+.fff-select-field > .fi-input-wrp-content-ctn:has(> .fff-select-native-chevron) {
+    position: relative;
+}
+
+.fff-select-field .fff-select-trigger-chevron,
+.fff-select-field .fff-select-native-chevron {
+    position: absolute;
+    top: 50%;
+    inset-inline-end: var(--fff-select-affix-end);
+    translate: 0 -50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--fff-select-affix-icon-size);
+    height: var(--fff-select-affix-icon-size);
+    color: var(--fff-select-chevron-color);
+    pointer-events: none;
+}
+
+.fff-select-field .fff-select-item-card-ssr__chevron,
+.fff-select-field .fff-select-item-card-trigger__chevron {
+    display: inline-flex;
+    color: var(--fff-select-chevron-color);
+    pointer-events: none;
+}
+
+.fff-select-field :is(.fff-select-trigger-chevron, .fff-select-native-chevron, .fff-select-item-card-ssr__chevron, .fff-select-item-card-trigger__chevron) :is(.fi-icon, svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    stroke-width: 2;
+}
+
+.fff-select-field .fi-select-input-value-remove-btn svg {
+    stroke-width: 2;
+}
+
+.fff-select-field .fi-select-input-btn.is-loading :is(.fff-select-trigger-chevron, .fff-select-item-card-trigger__chevron) {
+    visibility: hidden;
+}

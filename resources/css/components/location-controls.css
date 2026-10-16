@@ -22,7 +22,7 @@
 .fff-location-select :is(.fi-input-wrp-icon, .fff-flex-text-input__action-icon) [stroke] { stroke-width: 2; }
 .fff-location-select__clear { display: grid; place-items: center; flex: 0 0 1.75rem; align-self: stretch; margin: 0; padding: 0; border: 0; background: transparent; color: var(--fff-location-muted, #71717a); cursor: pointer; }
 .fff-location-select__clear:hover { color: var(--fff-location-text, #18181b); }
-.fff-location-select__clear:focus-visible { outline: 2px solid var(--fff-location-color); outline-offset: -2px; border-radius: 50%; }
+.fff-location-select__clear:focus-visible { outline: 2px solid var(--fff-location-color, var(--fff-field-focus-border)); outline-offset: -2px; border-radius: 50%; }
 .fff-map-controls__button--text { width: auto; flex-basis: auto; padding-inline: 8px; font-size: 12px; }
 @media (hover: hover) { .fff-map-controls__button:hover:not(:disabled) { background: var(--fff-map-control-hover); } }
 .fff-map-controls__button.is-active { color: var(--fff-location-color, var(--fff-country-map-color)); background: color-mix(in oklab, var(--fff-location-color, var(--fff-country-map-color)) 12%, var(--fff-map-control-bg)); }

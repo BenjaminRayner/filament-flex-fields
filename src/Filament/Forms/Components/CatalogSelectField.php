@@ -20,7 +20,6 @@ abstract class CatalogSelectField extends SelectField
         parent::setUp();
         $this->catalogTransformer = $this->transformOptionsForJsUsing;
         $this->searchable()->richOptions()->clearable(false)->optionsLimit(1000)->searchDebounce(0);
-        $this->chevronIcon('hugeicons-unfold-more');
     }
 
     /** @return array<string, array<string, mixed>> */

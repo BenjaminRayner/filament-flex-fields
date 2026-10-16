@@ -48,7 +48,7 @@
                                     x-on:click="toggleTime({{ $index }}, true)" aria-label="{{ __('filament-flex-fields::date-time.seconds') }}" aria-haspopup="listbox" aria-expanded="false"
                                     @disabled($isDisabled() || $isReadOnly())><x-filament::icon icon="hugeicons-clock-05" class="fff-flex-text-input__action-icon" /></button></span>
                             @endif
-                            <span class="fff-flex-text-input__action-item fff-date-disclosure" aria-hidden="true"><x-filament::icon :icon="FlexIcon::ChevronDown" class="fff-flex-text-input__action-icon" /></span>
+                            <span class="fff-flex-text-input__action-item fff-date-disclosure" aria-hidden="true"><x-filament::icon :icon="FlexIcon::CircleChevronDown" stroke-width="2" class="fff-flex-text-input__action-icon" /></span>
                         </x-slot:actions>
                     </x-filament-flex-fields::text-input.shell>
                 </div>

@@ -26,18 +26,19 @@
             x-on:keydown="onHeadlessMenuKeydown($event)"
             x-on:click.outside="if (!isEventInsideHeadlessMenu($event)) comboboxCloseMenu({ immediate:true, reason:'outside' })">
             @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'font-select', 'livewireKey' => $getLivewireKey()])
-            <div class="fi-select-input-ctn" x-bind:class="{'fi-select-input-ctn-clearable':clearable && state && !disabled}">
+            <div @class(['fi-select-input-ctn', 'fi-select-input-ctn-clearable' => $isClearable() && filled($seed) && ! $locked]) x-bind:class="{'fi-select-input-ctn-clearable':hasClearableSelection()}">
                 <button type="button" id="{{ $controlId }}" class="fi-select-input-btn" x-ref="headlessTrigger" data-fff-open-trigger
                     aria-label="{{ $getLabel() }}" aria-haspopup="listbox" aria-expanded="false" @disabled($locked)
                     x-bind:disabled="disabled" x-bind:aria-expanded="comboboxOpen" x-bind:aria-controls="menuDomId + '-listbox'"
                     x-on:click="onHeadlessTriggerClick($event)" x-on:keydown="onHeadlessControlKeydown($event, {trigger:true})">
                     <span class="fi-select-input-value-ctn"><span class="fi-select-input-value-label"
                         x-bind:style="selectedFontPreviewStyle()" x-text="fontSelection?.label || placeholder">{{ $seed['label'] ?? $getPlaceholder() }}</span></span>
+                    <span class="fff-select-trigger-chevron" aria-hidden="true"><x-filament::icon :icon="$field->getChevronIcon()" stroke-width="2" /></span>
                 </button>
                 @if ($isClearable())
-                    <button type="button" class="fi-select-input-value-remove-btn" x-cloak x-show="state && !disabled"
+                    <button type="button" class="fi-select-input-value-remove-btn" @if (blank($seed) || $locked) style="display:none" @endif x-show="hasClearableSelection()"
                         x-on:click.stop="clearSelection()" aria-label="{{ __('filament-flex-fields::font-select.clear') }}">
-                        <x-filament::icon :icon="$field->getClearIcon()" />
+                        <x-filament::icon :icon="$field->getClearIcon()" stroke-width="2" />
                     </button>
                 @endif
             </div>

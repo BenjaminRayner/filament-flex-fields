@@ -78,7 +78,7 @@ return [
         'country_size' => 'md',
         'country_variant' => 'primary',
         'country_default_country' => 'PL',
-        'select_chevron_icon' => 'hugeicons-arrow-down-01',
+        'select_chevron_icon' => 'hugeicons-circle-arrow-down-01',
         'select_clear_icon' => 'hugeicons-cancel-circle',
         'select_selected_option_check_icon' => 'hugeicons-tick-02',
         'address_autocomplete_size' => 'md',

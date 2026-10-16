@@ -27,7 +27,7 @@ class UserSelect extends SelectField
     protected function setUp(): void
     {
         parent::setUp();
-        $this->richOptions()->allowHtml()->searchable()->chevronIcon('hugeicons-unfold-more');
+        $this->richOptions()->allowHtml()->searchable();
     }
 
     public function __clone(): void

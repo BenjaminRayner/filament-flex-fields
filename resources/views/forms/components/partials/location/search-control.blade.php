@@ -29,12 +29,12 @@
         @if (! $searchConfig['disabled'] && $searchConfig['clearable'])
             @if ($minimalClear ?? false)
                 <button type="button" class="fff-location-select__clear" x-show="state !== null" @if (blank($initialLabel ?? '')) style="display:none" @endif x-on:click.stop="clearSelection()" aria-label="{{ __('filament-flex-fields::default.address_autocomplete.clear') }}">
-                    <x-filament::icon :icon="$searchClearIcon" class="fff-flex-text-input__action-icon" />
+                    <x-filament::icon :icon="$searchClearIcon" stroke-width="2" class="fff-flex-text-input__action-icon" />
                 </button>
             @else
             <div class="fff-flex-text-input__action-group" x-show="state !== null" @if (blank($initialLabel ?? '')) style="display:none" @endif>
                 <div class="fff-flex-text-input__action-item"><button type="button" class="fff-flex-text-input__action-btn" x-on:click.stop="clearSelection()" aria-label="{{ __('filament-flex-fields::default.address_autocomplete.clear') }}">
-                    <x-filament::icon :icon="$searchClearIcon" class="fff-flex-text-input__action-icon" />
+                    <x-filament::icon :icon="$searchClearIcon" stroke-width="2" class="fff-flex-text-input__action-icon" />
                 </button></div>
             </div>
             @endif
