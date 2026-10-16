@@ -3,26 +3,28 @@ import { reportRuntimeError, diagnosticContext } from '../diagnostics/document-d
 import { readReferencedPlan } from './plan-dictionary.js'
 import { parseInlineAssetUrls } from './boundary-plan.js'
 
-export function readAssetUrls(element, attribute) {
+function referencedPlan(element) {
     let plan
     try { plan = readReferencedPlan(element) }
     catch (error) {
         reportRuntimeError(element?.ownerDocument ?? globalThis.document, error, diagnosticContext(element, { code: 'owner_plan_failed', phase: 'preparation' }))
         throw error
     }
-    if (plan) {
-        if (attribute === 'data-fff-stylesheets') return plan.stylesheets
-        if (attribute === 'data-fff-chunks') return plan.chunks
-        throw Error('Unsupported FLEX asset plan URL projection.')
-    }
-    if (!element || typeof element !== 'object') return []
-    const raw = element.getAttribute?.(attribute) ?? '[]'
+    return plan
+}
+
+function inlineListsFor(element) {
     const state = getRuntimeState()
     state.inlineAssetLists ??= new WeakMap()
     let cached = state.inlineAssetLists.get(element)
     if (!cached) { cached = new Map(); state.inlineAssetLists.set(element, cached) }
-    const baseURI = element.ownerDocument?.baseURI ?? globalThis.document?.baseURI ?? 'http://localhost/'
-    if (cached.get(attribute)?.raw === raw && cached.get(attribute)?.baseURI === baseURI) return cached.get(attribute).urls
+    return cached
+}
+
+function inlineUrls(element, attribute, cached, baseURI) {
+    const raw = element.getAttribute?.(attribute) ?? '[]'
+    const previous = cached.get(attribute)
+    if (previous?.raw === raw && previous.baseURI === baseURI) return previous.urls
     let urls
     try { urls = parseInlineAssetUrls(raw, baseURI) }
     catch (error) {
@@ -32,6 +34,31 @@ export function readAssetUrls(element, attribute) {
     // Only these two plan projections are retained; arbitrary callers cannot grow a marker's cache.
     if (['data-fff-stylesheets', 'data-fff-chunks'].includes(attribute)) cached.set(attribute, { raw, baseURI, urls })
     return urls
+}
+
+export function readAssetUrls(element, attribute) {
+    const plan = referencedPlan(element)
+    if (plan) {
+        if (attribute === 'data-fff-stylesheets') return plan.stylesheets
+        if (attribute === 'data-fff-chunks') return plan.chunks
+        throw Error('Unsupported FLEX asset plan URL projection.')
+    }
+    if (!element || typeof element !== 'object') return []
+    const baseURI = element.ownerDocument?.baseURI ?? globalThis.document?.baseURI ?? 'http://localhost/'
+    return inlineUrls(element, attribute, inlineListsFor(element), baseURI)
+}
+
+/** Admit both projections together without repeating dictionary/base-URI reads.
+ * Every call still checks current marker attributes; no mutation is hidden by a cache.
+ */
+export function readAssetUrlLists(element) {
+    const plan = referencedPlan(element)
+    if (plan) return plan
+    if (!element || typeof element !== 'object') return { stylesheets: [], chunks: [] }
+    const baseURI = element.ownerDocument?.baseURI ?? globalThis.document?.baseURI ?? 'http://localhost/'
+    const cached = inlineListsFor(element)
+    return { stylesheets: inlineUrls(element, 'data-fff-stylesheets', cached, baseURI),
+        chunks: inlineUrls(element, 'data-fff-chunks', cached, baseURI) }
 }
 
 export function assetBatchesIn(root) {
@@ -64,8 +91,9 @@ export function createBundleRegistry() {
 
                 const previous = bundles[componentId]
                 if (previous?.kind === 'ambiguous') continue
-                const stylesheets = [...new Set(readAssetUrls(batch, 'data-fff-stylesheets'))]
-                const chunks = [...new Set(readAssetUrls(batch, 'data-fff-chunks'))]
+                const plan = readAssetUrlLists(batch)
+                const stylesheets = [...new Set(plan.stylesheets)]
+                const chunks = [...new Set(plan.chunks)]
                 const same = previous && stylesheets.length === previous.stylesheets.length && chunks.length === previous.chunks.length
                     && stylesheets.every((url, index) => url === previous.stylesheets[index])
                     && chunks.every((url, index) => url === previous.chunks[index])

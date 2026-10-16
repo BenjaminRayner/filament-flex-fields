@@ -20,6 +20,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Whisper ships browser WASM; native Node CUDA binaries are not used in CI.
+  ONNXRUNTIME_NODE_INSTALL: skip
+
 concurrency:
   group: flex-fields-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

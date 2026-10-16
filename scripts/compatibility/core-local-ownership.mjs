@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { createConsumerGraph } from '../../resources/js/runtime/assets/consumer-graph.js'
-import { readAssetUrls } from '../../resources/js/runtime/assets/bundle-registry.js'
+import { readAssetUrls, readAssetUrlLists } from '../../resources/js/runtime/assets/bundle-registry.js'
 import { createDomTransactions } from '../../resources/js/runtime/lifecycle/dom-transactions.js'
 import { waitForAssetActivation } from '../../resources/js/runtime/lifecycle/asset-activation.js'
 import { createDom, createAssetBatch } from '../../tests/js/helpers/flex-field-asset-injector-dom.mjs'
@@ -38,6 +38,24 @@ proofs.push('100 local resyncs inspect zero unrelated connections at 100/1000/50
 }
 proofs.push('connected subtree movement and surface changes preserve identity/references; later subtree retirement uses the updated ancestor index')
 {
+    const { document, body } = createDom()
+    const first = document.createElement('section'), second = document.createElement('section'), wrapper = document.createElement('div')
+    body.appendChild(first); body.appendChild(second); first.appendChild(wrapper)
+    const marker = createAssetBatch(['/shared']); wrapper.appendChild(marker)
+    const graph = createConsumerGraph(); graph.resyncFromDom(first)
+    const original = graph.resolveConsumerInstanceId(marker)
+    for (let pass = 0; pass < 100; pass++) assert.equal(graph.resolveConsumerInstanceId(marker), original)
+    wrapper.remove(); second.appendChild(wrapper); graph.resyncFromDom(first)
+    graph.releaseSubtree(first); assert.equal(graph.getRefCount('/shared'), 1)
+    marker.setAttribute('data-fff-asset-consumer-id', 'replacement')
+    graph.resyncFromDom(second)
+    assert.notEqual(graph.resolveConsumerInstanceId(marker), original)
+    assert.equal(graph.getRefCount('/shared'), 1)
+    assert.equal(graph.getActiveConsumerIds().length, 1)
+    graph.releaseSubtree(second); assert.equal(graph.getRefCount('/shared'), 0)
+}
+proofs.push('warm IDs remain stable; changed identity replaces one owner and an ancestor move reindexes a marker whose immediate parent is unchanged')
+{
     const { body } = createDom(), marker = createAssetBatch(['/a'])
     body.appendChild(marker); const graph = createConsumerGraph(); graph.resyncFromDom(marker)
     marker.removeAttribute('data-fff-asset-consumer'); delete marker.dataset.fffAssetConsumer
@@ -67,6 +85,25 @@ proofs.push('attribute removal retires the local owner; immutable parsed-list ca
     graph.reset()
 }
 proofs.push('warm projection shortcut still rejects mutated JSON and reconciles explicit acquire/release, new lists and graph reset without stale references')
+{
+    let reads = 0, baseURI = 'https://first.test/'
+    const document = { get baseURI() { reads++; return baseURI } }
+    const attributes = new Map([['data-fff-stylesheets', '["/a"]'], ['data-fff-chunks', '["/b"]']])
+    const marker = { ownerDocument: document, hasAttribute: name => attributes.has(name), getAttribute: name => attributes.get(name) ?? null }
+    const first = readAssetUrlLists(marker)
+    assert.equal(reads, 1)
+    const warm = readAssetUrlLists(marker)
+    assert.equal(reads, 2)
+    assert.equal(warm.stylesheets, first.stylesheets); assert.equal(warm.chunks, first.chunks)
+    baseURI = 'https://second.test/'
+    const moved = readAssetUrlLists(marker)
+    assert.notEqual(moved.stylesheets, first.stylesheets); assert.notEqual(moved.chunks, first.chunks)
+    attributes.set('data-fff-chunks', '{')
+    assert.throws(() => readAssetUrlLists(marker), /JSON/)
+    attributes.set('data-fff-chunks', '["javascript:bad"]')
+    assert.throws(() => readAssetUrlLists(marker), /HTTP/)
+}
+proofs.push('paired projection reads the current base once, reuses immutable lists, invalidates on base changes and rejects malformed or unsafe mutated chunks')
 function transactionFixture(limit = 4096) {
     const dom = createDom(), frames = new Map(), calls = []
     let seq = 0

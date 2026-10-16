@@ -3,7 +3,6 @@
     <div class="fff-flex-detail">
         <x-filament-flex-fields::assets component="flex-catalog-layout" consumer="flex.detail" :critical="true" />
         @include('filament-flex-fields::catalog.detail-header', ['demoActions' => $this->getCachedHeaderActions()])
-        @include('filament-flex-fields::catalog.recording')
         <form class="fi-form grid gap-y-6" wire:submit.prevent="validateForm">{{ $this->form }}</form>
         @include('filament-flex-fields::catalog.footer')
     </div>

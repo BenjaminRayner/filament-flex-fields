@@ -108,6 +108,12 @@ for (const { name, command, env } of commands) {
     receipt.checks.push(check); save()
     if (!check.passed) {
         process.stderr.write(`Acceptance failed at ${name}. See ${log}\n`)
+        // Keep the full evidence artifact and expose the bounded failure detail
+        // in CI itself, where archive downloads may be unavailable.
+        const failure = fs.readFileSync(log)
+        if (failure.length > 32768) process.stderr.write('Failure log truncated to the last 32 KiB.\n')
+        process.stderr.write(failure.subarray(-32768))
+        process.stderr.write('\n')
         process.exitCode = 1
         break
     }

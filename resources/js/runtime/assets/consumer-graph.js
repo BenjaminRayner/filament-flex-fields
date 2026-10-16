@@ -1,5 +1,5 @@
 import { createOwnerTreeIndex } from '../owners/owner-tree-index.js'
-import { readAssetUrls } from './bundle-registry.js'
+import { readAssetUrlLists } from './bundle-registry.js'
 import { normalizeResources, resourcesFromPlan, resourceKey } from './resource-descriptor.js'
 import { createReferenceCounts } from './reference-counts.js'
 
@@ -80,14 +80,14 @@ export function createConsumerGraph(options = {}) {
     }
 
     const readConsumerComponent = (el) => {
-        return el?.dataset?.fffAssetConsumer
-            ?? el?.getAttribute?.('data-fff-asset-consumer')
+        return el?.getAttribute?.('data-fff-asset-consumer')
+            ?? el?.dataset?.fffAssetConsumer
             ?? null
     }
 
     const readConsumerId = (el) => {
-        return el?.dataset?.fffAssetConsumerId
-            ?? el?.getAttribute?.('data-fff-asset-consumer-id')
+        return el?.getAttribute?.('data-fff-asset-consumer-id')
+            ?? el?.dataset?.fffAssetConsumerId
             ?? null
     }
 
@@ -102,12 +102,16 @@ export function createConsumerGraph(options = {}) {
             return null
         }
 
-        if (!elementIds.has(el)) {
-            elementIds.set(el, { sequence: ++elementSequence, surface: resolveSurfaceKey(el) })
+        let identity = elementIds.get(el)
+        if (!identity) {
+            identity = { sequence: ++elementSequence, surface: resolveSurfaceKey(el) }
+            elementIds.set(el, identity)
         }
-
-        const identity = elementIds.get(el)
-        return `${base}::${identity.surface}::${identity.sequence}`
+        if (identity.base !== base) {
+            identity.base = base
+            identity.id = `${base}::${identity.surface}::${identity.sequence}`
+        }
+        return identity.id
     }
 
     const acquireResources = (instanceId, componentId, requirements) => {
@@ -189,8 +193,9 @@ export function createConsumerGraph(options = {}) {
         // Frozen projection identity permits skipping redundant normalization
         // and reference-ledger reconstruction, never skipping admission.
         const declared = el?.hasAttribute?.('data-fff-asset-batch')
-        const stylesheets = declared ? readAssetUrls(el, 'data-fff-stylesheets') : null
-        const chunks = declared ? readAssetUrls(el, 'data-fff-chunks') : null
+        const plan = declared ? readAssetUrlLists(el) : null
+        const stylesheets = plan?.stylesheets ?? null
+        const chunks = plan?.chunks ?? null
         const retained = activeConsumers.get(instanceId), cached = registeredPlans.get(el)
         if (declared && retained?.element === el && cached?.consumer === retained
             && cached.componentId === componentId && cached.stylesheets === stylesheets && cached.chunks === chunks
@@ -249,10 +254,10 @@ export function createConsumerGraph(options = {}) {
                 continue
             }
 
-            const inScope = consumer.element === root || root.contains?.(consumer.element)
-            if (consumer.element.isConnected === false || (inScope && !connected.has(instanceId))) {
+            const present = connected.has(instanceId)
+            if (consumer.element.isConnected === false || (!present && (consumer.element === root || root.contains?.(consumer.element)))) {
                 release(instanceId)
-            } else if (!connected.has(instanceId)) owners.bind(instanceId, consumer.element)
+            } else if (!present) owners.bind(instanceId, consumer.element)
         }
     }
 

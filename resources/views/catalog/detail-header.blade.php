@@ -19,7 +19,6 @@
         </div>
     </div>
     <div class="fff-flex-detail__actions">
-    <button type="button" class="fff-recording-launch" x-data="{}" x-on:click="$el.closest('.fff-flex-detail').setAttribute('data-fff-recording-requested', ''); $dispatch('fff-recording-choose')"><x-filament::icon icon="hugeicons-video-01" />{{ __('filament-flex-fields::catalog.recording.title') }}</button>
     @if (!empty($demoActions)) @include('filament-flex-fields::catalog.detail-actions') @endif
     @if ($entry['repository'])
         <a class="fff-flex-detail__action" href="{{ $entry['repository'] }}" target="_blank" rel="noopener noreferrer">

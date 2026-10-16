@@ -20,9 +20,16 @@ export function createOwnerTreeIndex() {
     return {
         bind(id, element) {
             if (!element) { remove(id); return }
-            const path = pathFor(element), previous = records.get(id)
-            if (previous?.element === element && path.length === previous.path.length
-                && path.every((node, index) => node === previous.path[index])) return
+            const previous = records.get(id)
+            if (previous?.element === element) {
+                let node = element, index = 0
+                while (node && node === previous.path[index]) {
+                    node = node.parentNode ?? node.parentElement
+                    index++
+                }
+                if (!node && index === previous.path.length) return
+            }
+            const path = pathFor(element)
             remove(id)
             for (const node of path) {
                 let members = ancestors.get(node)
