@@ -2,6 +2,14 @@ import { customSurfacesFor } from '../surfaces/document-surfaces.js'
 
 const NativeElement = globalThis.Element
 
+/** A native layout node without attributes has no explicit suspension state.
+ * DETAILS is the exception: it is closed by default without an open attribute.
+ * Do not infer this for host objects or elements from another DOM realm.
+ */
+export function isBareAssetLayoutOwner(owner) {
+    return Boolean(NativeElement && owner instanceof NativeElement && !owner.hasAttributes() && owner.tagName !== 'DETAILS')
+}
+
 export function isHiddenAssetOwner(owner) {
     // Native selectors avoid repeatedly crossing into DOMTokenList and
     // CSSStyleDeclaration for every ancestor of every consumer. Read the

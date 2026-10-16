@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T09:16:28.794Z",
+  "generatedAt": "2026-10-16T09:30:16.404Z",
   "css": {
     "address-autocomplete.css": {
       "bytes": 1501,
@@ -539,9 +539,9 @@
       "gzipKb": 5.12
     },
     "flex-core-runtime.js": {
-      "bytes": 70602,
-      "kb": 68.95,
-      "gzipKb": 22.7
+      "bytes": 70525,
+      "kb": 68.87,
+      "gzipKb": 22.68
     },
     "flex-date-picker.js": {
       "bytes": 12223,
@@ -676,7 +676,7 @@
     "price-range.js": {
       "bytes": 7556,
       "kb": 7.38,
-      "gzipKb": 3.15
+      "gzipKb": 3.14
     },
     "progress-circle-breakdown.js": {
       "bytes": 726,
@@ -763,7 +763,7 @@
       "kb": 0.47,
       "gzipKb": 0.29
     },
-    "flex-fields-audio-YYSOPIGB.js": {
+    "flex-fields-audio-EQGWNVG2.js": {
       "bytes": 7567,
       "kb": 7.39,
       "gzipKb": 3.18
@@ -803,7 +803,7 @@
       "kb": 0.63,
       "gzipKb": 0.4
     },
-    "flex-fields-choice-cards-effects-FQUD5HJB.js": {
+    "flex-fields-choice-cards-effects-W3CEIVLD.js": {
       "bytes": 5212,
       "kb": 5.09,
       "gzipKb": 2.16
@@ -813,7 +813,7 @@
       "kb": 0.27,
       "gzipKb": 0.2
     },
-    "flex-fields-choice-lists-presentation-TWFXWSIG.js": {
+    "flex-fields-choice-lists-presentation-DKI7HH2S.js": {
       "bytes": 3857,
       "kb": 3.77,
       "gzipKb": 1.58
@@ -1003,7 +1003,7 @@
       "kb": 2.45,
       "gzipKb": 1.1
     },
-    "flex-fields-flex-alpine-load-gate-3RJHSUE3.js": {
+    "flex-fields-flex-alpine-load-gate-RN4KG6DZ.js": {
       "bytes": 7391,
       "kb": 7.22,
       "gzipKb": 2.92
@@ -1133,7 +1133,7 @@
       "kb": 0.96,
       "gzipKb": 0.51
     },
-    "flex-fields-runtime-alpine-boundary-fallback-GEOSDIKP.js": {
+    "flex-fields-runtime-alpine-boundary-fallback-M4SD5O5I.js": {
       "bytes": 764,
       "kb": 0.75,
       "gzipKb": 0.41
@@ -1173,10 +1173,10 @@
       "kb": 5.82,
       "gzipKb": 2.48
     },
-    "flex-fields-runtime-filament-activation-mutation-25GJKZCZ.js": {
-      "bytes": 5978,
-      "kb": 5.84,
-      "gzipKb": 2.26
+    "flex-fields-runtime-filament-activation-mutation-YEGXPEQX.js": {
+      "bytes": 6099,
+      "kb": 5.96,
+      "gzipKb": 2.3
     },
     "flex-fields-runtime-filament-presentation-segment-FH5L3ECJ.js": {
       "bytes": 170,
@@ -1193,10 +1193,10 @@
       "kb": 0.22,
       "gzipKb": 0.16
     },
-    "flex-fields-runtime-lifecycle-lifecycle-events-RNSY5R42.js": {
+    "flex-fields-runtime-lifecycle-lifecycle-events-FPNIO5A3.js": {
       "bytes": 4561,
       "kb": 4.45,
-      "gzipKb": 1.98
+      "gzipKb": 1.97
     },
     "flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js": {
       "bytes": 1688,

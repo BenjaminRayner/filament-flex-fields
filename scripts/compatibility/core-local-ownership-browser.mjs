@@ -48,7 +48,8 @@ try {
     await page.waitForFunction(() => window.fixture)
     await page.evaluate(() => {
         const owner = document.createElement('section'); document.body.append(owner)
-        const el = marker(owner)
+        const layout = document.createElement('div'); owner.append(layout)
+        const el = marker(layout)
         for (const [attribute, value] of [['hidden', ''], ['aria-hidden', 'true'], ['data-fff-asset-active', 'false'],
             ['class', 'hidden'], ['class', 'invisible'], ['style', 'display: none !important'], ['style', 'visibility: hidden']]) {
             owner.setAttribute(attribute, value)
@@ -58,9 +59,26 @@ try {
         }
         owner.setAttribute('style', 'display: grid; visibility: visible')
         if (!fixture.active(el)) throw Error('Visible styled owner was suspended')
+        owner.removeAttribute('style')
+        for (const [inactive, active] of [['fi-sc-tabs-tab', 'fi-sc-tabs-tab fi-active'],
+            ['fi-sc-wizard-step', 'fi-sc-wizard-step fi-active'], ['fff-segment-tabs__panel', 'fff-segment-tabs__panel is-active']]) {
+            owner.className = inactive
+            if (fixture.active(el)) throw Error('Bare layout bypassed inactive parent: ' + inactive)
+            owner.className = active
+            if (!fixture.active(el)) throw Error('Active parent was suspended: ' + active)
+        }
+        owner.removeAttribute('class')
+        const details = document.createElement('details'); owner.append(details); details.append(layout)
+        if (fixture.active(el)) throw Error('Attribute-free DETAILS activated while closed')
+        details.open = true
+        if (!fixture.active(el)) throw Error('Open DETAILS stayed inactive')
+        details.open = false
+        if (fixture.active(el)) throw Error('Reclosed DETAILS retained an active value')
+        const summary = document.createElement('summary'); details.append(summary); summary.append(layout)
+        if (!fixture.active(el)) throw Error('Closed DETAILS suspended its summary control')
         owner.remove()
     })
-    proofs.push('native activation re-reads hidden/ARIA/explicit state, both hidden classes and inline CSS including !important; restoring each declaration activates without stale visibility caches')
+    proofs.push('native activation re-reads hidden/ARIA/explicit state, both hidden classes and inline CSS including !important; restoring each declaration activates without stale visibility caches; bare layout ancestors preserve inactive tabs/wizards/segments and closed DETAILS/summary semantics')
     const measurements = await page.evaluate(() => {
         const measurements = []
         for (const count of [100, 1000, 5000]) {

@@ -2,7 +2,7 @@ import { changesFilamentActivation as changesAssetActivation } from '../filament
 import { createOwnerTreeIndex } from '../owners/owner-tree-index.js'
 import { getRuntimeState } from '../runtime-state.js'
 import { customSurfacesFor } from '../surfaces/document-surfaces.js'
-import { isHiddenAssetOwner } from './dom-activation.js'
+import { isBareAssetLayoutOwner, isHiddenAssetOwner } from './dom-activation.js'
 
 /** Asset visibility is a surface lifecycle, not intersection with the viewport.
  * Fields below the fold stay usable; closed tabs and modal shells have no demand.
@@ -22,6 +22,10 @@ export function isAssetElementActive(element, { document = element?.ownerDocumen
 
     let owner = element.hasAttribute?.('data-fff-asset-batch') ? element.parentElement : element
     while (owner && owner !== modal && owner !== document?.body) {
+        // Re-read the native attribute set every time. Bare layout ancestors
+        // cannot be hidden or carry Filament suspension classes; still walk
+        // through them so an enclosing tab, modal or moved ancestor is checked.
+        if (isBareAssetLayoutOwner(owner)) { owner = owner.parentElement; continue }
         const suspendedWindow = retainedModal && (owner.classList?.contains('fi-modal-window') || owner.classList?.contains('fi-modal-window-ctn'))
         if (!suspendedWindow && !custom?.retainsRoot(owner)) {
             if (isHiddenAssetOwner(owner)) return false

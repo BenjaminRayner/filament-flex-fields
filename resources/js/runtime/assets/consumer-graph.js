@@ -187,7 +187,7 @@ export function createConsumerGraph(options = {}) {
 
         // Re-read admitted projections even on the warm path: mutated JSON,
         // dictionary identity and base URI must still pass the plan reader.
-        // Frozen projection identity permits skipping redundant normalization
+        // The admitted frozen plan identity permits skipping redundant normalization
         // and reference-ledger reconstruction, never skipping admission.
         const declared = el?.hasAttribute?.('data-fff-asset-batch')
         const plan = declared ? readAssetUrlLists(el) : null
@@ -195,8 +195,7 @@ export function createConsumerGraph(options = {}) {
         const chunks = plan?.chunks ?? null
         const retained = activeConsumers.get(instanceId), cached = registeredPlans.get(el)
         if (declared && retained?.element === el && cached?.consumer === retained
-            && cached.componentId === componentId && cached.stylesheets === stylesheets && cached.chunks === chunks
-            && Object.isFrozen(stylesheets) && Object.isFrozen(chunks)) {
+            && cached.componentId === componentId && cached.plan === plan) {
             owners.bind(instanceId, el)
             return instanceId
         }
@@ -212,7 +211,7 @@ export function createConsumerGraph(options = {}) {
             consumer.element = el
             owners.bind(instanceId, el)
             registeredElements.set(el, instanceId)
-            registeredPlans.set(el, { consumer, componentId, stylesheets, chunks })
+            registeredPlans.set(el, { consumer, componentId, plan })
         }
 
         return instanceId
