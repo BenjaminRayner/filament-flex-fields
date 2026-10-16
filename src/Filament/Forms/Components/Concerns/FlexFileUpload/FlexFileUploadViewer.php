@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\FlexFil
 use Bjanczak\FilamentFlexFields\Filament\Actions\Action;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexFileUpload;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\FlexSpatieMediaLibraryFileUpload;
+use Bjanczak\FilamentFlexFields\Support\FilamentApi;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\DiskUploadBridge;
 use Bjanczak\FilamentFlexFields\Support\Media\Data\MediaFailure;
 use Bjanczak\FilamentFlexFields\Support\Media\Spatie\SpatieUploadBridge;
@@ -120,15 +121,16 @@ trait FlexFileUploadViewer
             ->icon('hugeicons-view')->visible(fn (): bool => $this->hasFileViewer())->modalWidth(Width::Screen)
             ->closeModalByClickingAway(false)->closeModalByEscaping(false)
             ->modalHeading('')->modalCloseButton(false)->modalSubmitAction(false)->modalCancelAction(false)->modalFooterActions([])
-            ->extraModalWindowAttributes(fn () => ['class' => 'fff-upload-lightbox-window', 'data-fff-loading-presentation' => 'lightbox', 'aria-label' => Translations::get('filament-flex-fields::default.file_upload.viewer.open')])
             ->extraModalOverlayAttributes(['class' => 'fff-upload-lightbox-overlay'])
+            ->extraModalWindowAttributes(fn () => ['class' => 'fff-upload-lightbox-window', 'data-fff-loading-presentation' => 'lightbox', 'aria-label' => Translations::get('filament-flex-fields::default.file_upload.viewer.open')])
             ->schema(fn (array $arguments, \Filament\Actions\Action $action): array => [Grid::make(1)->extraAttributes([
                 'class' => 'fff-upload-lightbox-layout'.($this->hasFileViewerMetadata() ? ' has-information' : ''),
             ])->schema([
                 View::make('filament-flex-fields::forms.components.file-upload.viewer')->viewData([
                     'viewerField' => $this, 'viewerItems' => $this->getFileViewerItems(),
                     'viewerKey' => (string) ($arguments['fileKey'] ?? ''),
-                    'viewerCancelParentActions' => $action->getParentActionsToCancelOnClose(),
+                    'viewerCancelParentActions' => FilamentApi::hasMethod(\Filament\Actions\Action::class, 'getParentActionsToCancelOnClose')
+                        ? $action->getParentActionsToCancelOnClose() : false,
                 ]),
                 ...($this->hasFileViewerMetadata() ? [Group::make([
                     ...$this->getFileMetadataEditorSchema(),

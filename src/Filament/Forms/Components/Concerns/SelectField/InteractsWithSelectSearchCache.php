@@ -79,7 +79,7 @@ trait InteractsWithSelectSearchCache
     /** @return list<mixed> */
     protected function selectSearchProviderIdentity(): array
     {
-        $callbacks = [$this->getSearchResultsUsing, $this->getSearchResultsPageUsing, $this->modifyRelationshipQueryUsing];
+        $callbacks = [$this->getSearchResultsUsing, $this->getSearchResultsPageUsing, $this->selectRelationshipQueryUsing];
         if ($this->options instanceof Closure) {
             $callbacks[] = $this->options;
         }

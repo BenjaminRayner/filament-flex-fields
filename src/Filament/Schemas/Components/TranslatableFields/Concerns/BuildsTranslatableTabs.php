@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\Concerns;
 
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\TranslatableTab;
+use Bjanczak\FilamentFlexFields\Support\FilamentSchemaCompatibility;
 use Bjanczak\FilamentFlexFields\Support\Translatable\TranslatableAttributePath;
 use Bjanczak\FilamentFlexFields\Support\Translatable\TranslatableTabFactory;
 use Filament\Forms\Components\Field;
@@ -83,7 +84,7 @@ trait BuildsTranslatableTabs
                     }
                     $this->configureLocaleField($field, $tab->getLocale());
                     foreach ($this->getTranslatableFieldModifiers() as $modifier) {
-                        $field->evaluate($modifier, $injections);
+                        $field->evaluate($modifier, [...$injections, 'field' => $field, 'component' => $field], [Field::class => $field]);
                     }
                 }
             }
@@ -101,6 +102,10 @@ trait BuildsTranslatableTabs
     public function clearCachedChildSchemas(): void
     {
         $this->preparedLocaleSchema = null;
-        parent::clearCachedChildSchemas();
+        if (FilamentSchemaCompatibility::supportsChildSchemaCacheReset()) {
+            parent::clearCachedChildSchemas();
+        } else {
+            $this->cachedDefaultChildSchemas = null;
+        }
     }
 }

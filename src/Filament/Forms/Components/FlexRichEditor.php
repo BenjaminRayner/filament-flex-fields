@@ -13,18 +13,24 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\InteractsWith
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\Actions\AttachFilesAction;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\Actions\NativeActionTranslations;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\Concerns\BuildsRichEditorToolbar;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\RichEditor\Concerns\ConfiguresRichEditorPresentation;
 use Bjanczak\FilamentFlexFields\Support\Translations;
 use Closure;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Concerns\HasMaxHeight;
+use Filament\Forms\Components\Concerns\HasMinHeight;
 use Filament\Forms\Components\RichEditor;
 use InvalidArgumentException;
 
 class FlexRichEditor extends RichEditor
 {
     use BuildsRichEditorToolbar;
+    use ConfiguresRichEditorPresentation;
     use HasControlSize;
     use HasFieldFocusOutline;
     use HasFieldRounding;
+    use HasMaxHeight;
+    use HasMinHeight;
     use InteractsWithFlexRichEditorEnhancements;
     use InteractsWithFlexRichEditorFileAttachments;
     use InteractsWithFlexRichEditorYoutube;

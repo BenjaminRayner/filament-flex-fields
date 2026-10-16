@@ -7,14 +7,17 @@ Filament Flex Fields is tested as a **premium Filament v5 plugin**. This documen
 | Dependency | Supported range | CI coverage |
 |------------|-----------------|-------------|
 | PHP | `^8.3` | 8.3, 8.4, 8.5 |
-| Filament | Composer permits `^5.0`; verified support starts at **5.9.0** | **5.9.0** (exact stable floor) and **^5.9** (latest admitted 5.x stable) |
+| Filament | `^5.6` (5.6.0 or newer within 5.x) | **5.6.0**, **5.7.8**, **5.8.0** on PHP 8.3; **5.9.0** and **^5.9** on PHP 8.3–8.5 |
 | Filament canary | `5.x-dev` | **Daily** schedule / on push — **non-blocking** (`continue-on-error`) |
 
 We check the **latest Filament 5.x stable** daily through the scheduled `filament-compat` job, canary and override signature guards. Dependabot checks Composer daily and waits at least **3 days** before proposing ordinary version updates. Dependabot security updates bypass that cooldown.
 
-The older 5.7.8 fixture was rejected by Composer's security advisory admission.
-Security checks remain enabled. The Composer constraint is retained for backwards
-resolution compatibility; versions below the verified floor are not certified.
+Use the latest patched Filament 5.x release in applications. Historical tags are
+kept only in isolated API compatibility fixtures.
+Those fixtures explicitly bypass Composer security advisory admission because
+upstream historical releases contain known advisories. They are never deployed;
+normal installation, current dependency audits and release quality gates retain
+security checks. Compatibility does not make an old upstream release secure.
 Workflow declarations are acceptance requirements, not evidence of a remote run.
 
 ## How we catch Filament breaks (class of [#61](https://github.com/janczakb/filament-flex-fields/issues/61))
@@ -30,9 +33,9 @@ Workflow declarations are acceptance requirements, not evidence of a remote run.
 On `main` / release tags, require at least:
 
 - `quality (PHP 8.3)`
-- `Filament latest-5.x · PHP 8.3` and the exact `Filament 5.9.0 · PHP 8.3` floor
+- `Filament latest-5.x · PHP 8.3` and the exact `Filament 5.6.0 · PHP 8.3` floor
 
-Optional but recommended: all `quality` PHP axes and both Filament stable matrix legs.
+Optional but recommended: all `quality` PHP axes and every Filament stable matrix leg.
 
 Configure under **Settings → Branches → Branch protection rules → Require status checks**.
 

@@ -193,7 +193,7 @@ jobs:
       - name: Install optional packages in the disposable CI checkout
         run: >-
           composer require --dev --no-scripts --no-interaction --prefer-dist --with-all-dependencies
-          'filament/spatie-laravel-media-library-plugin:^5.0'
+          'filament/spatie-laravel-media-library-plugin:^5.6'
           'spatie/laravel-tags:^4.0' 'spatie/laravel-translatable:^6.0' 'laravel/octane:^2.0'
 
       - name: Verify core API and real Laravel queue lifecycle
@@ -272,6 +272,18 @@ jobs:
       matrix:
         include:
           - php: '8.3'
+            filament: '5.6.0'
+            label: '5.6.0'
+            legacy: true
+          - php: '8.3'
+            filament: '5.7.8'
+            label: '5.7.8'
+            legacy: true
+          - php: '8.3'
+            filament: '5.8.0'
+            label: '5.8.0'
+            legacy: true
+          - php: '8.3'
             filament: '5.9.0'
             label: '5.9.0'
           - php: '8.4'
@@ -325,11 +337,21 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Switch Filament to ${{ matrix.label }}
+      - name: Switch current Filament to ${{ matrix.label }}
+        if: ${{ !matrix.legacy }}
         run: |
           set -euo pipefail
           composer require "filament/filament:${{ matrix.filament }}" --no-update --no-interaction
           composer update "filament/*" --with-all-dependencies --no-interaction --prefer-dist
+
+      # Historical tags contain upstream advisories. Only this disposable API
+      # compatibility fixture bypasses admission; current quality/audit stays strict.
+      - name: Switch historical Filament to ${{ matrix.label }}
+        if: matrix.legacy
+        run: |
+          set -euo pipefail
+          composer require "filament/filament:${{ matrix.filament }}" --no-update --no-interaction
+          composer update "filament/*" --with-all-dependencies --no-security-blocking --no-interaction --prefer-dist
 
       - name: Show installed Filament versions
         run: |
@@ -344,7 +366,12 @@ jobs:
       - name: Run Filament compatibility Pest suites
         run: composer test:filament-compat
 
+      - name: Run full suite at the minimum supported Filament version
+        if: matrix.filament == '5.6.0'
+        run: php -d memory_limit=2G vendor/bin/pest --compact
+
       - name: Verify independently installed Composer component family
+        if: ${{ !matrix.legacy }}
         run: php scripts/compatibility/core-author-tooling.php --composer-install
 
   filament-dev:

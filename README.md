@@ -215,7 +215,7 @@ Disk-backed media, plain tags and translation maps also have modes that do not r
 
 ## Installation
 
-Start with **PHP 8.3+** and an existing **Filament 5** panel, using compatible Laravel and Livewire versions.
+Start with **PHP 8.3+** and an existing **Filament 5.6+** panel, using compatible Laravel and Livewire versions.
 
 > [!NOTE]
 > **FLEX Fields v4 preview:** this README describes the upcoming v4 release. A stable v4 package is not yet available on Packagist. The installation command below applies once v4 is published in your Composer repository. Follow the [release notes](https://flex-fields.bjanczak.com/docs/changelog) for availability.

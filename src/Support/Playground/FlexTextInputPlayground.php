@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Support\Playground;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs\SegmentTab;
+use Bjanczak\FilamentFlexFields\Support\FilamentSchemaCompatibility;
 use Bjanczak\FilamentFlexFields\Support\Playground\TextInput\TextInputDemo;
 use Bjanczak\FilamentFlexFields\Support\TextInput\TextInputMessages;
 use Filament\Schemas\Components\Component;
@@ -29,9 +30,12 @@ final class FlexTextInputPlayground
         $tabs = [];
         foreach (TextInputDemo::groups() as $group => $scenarios) {
             $fields = array_map(fn (array $scenario): FlexTextInput => TextInputDemo::field($scenario), $scenarios);
+            $components = [Grid::make(['default' => 1, 'lg' => 2])->schema($fields)];
+            $schema = FilamentSchemaCompatibility::supportsDeferredLoading()
+                ? Schema::make()->key('input-demo-'.$group)->deferLoading($group !== 'overview')->components($components)
+                : $components;
             $tabs[] = SegmentTab::make(TextInputMessages::get('demo.'.$group))
-                ->schema(Schema::make()->key('input-demo-'.$group)->deferLoading($group !== 'overview')
-                    ->components([Grid::make(['default' => 1, 'lg' => 2])->schema($fields)]));
+                ->schema($schema);
         }
 
         return [Section::make('Flex Text Input')

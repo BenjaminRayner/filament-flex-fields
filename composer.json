@@ -61,14 +61,14 @@
         }
     ],
     "require": {
-        "filament/filament": "^5.0",
+        "filament/filament": "^5.6",
         "giggsey/libphonenumber-for-php": "^9.0",
         "janczakb/blade-hugeicons": "^1.0",
         "php": "^8.3",
         "prodstarter/filament-notification-center": "^1.0"
     },
     "require-dev": {
-        "filament/spatie-laravel-media-library-plugin": "^5.0",
+        "filament/spatie-laravel-media-library-plugin": "^5.6",
         "laravel/octane": "^2",
         "orchestra/testbench": "^11.1",
         "pestphp/pest": "^4.0",
@@ -114,7 +114,7 @@
         "test:core:optional": "pest --compact tests/Integration/Core tests/Unit/FlexSpatieMediaLibraryFileUploadTest.php tests/Unit/FlexSpatieTagsFieldTest.php",
         "test:select-atomics": "FFF_SELECT_ATOMICS_FULL=1 pest --compact tests/Feature/PlaygroundSelectVariantAtomicsTest.php tests/Feature/PlaygroundSelectCascadeAtomicsTest.php tests/Feature/PlaygroundSelectLivewireMatrixTest.php tests/Feature/PlaygroundSelectConfigMatrixTest.php",
         "test:filament-compat": [
-            "@php vendor/bin/pest --compact tests/Unit/FilamentOverrideCompatibilityTest.php tests/Feature/TranslatableFieldsFilament58SmokeTest.php tests/Unit/TranslatableFieldsTest.php tests/Unit/TranslatableArchitectureTest.php tests/Feature/TranslatableFieldsTest.php tests/Feature/TranslatableFieldsPlaygroundFillTest.php tests/Feature/TitleSlugTranslatableFieldTest.php tests/Feature/SelectFieldCoordinatorRenderTest.php"
+            "@php vendor/bin/pest --compact tests/Unit/FilamentOverrideCompatibilityTest.php tests/Feature/FilamentSchemaVersionCompatibilityTest.php tests/Feature/TranslatableFieldsFilament58SmokeTest.php tests/Unit/TranslatableFieldsTest.php tests/Unit/TranslatableArchitectureTest.php tests/Feature/TranslatableFieldsTest.php tests/Feature/TranslatableFieldsPlaygroundFillTest.php tests/Feature/TitleSlugTranslatableFieldTest.php tests/Feature/SelectFieldCoordinatorRenderTest.php tests/Unit/CalculatorFieldTest.php tests/Unit/FlexRichEditorTest.php tests/Feature/FlexRichEditorFieldRenderTest.php tests/Unit/FlexTextareaFieldTest.php tests/Feature/FlexFileUploadViewerTest.php tests/Feature/FlexFileUploadStorageTest.php tests/Feature/CardMatrixFormTest.php tests/Feature/Intelligence/CalculationPersistenceTest.php tests/Feature/FlexTextInputArchitectureTest.php tests/Unit/CoverCardTest.php"
         ],
         "analyse": "phpstan analyse --memory-limit=512M",
         "prune:phpstan-baseline": "node scripts/prune-phpstan-baseline.mjs",

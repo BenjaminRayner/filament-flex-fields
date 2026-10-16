@@ -57,6 +57,7 @@ not yet been publicly released.
 
 ### Upgrade notes
 
+- Filament **5.6.0 or newer within 5.x** is required. Versions below 5.6 are no longer admitted by Composer; use the latest patched 5.x release in applications.
 - Replace `ObservabilityHooks`, `ObservabilityState`, `SiemBridge` and `enterprise` settings with Laravel event listeners. See [Monitoring & operations](docs/sre-runbook.md#data-handling-and-migration).
 - Applications using optional browser Whisper transcription must reinstall its runtime with `php artisan fff:whisper:install` after upgrading.
 - Review custom component definitions, asset integrations and existing typed/encrypted values before upgrading; some legacy representations require an explicit migration decision.

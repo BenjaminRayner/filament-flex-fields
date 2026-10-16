@@ -6,6 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
+use Bjanczak\FilamentFlexFields\Support\FilamentApi;
 use Bjanczak\FilamentFlexFields\Support\Matrix\DimensionCatalog;
 use Bjanczak\FilamentFlexFields\Support\Matrix\Presentation\SizeStyles;
 use Closure;
@@ -89,7 +90,7 @@ class FlexMatrixTable extends Repeater
     }
 
     /**
-     * @param array<string|int,array<string,mixed>>|null $state
+     * @param  array<string|int,array<string,mixed>>|null  $state
      * @return array<string|int,array<string,mixed>>
      */
     public function dehydrateItems(?array $state): array
@@ -105,6 +106,13 @@ class FlexMatrixTable extends Repeater
     }
 
     /** @return array<Schema> */
+    public function getItems(): array
+    {
+        return FilamentApi::hasMethod(Repeater::class, 'areCachedDefaultChildSchemasFresh')
+            ? parent::getItems() : $this->getDefaultChildSchemas();
+    }
+
+    /** @return array<Schema> */
     public function getDefaultChildSchemas(): array
     {
         if (! is_array($this->getRawState())) {
@@ -112,7 +120,8 @@ class FlexMatrixTable extends Repeater
         }
         $rows = $this->getNormalizedRows();
         $schemas = [];
-        foreach (parent::getDefaultChildSchemas() as $key => $schema) {
+        foreach ((FilamentApi::hasMethod(Repeater::class, 'areCachedDefaultChildSchemasFresh')
+            ? parent::getDefaultChildSchemas() : parent::getItems()) as $key => $schema) {
             if (array_key_exists($key, $rows)) {
                 $schemas[$key] = $schema->disabled((bool) $rows[$key]['disabled']);
             }
@@ -123,13 +132,15 @@ class FlexMatrixTable extends Repeater
 
     protected function areCachedDefaultChildSchemasFresh(): bool
     {
-        return is_array($this->getRawState()) && parent::areCachedDefaultChildSchemasFresh();
+        return is_array($this->getRawState())
+            && (! FilamentApi::hasMethod(Repeater::class, 'areCachedDefaultChildSchemasFresh') || parent::areCachedDefaultChildSchemasFresh());
     }
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->addable(false)->deletable(false)->reorderable(false);
+        $this->mutateDehydratedStateUsing(static fn (self $component, ?array $state): array => $component->dehydrateItems($state));
         $this->rule('array');
         $this->rule(static fn (self $component): Closure => static function (string $attribute, mixed $value, Closure $fail) use ($component): void {
             // Child validation may materialize nested paths. Inspect the original

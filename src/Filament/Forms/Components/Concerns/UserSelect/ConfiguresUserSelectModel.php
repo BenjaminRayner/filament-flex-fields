@@ -138,12 +138,12 @@ trait ConfiguresUserSelectModel
     public function applyUserSelectRelationshipScope(Builder $query, ?string $search = null): Builder
     {
         $record = $this->getRecord();
-        if ($this->shouldIgnoreRelationshipRecord && $record instanceof Model) {
+        if ($this->selectIgnoreRelationshipRecord && $record instanceof Model) {
             $query->where($record->getQualifiedKeyName(), '!=', $record->getKey());
         }
 
-        if ($this->modifyRelationshipQueryUsing !== null) {
-            $modified = $this->evaluate($this->modifyRelationshipQueryUsing, [
+        if ($this->selectRelationshipQueryUsing !== null) {
+            $modified = $this->evaluate($this->selectRelationshipQueryUsing, [
                 'query' => $query, 'search' => $search,
             ]);
             if ($modified !== null && ! $modified instanceof Builder) {

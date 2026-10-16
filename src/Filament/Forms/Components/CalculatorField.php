@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Calculator\ConfiguresCalculator;
 use Bjanczak\FilamentFlexFields\Support\Calculator\CalculatorPrecision;
 use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionText;
+use Closure;
 use Filament\Actions\Action;
 
 /** Numeric storage and every input affordance belong to the actual FlexTextInput. */
@@ -15,6 +16,20 @@ class CalculatorField extends FlexTextInput
     use ConfiguresCalculator;
 
     protected string $view = 'filament-flex-fields::forms.components.calculator-field';
+
+    protected bool|Closure $calculatorInteger = false;
+
+    public function integer(bool|Closure $condition = true): static
+    {
+        $this->calculatorInteger = $condition;
+
+        return parent::integer($condition);
+    }
+
+    public function isInteger(): bool
+    {
+        return (bool) $this->evaluate($this->calculatorInteger);
+    }
 
     protected function setUp(): void
     {
@@ -42,6 +57,6 @@ class CalculatorField extends FlexTextInput
 
     public function getCalculatorFieldId(): string
     {
-        return $this->hasContainer() ? $this->getLivewire()->getId().':'.$this->getStatePath() : $this->getName();
+        return isset($this->container) ? $this->getLivewire()->getId().':'.$this->getStatePath() : $this->getName();
     }
 }

@@ -10,6 +10,7 @@ use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\C
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\Concerns\HasTranslatableMigrationAliases;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\Concerns\ProvidesTranslatablePresets;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\TranslatableFields\Concerns\SyncsTranslatableLocaleFieldState;
+use Filament\Schemas\Schema;
 
 /** Locale composition: shared tab renderer, independently owned child fields. */
 class TranslatableFields extends SegmentTabs
@@ -20,6 +21,18 @@ class TranslatableFields extends SegmentTabs
     use HasTranslatableMigrationAliases;
     use ProvidesTranslatablePresets;
     use SyncsTranslatableLocaleFieldState;
+
+    public function container(Schema $schema): static
+    {
+        $changed = isset($this->container) && $this->container !== $schema;
+        parent::container($schema);
+        if ($changed) {
+            $this->clearCachedChildSchemas();
+            unset($this->rootContainer);
+        }
+
+        return $this;
+    }
 
     protected function setUp(): void
     {

@@ -1,5 +1,6 @@
 @php
     use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs;
+    use Bjanczak\FilamentFlexFields\Support\FilamentSchemaCompatibility;
 
     $id = $getId();
     $key = $getKey(isAbsolute: false);
@@ -11,7 +12,7 @@
 
 @if (! empty($childSchema->getComponents()))
     <div
-        @if ($childSchema->isLoadingDeferred()) data-fff-deferred-panel @endif
+        @if (FilamentSchemaCompatibility::isDeferred($childSchema)) data-fff-deferred-panel @endif
         @class([
             'fff-segment-tabs__panel',
             'is-active' => $isActivePanel,

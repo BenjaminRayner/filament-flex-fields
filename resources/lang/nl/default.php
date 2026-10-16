@@ -700,6 +700,11 @@ return [
         ],
     ],
     'rich_editor' => [
+        'blocks' => [
+            'search' => 'Blokken zoeken',
+            'no_results' => 'Geen blokken komen overeen met je zoekopdracht.',
+            'close_panel' => 'Paneel sluiten',
+        ],
         'clear_content' => 'Inhoud wissen',
         'toolbar_groups' => [
             'heading' => 'Kop',

@@ -6,6 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Support\Assets;
 
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs\SegmentTab;
+use Bjanczak\FilamentFlexFields\Support\FilamentSchemaCompatibility;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -48,7 +49,8 @@ final class InitialSchemaVisibility
         for ($node = $component; $node !== null; $node = $parent) {
             $container = $node->getContainer();
             $parent = $container->getParentComponent();
-            if ($node->isHidden() || filled($node->getHiddenJs()) || filled($node->getVisibleJs()) || $container->isLoadingDeferred()) {
+            if ($node->isHidden() || filled($node->getHiddenJs()) || filled($node->getVisibleJs())
+                || FilamentSchemaCompatibility::isDeferred($container)) {
                 return false;
             }
             $attributes = $node->getExtraAttributes();

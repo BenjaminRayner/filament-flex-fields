@@ -23,6 +23,7 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectField\T
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectField\ValidatesSelectValues;
 use Bjanczak\FilamentFlexFields\Support\Events\ActivityDispatcher;
 use Bjanczak\FilamentFlexFields\Support\Events\FieldMounted;
+use Bjanczak\FilamentFlexFields\Support\FilamentApi;
 use Filament\Forms\Components\Select;
 use Illuminate\Support\HtmlString;
 
@@ -71,8 +72,12 @@ class SelectField extends Select
         $this->richOptionJsTransformer = null;
         $this->transformingRichOptionHtml = null;
         $this->cachedSelectedRecord = null;
-        $this->cachedRelationshipRecords = null;
-        $this->cachedRelationshipOptions = null;
+        if (FilamentApi::hasProperty(static::class, 'cachedRelationshipRecords')) {
+            $this->cachedRelationshipRecords = null;
+        }
+        if (FilamentApi::hasProperty(static::class, 'cachedRelationshipOptions')) {
+            $this->cachedRelationshipOptions = null;
+        }
         $this->allowDeferredOptionResolution = false;
         $this->forgetUsesRichOptionHtmlCache();
     }

@@ -10,6 +10,7 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Spatie\FlexSpatieMedia
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\VoiceNoteRecorderField;
 use Bjanczak\FilamentFlexFields\Support\Events\ActivityDispatcher;
 use Bjanczak\FilamentFlexFields\Support\Events\UploadFailed;
+use Bjanczak\FilamentFlexFields\Support\FilamentApi;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\FileUploadMetadata;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\DiskUploadBridge;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Lifecycle\UploadRecordLifecycle;
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use League\Flysystem\UnableToCheckFileExistence;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 /**
@@ -246,6 +248,31 @@ trait FlexFileUploadStorage
                 ]);
             });
         }
+    }
+
+    public function hydrateFiles(): void
+    {
+        if (FilamentApi::hasMethod(BaseFileUpload::class, 'hydrateFiles')) {
+            parent::hydrateFiles();
+
+            return;
+        }
+        $this->rawState(array_filter(Arr::wrap($this->getRawState()), function (mixed $file): bool {
+            if ($file instanceof TemporaryUploadedFile) {
+                return true;
+            }
+            if (! is_string($file) || blank($file)) {
+                return false;
+            }
+            if (! $this->shouldFetchFileInformation()) {
+                return true;
+            }
+            try {
+                return $this->getDisk()->exists($file);
+            } catch (UnableToCheckFileExistence) {
+                return false;
+            }
+        }));
     }
 
     public function registerFlexFileUploadHooks(): void

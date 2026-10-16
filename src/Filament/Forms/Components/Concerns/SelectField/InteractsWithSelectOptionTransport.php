@@ -14,6 +14,10 @@ use Livewire\Attributes\Renderless;
 /** @mixin SelectField */
 trait InteractsWithSelectOptionTransport
 {
+    protected ?Closure $selectRelationshipQueryUsing = null;
+
+    protected bool $selectIgnoreRelationshipRecord = false;
+
     /**
      * The package transport supports rich records as well as Filament strings.
      * Keep the configured transformer authoritative, including custom callbacks.
@@ -78,10 +82,13 @@ trait InteractsWithSelectOptionTransport
 
     public function relationship(string|Closure|null $name = null, string|Closure|null $titleAttribute = null, ?Closure $modifyQueryUsing = null, bool $ignoreRecord = false): static
     {
+        $this->selectRelationshipQueryUsing = $this->wrapRelationshipQueryModifier($modifyQueryUsing);
+        $this->selectIgnoreRelationshipRecord = $ignoreRecord;
+
         return parent::relationship(
             $name,
             $titleAttribute,
-            $this->wrapRelationshipQueryModifier($modifyQueryUsing),
+            $this->selectRelationshipQueryUsing,
             $ignoreRecord,
         );
     }

@@ -17,6 +17,7 @@ use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\TextInput\Con
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\TextInput\ConfiguresTextInputSuggestions;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\TextInput\ConfiguresTextInputTools;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\TextInput\ConfiguresTextInputVerification;
+use Bjanczak\FilamentFlexFields\Support\FilamentApi;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsConfig;
 use Bjanczak\FilamentFlexFields\Support\TextInput\TextInputRenderState;
 use Bjanczak\FilamentFlexFields\Support\TextInput\TextInputValidationRule;
@@ -25,6 +26,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TextInput\Actions\CopyAction;
 use Filament\Forms\Components\TextInput\Actions\HidePasswordAction;
 use Filament\Forms\Components\TextInput\Actions\ShowPasswordAction;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 
 /** Native state/validation, FLEX presentation and opt-in browser tools. */
 class FlexTextInput extends TextInput
@@ -43,6 +46,20 @@ class FlexTextInput extends TextInput
     use HasFieldRounding;
 
     protected string $view = 'filament-flex-fields::forms.components.flex-text-input-field';
+
+    public function container(Schema $schema): static
+    {
+        $changed = isset($this->container) && $this->container !== $schema;
+        parent::container($schema);
+        if ($changed && ! FilamentApi::hasMethod(Component::class, 'flushCachedHierarchy')) {
+            $this->flushCachedAbsoluteKey();
+            $this->flushCachedAbsoluteInheritanceKey();
+            $this->flushCachedAbsoluteStatePath();
+            unset($this->rootContainer);
+        }
+
+        return $this;
+    }
 
     protected function setUp(): void
     {

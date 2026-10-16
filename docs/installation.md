@@ -12,7 +12,7 @@ Start with a working Laravel application and a Filament 5 panel. This guide inst
 | Requirement | What to check |
 | --- | --- |
 | PHP | The package requires `^8.3` |
-| Filament | The package permits `^5.0`; the verified stable baseline is 5.9.0 |
+| Filament | The package requires `^5.6` (Filament 5.6.0 or newer within 5.x) |
 | Laravel and Livewire | Use versions compatible with your installed Filament release |
 | Browser assets | Publish the prebuilt files after installing the package |
 

@@ -18,6 +18,11 @@ class Action extends BaseAction
     use CanRoundAction;
     use CanStyleItemCardAction;
 
+    public function hasLivewireTarget(): bool
+    {
+        return $this->livewireTarget !== null;
+    }
+
     protected function toButtonHtml(): string
     {
         $html = parent::toButtonHtml();

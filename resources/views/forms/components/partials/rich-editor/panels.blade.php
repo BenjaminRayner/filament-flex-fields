@@ -11,12 +11,12 @@
             <div x-show="isPanelActive('customBlocks')" x-cloak>
                 <div class="fff-rich-editor__panel-heading">
                     <span>{{ __('filament-forms::components.rich_editor.tools.custom_blocks') }}</span>
-                    <button type="button" x-on:click="togglePanel()" aria-label="{{ __('filament-forms::components.rich_editor.actions.close_panel.label') }}"><x-filament::icon icon="hugeicons-cancel-01" /></button>
+                    <button type="button" x-on:click="togglePanel()" aria-label="{{ __('filament-flex-fields::default.rich_editor.blocks.close_panel') }}"><x-filament::icon icon="hugeicons-cancel-01" /></button>
                 </div>
                 @if ($panelSearchable)
                     <input type="search" class="fff-rich-editor__panel-search" x-model="customBlockSearch" x-on:keydown.enter.prevent
-                        aria-label="{{ __('filament-forms::components.rich_editor.custom_blocks.search_label') }}"
-                        placeholder="{{ __('filament-forms::components.rich_editor.custom_blocks.search_prompt') }}" />
+                        aria-label="{{ __('filament-flex-fields::default.rich_editor.blocks.search') }}"
+                        placeholder="{{ __('filament-flex-fields::default.rich_editor.blocks.search') }}" />
                 @endif
                 @foreach ($panelBlocks as $groupLabel => $blocks)
                     @if (filled($groupLabel))
@@ -34,7 +34,7 @@
                     </div>
                 @endforeach
                 @if ($panelSearchable)
-                    <p class="fff-rich-editor__panel-group" x-show="!matchesCustomBlockSearch(@js($panelBlocks->flatMap(fn ($blocks, $label) => [$label, ...$blocks->map(fn ($block) => $block::getLabel())->all()])->all()))" x-cloak>{{ __('filament-forms::components.rich_editor.custom_blocks.no_search_results_message') }}</p>
+                    <p class="fff-rich-editor__panel-group" x-show="!matchesCustomBlockSearch(@js($panelBlocks->flatMap(fn ($blocks, $label) => [$label, ...$blocks->map(fn ($block) => $block::getLabel())->all()])->all()))" x-cloak>{{ __('filament-flex-fields::default.rich_editor.blocks.no_results') }}</p>
                 @endif
             </div>
         @endif
@@ -42,7 +42,7 @@
             <div x-show="isPanelActive('mergeTags')" x-cloak>
                 <div class="fff-rich-editor__panel-heading">
                     <span>{{ __('filament-forms::components.rich_editor.tools.merge_tags') }}</span>
-                    <button type="button" x-on:click="togglePanel()" aria-label="{{ __('filament-forms::components.rich_editor.actions.close_panel.label') }}"><x-filament::icon icon="hugeicons-cancel-01" /></button>
+                    <button type="button" x-on:click="togglePanel()" aria-label="{{ __('filament-flex-fields::default.rich_editor.blocks.close_panel') }}"><x-filament::icon icon="hugeicons-cancel-01" /></button>
                 </div>
                 <div class="fff-rich-editor__panel-items">
                     @foreach ($panelMergeTags as $tagId => $tagLabel)

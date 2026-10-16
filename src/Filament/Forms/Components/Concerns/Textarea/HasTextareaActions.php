@@ -6,6 +6,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Textare
 
 use BackedEnum;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextareaField;
+use Bjanczak\FilamentFlexFields\Support\FilamentApi;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -178,7 +179,9 @@ trait HasTextareaActions
 
     protected function prepareSubmitAction(Action $action): Action
     {
-        $wasDisabled = $action->hasDisabled() && (! $this->isMountedInContainer() || $action->isDisabled());
+        $hasDisabled = FilamentApi::hasMethod(Action::class, 'hasDisabled')
+            ? $action->hasDisabled() : (new \ReflectionProperty(Action::class, 'isDisabled'))->getValue($action) !== false;
+        $wasDisabled = $hasDisabled && (! $this->isMountedInContainer() || $action->isDisabled());
 
         return $action
             ->disabled(fn (FlexTextareaField $component): bool => $wasDisabled || $component->isSubmitDisabled())

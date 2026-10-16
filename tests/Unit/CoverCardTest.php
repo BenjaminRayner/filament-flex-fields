@@ -158,9 +158,12 @@ it('merges extraAttributes style with aspect-ratio into a single style attribute
 
     $html = html_entity_decode(Livewire::test(TestableIconPickerForm::class)->html(false));
 
-    expect($html)
-        ->toContain('style="min-width: fit-content; --fff-cover-card-aspect-ratio: 3 / 4; --fff-cover-card-max-width: 16rem;"')
-        ->not->toMatch('/style="[^"]*"\s[^>]*style="/');
+    expect($html)->not->toMatch('/style="[^"]*"\s[^>]*style="/');
+    preg_match('/<[^>]+class="[^"]*fff-cover-card(?:\s|"|_)[^>]*>/', $html, $card);
+    expect($card)->not->toBeEmpty();
+    preg_match('/\sstyle="([^"]*)"/', $card[0], $style);
+    $declarations = array_map('trim', explode(';', $style[1] ?? ''));
+    expect($declarations)->toContain('min-width: fit-content', '--fff-cover-card-aspect-ratio: 3 / 4', '--fff-cover-card-max-width: 16rem');
 });
 
 it('keeps cover card height from shrinking below content when aspect-ratio is short', function () {

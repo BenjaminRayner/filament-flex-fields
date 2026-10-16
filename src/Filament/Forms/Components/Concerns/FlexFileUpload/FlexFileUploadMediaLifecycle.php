@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\FlexFileUpload;
 
+use Bjanczak\FilamentFlexFields\Support\FilamentApi;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\UploadAggregate;
 use Closure;
 use Filament\Forms\Components\BaseFileUpload;
@@ -57,6 +58,20 @@ trait FlexFileUploadMediaLifecycle
     public function getValidationRules(): array
     {
         $rules = parent::getValidationRules();
+        // Older Filament only drops forged paths while saving. The staging path
+        // needs the same rejection before validation returns a persistable value.
+        if (FilamentApi::hasMethod(BaseFileUpload::class, 'dropTamperedFilePaths') && $this->shouldPreventFilePathTampering()) {
+            $rules[] = function (string $attribute, mixed $value, Closure $fail): void {
+                $originalPaths = $this->getOriginalFilePaths();
+                foreach (Arr::wrap($value) as $file) {
+                    if (is_string($file) && ! $this->isFilePathAuthorized($file, $originalPaths)) {
+                        $fail(__($this->getValidationMessages()['tampered'] ?? 'validation.in', ['attribute' => $this->getValidationAttribute()]));
+
+                        return;
+                    }
+                }
+            };
+        }
         $limit = $this->getMaxTotalSizeKb();
         if ($limit !== null) {
             $rules[] = function (string $attribute, mixed $value, Closure $fail) use ($limit): void {

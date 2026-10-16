@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Actions\Concerns\HoldConfirm;
 
 use Bjanczak\FilamentFlexFields\Support\Confirmation\HoldTriggerRenderer;
+use Bjanczak\FilamentFlexFields\Support\FilamentApi;
+use Filament\Actions\Action;
 
 trait RendersConfirmation
 {
@@ -45,7 +47,8 @@ trait RendersConfirmation
 
     public function getConfirmationConsumerKey(): ?string
     {
-        return $this->getLivewireKey();
+        return FilamentApi::hasMethod(Action::class, 'getLivewireKey')
+            ? $this->getLivewireKey() : null;
     }
 
     /** @return array<string, mixed> */

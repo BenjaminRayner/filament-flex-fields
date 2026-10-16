@@ -7,9 +7,11 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectF
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
 use Bjanczak\FilamentFlexFields\Support\Events\ActivityDispatcher;
 use Bjanczak\FilamentFlexFields\Support\Events\SelectSearched;
+use Bjanczak\FilamentFlexFields\Support\FilamentApi;
 use Bjanczak\FilamentFlexFields\Support\Select\EntityMentionQuery;
 use Bjanczak\FilamentFlexFields\Support\Select\SelectSearchRateLimiter;
 use Bjanczak\FilamentFlexFields\Support\Select\Transport\SearchQueryInput;
+use Filament\Forms\Components\Select;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Livewire\Attributes\Renderless;
 
@@ -53,7 +55,10 @@ trait RequestsSelectOptions
             mb_strlen(trim($search)), 'relationship',
         ));
 
-        return $this->selectSearchResultCache()->put($cacheKey, parent::getSearchResultsFromRelationship($search));
+        $results = FilamentApi::hasMethod(Select::class, 'getSearchResultsFromRelationship')
+            ? parent::getSearchResultsFromRelationship($search) : parent::getSearchResults($search);
+
+        return $this->selectSearchResultCache()->put($cacheKey, $results);
     }
 
     /** @return array<array<string, mixed>> Rich records retain their metadata. */

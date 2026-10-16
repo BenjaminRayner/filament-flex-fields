@@ -700,6 +700,11 @@ return [
         ],
     ],
     'rich_editor' => [
+        'blocks' => [
+            'search' => 'Blöcke suchen',
+            'no_results' => 'Keine Blöcke entsprechen deiner Suche.',
+            'close_panel' => 'Panel schließen',
+        ],
         'clear_content' => 'Inhalt löschen',
         'toolbar_groups' => [
             'heading' => 'Überschrift',

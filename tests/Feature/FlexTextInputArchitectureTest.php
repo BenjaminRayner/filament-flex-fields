@@ -46,11 +46,16 @@ it('retains whitespace and server clearing instead of resurrecting the initial v
 });
 
 it('keeps numeric state casts and validation identical to native TextInput', function (): void {
+    $nativeValue = null;
     foreach ([TextInput::class, FlexTextInput::class] as $class) {
         TestableTranslatableForm::$formSchema = [$class::make('value')->integer()->minValue(2)->maxValue(5)->required()];
         $test = Livewire::test(TestableTranslatableForm::class)->set('data.value', '3');
         $schema = $test->instance()->getSchema('form');
-        expect($schema->getState()['value'])->toBe(3);
+        $value = $schema->getState()['value'];
+        if ($class === TextInput::class) {
+            $nativeValue = $value;
+        }
+        expect($value)->toEqual(3)->toBe($nativeValue);
         $test->set('data.value', '1');
         expect(fn () => $test->instance()->getSchema('form')->getState())->toThrow(ValidationException::class);
     }

@@ -12,7 +12,7 @@ Install the dependencies required by the package, then prepare only the services
 | Dependency | Package constraint or setup |
 | --- | --- |
 | PHP | `^8.3` |
-| Filament | `^5.0`; verified stable baseline 5.9.0 |
+| Filament | `^5.6` (Filament 5.6.0 or newer within 5.x) |
 | Laravel and Livewire | Compatible with the installed Filament release |
 | FLEX Fields | The v4 release line for these guides |
 | Node.js in production | Not required for normal use of prebuilt FLEX assets |

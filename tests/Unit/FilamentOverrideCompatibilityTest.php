@@ -94,5 +94,5 @@ it('reports the installed Filament schemas version for CI matrix diagnostics', f
     $version = InstalledVersions::getPrettyVersion('filament/schemas');
 
     expect($version)->not->toBeEmpty()
-        ->and(version_compare((string) InstalledVersions::getVersion('filament/schemas'), '5.0.0', '>='))->toBeTrue();
+        ->and(version_compare((string) InstalledVersions::getVersion('filament/schemas'), '5.6.0', '>='))->toBeTrue();
 });

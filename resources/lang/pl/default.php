@@ -704,6 +704,11 @@ return [
         ],
     ],
     'rich_editor' => [
+        'blocks' => [
+            'search' => 'Szukaj bloków',
+            'no_results' => 'Żadne bloki nie pasują do wyszukiwania.',
+            'close_panel' => 'Zamknij panel',
+        ],
         'clear_content' => 'Wyczyść treść',
         'toolbar_groups' => [
             'heading' => 'Nagłówek',
