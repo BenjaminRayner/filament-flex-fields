@@ -1,74 +1,57 @@
 ---
 title: "Plans and pricing"
-description: "Commercial licenses for one product, one company or a corporate group."
+description: "Compare free use for qualifying internal business tools, personal and educational projects with one-time commercial licenses for hosted products."
 icon: "wallet"
 mode: "wide"
 ---
 
 <Badge color="purple" shape="pill">Same package features</Badge> <Badge color="gray" shape="pill">Standard plans · one-time purchase</Badge>
 
-Choose by ownership and delivery model. Standard plans include unlimited users, tenants, developers and servers within scope. Qualifying [free use](/docs/licensing) needs no purchase.
+Choose by ownership and delivery model. **Free also covers qualifying internal business use** — including staff tools for your own company. The same complete toolkit is available in every plan. Standard commercial plans include unlimited users, tenants, developers and servers within scope. [Check free-use eligibility](/docs/licensing).
 
 **USD, excluding applicable VAT or sales tax.** Current prices under License v2.0; existing purchases retain their agreed terms.
 
-<CardGroup cols={3}>
-  <Card title="Single Product" icon="package">
-    ### $249
-
-    One-time purchase for **one named hosted product** owned by one named person or legal entity.
-
-    - Unlimited users, tenants and developers.
-    - Production, staging, local and CI environments.
-    - Perpetual rights within the licensed scope.
-
-    [Request Single Product](/docs/request-license)
-  </Card>
-  <Card title="Unlimited Company" icon="building-2">
-    ### $699
-
-    One-time purchase for **all current and future hosted products** owned and operated by one named entity or sole proprietor.
-
-    - Unlimited products within that entity.
-    - Unlimited users, teams and environments.
-    - Perpetual rights within the licensed scope.
-
-    [Request Unlimited Company](/docs/request-license)
-  </Card>
-  <Card title="Enterprise Group" icon="network">
-    ### $1,499
-
-    One-time purchase for a **named parent and its 100%-owned subsidiaries**, through the qualifying ownership and voting-rights chain.
-
-    - Unlimited qualifying hosted products.
-    - Shared development across covered entities.
-    - Perpetual rights within the licensed scope.
-
-    [Request Enterprise Group](/docs/request-license)
-  </Card>
-</CardGroup>
-
-<Card title="Custom / OEM / Redistribution" icon="handshake" href="/docs/request-license">
-  **From $2,999 · individually agreed.** For customer installations, software distribution, reusable kits, OEM, independent reseller rights or other scope beyond a Standard Plan. Delivery rights, scale, term, updates and fees must be expressly agreed. The starting price does not buy automatic or unlimited distribution rights; a quote may be higher or include ongoing fees.
-</Card>
+<div className="fff-pricing">
+    <div className="fff-landing-pricing">
+      <div className="fff-landing-plan"><div className="fff-landing-plan-top"><div className="fff-landing-plan-heading"><Icon icon="gift" size={20} /><h3>Free</h3></div><p className="fff-landing-plan-label">No purchase required</p><div className="fff-landing-price-row"><p className="fff-landing-price">Free</p><span>eligible use</span></div><p className="fff-landing-plan-description">For qualifying internal business tools, personal projects and learning.</p><a className="fff-landing-button fff-landing-button-white" href="/docs/licensing">Check free eligibility<Icon icon="arrow-up-right" size={16} /></a></div><div className="fff-landing-plan-features"><div><Icon icon="check" size={16} /><p><strong>Internal operations</strong><span>Build qualifying staff tools and business portals.</span></p></div><div><Icon icon="check" size={16} /><p><strong>Personal & learning</strong><span>Use it for education, research and personal projects.</span></p></div><div><Icon icon="check" size={16} /><p><strong>Private evaluation</strong><span>Try a prospective commercial product before launch.</span></p></div><div><Icon icon="check" size={16} /><p><strong>Bespoke client work</strong><span>Build client-specific internal tools when the free-use conditions are met.</span></p></div></div></div>
+      <div className="fff-landing-plan"><div className="fff-landing-plan-top"><div className="fff-landing-plan-heading"><Icon icon="package" size={20} /><h3>Single Product</h3></div><p className="fff-landing-plan-label">One hosted product</p><div className="fff-landing-price-row"><p className="fff-landing-price">&#36;249</p><span>one-time purchase</span></div><p className="fff-landing-plan-description">Launch one commercial product or SaaS that you own and host.</p><a className="fff-landing-button fff-landing-button-white" href="/docs/request-license">Choose Single Product<Icon icon="arrow-up-right" size={16} /></a></div><div className="fff-landing-plan-features"><div><Icon icon="check" size={16} /><p><strong>Sell hosted access</strong><span>Charge for subscriptions or access to your product.</span></p></div><div><Icon icon="check" size={16} /><p><strong>One product, many editions</strong><span>Versions, languages and pricing tiers are covered.</span></p></div><div><Icon icon="check" size={16} /><p><strong>Multi-region & multi-tenant</strong><span>Dedicated tenant instances stay within product scope.</span></p></div><div><Icon icon="check" size={16} /><p><strong>One named owner</strong><span>A person or legal entity holds the product license.</span></p></div></div></div>
+      <div className="fff-landing-plan fff-landing-plan-featured"><div className="fff-landing-plan-top"><div className="fff-landing-plan-heading"><Icon icon="building-2" size={20} /><h3>Unlimited Company</h3></div><p className="fff-landing-plan-label">Your product portfolio</p><div className="fff-landing-price-row"><p className="fff-landing-price">&#36;699</p><span>one-time purchase</span></div><p className="fff-landing-plan-description">One license for the hosted products your company owns and operates.</p><a className="fff-landing-button" href="/docs/request-license">Choose Unlimited Company<Icon icon="arrow-up-right" size={16} /></a></div><div className="fff-landing-plan-features"><div><Icon icon="check" size={16} /><p><strong>Unlimited current products</strong><span>Cover your company’s entire hosted portfolio.</span></p></div><div><Icon icon="check" size={16} /><p><strong>Future products included</strong><span>Launch another hosted product without a separate license.</span></p></div><div><Icon icon="check" size={16} /><p><strong>All company teams</strong><span>Multiple brands and departments in one entity.</span></p></div><div><Icon icon="check" size={16} /><p><strong>One company or sole proprietor</strong><span>Other legal entities need their own coverage.</span></p></div></div></div>
+      <div className="fff-landing-plan"><div className="fff-landing-plan-top"><div className="fff-landing-plan-heading"><Icon icon="network" size={20} /><h3>Enterprise Group</h3></div><p className="fff-landing-plan-label">Your corporate group</p><div className="fff-landing-price-row"><p className="fff-landing-price">&#36;1,499</p><span>one-time purchase</span></div><p className="fff-landing-plan-description">Extend coverage across a parent and its qualifying subsidiaries.</p><a className="fff-landing-button fff-landing-button-white" href="/docs/request-license">Choose Enterprise Group<Icon icon="arrow-up-right" size={16} /></a></div><div className="fff-landing-plan-features"><div><Icon icon="check" size={16} /><p><strong>Multiple covered entities</strong><span>Named parent and its 100%-owned subsidiaries.</span></p></div><div><Icon icon="check" size={16} /><p><strong>Future subsidiaries qualify</strong><span>No per-subsidiary fee while conditions are met.</span></p></div><div><Icon icon="check" size={16} /><p><strong>Unlimited group products</strong><span>Products owned and operated within the covered group.</span></p></div><div><Icon icon="check" size={16} /><p><strong>Share across your group</strong><span>Covered teams can share private repositories and copies.</span></p></div></div></div>
+    </div>
+    <div className="fff-landing-custom-plan"><div><h3>Custom / OEM <span>From &#36;2,999</span></h3><p>Deliver your software to customers, distribute a reusable kit or agree OEM and reseller rights. Delivery scope, updates and fees are quoted for your project.</p></div><a className="fff-landing-button fff-landing-button-white" href="/docs/request-license">Discuss custom rights <Icon icon="arrow-up-right" size={16} /></a></div>
+    <div className="fff-landing-license-included"><h3>Every standard commercial license also includes</h3><div><p><Icon icon="infinity" size={20} /><strong>Unlimited scale</strong><span>No seat, user, tenant, server or region limits within the licensed scope.</span></p><p><Icon icon="refresh-cw" size={20} /><strong>Perpetual rights & updates</strong><span>No mandatory renewal. Released updates, including major versions of this package, stay covered.</span></p><p><Icon icon="palette" size={20} /><strong>Your application, your brand</strong><span>Private modifications and theming. No public “Powered by FLEX” badge required.</span></p><p><Icon icon="unplug" size={20} /><strong>No runtime activation</strong><span>Standard plans require no periodic online license validation.</span></p></div></div>
+    <p className="fff-landing-small-print">The same complete toolkit in every plan. Free use depends on eligibility. Standard commercial plans cover hosted use; customer installations, OEM and redistribution require agreed Custom rights. USD, excluding taxes. <a href="/docs/license-terms">Read the complete license terms.</a></p>
+</div>
 
 ## Compare the scope
 
-| | Single Product | Unlimited Company | Enterprise Group |
-|---|---|---|---|
-| Hosted products | One named product | All licensee-owned products | All qualifying group-owned products |
-| Licensee coverage | One person or legal entity | One entity or sole proprietor | Named parent + qualifying 100%-owned subsidiaries |
-| Users, tenants and developers | Unlimited within scope | Unlimited within scope | Unlimited within scope |
-| Servers and environments | Included within scope | Included within scope | Included within scope |
-| Private modifications and application branding | Included within scope | Included within scope | Included within scope |
-| Mandatory renewal to continue licensed use | None | None | None |
-| Customer installations, OEM and redistribution | Separate Custom rights | Separate Custom rights | Separate Custom rights |
-| SLA, custom development or other packages | Not included | Not included | Not included |
+| | Free | Single Product | Unlimited Company | Enterprise Group |
+|---|---|---|---|---|
+| Price before tax | No purchase for eligible use | $249 once | $699 once | $1,499 once |
+| Primary scope | Qualifying internal operations, personal/educational use and private evaluation | One named hosted product | All licensee-owned hosted products | All qualifying group-owned hosted products |
+| Licensee coverage | One person/entity; qualifying bespoke work has additional conditions | One person or legal entity | One entity or sole proprietor | Named parent + qualifying 100%-owned subsidiaries |
+| Users, tenants and developers | Subject to free-use scope | Unlimited within scope | Unlimited within scope | Unlimited within scope |
+| Servers and environments | Included for eligible use | Included within scope | Included within scope | Included within scope |
+| Private modifications and application branding | Included within the free grant | Included within scope | Included within scope | Included within scope |
+| Mandatory renewal to continue licensed use | None while use qualifies | None | None | None |
+| Customer installations, OEM and redistribution | No general distribution right; see bespoke exceptions | Separate Custom rights | Separate Custom rights | Separate Custom rights |
+| SLA, custom development or other packages | Not included | Not included | Not included | Not included |
 
 Enterprise Group expands entity coverage. It does not add OEM rights. A client, sister company or partly owned subsidiary is not automatically covered by a company license.
 
 ## Which plan fits your application?
 
 <Tabs>
+  <Tab title="Internal company tools" icon="building-2">
+    **Free can cover your company's own internal operations.** A staff CRM,
+    inventory system or business administration tool can qualify even when the
+    company earns revenue. Personal, educational and research projects can also qualify.
+
+    The application must meet the free-use conditions. A back office forming or
+    configuring a software service sold to customers does not become free simply
+    because it is staff-only. Check the [free-use guide](/docs/licensing#what-can-remain-free)
+    for business portals, bespoke client work and private evaluation.
+  </Tab>
   <Tab title="One hosted product" icon="package">
     **Single Product is sufficient** for one named hosted product, even with many developers or customers. Multiple regions, tenant instances in your controlled hosting and pricing tiers can belong to the same product.
 

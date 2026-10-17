@@ -2683,6 +2683,12 @@ body > .fi-dropdown-panel.fff-select-dropdown-panel {
     padding-inline-end: 0.25rem;
 }
 
+/* Empty multi-selects have a text label, not a chip row to align at the top. */
+.fff-select-field--multiple:not(.fff-user-select):not(.fff-select-field--item-card) .fi-select-input-btn:has(> .fi-select-input-value-ctn > .fi-select-input-placeholder):not(:has(.fi-select-input-value-badges-ctn)),
+.fff-select-field--multiple:not(.fff-user-select):not(.fff-select-field--item-card) .fff-select-trigger-ssr--multiple:not(:has(.fi-select-input-value-badges-ctn)) .fff-select-trigger-ssr__btn {
+    align-items: center !important;
+}
+
 /* Shared by SSR placeholder + hydrated Filament trigger so reload does not reflow chips. */
 .fff-select-field--multiple .fi-select-input-value-badges-ctn,
 .fff-select-trigger-ssr--multiple .fi-select-input-value-badges-ctn {

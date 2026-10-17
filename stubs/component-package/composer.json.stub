@@ -5,7 +5,7 @@
     "license": "proprietary",
     "require": {
         "php": "^8.3",
-        "janczakb/filament-flex-fields": "^3.1.19"
+        "janczakb/filament-flex-fields": "^4.0"
     },
     "autoload": {
         "psr-4": { "{{JSON_NAMESPACE}}\\": "src/" }

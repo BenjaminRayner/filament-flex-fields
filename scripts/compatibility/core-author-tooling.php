@@ -240,11 +240,11 @@ PHP, $providerSource, $compositionChanges);
     ];
     file_put_contents($application.'/composer.json', json_encode([
         'name' => 'acceptance/isolated-application', 'type' => 'project',
-        'require' => ['janczakb/filament-flex-fields' => '3.1.19', 'acceptance/summary' => '1.0.0', 'acceptance/status' => '1.0.0',
+        'require' => ['janczakb/filament-flex-fields' => '4.0.0', 'acceptance/summary' => '1.0.0', 'acceptance/status' => '1.0.0',
             'filament/filament' => in_array('--filament-floor', $_SERVER['argv'] ?? [], true)
                 ? '5.9.0' : InstalledVersions::getPrettyVersion('filament/filament'),
             'orchestra/testbench' => InstalledVersions::getPrettyVersion('orchestra/testbench')],
-        'repositories' => [$package('janczakb/filament-flex-fields', '3.1.19', $archives['core']), $package('acceptance/summary', '1.0.0', $archives['extension']), $package('acceptance/status', '1.0.0', $archives['status'])],
+        'repositories' => [$package('janczakb/filament-flex-fields', '4.0.0', $archives['core']), $package('acceptance/summary', '1.0.0', $archives['extension']), $package('acceptance/status', '1.0.0', $archives['status'])],
         'config' => ['allow-plugins' => false, 'platform' => ['php' => '8.3.33']], 'minimum-stability' => 'stable', 'prefer-stable' => true,
     ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     [$code, $output, $error] = authorProcess(['composer', 'install', '--quiet', '--no-interaction', '--no-scripts', '--no-plugins', '--prefer-dist', '--no-progress'], $application);
@@ -619,6 +619,7 @@ try {
     $packageRoot = $root.'/package';
     authorCheck($generator->generate($blueprint, $packageRoot) === array_keys($plan), 'Incomplete generated package');
     $composer = json_decode(file_get_contents($packageRoot.'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+    authorCheck($composer['require']['janczakb/filament-flex-fields'] === '^4.0', 'Generated package does not target FLEX v4');
     authorCheck($composer['autoload']['psr-4']['Acceptance\\Summary\\'] === 'src/', 'Broken PSR-4 namespace');
     authorCheck($composer['extra']['laravel']['providers'] === ['Acceptance\\Summary\\SummaryServiceProvider'], 'Broken provider discovery');
     authorReject(fn () => $generator->generate($blueprint, $packageRoot));

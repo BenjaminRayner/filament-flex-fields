@@ -2,6 +2,7 @@
           SOURCE-AVAILABLE & COMMERCIAL LICENSE — VERSION 2.0
               janczakb/filament-flex-fields (the "Software")
                        Effective: 1 October 2026
+           GitHub platform-rights clarification: 17 October 2026
 ================================================================================
 
 Copyright (c) 2026 Bartłomiej Janczak. All rights reserved.
@@ -66,8 +67,13 @@ SECTION 1 — DEFINITIONS
      (c) Runtime Access and Browser Assets under Section 1.6;
      (d) contributions to the Copyright Holder under Section 4;
      (e) copies expressly authorized by a Custom agreement under Section 5.5.
-     Public forks, mirrors, customer source access, and customer downloads are
-     not permitted merely because the upstream package is publicly available.
+     (f) viewing and service-native forks to the extent separately permitted
+         by GitHub's terms accepted by the Copyright Holder for the official
+         public repository. Those platform permissions do not grant commercial
+         operation, independent redistribution outside that service, or OEM rights.
+     Except for such separately granted platform permissions, public access to
+     the upstream package does not authorize mirrors, customer source delivery,
+     or customer downloads.
 
 1.6  "Runtime Access" means using an application's interface or API without
      receiving its server-side Software, installation artifacts, or rights to
@@ -211,8 +217,9 @@ SECTION 2 — FREE LICENSE AND COMMON OPERATING PERMISSIONS
      permitted scope, including changes under vendor/. Private package feeds
      for Authorized Personnel or Covered Entities are permitted under Section
      1.5(b). Modifications do not enlarge the license, remove attribution, or
-     authorize public forks or external redistribution. Support for modifications
-     is not promised. Contributions follow Section 4.
+     authorize independent public distributions or external redistribution.
+     Separately granted GitHub platform permissions remain as stated in Section
+     1.5(f). Support for modifications is not promised. Contributions follow Section 4.
 
 2.5  There are no developer-seat, user, tenant, server, CPU, region, or revenue
      limits for a use otherwise within the applicable grant. Unlimited scale
@@ -296,12 +303,13 @@ SECTION 4 — CONTRIBUTIONS
      commercial rights, support, or acceptance of the proposed change.
 
 4.3  You may send patches privately to the Copyright Holder or through the
-     official repository's contribution workflow. A minimal contribution fork
-     required by that workflow is permitted solely to submit the change, with
-     existing notices retained. This is not permission to maintain or promote
-     an independent Software distribution; remove the submission fork after the
-     contribution is accepted or finally closed. Ordinary code-free discussion,
-     issue reports, and links to official sources are not redistribution.
+     official repository's contribution workflow, including a service-native
+     fork with existing notices retained. This License does not require deletion
+     of a fork that remains permitted under the separate platform permissions
+     in Section 1.5(f). Contributing does not grant commercial operation, external
+     distribution, or promotion of a separately licensed Software product.
+     Ordinary code-free discussion, issue reports, and links to official sources
+     are not redistribution.
 
 ================================================================================
 SECTION 5 — COMMERCIAL PLANS AND COMMERCIAL LIFECYCLE
@@ -637,6 +645,11 @@ SECTION 10 — GENERAL TERMS AND VERSION PROTECTION
      (d) Issued version-2.0 commercial grants retain their terms for updates
          covered by Section 5.8. No later website, repository, or price-list
          edit unilaterally reduces rights already granted.
+     (e) The clarification published on 17 October 2026 in Sections 1.5(f),
+         2.4 and 4.3 acknowledges separately granted GitHub platform permissions.
+         It does not change plan prices, commercial scope, update entitlement,
+         or the conditions of previously issued grants, and does not withdraw
+         rights already held under GitHub's terms.
 
 10.7 English is the governing language; translations are for convenience.
 

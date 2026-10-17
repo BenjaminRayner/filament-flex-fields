@@ -38,7 +38,7 @@
 </p>
 
 <p align="center">
-  <sub>This README previews FLEX Fields v4. See installation for release availability.</sub>
+  <sub>FLEX Fields v4 is available on Packagist for Filament 5.</sub>
 </p>
 
 <p align="center">
@@ -227,9 +227,9 @@ Disk-backed media, plain tags and translation maps also have modes that do not r
 Start with **PHP 8.3+** and an existing **Filament 5.6+** panel, using compatible Laravel and Livewire versions.
 
 > [!NOTE]
-> **FLEX Fields v4 preview:** this README describes the upcoming v4 release. A stable v4 package is not yet available on Packagist. The installation command below applies once v4 is published in your Composer repository. Follow the [release notes](https://flex-fields.bjanczak.com/docs/changelog) for availability.
+> FLEX Fields v4 is available on Packagist. See the [release notes](https://flex-fields.bjanczak.com/docs/changelog) when updating an existing installation.
 
-**1. Install the package once v4 is available.**
+**1. Install the package.**
 
 ```bash
 composer require janczakb/filament-flex-fields:"^4.0"
@@ -388,13 +388,15 @@ Yes. Compose existing FLEX controls using their configuration APIs and reuse the
 
 | Plan | Price | What it covers |
 | --- | --- | --- |
-| **Permitted Free Use** | **Free** | Qualifying personal, educational, research, internal operational and evaluation uses, plus defined bespoke-client routes under LICENSE §1.7. |
+| **Permitted Free Use** | **Free** | Qualifying personal, educational, research and internal business use, private pre-production evaluation, and eligible bespoke client work under LICENSE §§1.7 and 5.6. |
 | **Single Product** | **$249 one-time** | One named hosted commercial Product for one named licensee. |
 | **Unlimited Company** | **$699 one-time** | Current and future hosted Products of one named company or sole proprietor. |
 | **Enterprise Group** | **$1,499 one-time** | Hosted Products across a named parent and its qualifying 100%-owned subsidiaries. |
 | **Custom / OEM / Redistribution** | **From $2,999; quoted individually** | Customer installations, distribution and other rights expressly agreed in the grant. |
 
 Prices are USD, excluding applicable taxes. Standard paid plans provide perpetual use within their licensed scope, with no mandatory renewal. Enterprise Group does not include OEM or external customer-installation rights. Public source access is not an unrestricted open-source grant.
+
+**Free also covers qualifying internal tools for your own company.** It is not limited to students or non-profit organizations. A commercial software product or SaaS needs the appropriate commercial grant. Standard plans include subsequent official updates, including major versions of FLEX Fields; separate packages such as FLEX Forms are not included. Previously issued licenses retain their agreed terms.
 
 [Compare plans](COMMERCIAL.md) · [Full license terms](LICENSE) · [Request a license](https://flex-fields.bjanczak.com/docs/request-license)
 

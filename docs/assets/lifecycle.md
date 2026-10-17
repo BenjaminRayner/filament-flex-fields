@@ -28,6 +28,12 @@ shows the complete system. Jump to the relevant example on YouTube:
 - [03:26 — Recover from a controlled loading failure](https://www.youtube.com/watch?v=KufHFWijeCc&t=206s).
 - [03:51 — Livewire navigation and new consumers](https://www.youtube.com/watch?v=KufHFWijeCc&t=231s).
 
+<Info>
+  The walkthrough deliberately pauses loading and initialization to make the
+  lifecycle visible. Your forms use the same readiness checks automatically;
+  they do not require those test controls or the demonstration's long pauses.
+</Info>
+
 ## Hidden areas activate when used
 
 | Where the field is rendered | Activation behavior |

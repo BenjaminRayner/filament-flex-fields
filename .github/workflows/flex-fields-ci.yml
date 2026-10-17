@@ -79,9 +79,9 @@ jobs:
         if: matrix.php == '8.3'
         run: npm audit
 
-      - name: Check generated changelog documentation
+      - name: Check generated documentation and license consistency
         if: matrix.php == '8.3'
-        run: npm run docs:recipes:check && npm run docs:changelog:check
+        run: npm run docs:recipes:check && npm run docs:changelog:check && npm run docs:license:check
 
       # Select playground stress suites (~8k+) excluded from Pest — see composer test:select-atomics.
       - name: Run Pest

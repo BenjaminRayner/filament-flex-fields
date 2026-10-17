@@ -11,18 +11,19 @@ Search existing issues and pull requests first. For a new component, a public AP
 change or a substantial refactor, open an issue describing the problem and proposed
 approach before investing in an implementation.
 
-Check the version and branch you are working with. Version 4 is currently under
-development and may differ from the latest published release. Include the package
-version or commit when discussing behavior. See [Support](SUPPORT.md) for the
+FLEX Fields v4 is available on Packagist. Check the installed version and branch
+you are working with; the development branch may contain changes not yet released.
+Include the package version or commit when discussing behavior. See [Support](SUPPORT.md) for the
 compatibility policy.
 
 FLEX Fields is source-available under its [own license](LICENSE), rather than an
 unrestricted open-source license. Contributions are governed by **Section 4** of
 that license: you retain ownership of your original contribution and grant the
 rights described there. Submit only work you have the necessary rights to share,
-and disclose any third-party terms. The license also defines the limited permission
-for a contribution fork and requires removing it after the submission is accepted
-or finally closed. Read those terms before submitting code.
+and disclose any third-party terms. You can submit a patch privately or use a
+GitHub-native contribution fork under GitHub's platform permissions. Keep existing
+notices. A contribution fork is not a commercial license or permission for
+independent redistribution outside those permissions.
 
 ## Report a bug or suggest an improvement
 
@@ -118,11 +119,9 @@ npm run build
 npm run check:budgets
 ```
 
-The full build includes a core audit gate that uses maintainer-only verification
-records in `.internal/`. Those records are not distributed in public checkouts.
-If that prevents a full build, report the limitation in your pull request; do not
-create substitute audit records or bypass the gate. Maintainers complete that
-verification before release.
+The normal build and public checks can run from a public checkout. Maintainers
+also run separate release-acceptance checks. Report any check you cannot run;
+do not disable a check or replace missing evidence with an assumed result.
 
 For an integrated Laravel application, publish rebuilt assets with
 `php artisan filament:assets` from the application root before checking the UI.

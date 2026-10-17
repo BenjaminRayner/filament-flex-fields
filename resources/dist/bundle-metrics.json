@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T10:19:59.603Z",
+  "generatedAt": "2026-10-17T18:16:24.522Z",
   "css": {
     "address-autocomplete.css": {
       "bytes": 1501,
@@ -332,9 +332,9 @@
       "gzipKb": 0.77
     },
     "select-field.css": {
-      "bytes": 120314,
-      "kb": 117.49,
-      "gzipKb": 14.21
+      "bytes": 120747,
+      "kb": 117.92,
+      "gzipKb": 14.25
     },
     "selection-indicator.css": {
       "bytes": 1647,

@@ -1,6 +1,6 @@
 {
   "format": 2,
-  "release": "1789af108f6d641d6aee93027ce5245d3dcc9822e97c363400a3e1b9e20d32c0",
+  "release": "1ad5bc79162ecc7e44aa8c42b52710fd81899d782effd18d1ea63fa8c37b0c9b",
   "assets": {
     "assets/barcode-scanner-field/barcode-scan-success.mp3": "fef38e83de67a096494b3b0ae7fc0e5a5a84df59cfa1e3ea65fd5d06595e9f8a",
     "assets/country-flags/ac.svg": "3acc0d1b3156debe149d1ea086c7eda3dfd5ecd7fd14b7a3e385ae63cd71ab64",
@@ -559,7 +559,7 @@
     "css/schedule-field.css": "fc8ad262180be12786bd9b00f3c6dff10fb49d9256e978427ef93b98eaa98d16",
     "css/segment-control.css": "f3fcab22a067fde4b232ded114f3d2b5ab18b7aba9d855c71553a818e96d4aa1",
     "css/segment-tabs.css": "d463743aa5a7076ea020b14864d6edef1ca2f4de3406cb2310f0db7cf9ace5cb",
-    "css/select-field.css": "eaa72be661e2828beda8a5836d0ca6cdf669d3e2459aac35bcebc1fd7ac69bc8",
+    "css/select-field.css": "ab4ab8705a13b0032553f8feda03a0966390a3632707566450250e9eb473fa0f",
     "css/selection-indicator.css": "7e9eae739648dd59fbadec2d6be8f295d705f96ed8db53a6fdecc7fd0bb3c6fe",
     "css/signature-field.css": "faf2828f46cc92c14722fdd85932e564a4a4431387229a15c231292a91f0f3d9",
     "css/signature-preview-column.css": "2047fc8fe6a7a75ccea2c05d0160b446d8db39a8190181aa2a5fc9d2269d9644",
@@ -1141,7 +1141,7 @@
     "css/schedule-field.css": 11744,
     "css/segment-control.css": 17500,
     "css/segment-tabs.css": 2224,
-    "css/select-field.css": 120314,
+    "css/select-field.css": 120747,
     "css/selection-indicator.css": 1647,
     "css/signature-field.css": 8623,
     "css/signature-preview-column.css": 1465,

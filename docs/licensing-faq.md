@@ -13,7 +13,10 @@ These examples explain the current License v2.0. For the exact conditions, read 
     No. The free-use grant limits how the software may be used; it does not describe a smaller component edition. The three standard commercial plans also have the same package features.
   </Accordion>
   <Accordion title="Is this an open-source license?">
-    No. It is source-available. Public access lets you inspect and obtain the official package, but does not grant unrestricted commercial use, redistribution or public forks.
+    No. It is source-available. You can inspect the source and obtain the official package. GitHub separately permits viewing and service-native forks of its public repositories. Those platform permissions do not grant unrestricted commercial use, customer installations, OEM rights or independent redistribution outside their scope.
+  </Accordion>
+  <Accordion title="Can I fork the repository to contribute?">
+    Yes. You can use GitHub's native fork and pull-request workflow while retaining existing notices. The FLEX license does not require deleting a fork that remains permitted by GitHub's platform terms after the contribution is accepted or closed. Contributing does not itself grant a commercial license. Your contribution remains yours, with the submission rights described in Section 4 of the license.
   </Accordion>
   <Accordion title="Can a profitable company use an internal app for free?">
     Yes, when every internal-use condition is met. Revenue is not the test. The application must serve the eligible entity's own operations rather than constitute or configure the commercial software service supplied to users.

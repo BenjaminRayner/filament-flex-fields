@@ -2,6 +2,7 @@
 
 **Package:** `janczakb/filament-flex-fields`<br>
 **License:** [LICENSE](LICENSE), version **2.0**, effective **1 October 2026**<br>
+**GitHub platform-rights clarification:** **17 October 2026**; prices and commercial grants unchanged.<br>
 **Contact / purchase:** [barek122@gmail.com](mailto:barek122@gmail.com)
 
 Flex Fields is source-available: you can inspect the source and evaluate the package through official public channels. Qualifying internal use and bespoke client work remain free. Commercial hosted products require the appropriate commercial grant; customer installations, OEM, and redistribution require expressly agreed Custom rights.
@@ -32,6 +33,15 @@ All prices are in **USD, excluding applicable VAT/sales tax**. The three Standar
 **Recommended for a growing product portfolio: Unlimited Company.** One company can build future Products without purchasing another license each time. For one Product, Single Product is sufficient. For exactly two Products, two Single Product licenses cost less at current prices; see [the cost comparison](#8-prices-upgrades-and-choosing-the-economic-threshold).
 
 **Enterprise Group does not include OEM.** Neither team size nor buying the highest Standard Plan creates redistribution rights. **From $2,999 is a starting quote level, not an unlimited-distribution price.**
+
+### Free — no purchase for eligible use
+
+Free includes the complete toolkit for qualifying personal, educational, research
+and internal business use, private pre-production evaluation, and eligible
+bespoke client work. It is not restricted to students or non-profit organizations.
+A profitable company can use an eligible internal CRM or staff tool for free.
+Supplying the application itself as a commercial software product is different.
+See [what remains free](#what-remains-free) for the conditions and examples.
 
 ## 2. Choose by use, then by ownership
 
@@ -70,7 +80,7 @@ flowchart TD
 | A bespoke internal application operated for an identified client | Every condition of LICENSE §1.7(b), including runtime-only access and no client product resale, must hold |
 | A client's own internal application built by an agency acting for that client | The client independently qualifies for free use, obtains the official package directly, and authorizes the agency as its contractor; see section 7 |
 
-Free use includes private repositories/build artifacts, backups, CSS/theme overrides, and local patches within its scope. It does not authorize public forks, customer distribution of private package copies, or reusable starter kits.
+Free use includes private repositories/build artifacts, backups, CSS/theme overrides, and local patches within its scope. GitHub-native viewing and forks remain subject to the separate platform permissions described in LICENSE §1.5(f). Those permissions are not a commercial grant or permission for customer distribution, independent external mirrors, or reusable starter kits.
 
 **No revenue threshold applies.** A profitable company can use an eligible internal tool for free. A small SaaS serving its first paying customer needs a commercial grant. A live freemium tier of a commercial service is part of that commercial Product. Staging labels do not exempt a paid pilot or live customer workload.
 
@@ -173,7 +183,7 @@ Custom is required when your business supplies Software-containing installations
 
 You may use your own application brand. Tenant colors, logos, and domains are allowed under a Standard Plan when you still own/operate the service and retain the customer service relationship. A referral partner may introduce customers who contract directly for your service.
 
-Custom is required if another business receives the Software, an independently operated customer edition, or the right to resell/sublicense a Software-based product as its own. Renaming Flex Fields as your own plugin, publishing your fork, or supplying a competing component kit also requires express Custom terms. No standard purchase removes copyright notices or transfers authorship.
+Custom is required if another business receives the Software outside the permitted exceptions, an independently operated customer edition, or the right to resell/sublicense a Software-based product as its own. Renaming Flex Fields as your own plugin, publishing an independent Software distribution outside GitHub's separate platform permissions, or supplying a competing component kit requires express Custom terms. No standard purchase removes copyright notices or transfers authorship.
 
 A hosted form builder can use a Standard Plan even when Flex Fields is central to its functionality. Runtime tools, filled forms, and ordinary data output do not themselves create redistribution rights. Exporting reusable Flex Fields code, a component SDK, or a deployable Software-containing application requires Custom scope.
 
@@ -275,7 +285,7 @@ Standard licensing requires no periodic online validation or runtime activation.
 
 You may inspect, theme, integrate, patch, and privately fork Flex Fields within your licensed scope. Confidential access for employees, agencies, and service providers is allowed for that work. They cannot reuse your license for their own Products. Private internal package feeds are allowed for Authorized Personnel and, under Enterprise Group, Covered Entities.
 
-Keep copyright/license and third-party notices. There is no additional public “Powered by” badge requirement. Browser assets needed to operate your application may be served normally, including through a CDN. Public Software mirrors, reusable downloads, and maintained public forks require express rights; the limited upstream-contribution exception is in LICENSE §4.3.
+Keep copyright/license and third-party notices. There is no additional public “Powered by” badge requirement. Browser assets needed to operate your application may be served normally, including through a CDN. GitHub-native forks can be used within the platform permissions acknowledged in LICENSE §1.5(f); the license does not require deleting such a fork when a contribution closes. Independent mirrors, reusable downloads and commercial operation outside the applicable grant still need appropriate rights.
 
 ### Corporate and Product changes
 
@@ -354,7 +364,7 @@ The process is **scope assessment → written proposal and quote → accepted ag
 
 - [LICENSE](LICENSE) — full free and commercial grants, version 2.0.
 - [README.md](README.md) — package overview and licensing summary.
-- [Form OS one-pager](docs/form-os-one-pager.md) — product positioning and plan summary.
+- [FLEX Fields overview](https://flex-fields.bjanczak.com/docs/form-os-one-pager) — product features and licensing at a glance.
 - [CREDITS.md](CREDITS.md) — third-party attributions.
 
 © 2026 Bartłomiej Janczak. Public prices may change for future purchases. Accepted orders and issued licenses retain their agreed terms.

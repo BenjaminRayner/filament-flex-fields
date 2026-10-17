@@ -1574,8 +1574,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/select-field.css",
       "type": "stylesheet",
-      "sha256": "eaa72be661e2828beda8a5836d0ca6cdf669d3e2459aac35bcebc1fd7ac69bc8",
-      "bytes": 120314
+      "sha256": "ab4ab8705a13b0032553f8feda03a0966390a3632707566450250e9eb473fa0f",
+      "bytes": 120747
     },
     "distribution:css/selection-indicator.css": {
       "origin": "distribution",

@@ -7,6 +7,14 @@ This walkthrough creates `acme/summary` inside an application that already has F
 and a Filament panel. Run the first command from the application directory containing
 `artisan` and `composer.json`. Replace `acme` with your vendor name before distributing it.
 
+For a private application extension, keep using your applicable FLEX grant. Before
+distributing a package or reusable kit, confirm its [licensing scope](/docs/licensing).
+Generating a starter does not grant rights to redistribute FLEX itself.
+
+<Tip>
+  **Watch this in the workshop:** [29:56 — generate the reusable family](https://www.youtube.com/watch?v=m4V_R7YxTP4&t=1796s) · [1:03:07 — install it through Composer and enable it in Filament](https://www.youtube.com/watch?v=m4V_R7YxTP4&t=3787s).
+</Tip>
+
 <Steps>
   <Step title="Generate the family">
     The parent directory must exist. The destination must be new.
@@ -53,6 +61,25 @@ and a Filament panel. Run the first command from the application directory conta
     Composer discovers `SummaryServiceProvider`. Keep your application's existing FLEX
     package repository and license access configuration. The local development constraint
     is not a release version for a distributed package.
+
+    Keep the main FLEX plugin enabled in the panel that will use your extension. If it is
+    already enabled, no panel change is needed. Otherwise, add it to the panel's existing
+    plugins in `AdminPanelProvider`:
+
+    ```php
+    use Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin;
+
+    // Inside your existing panel configuration:
+    ->plugins([
+        FilamentFlexFieldsPlugin::make(),
+        // Keep your other panel plugins here.
+    ])
+    ```
+
+    The generated Summary family does not need its own `->plugin()` call. Its Laravel
+    service provider registers its definitions with FLEX. For an application-local
+    provider that is not installed through Composer, register that provider in
+    `bootstrap/providers.php` instead; do not register the same provider twice.
   </Step>
   <Step title="Add the field">
     Add this component to the form schema of your resource or Livewire form:

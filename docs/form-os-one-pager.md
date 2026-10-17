@@ -1,55 +1,69 @@
 ---
-title: "Form OS — commercial one-pager"
+title: "FLEX Fields at a glance"
+description: "Explore FLEX Fields v4, its complete component toolkit and the free and commercial plans available for your application."
+icon: "blocks"
 ---
 
-# Form OS — choosing commercial coverage
+FLEX Fields v4 adds advanced controls to your existing Filament 5 application.
+Use one field or combine the controls you need, while keeping your models,
+native fields and existing application workflow.
 
-**Flex Fields v3** is positioned as a **Form + Admin OS**: one design system, lazy asset intelligence, JSON flex schemas, and flagship fields (Select, DateTime, Media, Choice, Layout) that ship together—not à la carte widgets.
+## One toolkit for richer applications
 
----
-
-## What you get
-
-| Layer | Value |
+| Capability | What it brings to your project |
 | --- | --- |
-| **79 components** | Text, number, choice, datetime, media, layout, table columns — shared tokens and ControlSize |
-| **JSON flex fields** | `HasFlexFields` + schema conditions + import/export without EAV migrations |
-| **Asset intelligence** | Lazy CSS/JS, SPA injector, shared overlay chunks — no duplicate loads per page |
-| **Playground + docs** | Live previews, upgrade guides, SRE runbook — evaluate before you buy |
-| **Dual license** | Free for qualifying internal use; commercial grants for hosted Products; Custom for distribution |
+| 79+ form components | Searchable pickers, schedules, signatures, interactive maps, media tools and more |
+| Shared asset loading | Resources follow active components and their enabled features |
+| Media OS | Uploads, storage, image variants and optional Spatie Media Library integration |
+| Live calculations | Connected values update in the browser and can be recalculated in PHP before saving |
+| Reusable controls | Compose your own controls from existing FLEX components |
+| Flexible storage | Use ordinary model attributes or opt into managed JSON custom fields |
 
----
+[Browse the component library](/docs/component-library) or
+[try the live playground](https://demo.bjanczak.com/).
 
-## Choose coverage by ownership and delivery
+## Choose the scope you need
 
-| Plan | Current price (USD, before tax) | Scope |
-|---|---|---|
-| **Single Product** | **$249 one-time** | One named commercial hosted Product owned by one person/entity |
-| **Unlimited Company** | **$699 one-time** | Unlimited current/future hosted Products owned by one entity |
-| **Enterprise Group** | **$1,499 one-time** | Hosted Products across a named parent and its 100%-owned subsidiaries |
-| **Custom / OEM / Redistribution** | **From $2,999; contact us** | Expressly negotiated customer installations, source delivery, starter kits, OEM, or sublicensing |
+Every plan provides the complete FLEX Fields toolkit. Free use depends on your
+application's purpose; commercial plans depend on ownership and delivery.
 
-Standard Plans are perpetual within scope, with unlimited users, tenants, developers, and environments. They do not include external redistribution. Ordinary SaaS tenant branding is permitted; customer-owned deployments and distribution of Software-containing products require Custom rights. Genuine bespoke work using the client's own entitlement has a separate route in the commercial guide.
+| Plan | Price before tax | Suitable for |
+| --- | --- | --- |
+| Free | No purchase for eligible use | Qualifying internal business tools, personal and educational projects, private evaluation and eligible bespoke client work |
+| Single Product | $249 one-time | One named hosted product owned by one person or entity |
+| Unlimited Company | $699 one-time | Current and future hosted products owned and operated by one entity |
+| Enterprise Group | $1,499 one-time | Hosted products across a named parent and its qualifying 100%-owned subsidiaries |
+| Custom / OEM | From $2,999, individually quoted | Customer installations, software distribution and expressly agreed additional rights |
 
-**Unlimited Company is the portfolio plan:** two Single Product licenses cost $498; from three Products, $699 costs less than buying individual $249 licenses. A single Product does not require Enterprise merely because it has many developers or customers.
+**Free is also for businesses.** An eligible internal CRM, inventory system or
+staff tool can remain free even when the company earns revenue. Supplying the
+application itself as a commercial software product is different.
 
-Qualifying internal use and client work remain free under LICENSE §1.7 and §5.6. Existing grants keep their agreed terms; version-2.0 Standard Plans offer upgrade credit under LICENSE §5.9.
+Standard commercial plans include perpetual use within scope, unlimited users,
+tenants and developers, and subsequent official updates to FLEX Fields. No
+mandatory renewal is required. Customer installations, OEM and redistribution
+need the appropriate separate rights; Enterprise Group does not include them.
+Existing grants retain their agreed terms.
 
-Full pricing, examples, and purchase process: [COMMERCIAL.md](https://github.com/janczakb/filament-flex-fields/blob/main/COMMERCIAL.md). Binding grants: [LICENSE v2.0](https://github.com/janczakb/filament-flex-fields/blob/main/LICENSE).
+For one hosted product, Single Product is sufficient regardless of team size.
+At current prices, two Single Product licenses cost $498; Unlimited Company
+becomes less expensive than separate Singles from three eligible products.
 
----
+## FLEX Fields and FLEX Forms
 
-## Form OS vs “a few nice fields”
+FLEX Fields supplies the controls and supporting workflows. FLEX Forms is a
+separately licensed companion for building and publishing forms. A FLEX Fields
+license does not include FLEX Forms.
 
-- **Standalone fields** — drop a `PhoneField` into any Filament form; no platform commitment.
-- **Form OS** — global density/theme, schema registry, certified layout recipes (Translatable × SegmentTabs × ItemCard), quality gates, and Playwright coverage across hub groups.
+## Find the right next step
 
-**Flex Forms** (separately licensed commercial companion, not included in a Flex Fields license) adds Studio, public fill, embeds, and Insights on top of Flex Fields—ideal when forms are your product surface, not just admin CRUD.
+<CardGroup cols={2}>
+  <Card title="Get started" icon="rocket" href="/docs/quickstart">Install FLEX Fields v4 and add your first control.</Card>
+  <Card title="Compare plans" icon="wallet" href="/docs/plans">Review free eligibility, ownership and delivery scope.</Card>
+  <Card title="Licensing questions" icon="circle-question-mark" href="/docs/licensing-faq">Find examples for internal tools, SaaS and client projects.</Card>
+  <Card title="Ask about your project" icon="mail" href="/docs/request-license">Describe your application before choosing a commercial license.</Card>
+</CardGroup>
 
----
-
-## Next steps
-
-1. Install and open the Playground (`FLEX_FIELDS_PLAYGROUND=true`).
-2. Read [Updating FLEX Fields](/docs/updating) when upgrading.
-3. Email [barek122@gmail.com](mailto:barek122@gmail.com) with your product description to arrange scope confirmation and payment as described in [COMMERCIAL.md](https://github.com/janczakb/filament-flex-fields/blob/main/COMMERCIAL.md).
+The [full license](/docs/license-terms) governs the grants. For commercial use,
+your accepted License Confirmation identifies the purchased scope. Prices are
+in USD, excluding applicable taxes; Custom rights and fees are agreed individually.

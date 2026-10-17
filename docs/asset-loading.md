@@ -79,6 +79,21 @@ mode: "wide"
 
 **Use the controls your form needs without loading the whole catalog.** FLEX resolves active components, their declared dependencies and the optional features of each instance. Repeated controls share browser resources while keeping independent values and configuration.
 
+## Add a field. FLEX handles its resources.
+
+After [installation](/docs/installation), add a FLEX control to your existing
+Filament form and configure the features you want. The included components already
+declare their dependencies. FLEX handles resource planning, shared loading and
+activation as your users move between tabs, steps and dialogs.
+
+- **Start with one control.** Keep your existing Resource, model attributes and native Filament fields.
+- **Enable the features you need.** An editor or camera belongs to the upload instance where you enable it.
+- **Use the included build.** Publish the prebuilt assets with your application; ordinary usage needs no FLEX-specific Node.js or Tailwind build.
+
+There is no dependency graph or loading budget to configure before using a
+built-in field. The sections below explain what FLEX manages for you. If you
+want to start building, go straight to [your first component](/docs/first-component).
+
 ## Watch ownership in action
 
 <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9' }}>
@@ -102,11 +117,19 @@ surfaces. Within each example, clicks, pointer drawing and scrolling run at thei
 original speed. Chapter cards identify the cuts between examples. The inspector
 shows actual resource ownership, requests and registered SDK effects.
 
-CSS, module and initialization delays are released through visible test controls.
-The capture stream is synthetic; no camera is accessed. The transport failure is
-intentional, and the negative publication check changes an isolated copy only.
-The queue example runs the actual scheduler with two configured loading slots;
-it is not a component download-speed or frame-rate benchmark.
+<Info>
+  **Loading is deliberately paused for the demonstration.** Visible test controls
+  hold CSS, modules and initialization so you can inspect each stage. The long
+  skeleton states show those controlled pauses, not a required loading duration.
+</Info>
+
+<Accordion title="How the controlled examples were recorded">
+  The capture stream is synthetic; no camera is accessed. The transport failure
+  is intentional, and the negative publication check changes an isolated copy
+  only. The queue example runs the actual scheduler with two configured loading
+  slots to make admission order visible; it is not a download-speed or frame-rate
+  benchmark. These controls belong to the demonstration, not to your form setup.
+</Accordion>
 
 | Time | Recorded example |
 | --- | --- |
@@ -123,11 +146,11 @@ it is not a component download-speed or frame-rate benchmark.
 | [04:35](https://www.youtube.com/watch?v=KufHFWijeCc&t=275s) | Bounded queue and required-work priority. |
 | [05:04](https://www.youtube.com/watch?v=KufHFWijeCc&t=304s) | Intact and mismatched publication checks. |
 
-Native Filament already supports on-demand assets and per-field configuration.
-These examples focus on FLEX's per-instance ownership, last-owner retirement,
-capability plans, registered cleanup and current-generation readiness. Evaluated
-JavaScript remains reusable; it is not unloaded. These are specific verified
-paths, not a certification of every application or integration.
+The walkthrough focuses on the lifecycle FLEX adds around dynamic controls:
+shared resources stay available to the instances that need them, outdated work
+cannot reveal a replacement dialog, and registered effects are cleaned up when
+their instance is removed. Evaluated JavaScript remains available for reuse;
+managed styles can retire after their last owner leaves.
 
 <Accordion title="Read the English narration">
 
@@ -256,18 +279,18 @@ Use the diagram's zoom controls or open it fullscreen to follow individual paths
   This diagram shows the main runtime lifecycle, not every internal operation. Asset publication, cache configuration, transport policies and detailed failure handling are explained in the relevant sections and [deployment guidance](/docs/updating).
 </Note>
 
-## Separate the four costs
+## Fit FLEX into your application
 
-| Cost | What affects it | What FLEX does |
+| Area | What FLEX provides | Your application setup |
 | --- | --- | --- |
-| Installation | Composer packages and distributed files | Includes prebuilt browser files; optional integrations have separate setup |
-| Browser download | Resources needed by the current page | Selects component resources and shares common dependencies |
-| Initialization | Active controls and enabled features | Defers inactive areas and separates loading from initialization |
-| Your application work | Queries, file sizes, conversion jobs and external services | Provides configuration for providers and workflows; your data and infrastructure still matter |
+| Deployment | Prebuilt, versioned browser assets | Publish the files matching the installed package |
+| Browser resources | Shared runtime and base styles, plus selected component dependencies | Configure the controls and features your form needs |
+| Dynamic forms | Activation, readiness and resource ownership across changing surfaces | Use your Filament tabs, steps and dialogs |
+| Data and media | Configurable providers, storage and processing workflows | Connect your queries, disks and any selected queue workers |
 
-<Note>
-  A FLEX-enabled panel has shared runtime code and base styles. Selective loading avoids making every component's resources part of every page; it does not mean zero baseline JavaScript or zero installation cost.
-</Note>
+For deployment verification and troubleshooting, [inspect the published release
+or a component's dependencies](/docs/assets/deployment). These tools help you
+answer a specific setup question without manually tracing the whole runtime.
 
 ## Explore the Asset Manager
 

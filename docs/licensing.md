@@ -63,15 +63,22 @@ There is no revenue threshold. A profitable company's eligible internal applicat
 
 | Within the applicable grant | Separate rights are needed |
 |---|---|
-| Private integration, styling and modifications | Public forks, mirrors and reusable package downloads |
+| Private integration, styling and modifications | Independent public distributions, mirrors and reusable package downloads outside separately granted platform permissions |
 | Authorized employees, contractors and hosting providers working for the licensee | Independent use by another company or client |
 | Normal browser assets and ordinary data or document exports | Server-side copies, customer installations, source handover and OEM distribution outside permitted exceptions |
 | Your own application brand, while retaining required notices | Removing copyright or third-party notices, or claiming the package as your own |
 
 Standard plans are one-time purchases with perpetual rights within their scope. They include subsequent official updates, including major versions of this package, under the issued terms. They do not promise future releases, support SLAs, custom work or licenses for other packages such as FLEX Forms.
 
+You can view and fork the official public repository within GitHub's own platform
+permissions. This does not grant unrestricted commercial use, customer
+installations, OEM rights or independent distribution outside those permissions.
+
 ## Full terms and existing grants
 
 This overview explains the current licensing model. The [full license](/docs/license-terms) contains the grants and conditions; your accepted License Confirmation identifies the purchased scope. Expressly agreed Custom terms can vary that scope.
+
+The 17 October 2026 clarification acknowledges GitHub platform permissions. Prices,
+commercial scope and previously issued grants are unchanged.
 
 Previously issued licenses retain their agreed terms. A new plan or license version does not silently expand or reduce an existing commercial grant. See [existing purchases and upgrades](/docs/licensing-faq#existing-purchases-and-upgrades).

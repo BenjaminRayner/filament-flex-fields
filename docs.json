@@ -338,7 +338,7 @@
           {
             "group": "Getting started",
             "pages": [
-              "docs/extensions/index",
+              "docs/extensions",
               "docs/extensions/quickstart",
               "docs/extensions/ai-guidance",
               "docs/extensions/generate-package",
@@ -363,6 +363,7 @@
           {
             "group": "Composition",
             "pages": [
+              "docs/extensions/composition-patterns",
               "docs/extensions/asset-ownership",
               "docs/extensions/child-select",
               "docs/extensions/child-php-api",
@@ -1504,6 +1505,24 @@
           "og:video:height": "1080",
           "og:image:width": "1200",
           "og:image:height": "630"
+        }
+      },
+      {
+        "path": "docs/extensions",
+        "metatags": {
+          "og:type": "article",
+          "og:image": "https://i.ytimg.com/vi/m4V_R7YxTP4/maxresdefault.jpg",
+          "og:image:type": "image/jpeg",
+          "og:image:width": "1280",
+          "og:image:height": "720",
+          "og:image:alt": "Custom Laravel Filament form component workshop with a live preview and code editor",
+          "og:video": "https://www.youtube-nocookie.com/embed/m4V_R7YxTP4",
+          "og:video:secure_url": "https://www.youtube-nocookie.com/embed/m4V_R7YxTP4",
+          "og:video:type": "text/html",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "twitter:card": "summary_large_image",
+          "twitter:image": "https://i.ytimg.com/vi/m4V_R7YxTP4/maxresdefault.jpg"
         }
       }
     ]
