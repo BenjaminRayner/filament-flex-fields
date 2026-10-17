@@ -1,6 +1,8 @@
-import { resolveAssetUrl } from './asset-url.js'
+import { isAbsoluteAssetUrl, resolveAssetUrl } from './asset-url.js'
 import { factoryIdentity } from '../alpine/factory-contract.js'
 import { getRuntimeState } from '../runtime-state.js'
+
+const baseIndependentPlans = new WeakSet()
 
 const ID = /^[a-f0-9]{64}(?![\s\S])/
 const COMPONENT = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?![\s\S])/
@@ -44,7 +46,12 @@ export function decodeAssetPlan(raw, baseURI) {
         if (factoryOwners[resolved] && JSON.stringify(factoryOwners[resolved]) !== JSON.stringify(next)) throw Error('Conflicting FLEX factory owners.')
         factoryOwners[resolved] = next
     }
-    return Object.freeze({ componentId: value.component, stylesheets, chunks, sizes: Object.freeze(sizes), factoryOwners: Object.freeze(factoryOwners) })
+    const plan = Object.freeze({ componentId: value.component, stylesheets, chunks, sizes: Object.freeze(sizes), factoryOwners: Object.freeze(factoryOwners) })
+    // Classify original URL spellings only after complete admission. Resolved
+    // projections alone cannot tell whether the source depended on <base>.
+    if ([value.stylesheets, value.chunks, Object.keys(value.sizes), Object.keys(value.factoryOwners)]
+        .every(urls => urls.every(isAbsoluteAssetUrl))) baseIndependentPlans.add(plan)
+    return plan
 }
 
 /** Bounded immutable interning. Owners retain projections through weak marker keys,
@@ -95,7 +102,7 @@ export function createPlanDictionary({ limit = 256, byteLimit = 4 * 1024 * 1024 
         if (!root) return
         for (const [id, raw] of definitionsFor(root)) admit(id, raw, baseURI)
     }
-    const read = (batch, baseURI = batch?.ownerDocument?.baseURI ?? globalThis.document?.baseURI ?? 'http://localhost/') => {
+    const read = (batch, baseURI) => {
         const id = batch?.getAttribute?.('data-fff-plan-id')
         if (id === null || id === undefined) return null
         if (!ID.test(id)) throw Error('Invalid FLEX asset plan identity.')
@@ -105,7 +112,12 @@ export function createPlanDictionary({ limit = 256, byteLimit = 4 * 1024 * 1024 
             throw Error('FLEX asset boundary cannot mix referenced and inline plans.')
         }
         const cached = markers.get(batch)
-        if (cached?.id === id && cached.baseURI === baseURI && cached.component === component && cached.generation === generation) return cached.plan
+        const unchanged = cached?.id === id && cached.component === component && cached.generation === generation
+        // Re-read all owner/mixed-plan declarations above before using a frozen
+        // absolute plan. Relative declarations and explicit bases keep URI checks.
+        if (unchanged && baseURI === undefined && baseIndependentPlans.has(cached.plan)) return cached.plan
+        if (baseURI === undefined) baseURI = batch?.ownerDocument?.baseURI ?? globalThis.document?.baseURI ?? 'http://localhost/'
+        if (unchanged && cached.baseURI === baseURI) return cached.plan
         const key = JSON.stringify([baseURI, id])
         let plan = plans.get(key)?.plan
         // Detached incoming fragments have their own dictionary. Prefer it over

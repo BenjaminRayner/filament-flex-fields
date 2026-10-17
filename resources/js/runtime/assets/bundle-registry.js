@@ -2,6 +2,7 @@ import { getRuntimeState } from '../runtime-state.js'
 import { reportRuntimeError, diagnosticContext } from '../diagnostics/document-diagnostics.js'
 import { readReferencedPlan } from './plan-dictionary.js'
 import { parseInlineAssetUrls } from './boundary-plan.js'
+import { isAbsoluteAssetUrl } from './asset-url.js'
 
 function referencedPlan(element) {
     let plan
@@ -21,8 +22,7 @@ function inlineListsFor(element) {
     return cached
 }
 
-function inlineUrls(element, attribute, cached, baseURI) {
-    const raw = element.getAttribute?.(attribute) ?? '[]'
+function inlineUrls(element, attribute, cached, baseURI, raw = element.getAttribute?.(attribute) ?? '[]') {
     const previous = cached.get(attribute)
     if (previous?.raw === raw && previous.baseURI === baseURI) return previous.urls
     let urls
@@ -55,14 +55,25 @@ export function readAssetUrlLists(element) {
     const plan = referencedPlan(element)
     if (plan) return plan
     if (!element || typeof element !== 'object') return { stylesheets: [], chunks: [] }
-    const baseURI = element.ownerDocument?.baseURI ?? globalThis.document?.baseURI ?? 'http://localhost/'
     const cached = inlineListsFor(element)
-    const stylesheets = inlineUrls(element, 'data-fff-stylesheets', cached, baseURI)
-    const chunks = inlineUrls(element, 'data-fff-chunks', cached, baseURI)
-    // The weak marker cache may reuse the pair only after both current raw
-    // attributes and the current base URI have passed the readers above.
+    const stylesheetsRaw = element.getAttribute?.('data-fff-stylesheets') ?? '[]'
+    const chunksRaw = element.getAttribute?.('data-fff-chunks') ?? '[]'
+    // Absolute HTTP(S) URLs (and empty lists) cannot change meaning when <base>
+    // changes. Reuse only an admitted pair with both current raw attributes equal.
+    // Referenced plans were checked above; relative/protocol-relative URLs still
+    // read and validate the current base URI on every call.
+    const previousPair = cached.admittedPair
+    const unchanged = previousPair?.stylesheetsRaw === stylesheetsRaw && previousPair.chunksRaw === chunksRaw
+    if (unchanged && previousPair.baseIndependent) return previousPair.projection
+    const baseURI = element.ownerDocument?.baseURI ?? globalThis.document?.baseURI ?? 'http://localhost/'
+    const stylesheets = inlineUrls(element, 'data-fff-stylesheets', cached, baseURI, stylesheetsRaw)
+    const chunks = inlineUrls(element, 'data-fff-chunks', cached, baseURI, chunksRaw)
     if (cached.projection?.stylesheets !== stylesheets || cached.projection?.chunks !== chunks) {
         cached.projection = Object.freeze({ stylesheets, chunks })
+    }
+    if (!unchanged || previousPair.projection !== cached.projection) {
+        const baseIndependent = unchanged ? previousPair.baseIndependent : stylesheets.every(isAbsoluteAssetUrl) && chunks.every(isAbsoluteAssetUrl)
+        cached.admittedPair = { stylesheetsRaw, chunksRaw, baseIndependent, projection: cached.projection }
     }
     return cached.projection
 }

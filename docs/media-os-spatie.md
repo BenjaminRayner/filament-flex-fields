@@ -6,6 +6,12 @@ icon: "database"
 
 Spatie Media Library is optional. Use it when your attachments belong to Eloquent models and you want its collection and conversion APIs. Disk-only Media OS usage does not require these packages.
 
+## Do I need another table for website or API previews?
+
+Normally, no. Spatie already relates each original `media` row to its model and records which named conversions have been generated. Retrieve a thumbnail with `getUrl('thumb')`, checking `hasGeneratedConversion('thumb')` when conversions run in a queue. A converted file does not need its own additional gallery row, and the field does not require a JSON path column on the parent model.
+
+These images can be used outside Filament without mounting a FLEX field. See the [complete Spatie JSON endpoint and website guidance](/docs/file-upload-gallery-api#spatie-use-the-existing-media-apis). Skip the native `gallery_conversions` table and indexer in that guide when using Spatie. An extra SQL index is only an application-specific reporting/query choice, not a requirement for normal display or API use.
+
 ## Install optional dependencies
 
 Follow Spatie's [installation instructions](https://spatie.be/docs/laravel-medialibrary/v11/installation-setup). For FLEX form fields, also install Filament's matching Spatie Media Library plugin version.

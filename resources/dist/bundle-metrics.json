@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T09:30:16.404Z",
+  "generatedAt": "2026-10-17T05:28:23.559Z",
   "css": {
     "address-autocomplete.css": {
       "bytes": 1501,
@@ -541,7 +541,7 @@
     "flex-core-runtime.js": {
       "bytes": 70525,
       "kb": 68.87,
-      "gzipKb": 22.68
+      "gzipKb": 22.69
     },
     "flex-date-picker.js": {
       "bytes": 12223,
@@ -763,7 +763,7 @@
       "kb": 0.47,
       "gzipKb": 0.29
     },
-    "flex-fields-audio-EQGWNVG2.js": {
+    "flex-fields-audio-3GJ53BX4.js": {
       "bytes": 7567,
       "kb": 7.39,
       "gzipKb": 3.18
@@ -803,7 +803,7 @@
       "kb": 0.63,
       "gzipKb": 0.4
     },
-    "flex-fields-choice-cards-effects-W3CEIVLD.js": {
+    "flex-fields-choice-cards-effects-ST5RK2GE.js": {
       "bytes": 5212,
       "kb": 5.09,
       "gzipKb": 2.16
@@ -813,7 +813,7 @@
       "kb": 0.27,
       "gzipKb": 0.2
     },
-    "flex-fields-choice-lists-presentation-DKI7HH2S.js": {
+    "flex-fields-choice-lists-presentation-5DGQM6NX.js": {
       "bytes": 3857,
       "kb": 3.77,
       "gzipKb": 1.58
@@ -1003,7 +1003,7 @@
       "kb": 2.45,
       "gzipKb": 1.1
     },
-    "flex-fields-flex-alpine-load-gate-RN4KG6DZ.js": {
+    "flex-fields-flex-alpine-load-gate-BGVAAIL4.js": {
       "bytes": 7391,
       "kb": 7.22,
       "gzipKb": 2.92
@@ -1133,15 +1133,15 @@
       "kb": 0.96,
       "gzipKb": 0.51
     },
-    "flex-fields-runtime-alpine-boundary-fallback-M4SD5O5I.js": {
+    "flex-fields-runtime-alpine-boundary-fallback-2CSRFIVL.js": {
       "bytes": 764,
       "kb": 0.75,
       "gzipKb": 0.41
     },
-    "flex-fields-runtime-alpine-factory-contract-DPLPDDYU.js": {
-      "bytes": 9702,
-      "kb": 9.47,
-      "gzipKb": 3.43
+    "flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js": {
+      "bytes": 9890,
+      "kb": 9.66,
+      "gzipKb": 3.51
     },
     "flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js": {
       "bytes": 478,
@@ -1158,25 +1158,25 @@
       "kb": 1.17,
       "gzipKb": 0.62
     },
-    "flex-fields-runtime-assets-asset-demand-KC5USAC2.js": {
-      "bytes": 9967,
-      "kb": 9.73,
-      "gzipKb": 3.79
+    "flex-fields-runtime-assets-asset-demand-F2FX4F62.js": {
+      "bytes": 10354,
+      "kb": 10.11,
+      "gzipKb": 3.91
     },
-    "flex-fields-runtime-assets-asset-link-store-CHVNSHJY.js": {
+    "flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js": {
       "bytes": 20945,
       "kb": 20.45,
       "gzipKb": 7.36
     },
-    "flex-fields-runtime-assets-asset-url-DIBRIQGL.js": {
-      "bytes": 5955,
-      "kb": 5.82,
-      "gzipKb": 2.48
+    "flex-fields-runtime-assets-asset-url-I7JBWAKY.js": {
+      "bytes": 6017,
+      "kb": 5.88,
+      "gzipKb": 2.51
     },
-    "flex-fields-runtime-filament-activation-mutation-YEGXPEQX.js": {
-      "bytes": 6099,
-      "kb": 5.96,
-      "gzipKb": 2.3
+    "flex-fields-runtime-filament-activation-mutation-KPJKTX57.js": {
+      "bytes": 6253,
+      "kb": 6.11,
+      "gzipKb": 2.32
     },
     "flex-fields-runtime-filament-presentation-segment-FH5L3ECJ.js": {
       "bytes": 170,
@@ -1193,10 +1193,10 @@
       "kb": 0.22,
       "gzipKb": 0.16
     },
-    "flex-fields-runtime-lifecycle-lifecycle-events-FPNIO5A3.js": {
+    "flex-fields-runtime-lifecycle-lifecycle-events-NWMUKSW5.js": {
       "bytes": 4561,
       "kb": 4.45,
-      "gzipKb": 1.97
+      "gzipKb": 1.98
     },
     "flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js": {
       "bytes": 1688,
@@ -1273,11 +1273,6 @@
       "kb": 0.05,
       "gzipKb": 0.07
     },
-    "flex-fields-shared-ALTUNFZF.js": {
-      "bytes": 366,
-      "kb": 0.36,
-      "gzipKb": 0.2
-    },
     "flex-fields-shared-AWU2O33E.js": {
       "bytes": 50700,
       "kb": 49.51,
@@ -1287,6 +1282,11 @@
       "bytes": 38338,
       "kb": 37.44,
       "gzipKb": 13.44
+    },
+    "flex-fields-shared-ELT6ZO2N.js": {
+      "bytes": 366,
+      "kb": 0.36,
+      "gzipKb": 0.2
     },
     "flex-fields-shared-G4QHUK3N.js": {
       "bytes": 202,

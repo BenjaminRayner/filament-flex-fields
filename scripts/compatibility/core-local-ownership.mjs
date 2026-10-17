@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { createConsumerGraph } from '../../resources/js/runtime/assets/consumer-graph.js'
+import { createPlanDictionary } from '../../resources/js/runtime/assets/plan-dictionary.js'
 import { readAssetUrls, readAssetUrlLists } from '../../resources/js/runtime/assets/bundle-registry.js'
 import { createDomTransactions } from '../../resources/js/runtime/lifecycle/dom-transactions.js'
 import { waitForAssetActivation } from '../../resources/js/runtime/lifecycle/asset-activation.js'
@@ -104,6 +105,63 @@ proofs.push('warm projection shortcut still rejects mutated JSON and reconciles 
     assert.throws(() => readAssetUrlLists(marker), /HTTP/)
 }
 proofs.push('paired projection reads the current base once, reuses immutable lists, invalidates on base changes and rejects malformed or unsafe mutated chunks')
+{
+    let reads = 0, baseURI = 'https://first.test/'
+    const document = { get baseURI() { reads++; return baseURI } }
+    const attributes = new Map([['data-fff-stylesheets', '["https://cdn.test/a.css"]'], ['data-fff-chunks', '[]']])
+    const marker = { ownerDocument: document, hasAttribute: name => attributes.has(name), getAttribute: name => attributes.get(name) ?? null }
+    const first = readAssetUrlLists(marker)
+    assert(Object.isFrozen(first)); assert(Object.isFrozen(first.stylesheets)); assert(Object.isFrozen(first.chunks))
+    assert.equal(reads, 1)
+    baseURI = 'http://second.test/nested/'
+    for (let pass = 0; pass < 100; pass++) assert.equal(readAssetUrlLists(marker), first)
+    assert.equal(reads, 1, 'Absolute admitted plans do not depend on the document base')
+    attributes.set('data-fff-chunks', '{')
+    assert.throws(() => readAssetUrlLists(marker), /JSON/)
+    attributes.set('data-fff-chunks', '["javascript:bad"]')
+    assert.throws(() => readAssetUrlLists(marker), /HTTP/)
+    attributes.set('data-fff-chunks', '[]'); attributes.set('data-fff-stylesheets', '[]')
+    const empty = readAssetUrlLists(marker), before = reads
+    baseURI = 'https://third.test/'
+    assert.equal(readAssetUrlLists(marker), empty); assert.equal(reads, before)
+    attributes.set('data-fff-stylesheets', '["//cdn.test/relative.css"]')
+    const relative = readAssetUrlLists(marker), admittedReads = reads
+    baseURI = 'http://fourth.test/'
+    assert.notEqual(readAssetUrlLists(marker).stylesheets, relative.stylesheets)
+    assert.equal(reads, admittedReads + 1, 'Protocol-relative plans still read the current base')
+    attributes.set('data-fff-stylesheets', '["https://cdn.test/a.css"]')
+    readAssetUrlLists(marker)
+    attributes.set('data-fff-plan-id', 'invalid')
+    assert.throws(() => readAssetUrlLists(marker), /identity/)
+}
+proofs.push('absolute and empty admitted pairs avoid irrelevant base reads while raw mutation, unsafe chunks, protocol-relative URLs and newly referenced plans are still validated')
+{
+    let reads = 0, baseURI = 'https://first.test/'
+    const value = { format: 1, component: 'probe', stylesheets: ['https://first.test/a.css'], chunks: [], sizes: {}, factoryOwners: {} }
+    let raw = JSON.stringify(value)
+    const document = { get baseURI() { reads++; return baseURI }, querySelectorAll: () => [{ textContent: raw }] }
+    const attributes = new Map([['data-fff-plan-id', 'e'.repeat(64)], ['data-fff-plan-generation', '1']])
+    const batch = { ownerDocument: document, dataset: { fffAssetConsumer: 'probe' }, getRootNode: () => document,
+        hasAttribute: name => attributes.has(name), getAttribute: name => attributes.get(name) ?? null }
+    const dictionary = createPlanDictionary()
+    dictionary.admit('e'.repeat(64), raw, baseURI)
+    const first = dictionary.read(batch), initialReads = reads
+    baseURI = 'https://second.test/'
+    assert.equal(dictionary.read(batch), first); assert.equal(reads, initialReads)
+    attributes.set('data-fff-stylesheets', '[]'); assert.throws(() => dictionary.read(batch), /mix/)
+    attributes.delete('data-fff-stylesheets')
+    batch.dataset.fffAssetConsumer = 'wrong'; assert.throws(() => dictionary.read(batch), /component|owner|definition/)
+    batch.dataset.fffAssetConsumer = 'probe'
+    attributes.set('data-fff-plan-generation', 'invalid'); assert.throws(() => dictionary.read(batch), /generation/)
+    attributes.set('data-fff-plan-generation', '2')
+    raw = JSON.stringify({ ...value, sizes: { '/a.css': 1 } })
+    attributes.set('data-fff-plan-id', 'f'.repeat(64)); baseURI = 'https://first.test/'
+    dictionary.admit('f'.repeat(64), raw, baseURI); dictionary.read(batch)
+    baseURI = 'https://second.test/'
+    assert.throws(() => dictionary.read(batch), /size/)
+    dictionary.clear()
+}
+proofs.push('referenced absolute plans avoid irrelevant URI reads but still reject mixed plans, changed component/generation, and relative metadata keys after a base change')
 function transactionFixture(limit = 4096) {
     const dom = createDom(), frames = new Map(), calls = []
     let seq = 0

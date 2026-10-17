@@ -6,6 +6,10 @@ icon: "database"
 
 An upload has three stages: transfer into Livewire temporary storage, permanent file storage when the form dehydrates, and database persistence of the file reference. A finished progress bar confirms the first stage. Reloading an unsaved playground/form does not save its state. To restore files after reload, save the model or relation and fill the form from that saved data.
 
+For a complete application example, follow [A complete Post gallery](/docs/file-upload-gallery-recipe): migrations, models, authorization, a create/edit page, custom stored filenames, named conversions and an optional SQL conversion index. The code is provided as application examples; FLEX does not install those tables.
+
+To display saved images on your website or return them in JSON, continue with [Gallery images in your website and API](/docs/file-upload-gallery-api). It explains when a native conversion index is useful and why Spatie normally does not need one.
+
 ## Choose the database shape
 
 | Existing schema | Configuration |

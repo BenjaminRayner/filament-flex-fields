@@ -76,6 +76,18 @@ try {
         if (fixture.active(el)) throw Error('Reclosed DETAILS retained an active value')
         const summary = document.createElement('summary'); details.append(summary); summary.append(layout)
         if (!fixture.active(el)) throw Error('Closed DETAILS suspended its summary control')
+        owner.append(layout); details.remove()
+        const section = document.createElement('section'); section.className = 'fi-section-content-ctn'
+        owner.append(section); section.append(layout); owner.className = 'fi-collapsed'
+        if (fixture.active(el)) throw Error('Activation selector skipped collapsed section content')
+        owner.className = 'application-layout'; owner.id = 'unrelated-layout'
+        if (!fixture.active(el)) throw Error('Unrelated application layout suspended its owner')
+        document.body.hidden = true
+        if (!fixture.active(el)) throw Error('Activation selector crossed its body boundary')
+        document.body.hidden = false
+        document.documentElement.hidden = true
+        if (!fixture.active(el)) throw Error('Activation selector jumped past body to HTML')
+        document.documentElement.hidden = false
         owner.remove()
     })
     proofs.push('native activation re-reads hidden/ARIA/explicit state, both hidden classes and inline CSS including !important; restoring each declaration activates without stale visibility caches; bare layout ancestors preserve inactive tabs/wizards/segments and closed DETAILS/summary semantics')

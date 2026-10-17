@@ -118,6 +118,10 @@ FLEX File Upload provides a responsive file picker, list/grid layouts and circul
 
 For database persistence, custom gallery tables and existing files, use [models, galleries and migration recipes](/docs/file-upload-models-and-migration).
 
+For an end-to-end example with `Post` and `Gallery` models, migrations, create/edit persistence, custom filenames and optional conversion rows, see [A complete Post gallery](/docs/file-upload-gallery-recipe).
+
+To reuse saved images in a website gallery or API, see [Gallery images in your website and API](/docs/file-upload-gallery-api). It includes authorized routes, original-image fallbacks, a Blade view and the Spatie alternative without an extra conversion table.
+
 ## Choose a field
 
 | Class | Storage / purpose |

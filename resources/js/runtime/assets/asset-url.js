@@ -1,3 +1,6 @@
+/** A complete HTTP(S) URL has no dependency on a document's <base>. */
+export const isAbsoluteAssetUrl = value => typeof value === 'string' && /^https?:\/\//i.test(value)
+
 /** Transport identity is the complete URL, including version and signature. */
 export function resolveAssetUrl(value, baseUri = globalThis.document?.baseURI ?? 'http://localhost/') {
     if (typeof value !== 'string' || value.trim() === '') {

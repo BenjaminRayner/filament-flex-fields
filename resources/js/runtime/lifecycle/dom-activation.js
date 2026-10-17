@@ -2,12 +2,13 @@ import { customSurfacesFor } from '../surfaces/document-surfaces.js'
 
 const NativeElement = globalThis.Element
 
-/** A native layout node without attributes has no explicit suspension state.
- * DETAILS is the exception: it is closed by default without an open attribute.
- * Do not infer this for host objects or elements from another DOM realm.
- */
-export function isBareAssetLayoutOwner(owner) {
-    return Boolean(NativeElement && owner instanceof NativeElement && !owner.hasAttributes() && owner.tagName !== 'DETAILS')
+// Include body/modal boundaries so closest() cannot jump past an ancestor
+// that the activation walk intentionally stops at. All other selectors mirror
+// explicit suspension predicates; arbitrary application classes do not qualify.
+const ACTIVATION_OWNER = 'body, .fi-modal, [hidden], [aria-hidden="true"], [data-fff-asset-active="false"], .hidden, .invisible, [style], details, .fi-sc-tabs-tab, .fi-sc-wizard-step, .fff-segment-tabs__panel, .fi-section-content-ctn'
+
+export function findAssetActivationOwner(owner) {
+    return NativeElement && owner instanceof NativeElement ? owner.closest(ACTIVATION_OWNER) : owner
 }
 
 export function isHiddenAssetOwner(owner) {

@@ -159,6 +159,8 @@
                   "docs/flexfileupload-and-fleximageupload",
                   "docs/file-upload-storage-and-validation",
                   "docs/file-upload-models-and-migration",
+                  "docs/file-upload-gallery-recipe",
+                  "docs/file-upload-gallery-api",
                   "docs/file-upload-images-and-sources",
                   "docs/file-upload-metadata",
                   "docs/file-upload-events-and-recovery",
