@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00.000 --> 00:05.000
+An actual Filament page: one Post and two related galleries.
+
+00:05.000 --> 00:12.500
+Upload images into independently configured collections.
+
+00:12.500 --> 00:18.000
+Save the post and gallery rows through the application transaction.
+
+00:18.000 --> 00:23.000
+Reload the page. The stored files and previews return.
+
+00:23.000 --> 00:29.000
+Edit, save and reopen the same record again.

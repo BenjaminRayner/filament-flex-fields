@@ -6,7 +6,7 @@ import { admitFragmentPlans } from '../assets/plan-dictionary.js'
  * Prepare only FLEX metadata in the response before that renderer's microtask runs.
  * This does not render, acquire detached consumers, or override native partial HTML.
  */
-export function prepareFilamentPartials({ message, payload, document, surfaces, presentation = null, primePreparedStyles, onDeferredPanel }) {
+export function prepareFilamentPartials({ message, payload, document, surfaces, presentation = null, pending = null, primePreparedStyles, onDeferredPanel }) {
     if (payload?.effects?.html || !payload?.effects?.partials || !message?.component?.el) return
     const owner = message.component.el
     const candidates = [...owner.querySelectorAll('[wire\\:partial]')]
@@ -20,6 +20,18 @@ export function prepareFilamentPartials({ message, payload, document, surfaces, 
         container.innerHTML = html
         const incoming = container.firstElementChild
         if (!incoming) continue
+        // Native partials bypass morph.updating. Preserve an existing modal's
+        // owned readiness UI here as well, without replacing its generation.
+        if (pending) {
+            const modals = new Map([...(live.matches?.('.fi-modal[id]') ? [live] : []), ...live.querySelectorAll('.fi-modal[id]')]
+                .map(node => [node.id, node]))
+            for (const next of [...(incoming.matches?.('.fi-modal[id]') ? [incoming] : []), ...incoming.querySelectorAll('.fi-modal[id]')]) {
+                const previous = modals.get(next.id)
+                if (!previous) continue
+                pending.preserveMorph(previous, next)
+                pending.preserveMorph(previous.querySelector('.fi-modal-window'), next.querySelector('.fi-modal-window'))
+            }
+        }
         admitFragmentPlans(container, document)
         const panel = live.closest('[data-fff-deferred-panel]')
         if (panel && !live.querySelector('[data-fff-asset-batch]') && incoming.querySelector('[data-fff-asset-batch]')) {

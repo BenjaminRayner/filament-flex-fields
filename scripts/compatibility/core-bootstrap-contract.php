@@ -7,6 +7,7 @@ use Bjanczak\FilamentFlexFields\Console\AssetReleasesCommand;
 use Bjanczak\FilamentFlexFields\Console\AssetsDoctorCommand;
 use Bjanczak\FilamentFlexFields\Console\AssetsExplainCommand;
 use Bjanczak\FilamentFlexFields\Console\ComponentRemovalImpactCommand;
+use Bjanczak\FilamentFlexFields\Console\DescribeComponentsCommand;
 use Bjanczak\FilamentFlexFields\Console\InstallWhisperRuntimeCommand;
 use Bjanczak\FilamentFlexFields\Console\MakeFlexComponentPackageCommand;
 use Bjanczak\FilamentFlexFields\Console\MakeFlexFieldSchemaMigrationCommand;
@@ -179,6 +180,7 @@ $commandClasses = [
     AssetsDoctorCommand::class,
     AssetReleasesCommand::class,
     AssetsExplainCommand::class,
+    DescribeComponentsCommand::class,
     ComponentRemovalImpactCommand::class,
     MakeFlexComponentPackageCommand::class,
     PublishComponentAssetsCommand::class,
@@ -211,4 +213,4 @@ $dispatcher->dispatch(new CommandFinished('filament:assets', $input, $output, 1)
 coreCheck(CoreProbeProvider::$publications === 0, 'Unrelated or failed console command publishes assets');
 $dispatcher->dispatch(new CommandFinished('filament:assets', $input, $output, 0));
 coreCheck(CoreProbeProvider::$publications === 1, 'Successful Filament publication does not publish component resources');
-echo 'PASS: lazy optional providers, write-free ordinary boot, 34 isolated scopes, retained bootstrap defaults, native Laravel activity delivery, scoped theme, 12 lazy commands, obsolete commands absent, explicit successful publication.'.PHP_EOL;
+echo 'PASS: lazy optional providers, write-free ordinary boot, 34 isolated scopes, retained bootstrap defaults, native Laravel activity delivery, scoped theme, 13 lazy commands, obsolete commands absent, explicit successful publication.'.PHP_EOL;

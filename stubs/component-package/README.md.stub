@@ -57,6 +57,14 @@ publish the selected build instead of editing generated artifacts.
 
 Declare additional surfaces with typed `ComponentDefinition` contracts. Use `stylesFrom` for CSS-only sharing, `uses` for full runtime composition, and `capabilities` for per-instance optional features. Keep dependencies in the Composer package that supplies them. If you add dynamic imports, esbuild and the manifest compiler capture those edges; workers, WASM and other opaque resource references need an explicit declaration. The field factory uses SDK-owned resources and disposes them in `destroy()`.
 
+Installed FLEX releases that provide `ComponentGuidance` can also expose your
+component's usage, storage contract and verification steps to AI tools. Declare
+guidance beside the existing definition; it needs no playground registration or
+second component catalog. Use `fff:components:describe <id> --json` to inspect it.
+See https://flex-fields.bjanczak.com/docs/extensions/ai-guidance . Require a FLEX
+release containing that API before adding it to a distributed provider; do not
+assume older v4 installations support every newly introduced optional contract.
+
 
 ## Inspect registration and plan removal
 

@@ -28,7 +28,6 @@ Composer checks constraints and resolves your application's dependencies. Keep i
 | `filament/filament` | Panel, schemas and form integration |
 | `janczakb/blade-hugeicons` | The icon integration used by FLEX |
 | `giggsey/libphonenumber-for-php` | Server-side phone-number handling |
-| `prodstarter/filament-notification-center` | Notification-center integration |
 
 These are package dependencies even if a particular form does not use the associated feature. Browser resource selection is a separate mechanism; it does not remove required PHP packages from Composer installation.
 

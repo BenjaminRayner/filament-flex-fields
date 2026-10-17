@@ -1,6 +1,6 @@
 {
   "format": 2,
-  "release": "1233f56256bec7ce1d838c448701ee0d97f65d6a9b252769e90462d6be01e5ea",
+  "release": "1789af108f6d641d6aee93027ce5245d3dcc9822e97c363400a3e1b9e20d32c0",
   "assets": {
     "assets/barcode-scanner-field/barcode-scan-success.mp3": "fef38e83de67a096494b3b0ae7fc0e5a5a84df59cfa1e3ea65fd5d06595e9f8a",
     "assets/country-flags/ac.svg": "3acc0d1b3156debe149d1ea086c7eda3dfd5ecd7fd14b7a3e385ae63cd71ab64",
@@ -328,7 +328,7 @@
     "components/flex-checklist.js": "ea06de301d07af1497b04b2ac4ce5a0c91d8a5d5c38a9bcc700c8a99f6244e97",
     "components/flex-code-preview.js": "0926523aab902e838abf18aacccd6d2cec7cfd46f3582f5521ee84e92e91c66f",
     "components/flex-color-picker.js": "6226ec6bdca7238e977b2330a7ce916768f1752a280cd09f000eac58848b27c0",
-    "components/flex-core-runtime.js": "ec92d9f0d4d583e9aaca9942aed85b101205b3e47a21a2a73155067ad8863288",
+    "components/flex-core-runtime.js": "90a5a096acf8ca614af5a63be7f47046318f6da33d1bc1cda86c85ff328de894",
     "components/flex-date-picker.js": "4a590babe22a29ee11c80820c5a08c26c9a158c5ee6691008afb00bfa731b5ce",
     "components/flex-date-time-field.js": "4b6ee97585d9114273f8809a6cf4f97437ac93f0746eb999eab54e333d9eb17a",
     "components/flex-duration.js": "b33d89143ef3c7fb4a9fa9f74ec7c9fdf11c0c881ca72cff3fd2d9f54677fb14",
@@ -910,7 +910,7 @@
     "components/flex-checklist.js": 557,
     "components/flex-code-preview.js": 1120,
     "components/flex-color-picker.js": 13834,
-    "components/flex-core-runtime.js": 70525,
+    "components/flex-core-runtime.js": 71607,
     "components/flex-date-picker.js": 12223,
     "components/flex-date-time-field.js": 30800,
     "components/flex-duration.js": 3176,

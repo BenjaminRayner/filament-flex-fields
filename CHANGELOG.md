@@ -5,13 +5,32 @@ All notable changes to `filament-flex-fields` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.0] - Unreleased
+## [4.0.8] - 2026-10-17
+
+### Added
+
+- Optional Laravel Boost guidelines and a progressive FLEX development skill, with installed component discovery and bounded, component-owned guidance for extension authors.
+- Shipped application recipes for relational Post galleries and authorized paginated pickers. Documentation code blocks are generated from the tested recipe files.
+- Adoption and verification guides that keep ordinary attributes, relations and native Filament controls explicit.
+
+### Changed
+
+- Removed the unused mandatory Notification Center dependency. Applications using that separate plugin can continue to require it directly.
+
+## [4.0.7] - 2026-10-17
+
+### Changed
+
+- Reuse admitted absolute asset plans without repeatedly resolving the document base URL; relative URLs still follow the current base.
+- Limit activation checks to relevant layout ancestors while preserving hidden tabs, wizard steps, collapsed sections and modal ownership.
+- Added complete relational gallery examples, including custom filenames, website/API presentation and an optional SQL index of named conversions.
+
+## [4.0.0] - 2026-10-16
 
 A major rebuild of FLEX Fields. Every component has been rewritten, alongside the
 shared asset runtime, picker engine, media workflows and component catalog. This
 release expands configuration and integrations across the library; it is not
-limited to the new components listed below. Version 4.0 is in development and has
-not yet been publicly released.
+limited to the new components listed below.
 
 ### Added
 

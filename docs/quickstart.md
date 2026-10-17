@@ -7,6 +7,11 @@ mode: "wide"
 
 Build richer forms in your existing Filament application. **Start with the features you need**, then connect media workflows or create reusable extensions as your project grows.
 
+<Card title="Build with your AI assistant" icon="sparkles" href="/docs/ai-assisted-development">
+  Set up the FLEX skill, discover installed component APIs, configure File Upload
+  or use Media OS directly in your own Laravel services.
+</Card>
+
 <img src="/art/FLEX-FIELDS-v4.webp" alt="FLEX Fields v4: component previews, shared assets, composable controls and Media OS" width="3200" height="1800" className="w-full rounded-2xl" />
 
 ## Your setup, in three steps
@@ -15,8 +20,8 @@ Build richer forms in your existing Filament application. **Start with the featu
   <Card title="01 · Install FLEX" icon="package-plus" href="/docs/installation">
     Add FLEX to your panel, publish its assets and verify the installation.
   </Card>
-  <Card title="02 · Build your form" icon="layout-dashboard" href="/docs/component-library">
-    Choose your controls, then follow their configuration guides and working examples.
+  <Card title="02 · Build your form" icon="layout-dashboard" href="/docs/recipes">
+    Start with one field, a scoped picker or a relational gallery in your existing form.
   </Card>
   <Card title="03 · Save with confidence" icon="database-zap" href="/docs/data-and-validation">
     Set storage formats and validation, then verify saving and reopening records.
@@ -54,5 +59,7 @@ Build richer forms in your existing Filament application. **Start with the featu
 <Note>
   **Choose your own scope.** Ordinary fields can use existing model attributes. Managed field groups and third-party integrations are optional. Check [Requirements & integrations](/docs/requirements) for the features you enable.
 </Note>
+
+Working with an AI assistant? Use the [installed API and optional Laravel Boost skill](/docs/ai-assisted-development). You can also compare [native Filament, custom code and FLEX](/docs/choosing-components) before choosing a control.
 
 Need help? [Troubleshooting](/docs/troubleshooting) connects common symptoms to checks and solutions.

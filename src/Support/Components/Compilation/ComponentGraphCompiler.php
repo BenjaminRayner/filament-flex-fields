@@ -55,7 +55,14 @@ final class ComponentGraphCompiler
         $edgeCount = 0;
         $childCount = 0;
         $childBytes = 0;
+        $guidanceBytes = 0;
         foreach ($definitions as $id => $definition) {
+            if ($definition->guidance !== null) {
+                $guidanceBytes += $definition->guidance->metadataBytes;
+                if ($guidanceBytes > 4194304) {
+                    throw new InvalidArgumentException('Compiled component guidance exceeds its metadata budget.');
+                }
+            }
             if ($definition->childContract !== null) {
                 $childBytes += strlen(json_encode($definition->childContract->export(), JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION));
                 if ($childBytes > 4194304) {

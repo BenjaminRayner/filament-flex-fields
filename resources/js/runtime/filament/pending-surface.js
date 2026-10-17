@@ -278,6 +278,31 @@ export function createPendingSurface({ document, window, injectorHooks, resolveP
             || (element !== target && element?.classList?.contains('fff-flex-fields-assets-pending'))
     }
 
+    const preserveMorph = (element, incoming) => {
+        if (!element?.classList?.contains('fi-modal') && !element?.classList?.contains('fi-modal-window')) return
+        const target = nodeTargets.get(element) ?? resolvePendingTarget(element)
+        if (!target?.classList?.contains('fi-modal') || !hasPendingState(target) || !incoming) return
+        if (element === target) {
+            for (const name of ['fff-flex-fields-assets-pending', 'fff-flex-fields-assets-failed']) {
+                if (target.classList.contains(name)) incoming.classList?.add(name)
+            }
+            incoming.classList?.remove('fff-flex-fields-assets-ready')
+            for (const name of ['aria-busy', 'data-fff-pending-started-at']) {
+                const value = target.getAttribute?.(name)
+                if (value !== null && value !== undefined) incoming.setAttribute?.(name, value)
+            }
+        }
+        const host = target.querySelector?.('.fi-modal-window')
+        if (element !== host || !incoming.appendChild) return
+        // Server HTML does not contain the client-owned readiness presentation.
+        // Preserve its live DOM counterpart through morphing; only its current
+        // readiness lease, failure/retry or an actual close may retire it.
+        for (const overlay of host.children ?? []) {
+            if (!overlay.classList?.contains(ASSETS_SKELETON_CLASS)) continue
+            if (!incoming.querySelector?.(`.${ASSETS_SKELETON_CLASS}`)) incoming.appendChild(overlay.cloneNode(true))
+        }
+    }
+
     // Morph notifications are coalesced into an ancestor root. A pending child
     // must still be released even when that ancestor never needed a skeleton.
     const getPendingTargets = root => {
@@ -300,6 +325,7 @@ export function createPendingSurface({ document, window, injectorHooks, resolveP
         releasePendingState,
         hasPendingState,
         failPendingState,
+        preserveMorph,
         dispose() {
             disposed = true
             for (const finish of [...delayedReleases.values()]) finish()

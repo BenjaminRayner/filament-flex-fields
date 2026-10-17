@@ -60,6 +60,28 @@ final class CodeExampleRepository
     /** @return array{source: string, lines: list<string>, unavailable: false} */
     public function read(CodeExample $reference): array
     {
+        $source = $this->source($reference);
+        // Content identity prevents stale output even when edits preserve mtime and size.
+        $lines = RequestState::resolve(OptionalSharedCache::class)->remember('flex.examples.php.json-v2.'.hash('sha256', $source), 3600,
+            fn (): array => $this->highlighter->lines($source), static function (mixed $value): bool {
+                if (! is_array($value) || ! array_is_list($value) || count($value) > self::MAX_LINES) {
+                    return false;
+                }
+                foreach ($value as $line) {
+                    if (! is_string($line)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+        return ['source' => $source, 'lines' => $lines, 'unavailable' => false];
+    }
+
+    /** Read declared application code without evaluating it or touching the syntax cache. */
+    public function source(CodeExample $reference): string
+    {
         $handle = @fopen($reference->path, 'rb');
         if ($handle === false) {
             throw new RuntimeException('Example file is unavailable.');
@@ -80,21 +102,7 @@ final class CodeExampleRepository
         if (substr_count($source, "\n") + 1 > self::MAX_LINES) {
             throw new RuntimeException('Example has too many lines.');
         }
-        // Content identity prevents stale output even when edits preserve mtime and size.
-        $lines = RequestState::resolve(OptionalSharedCache::class)->remember('flex.examples.php.json-v2.'.hash('sha256', $source), 3600,
-            fn (): array => $this->highlighter->lines($source), static function (mixed $value): bool {
-                if (! is_array($value) || ! array_is_list($value) || count($value) > self::MAX_LINES) {
-                    return false;
-                }
-                foreach ($value as $line) {
-                    if (! is_string($line)) {
-                        return false;
-                    }
-                }
 
-                return true;
-            });
-
-        return ['source' => $source, 'lines' => $lines, 'unavailable' => false];
+        return $source;
     }
 }

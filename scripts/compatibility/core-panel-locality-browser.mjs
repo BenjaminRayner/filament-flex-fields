@@ -11,9 +11,10 @@ import { createSegmentPanelPaint } from './resources/js/runtime/filament/segment
 import { createResourceScope } from './resources/js/runtime/lifecycle/resource-scope.js'
 import { awaitSurfaceFactories } from './resources/js/runtime/filament/surface-readiness.js'
 import { createPendingSurface } from './resources/js/runtime/filament/pending-surface.js'
+import { prepareFilamentPartials } from './resources/js/runtime/filament/partial-assets.js'
 import { createSurfaceRegistry } from './resources/js/runtime/filament/surface-registry.js'
 import { createSurfaceReadinessIndex } from './resources/js/runtime/filament/surface-readiness-index.js'
-window.fixture = { runtime: createFlexFieldAssetInjector, paint: createSegmentPanelPaint, scope: createResourceScope, wait: awaitSurfaceFactories, pending: createPendingSurface, index: createSurfaceReadinessIndex, surfaces: createSurfaceRegistry }
+window.fixture = { runtime: createFlexFieldAssetInjector, paint: createSegmentPanelPaint, scope: createResourceScope, wait: awaitSurfaceFactories, pending: createPendingSurface, partial: prepareFilamentPartials, index: createSurfaceReadinessIndex, surfaces: createSurfaceRegistry }
 window.frames = async () => { await new Promise(requestAnimationFrame); await new Promise(requestAnimationFrame); await new Promise(requestAnimationFrame) }
 window.makeField = parent => {
  const field = document.createElement('div'); field.setAttribute('x-fff-load', ''); field._fffFactoryReady = true; field.style.height = '1px'
@@ -234,6 +235,35 @@ try {
         runtime.dispose(); modal.remove(); delete window.FffAssetInjector
     })
     proofs.push('concurrent local modal morphs share readiness settlement; one completed factory cannot reveal its pending sibling')
+    await page.evaluate(async () => {
+        const modal = document.createElement('section'); modal.className = 'fi-modal fi-modal-open'; document.body.append(modal)
+        const host = document.createElement('div'); host.className = 'fi-modal-window'; modal.append(host)
+        const pending = fixture.pending({ document, window, resolvePendingTarget: el => el.closest('.fi-modal') ?? el,
+            awaitInflightAssetLoads: async () => {}, injectorHooks: { markPendingStarted() {}, getPendingReleaseDelayMs: () => 0 } })
+        pending.applyPendingState(modal)
+        const lease = pending.capturePendingState(modal), overlay = host.lastElementChild
+        const incoming = document.createElement('section'); incoming.className = 'fi-modal fi-modal-open'
+        const incomingHost = document.createElement('div'); incomingHost.className = 'fi-modal-window'; incoming.append(incomingHost)
+        pending.preserveMorph(modal, incoming); pending.preserveMorph(host, incomingHost)
+        if (incoming.getAttribute('aria-busy') !== 'true' || !incoming.classList.contains('fff-flex-fields-assets-pending')
+            || !incomingHost.querySelector('.fff-flex-fields-assets-skeleton') || !lease.current()) throw Error('Server morph discarded active readiness presentation')
+        if (host.lastElementChild !== overlay) throw Error('Morph preparation moved the live readiness overlay')
+        const owner = document.createElement('div'); owner.setAttribute('wire:id', 'pending-proof'); document.body.append(owner); owner.append(modal)
+        modal.id = 'pending-partial-proof'; modal.setAttribute('wire:partial', 'pending-proof')
+        makeField(host)
+        const clean = modal.cloneNode(true); clean.classList.remove('fff-flex-fields-assets-pending'); clean.removeAttribute('aria-busy'); clean.querySelector('.fff-flex-fields-assets-skeleton').remove()
+        const payload = { effects: { partials: { 'pending-proof': clean.outerHTML } } }
+        fixture.partial({ message: { component: { el: owner } }, payload, document, surfaces: null, pending, primePreparedStyles() {} })
+        const parsed = document.createElement('template'); parsed.innerHTML = payload.effects.partials['pending-proof']
+        if (parsed.content.firstElementChild.getAttribute('aria-busy') !== 'true' || !parsed.content.querySelector('.fff-flex-fields-assets-skeleton')) throw Error('Native partial bypass discarded pending presentation')
+        owner.remove()
+
+        await pending.releasePendingState(modal, { lease })
+        const ready = document.createElement('section'); pending.preserveMorph(modal, ready)
+        if (ready.hasAttribute('aria-busy') || ready.classList.contains('fff-flex-fields-assets-pending')) throw Error('Completed readiness presentation was resurrected')
+        pending.dispose(); modal.remove()
+    })
+    proofs.push('server morph preserves current native modal busy state and overlay without moving the live UI or reviving a released generation')
     assert.deepEqual(errors, [])
     console.log(JSON.stringify({ browser: await browser.version(), minifiedSourceBuild: true, measurements, proofs, errors }))
 } finally {

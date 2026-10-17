@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ScheduleField;
 use Bjanczak\FilamentFlexFields\Support\Catalog\CatalogCategory;
 use Bjanczak\FilamentFlexFields\Support\Catalog\ComponentPresentation;
 use Bjanczak\FilamentFlexFields\Support\Catalog\Examples\CodeExample;
 use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
 use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\Guidance\ComponentGuidance;
 use Bjanczak\FilamentFlexFields\Support\Playground\ScheduleFieldPlayground;
 
 return new ComponentDefinition(
@@ -17,6 +19,13 @@ return new ComponentDefinition(
     uses: ['timezone-field', 'select-field', 'switch'],
     entry: 'schedule-field',
     capabilities: [],
+    guidance: new ComponentGuidance(
+        summary: 'Configure weekly periods, breaks and schedule validation.',
+        renderer: ScheduleField::class,
+        persistence: 'Use the documented structured schedule value with a JSON column and array cast. This is opening-hours data, not an appointment reservation engine.',
+        instructions: ['Choose timezone, overnight and day/period policies for the actual application.', 'Validate submitted periods; disabled day UI is not application authorization.'],
+        verification: ['Save and restore periods and timezone.', 'Reject overlapping or reversed intervals according to the configured policy.'],
+    ),
     catalog: new ComponentPresentation(
         label: 'filament-flex-fields::catalog.components.schedule-field.label',
         description: 'filament-flex-fields::catalog.components.schedule-field.description',

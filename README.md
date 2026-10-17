@@ -52,6 +52,12 @@
   <sub>See real components in action: pickers, uploads, image editing, maps, signatures and more.</sub>
 </p>
 
+## Configure one field, including with AI
+
+Keep your existing Filament Resource, models and native fields. FLEX includes optional Laravel Boost guidance and a focused development skill, plus read-only discovery of installed component declarations and PHP examples. Your application keeps its policies and persistence flow.
+
+[AI-assisted development](https://flex-fields.bjanczak.com/docs/ai-assisted-development) · [Your first saved component](https://flex-fields.bjanczak.com/docs/first-component) · [Native, custom or FLEX?](https://flex-fields.bjanczak.com/docs/choosing-components)
+
 ## Why choose FLEX Fields?
 
 | What makes FLEX worth choosing | What it gives your application |
@@ -138,7 +144,8 @@ FLEX loads the resources required by active controls and shares dependencies acr
 | Several instances of the same control | Shares CSS, JavaScript and pending loads. Each instance keeps its own values and configuration. |
 | A composite control containing other controls | Resolves declared child dependencies and reuses their renderers and resources. |
 | A field inside an inactive tab, wizard step or closed dialog | Waits for that area to activate before initializing its controls. |
-| A field removed by Livewire, or a nested dialog closing | Disposes instance-owned listeners, timers and streams while preserving dependencies still needed by other instances. |
+| A field removed by Livewire | Disposes registered instance-owned effects while preserving dependencies still needed by other instances. |
+| A nested dialog closes | Releases its resource interests and pending surface work; still-mounted factories are destroyed only when unmounted. |
 
 Editors, capture tools and other optional features follow each field's configuration. Every FLEX-enabled panel has a **shared runtime and base styles**. The package includes **prebuilt browser assets**, so normal use needs no FLEX Node.js build or custom Tailwind compilation.
 
@@ -180,12 +187,14 @@ flowchart TB
         owners -.->|Activity or configuration changes| events["Tab and dialog events<br/>Livewire morph and navigation"]
         events -.->|Render or replace| features
         events -.->|Change activity| activity
-        events -.->|Close or remove| cleanup["Cancel instance waits<br/>dispose owned effects"]
+        events -.->|Close / deactivate| release["Release resource interests<br/>cancel pending surface work"]
+        events -.->|Unmount| cleanup["Cancel instance waits<br/>dispose registered effects"]
+        release --> retained
         cleanup --> retained["Keep resources still in use<br/>ignore outdated completions"]
         retained -.->|Reconcile current instances| activity
         shared -.->|Loading failure| retry["Error state and retry"]
         init -.->|Initialization failure| retry
-        retry -.->|Retry the current instance| activity
+        retry -.->|Recheck failed roots| activity
     end
 
     classDef milestone stroke:#7964E8,stroke-width:3px,font-weight:bold;

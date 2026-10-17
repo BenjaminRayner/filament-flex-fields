@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T05:28:23.559Z",
+  "generatedAt": "2026-10-17T10:19:59.603Z",
   "css": {
     "address-autocomplete.css": {
       "bytes": 1501,
@@ -539,9 +539,9 @@
       "gzipKb": 5.12
     },
     "flex-core-runtime.js": {
-      "bytes": 70525,
-      "kb": 68.87,
-      "gzipKb": 22.69
+      "bytes": 71607,
+      "kb": 69.93,
+      "gzipKb": 22.96
     },
     "flex-date-picker.js": {
       "bytes": 12223,

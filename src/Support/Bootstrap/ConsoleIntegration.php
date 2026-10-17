@@ -8,6 +8,7 @@ use Bjanczak\FilamentFlexFields\Console\AssetReleasesCommand;
 use Bjanczak\FilamentFlexFields\Console\AssetsDoctorCommand;
 use Bjanczak\FilamentFlexFields\Console\AssetsExplainCommand;
 use Bjanczak\FilamentFlexFields\Console\ComponentRemovalImpactCommand;
+use Bjanczak\FilamentFlexFields\Console\DescribeComponentsCommand;
 use Bjanczak\FilamentFlexFields\Console\InstallWhisperRuntimeCommand;
 use Bjanczak\FilamentFlexFields\Console\MakeFlexComponentPackageCommand;
 use Bjanczak\FilamentFlexFields\Console\MakeFlexFieldSchemaMigrationCommand;
@@ -41,6 +42,7 @@ final class ConsoleIntegration
                 AssetsDoctorCommand::class,
                 AssetReleasesCommand::class,
                 AssetsExplainCommand::class,
+                DescribeComponentsCommand::class,
                 ComponentRemovalImpactCommand::class,
                 MakeFlexComponentPackageCommand::class,
                 PublishComponentAssetsCommand::class,

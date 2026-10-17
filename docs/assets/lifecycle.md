@@ -2,7 +2,31 @@
 title: "Tabs, modals & Livewire"
 description: "How FLEX activates hidden controls, keeps nested dialogs ready and cleans up owned resources during Livewire updates."
 icon: "refresh-cw"
+"canonical": "https://flex-fields.bjanczak.com/docs/assets/lifecycle"
+"og:type": "article"
+"og:image": "https://flex-fields.bjanczak.com/art/og/asset-manager-lifecycle.webp"
+"og:image:type": "image/webp"
+"og:image:width": "1200"
+"og:image:height": "630"
+"og:image:alt": "A real FLEX field remains usable after another resource owner is removed"
+"twitter:card": "summary_large_image"
+"twitter:image": "https://flex-fields.bjanczak.com/art/og/asset-manager-lifecycle.webp"
 ---
+
+<span id="recording-steps"></span>
+
+## Watch the lifecycle examples
+
+The [narrated Asset Manager walkthrough](/docs/asset-loading#watch-ownership-in-action)
+shows the complete system. Jump to the relevant example on YouTube:
+
+- [01:01 — CSS, module and initialization readiness](https://www.youtube.com/watch?v=KufHFWijeCc&t=61s).
+- [01:39 — Close during module loading](https://www.youtube.com/watch?v=KufHFWijeCc&t=99s).
+- [02:02 — Dispose registered effects](https://www.youtube.com/watch?v=KufHFWijeCc&t=122s).
+- [02:29 — Ignore outdated initialization](https://www.youtube.com/watch?v=KufHFWijeCc&t=149s).
+- [02:57 — Retain resources for nested parents](https://www.youtube.com/watch?v=KufHFWijeCc&t=177s).
+- [03:26 — Recover from a controlled loading failure](https://www.youtube.com/watch?v=KufHFWijeCc&t=206s).
+- [03:51 — Livewire navigation and new consumers](https://www.youtube.com/watch?v=KufHFWijeCc&t=231s).
 
 ## Hidden areas activate when used
 
@@ -27,7 +51,8 @@ A prepared control needs its CSS, JavaScript and initialization to complete. Dia
 | One of several fields is removed | Other fields keep their interest in shared resources |
 | An earlier opening finishes after a replacement | The old completion cannot mark the new instance ready |
 | Livewire replaces page content | Newly rendered controls acquire resources and removed owners are disposed |
-| An instance closes or is removed | Its tracked listeners, timers, subscriptions and capture streams can be cleaned up |
+| A surface closes or deactivates | Pending surface work and resource interests are released; closing does not necessarily destroy a mounted factory |
+| A component is actually unmounted | Its registered listeners, timers, subscriptions and capture streams are disposed |
 
 Already evaluated JavaScript remains in the browser. Closing a dialog does not unload an imported module or remove a shared implementation that another field still uses.
 

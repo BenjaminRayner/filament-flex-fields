@@ -8,6 +8,7 @@ use Bjanczak\FilamentFlexFields\Support\Catalog\ComponentPresentation;
 use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildComponentContract;
 use Bjanczak\FilamentFlexFields\Support\Components\Composition\ChildSlot;
 use Bjanczak\FilamentFlexFields\Support\Components\Contracts\ComponentSurface;
+use Bjanczak\FilamentFlexFields\Support\Components\Guidance\ComponentGuidance;
 use Bjanczak\FilamentFlexFields\Support\Runtime\ArraySnapshot;
 use InvalidArgumentException;
 
@@ -63,7 +64,15 @@ final readonly class ComponentDefinition
         array $children = [],
         public ?ChildComponentContract $childContract = null,
         array $routes = [],
+        public ?ComponentGuidance $guidance = null,
     ) {
+        if ($guidance?->renderer !== null) {
+            ComponentSurface::assertRendererClass($kind, $guidance->renderer);
+            $renderer = $surface->class ?? $childContract?->renderer;
+            if ($renderer !== null && $renderer !== $guidance->renderer) {
+                throw new InvalidArgumentException('Guidance cannot contradict the registered component renderer.');
+            }
+        }
         if (! array_is_list($routes) || count($routes) > 32) {
             throw new InvalidArgumentException('Component routes require a bounded typed list.');
         }

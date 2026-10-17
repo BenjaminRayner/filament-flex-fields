@@ -22,11 +22,11 @@
         "docs:fix-titles": "node scripts/fix-docs-mintlify-titles.mjs",
         "docs:changelog": "node scripts/generate-changelog-docs.mjs",
         "docs:changelog:check": "node scripts/generate-changelog-docs.mjs --check",
-        "predocs:dev": "npm run docs:changelog",
+        "predocs:dev": "npm run docs:recipes && npm run docs:changelog",
         "docs:dev": "mintlify dev",
-        "predocs:build": "npm run docs:changelog",
+        "predocs:build": "npm run docs:recipes && npm run docs:changelog",
         "docs:build": "mintlify build",
-        "prebuild": "npm run docs:changelog",
+        "prebuild": "npm run docs:recipes && npm run docs:changelog",
         "build": "npm run build:components:index && npm run audit:component-schema && npm run build:icons:manifest && npm run build:css && npm run build:js && node scripts/generate-bundle-summary.mjs && php scripts/assets/validate-build.php",
         "check:budgets": "node scripts/check-bundle-budgets.mjs",
         "compare:budgets": "node scripts/compare-bundle-metrics.mjs",
@@ -50,7 +50,9 @@
         "audit:core:diagnostics": "node scripts/compatibility/core-runtime-diagnostics.mjs && node scripts/compatibility/core-runtime-diagnostics-browser.mjs",
         "audit:core:build": "php scripts/compatibility/core-build-preflight.php",
         "audit:core:locality": "node scripts/compatibility/core-local-ownership.mjs && node scripts/compatibility/core-local-ownership-browser.mjs && node scripts/compatibility/core-panel-locality-browser.mjs",
-        "audit:core:release": "node scripts/core/release-acceptance.mjs"
+        "audit:core:release": "node scripts/core/release-acceptance.mjs",
+        "docs:recipes": "node scripts/generate-recipe-docs.mjs",
+        "docs:recipes:check": "node scripts/generate-recipe-docs.mjs --check"
     },
     "devDependencies": {
         "@playwright/test": "^1.64.0",

@@ -1,0 +1,114 @@
+---
+title: "Declare component guidance for AI tools"
+sidebarTitle: "AI guidance"
+description: "Attach bounded, typed usage guidance and declared examples to built-in or external ComponentDefinition instances without a separate AI registry or runtime behavior changes."
+---
+
+An installed component can describe how to use and verify it. Attach an optional
+`ComponentGuidance` to its existing `ComponentDefinition`; it works for external
+packages and components without a playground entry. Omission keeps existing
+definitions compatible and means that no author guidance is declared.
+
+## Declare beside the component
+
+This example belongs in a trusted package provider. `AcmeSignatureField` must be
+your actual installed Filament field class; the example file must exist in your
+distributed package.
+
+```php
+use Acme\Signature\Forms\AcmeSignatureField;
+use Bjanczak\FilamentFlexFields\Support\Catalog\Examples\CodeExample;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentDefinition;
+use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
+use Bjanczak\FilamentFlexFields\Support\Components\Guidance\ComponentGuidance;
+
+$definition = new ComponentDefinition(
+    id: 'acme-signature-field',
+    kind: ComponentKind::Field,
+    // Keep your existing styles, entry, family surface and child declarations.
+    guidance: new ComponentGuidance(
+        summary: 'Capture an approval signature in an existing Resource.',
+        renderer: AcmeSignatureField::class,
+        persistence: 'Store the SVG text on the application model.',
+        documentation: 'https://example.com/docs/signature',
+        useCases: ['Approval forms with an application-owned authorization policy.'],
+        prerequisites: ['A text attribute and the existing Resource save flow.'],
+        instructions: ['Keep application policies. Save only validated form state.'],
+        verification: ['Reject an empty required value.', 'Save, reload and edit the signature.'],
+        examples: [CodeExample::php(__DIR__.'/../examples/signature.php', 'Resource usage')],
+    ),
+);
+```
+
+Register the definition through the existing registrar/family flow. Guidance does
+not register a second component, render the control, create a database column or
+add assets. It is not executable configuration and is not accepted from submitted
+form data or a remote instruction feed.
+
+## Keep facts separate from advice
+
+| Field | Contract |
+| --- | --- |
+| `summary` | Required nonempty readable UTF-8 text, at most 512 bytes |
+| `renderer` | Optional installed, instantiable class matching the component kind; cannot contradict the surface or child contract |
+| `persistence` | Optional explanation of the value/storage contract, at most 2048 bytes; not an automatic database mapping |
+| `documentation` | Optional HTTPS URL, at most 2048 bytes, without credentials; discovery does not fetch it |
+| `useCases`, `prerequisites`, `instructions`, `verification` | Ordered lists of at most 12 strings each, at most 1024 bytes per string |
+| `examples` | At most 12 unique typed local PHP references; files are read only when requested, never executed |
+
+Guidance is immutable and detached from caller array aliases. Each declaration
+has a 32 KiB metadata budget; compiled exported guidance has a 4 MiB aggregate
+budget. Invalid metadata rejects before the registry candidate is committed.
+The optional guidance renderer is checked without creating a field instance.
+
+## Read the installed contract
+
+```bash
+php artisan fff:components:describe acme-signature-field --json
+php artisan fff:components:describe acme-signature-field --example=1 --json
+```
+
+The report has `format: 1`; declared guidance has its own `format: 1`. These are
+discovery formats, not asset manifests, SDK ABI or stored-value versions.
+Consumers should tolerate additional report fields, inspect `format` before
+interpreting it, and check the command exit status. Invalid selectors and missing
+examples return a nonzero exit with a `format: 1` / `error` JSON object when
+`--json` is selected. Text validation does not certify the accuracy of author advice.
+
+Surface and child-contract renderers remain authoritative. Guidance can supply
+a checked renderer when neither declares one. An absent renderer remains
+`not-declared`; the command never guesses a class from a slug. A guidance-specific
+documentation URL takes priority, including for third-party authors. Without an
+explicit external URL, discovery does not invent a page on the FLEX docs site.
+
+Nonempty guidance examples take precedence for this command; otherwise it uses
+the component's existing catalog examples. IDs are one-based and stable within
+that installed definition. Output exposes labels and requested source, not local
+file paths. Source is bounded to 128 KiB and 2000 lines, must be UTF-8 and is not
+evaluated. The CLI has no remote fetching, record query or publication step.
+
+The report intentionally does not enumerate arbitrary fluent methods. The
+`configurationOptions` list comes from the declared child configuration contract;
+it is not proof that every PHP callback can be serialized into a stored schema.
+
+## Author instructions are data
+
+The response marks guidance as supplied by an installed package author. It is
+not an override of user instructions or application policies, not authorization
+to execute a command, and not evidence that the described behavior was tested.
+An agent must review examples and adapt models, permissions and storage.
+
+Bounds and typing reject malformed data; they cannot prove arbitrary natural
+language instructions are trustworthy. Installed PHP packages are already trusted
+application code. This API does not sandbox them or certify third-party authors.
+
+## Verify your integration
+
+Exercise discovery with and without catalog metadata, invalid declarations,
+contradictory renderers and missing example files. Confirm no application queries
+or example execution during listing. Test your actual field separately: state,
+validation, save/reopen and its documented dynamic-surface behavior.
+
+If you distribute a separate Laravel Boost skill, use its package convention and
+let the application opt in through Boost. Component guidance is a focused source
+of installed facts; it should not inject an entire manual into every AI task.

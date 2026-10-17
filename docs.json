@@ -10,7 +10,8 @@
   },
   "logo": {
     "light": "/art/docs-logo-light.svg",
-    "dark": "/art/docs-logo-dark.svg"
+    "dark": "/art/docs-logo-dark.svg",
+    "href": "/docs/index"
   },
   "favicon": "/art/docs-favicon.svg",
   "banner": {
@@ -60,6 +61,8 @@
     "tabs": [
       {
         "tab": "Home",
+        "hidden": true,
+        "searchable": true,
         "pages": [
           "docs/index"
         ]
@@ -72,7 +75,11 @@
             "pages": [
               "docs/quickstart",
               "docs/installation",
-              "docs/first-component"
+              "docs/first-component",
+              "docs/choosing-components",
+              "docs/recipes",
+              "docs/scoped-select-recipe",
+              "docs/verification"
             ]
           },
           {
@@ -90,6 +97,27 @@
               "docs/updating",
               "docs/troubleshooting",
               "docs/sre-runbook"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "AI",
+        "icon": "sparkles",
+        "groups": [
+          {
+            "group": "Build with AI",
+            "pages": [
+              "docs/ai-assisted-development",
+              "docs/ai/setup",
+              "docs/ai/component-configuration"
+            ]
+          },
+          {
+            "group": "Media workflows",
+            "pages": [
+              "docs/ai/media-os",
+              "docs/ai/file-upload"
             ]
           }
         ]
@@ -160,6 +188,7 @@
                   "docs/file-upload-storage-and-validation",
                   "docs/file-upload-models-and-migration",
                   "docs/file-upload-gallery-recipe",
+                  "docs/file-upload-resource-recipe",
                   "docs/file-upload-gallery-api",
                   "docs/file-upload-images-and-sources",
                   "docs/file-upload-metadata",
@@ -311,6 +340,7 @@
             "pages": [
               "docs/extensions/index",
               "docs/extensions/quickstart",
+              "docs/extensions/ai-guidance",
               "docs/extensions/generate-package",
               "docs/extensions/package-structure",
               "docs/extensions/standalone",
@@ -1461,6 +1491,19 @@
           "og:image:type": "image/webp",
           "og:image:alt": "Voice Note Recorder in the FLEX Fields playground",
           "twitter:image:alt": "Voice Note Recorder in the FLEX Fields playground"
+        }
+      },
+      {
+        "path": "docs/asset-loading",
+        "metatags": {
+          "og:type": "article",
+          "og:video": "https://www.youtube-nocookie.com/embed/KufHFWijeCc",
+          "og:video:secure_url": "https://www.youtube-nocookie.com/embed/KufHFWijeCc",
+          "og:video:type": "text/html",
+          "og:video:width": "1920",
+          "og:video:height": "1080",
+          "og:image:width": "1200",
+          "og:image:height": "630"
         }
       }
     ]

@@ -142,6 +142,7 @@ export function createLivewireAdapter({ document, window, lifetime, transactions
     const handleMorphUpdating = (payload) => {
         if (lifetime.disposed) return
         rootAttempts.cancel(payload.el)
+        pending.preserveMorph?.(payload.el, payload.toEl)
         preserveMountedFactoryReadiness(payload.el, payload.toEl)
         presentation?.preserveMorph(payload.el, payload.toEl)
         // The hook runs for each node before paint. Inspect a marker once rather
@@ -221,7 +222,7 @@ export function createLivewireAdapter({ document, window, lifetime, transactions
                     onSuccess(({ payload }) => {
                         if (!live() || generation !== navigationGeneration) return
                         prepareLivewirePlanEffects(payload, document)
-                        prepareFilamentPartials({ message, payload, document, surfaces, presentation, primePreparedStyles,
+                        prepareFilamentPartials({ message, payload, document, surfaces, presentation, pending, primePreparedStyles,
                         onDeferredPanel(panel) {
                             // The panel is outside the native partial root and remains
                             // stable while Filament replaces its loader. Reveal only
