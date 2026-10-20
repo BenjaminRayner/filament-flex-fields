@@ -12,6 +12,8 @@ use Bjanczak\FilamentFlexFields\Console\DescribeComponentsCommand;
 use Bjanczak\FilamentFlexFields\Console\InstallWhisperRuntimeCommand;
 use Bjanczak\FilamentFlexFields\Console\MakeFlexComponentPackageCommand;
 use Bjanczak\FilamentFlexFields\Console\MakeFlexFieldSchemaMigrationCommand;
+use Bjanczak\FilamentFlexFields\Console\MediaDoctorCommand;
+use Bjanczak\FilamentFlexFields\Console\MediaProbeCommand;
 use Bjanczak\FilamentFlexFields\Console\PruneCaptureMediaCommand;
 use Bjanczak\FilamentFlexFields\Console\PruneMediaConversionJournalsCommand;
 use Bjanczak\FilamentFlexFields\Console\PruneMediaStagingCommand;
@@ -40,6 +42,8 @@ final class ConsoleIntegration
         \Illuminate\Console\Application::starting(static function (\Illuminate\Console\Application $artisan): void {
             $artisan->resolveCommands([
                 AssetsDoctorCommand::class,
+                MediaDoctorCommand::class,
+                MediaProbeCommand::class,
                 AssetReleasesCommand::class,
                 AssetsExplainCommand::class,
                 DescribeComponentsCommand::class,

@@ -21,6 +21,11 @@ These examples explain the current License v2.0. For the exact conditions, read 
   <Accordion title="Can a profitable company use an internal app for free?">
     Yes, when every internal-use condition is met. Revenue is not the test. The application must serve the eligible entity's own operations rather than constitute or configure the commercial software service supplied to users.
   </Accordion>
+  <Accordion title="Is the free-use test applied per panel or per Laravel application?">
+    Neither boundary decides the result on its own. Assess what FLEX implements. Internal monitoring, employee records and company accounting can remain free even when they share a Laravel backend with a commercial product. FLEX controls defining the product's comparison rules or calculation parameters are commercial functionality even behind a staff login.
+
+    Read-only access does not establish an exemption, and editing records does not automatically require a commercial license. See the [shared-backend examples](/docs/licensing#internal-panel-and-commercial-product-in-the-same-application), including how to answer the license guide.
+  </Accordion>
   <Accordion title="Does a small or freemium SaaS need a commercial license?">
     A live commercial hosted product needs the appropriate grant regardless of revenue or user count. Its freemium tier is part of that product. Private evaluation before launch is different from a paid pilot or live customer workload.
   </Accordion>
@@ -93,7 +98,7 @@ These examples explain the current License v2.0. For the exact conditions, read 
     A new legal owner does not automatically inherit your portfolio license. Product sales, entity transfers and incorporation can need transfer approval, a new grant or an agreed transition. Discuss the change before the new operator takes over. A name change of the same legal entity is different from changing the licensee.
   </Accordion>
   <Accordion title="How do I buy or clarify a plan?">
-    Email [barek122@gmail.com](mailto:barek122@gmail.com) with the intended licensee, product owners/operators and delivery model. Scope and price are confirmed before payment. A tax receipt alone is not the grant; keep the authenticated License Confirmation as well.
+    [Buy Single Product, Unlimited Company or Enterprise Group](https://shop.bjanczak.com/checkout/buy/9035f5b4-c5a2-4b03-867d-109b48d49134) directly and select the matching plan in checkout. You do not need to submit an enquiry first. Use the [license guide](/docs/request-license) if you need help choosing. Custom / OEM, unclear scope, upgrades and transfers require individual contact before payment: [barek122@gmail.com](mailto:barek122@gmail.com). A tax receipt alone is not the grant; keep the authenticated License Confirmation as well.
   </Accordion>
 </AccordionGroup>
 

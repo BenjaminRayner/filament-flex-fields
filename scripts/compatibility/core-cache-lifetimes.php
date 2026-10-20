@@ -306,7 +306,11 @@ cacheRejected(fn () => app(ComponentRegistry::class)->register(
     new ComponentDefinition('late-worker-component', ComponentKind::Display),
 ));
 $scopes = (new ReflectionProperty(Container::class, 'scopedInstances'))->getValue(app());
-$inventory = json_decode(file_get_contents('.internal/core-architecture-inventory.json'), true, 32, JSON_THROW_ON_ERROR);
+$inventoryPath = getenv('FFF_CORE_ARCHITECTURE_INVENTORY') ?: 'build/core-reports/core-architecture-inventory.json';
+if (! is_file($inventoryPath) || is_link($inventoryPath)) {
+    throw new RuntimeException('Generate the current core inventory before checking container lifetimes.');
+}
+$inventory = json_decode(file_get_contents($inventoryPath), true, 32, JSON_THROW_ON_ERROR);
 foreach ($inventory['serviceBindings'] as $binding) {
     cacheCheck(app()->bound($binding['service']), 'Declared core binding is missing from the real container.');
     cacheCheck(in_array($binding['service'], $scopes, true) === ($binding['lifetime'] === 'request-or-job'), 'Actual service lifetime differs from the inventory.');

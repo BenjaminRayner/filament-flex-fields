@@ -9,6 +9,7 @@ description: "Explain registered dependencies, inspect live owners and diagnose 
 
 ```bash
 php artisan fff:assets:doctor
+php artisan fff:assets:doctor --published --share
 php artisan fff:assets:explain acme-summary-field
 php artisan fff:assets:explain flex-text-input \
   --capability=emoji-picker --json
@@ -19,6 +20,13 @@ shows why dependencies are required, who owns each stylesheet, the selected
 runtime components and the package's version, ABI and content release. It marks
 lazy package resources separately from eager dependencies. Declared child slots
 are reported without making their JavaScript eager.
+
+For a support request, `doctor --share` returns redacted JSON with the effect of
+each detected issue and a recommended repair. It omits raw error messages, file
+paths, private file URLs and extension identities. Ordinary `--json` retains local details and
+adds a `diagnosis` section with the same advice. The shareable report cannot
+include `--definitions` or `--locations`. Its success covers asset validation,
+rather than the health of application storage or queue workers.
 
 This command reports the installation, rather than a particular open browser.
 Use the live asset diagnostics to inspect active instance owners, generations and

@@ -39,6 +39,23 @@ php artisan filament:assets
 
 Reload the affected page and try the control. The files must also be reachable by the browser: inspect failed network requests and the first relevant JavaScript error. A passing publication report cannot fix a web server returning 404, a blocked origin or an incompatible custom script.
 
+The doctor explains the effect of a detected build or delivery problem and gives
+a recommended next step. To attach its result to a support request, use:
+
+```bash
+php artisan fff:assets:doctor --published --share
+```
+
+This produces a redacted JSON report with the release identity, validation counts
+and repair advice. It excludes raw exception messages, local paths, file URLs,
+extension names and definition inventories. Keep the ordinary `--json` report
+locally when you need the exact affected file. `--share` cannot be combined with
+`--definitions` or `--locations`.
+
+The check does not publish or repair files. A successful report covers the assets
+and delivery settings it inspected; it does not confirm that queue workers,
+storage credentials, media conversions or browser network access are working.
+
 **Expected result:** the component has its styling and responds to interaction. If it still fails, include the failed resource URL and relevant error in your report. See [Installation](/docs/installation) and [asset delivery](/docs/extensions/asset-delivery).
 
 ## The value does not save

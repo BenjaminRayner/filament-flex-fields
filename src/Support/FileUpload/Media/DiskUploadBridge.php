@@ -236,6 +236,7 @@ final class DiskUploadBridge
         $name = $field->isMultiple() && is_array($names) ? ($names[$path] ?? null) : (is_string($names) ? $names : null);
 
         return ['name' => $name ?? $original->file->originalName, 'size' => $primary->file->bytes,
+            'correlationId' => \Bjanczak\FilamentFlexFields\Support\Events\MediaOperationObserved::identity($original->operationId),
             'type' => $primary->file->mimeType,
             'processingStatus' => $processing['status'] ?? null,
             'processingError' => $processing['error'] ?? null,

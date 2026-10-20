@@ -32,6 +32,11 @@
     $stickyToolbar = method_exists($field, 'hasStickyToolbar') && $field->hasStickyToolbar();
     $minimalBlockControls = method_exists($field, 'hasMinimalCustomBlockControls') && $field->hasMinimalCustomBlockControls();
     $youtubeConfig = $field->getYoutubeConfigForJs();
+    $initialDocument = \Bjanczak\FilamentFlexFields\Support\Assets\InitialSchemaVisibility::allows($field)
+        ? $field->makeFlexRichContentRenderer(\Bjanczak\FilamentFlexFields\Support\Translatable\TranslatableHydrator::resolveRenderedState($field))
+            ->linkProtocols($linkProtocols)
+            ->toHtml()
+        : null;
 @endphp
 
 <x-dynamic-component
@@ -154,6 +159,9 @@
                         aria-labelledby="{{ $getId() }}-label"
                     @endif
                 >
+                    @if ($initialDocument !== null)
+                        <div class="fff-rich-editor__initial-content" data-fff-rich-editor-initial aria-hidden="true" inert>{!! $initialDocument !!}</div>
+                    @endif
                 </div>
 
                 @include('filament-flex-fields::forms.components.partials.rich-editor.image-actions')

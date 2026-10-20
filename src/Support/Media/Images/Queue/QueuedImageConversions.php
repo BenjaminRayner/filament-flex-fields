@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Media\Images\Queue;
 
+use Bjanczak\FilamentFlexFields\Support\Events\ActivityDispatcher;
+use Bjanczak\FilamentFlexFields\Support\Events\MediaOperationObserved;
 use Bjanczak\FilamentFlexFields\Support\Media\Contracts\ImageEncoder;
 use Bjanczak\FilamentFlexFields\Support\Media\Data\MediaFailure;
 use Bjanczak\FilamentFlexFields\Support\Media\Data\MediaPolicy;
@@ -118,6 +120,7 @@ final class QueuedImageConversions
         if ($batch === null) {
             return;
         }
+        $this->observe('conversion_queued', $batch);
         try {
             $this->bus->dispatch(new GenerateImageConversions($id, new ConversionQueueOptions(...$batch['queue'])));
             $this->journal->update($id, static function (?array $state): ?array {
@@ -184,6 +187,7 @@ final class QueuedImageConversions
                 }
                 $original = ReceiptCodec::decode($batch['original']);
                 $intent = $this->intent($batch, $original);
+                $this->observe('conversion_processing', $batch);
                 $this->journal->update($id, static function (?array $state): ?array {
                     if ($state !== null && $state['status'] !== 'cancelled') {
                         $state['status'] = 'processing';
@@ -268,13 +272,16 @@ final class QueuedImageConversions
                             $encoded->close();
                         }
                     }
-                    $this->journal->update($id, static function (?array $state): ?array {
+                    $completed = $this->journal->update($id, static function (?array $state): ?array {
                         if ($state !== null && $state['status'] !== 'cancelled') {
                             $state['status'] = 'ready';
                         }
 
                         return $state;
                     });
+                    if ($completed !== null && $completed['status'] === 'ready') {
+                        $this->observe('conversion_ready', $completed);
+                    }
                 } finally {
                     $prepared->close();
                 }
@@ -301,7 +308,7 @@ final class QueuedImageConversions
 
     public function failed(string $id, ?Throwable $error, bool $terminal = true): void
     {
-        $this->journal->update($id, static function (?array $state) use ($error, $terminal): ?array {
+        $failed = $this->journal->update($id, static function (?array $state) use ($error, $terminal): ?array {
             if ($state !== null && ! in_array($state['status'], ['cancelled', 'ready'], true)) {
                 $state['status'] = $terminal ? 'failed' : 'retrying';
                 $state['dispatched'] = false;
@@ -310,6 +317,9 @@ final class QueuedImageConversions
 
             return $state;
         });
+        if ($failed !== null && in_array($failed['status'], ['retrying', 'failed'], true)) {
+            $this->observe('conversion_failed', $failed, $failed['error']);
+        }
     }
 
     /** Tombstone first; writers checkpoint under the same state lock and compensate if cancelled. */
@@ -329,6 +339,9 @@ final class QueuedImageConversions
 
             return $state;
         });
+        if ($batch !== null) {
+            $this->observe('conversion_cancelled', $batch);
+        }
         $members = [];
         foreach ($batch === null ? [] : [...$batch['attempts'], ...$batch['variants']] as $data) {
             $receipt = ReceiptCodec::decode($data);
@@ -365,6 +378,18 @@ final class QueuedImageConversions
         }
 
         return ['class' => $record::class, 'key' => $key, 'connection' => $record->getConnectionName()];
+    }
+
+    /** @param array<string, mixed> $batch */
+    private function observe(string $stage, array $batch, ?string $reason = null): void
+    {
+        try {
+            $original = ReceiptCodec::decode($batch['original']);
+            app(ActivityDispatcher::class)->dispatch(new MediaOperationObserved($stage, $original->operationId,
+                journalId: $batch['id'], reason: $reason));
+        } catch (Throwable) {
+            // Diagnostics cannot replace a conversion result or retry decision.
+        }
     }
 
     /** @param array<string, mixed> $batch */

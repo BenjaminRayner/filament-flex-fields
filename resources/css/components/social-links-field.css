@@ -1,22 +1,25 @@
 /* SocialLinks owns layout and actions; URL controls belong to text-input-presentation. */
+.fff-social-links-field { --fff-social-brand-icon-size: 1.5rem; --fff-social-brand-frame-size: 2.25rem; --fff-social-action-size: 2rem; --fff-social-action-icon-size: 1rem; }
+.fff-social-links-field--sm { --fff-social-brand-icon-size: 1rem; --fff-social-brand-frame-size: 1.5rem; --fff-social-action-size: 1.5rem; --fff-social-action-icon-size: .75rem; }
+.fff-social-links-field--md { --fff-social-brand-icon-size: 1.25rem; --fff-social-brand-frame-size: 1.875rem; --fff-social-action-size: 1.75rem; --fff-social-action-icon-size: .875rem; }
 .fff-social-links { display:flex; flex-direction:column; gap:.75rem; width:100%; min-width:0; }
 .fff-social-links [hidden] { display:none !important; }
-.fff-social-links__toolbar { display:flex; gap:.5rem; align-items:stretch; min-width:0; }
+.fff-social-links__toolbar { display:flex; gap:.5rem; align-items:center; min-width:0; }
 .fff-social-links__toolbar > .fff-select-control { min-width:0; flex:1; }
-.fff-social-links__add-btn { border:0; border-radius:var(--fff-global-radius,.75rem); padding:.5rem 1rem; font-size:.875rem; font-weight:600; color:#fafafa; background:#18181b; cursor:pointer; }
+.fff-social-links__add-btn { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; height:var(--fff-flex-text-input-h); min-height:var(--fff-flex-text-input-h); border:0; border-radius:var(--fff-global-radius,.75rem); padding:0 var(--fff-flex-text-input-p); font-size:var(--fff-flex-text-input-text-size); line-height:1; font-weight:600; white-space:nowrap; color:#fafafa; background:#18181b; cursor:pointer; }
 .fff-social-links__add-btn:disabled { opacity:.5; cursor:not-allowed; }
 .fff-social-links__empty { margin:0; border:1px dashed #e4e4e7; border-radius:1rem; padding:1.5rem 1rem; text-align:center; font-size:.875rem; color:#71717a; }
 .fff-social-links__list { display:flex; flex-direction:column; gap:.75rem; list-style:none; margin:0; padding:0; min-width:0; }
 .fff-social-links__item { min-width:0; border:1px solid var(--fff-field-border,#e4e4e7); background:var(--fff-field-bg,#fff); border-radius:1rem; padding:.75rem; }
 .fff-social-links__item-head { display:flex; align-items:center; gap:.625rem; margin-bottom:.75rem; }
-.fff-social-links__item-icon { display:flex; align-items:center; justify-content:center; width:2.25rem; height:2.25rem; flex:none; border-radius:.5rem; background:#f4f4f5; color:#27272a; }
+.fff-social-links__item-icon { display:flex; align-items:center; justify-content:center; width:var(--fff-social-brand-frame-size); height:var(--fff-social-brand-frame-size); flex:none; border-radius:.5rem; background:#f4f4f5; color:#27272a; }
 .fff-social-links__brand-icon { display:flex; align-items:center; justify-content:center; }
-.fff-social-links__brand-icon svg { display:block; width:1.5rem; height:1.5rem; }
+.fff-social-links__item-icon svg { display:block; width:var(--fff-social-brand-icon-size); height:var(--fff-social-brand-icon-size); }
 .fff-social-links__brand-icon svg [stroke-width] { stroke-width:2; }
 .fff-social-links__item-label { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; font-size:.875rem; font-weight:600; }
 .fff-social-links__item-actions { display:flex; gap:.25rem; margin-inline-start:auto; flex:none; }
-.fff-social-links__remove-btn,.fff-social-links__reorder-btn { display:flex; justify-content:center; align-items:center; width:2rem; height:2rem; border:0; border-radius:9999px; background:#f4f4f5; color:#71717a; cursor:pointer; transition:background-color .15s,color .15s; }
-.fff-social-links__item-actions svg { width:1rem; height:1rem; }
+.fff-social-links__remove-btn,.fff-social-links__reorder-btn { display:flex; justify-content:center; align-items:center; width:var(--fff-social-action-size); height:var(--fff-social-action-size); border:0; border-radius:9999px; background:#f4f4f5; color:#71717a; cursor:pointer; transition:background-color .15s,color .15s; }
+.fff-social-links__item-actions svg { width:var(--fff-social-action-icon-size); height:var(--fff-social-action-icon-size); }
 .fff-social-links__item-actions svg [stroke-width] { stroke-width:2; }
 .fff-social-links__item-actions button:disabled { opacity:.4; cursor:not-allowed; }
 .fff-social-links__remove-btn:hover:not(:disabled) { background:#fef2f2; color:#dc2626; }

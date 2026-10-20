@@ -6,6 +6,11 @@ icon: "settings-2"
 
 Media OS reads `media_capture` in `config/filament-flex-fields.php`. The examples below are entries inside that existing array; merge them into your published configuration rather than replacing unrelated settings.
 
+After configuring your workflow, run `php artisan fff:media:doctor` for storage
+and recovery settings, or add `--queued` for native background image conversions.
+The [diagnostics guide](/docs/media-os-diagnostics) explains the profiles and
+distinguishes configuration checks from worker and storage verification.
+
 ## Default storage
 
 ```php

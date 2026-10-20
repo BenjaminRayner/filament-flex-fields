@@ -11,6 +11,7 @@ use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Text;
 
 class SegmentTabsPlayground
 {
@@ -74,6 +75,17 @@ class SegmentTabsPlayground
                                     ]),
                             ]),
                     ]),
+                Grid::make(['default' => 1, 'md' => 3])
+                    ->schema(array_map(
+                        static fn (string $size, int $height): SegmentTabs => SegmentTabs::make('Size '.$size)
+                            ->size($size)
+                            ->tabs([
+                                SegmentTab::make('Overview')->schema([Text::make(strtoupper($size).' · '.$height.' px')]),
+                                SegmentTab::make('Details')->schema([Text::make('Independent tab panel.')]),
+                            ]),
+                        ['sm', 'md', 'lg'],
+                        [32, 40, 48],
+                    )),
                 SegmentTabs::make('Overflow · nine tabs')->activeTab(5)->tabs(
                     array_map(static fn (string $label): SegmentTab => SegmentTab::make($label)
                         ->schema([FlexTextInput::make('overflow_'.strtolower($label))->label($label.' content')]),

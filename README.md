@@ -398,7 +398,7 @@ Prices are USD, excluding applicable taxes. Standard paid plans provide perpetua
 
 **Free also covers qualifying internal tools for your own company.** It is not limited to students or non-profit organizations. A commercial software product or SaaS needs the appropriate commercial grant. Standard plans include subsequent official updates, including major versions of FLEX Fields; separate packages such as FLEX Forms are not included. Previously issued licenses retain their agreed terms.
 
-[Compare plans](COMMERCIAL.md) · [Full license terms](LICENSE) · [Request a license](https://flex-fields.bjanczak.com/docs/request-license)
+[Compare plans](COMMERCIAL.md) · [Full license terms](LICENSE) · [Buy a standard license](https://shop.bjanczak.com/checkout/buy/9035f5b4-c5a2-4b03-867d-109b48d49134) · [License guide / Custom enquiries](https://flex-fields.bjanczak.com/docs/request-license)
 
 ## Build your next Filament form with FLEX
 

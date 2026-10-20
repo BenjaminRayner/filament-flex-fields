@@ -519,7 +519,7 @@
 
 /* Command groups reuse the track and keyboard owner with a joined-button skin. */
 .fff-segment-control--commands {
-    --fff-command-height: 2.25rem;
+    --fff-command-height: var(--fff-track-h-md);
     --fff-command-padding: 1rem;
     --fff-command-font: .875rem;
     --fff-command-icon: 1rem;
@@ -533,11 +533,11 @@
     --fff-command-foreground: rgb(244 244 245);
 }
 .fff-segment-control--commands:has(.fff-segment-track--sm) {
-    --fff-command-height: 2rem; --fff-command-padding: .75rem;
+    --fff-command-height: var(--fff-track-h-sm); --fff-command-padding: .75rem;
     --fff-command-font: .8125rem; --fff-command-icon: .875rem;
 }
 .fff-segment-control--commands:has(.fff-segment-track--lg) {
-    --fff-command-height: 2.5rem; --fff-command-padding: 1.125rem;
+    --fff-command-height: var(--fff-track-h-lg); --fff-command-padding: 1.125rem;
     --fff-command-font: 1rem; --fff-command-icon: 1.125rem;
 }
 .fff-segment-control--commands .fff-segment-track {

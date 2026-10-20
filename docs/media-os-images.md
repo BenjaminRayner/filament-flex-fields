@@ -215,6 +215,11 @@ Cancellation prevents further work and removes the plan's owned derivatives. It 
 
 Queue jobs use durable checkpoints and locks to make retries safe. Use shared private journals, disks, encryption keys and locks across web/worker hosts. [Worker configuration](/docs/media-os-configuration#conversion-worker).
 
+Inspect the selected native queue configuration with `php artisan fff:media:doctor
+--queued --connection=database --timeout=60`, replacing those values with your
+actual conversion options. This does not run a worker or perform a conversion.
+See [Media OS diagnostics](/docs/media-os-diagnostics).
+
 ## Delete a synchronous bundle
 
 ```php

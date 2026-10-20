@@ -80,6 +80,8 @@ flowchart TD
 | A bespoke internal application operated for an identified client | Every condition of LICENSE §1.7(b), including runtime-only access and no client product resale, must hold |
 | A client's own internal application built by an agency acting for that client | The client independently qualifies for free use, obtains the official package directly, and authorizes the agency as its contractor; see section 7 |
 
+**Shared backend, different functions.** Assess the functionality implemented using Flex Fields. A Laravel application, database or Filament-panel boundary does not decide the result. Staff monitoring of processing statuses, failed jobs and logs, or employee records and internal accounting, can remain free even alongside a commercial product. Staff controls defining the product's comparison rules, calculation parameters or customer features are commercial use. Rendering an analysis/report supplied as a commercial software feature is also commercial use. Read-only access is not an exemption, and editing an internal employee record does not make it a commercial product. These examples explain §1.7(a); every other applicable condition still holds.
+
 Free use includes private repositories/build artifacts, backups, CSS/theme overrides, and local patches within its scope. GitHub-native viewing and forks remain subject to the separate platform permissions described in LICENSE §1.5(f). Those permissions are not a commercial grant or permission for customer distribution, independent external mirrors, or reusable starter kits.
 
 **No revenue threshold applies.** A profitable company can use an eligible internal tool for free. A small SaaS serving its first paying customer needs a commercial grant. A live freemium tier of a commercial service is part of that commercial Product. Staging labels do not exempt a paid pilot or live customer workload.
@@ -330,11 +332,11 @@ Issued grants are generally non-refundable unless the accepted order, applicable
 
 ## 11. How to purchase
 
-Email [barek122@gmail.com](mailto:barek122@gmail.com). Standard license payments are handled through **[Lemon Squeezy](https://www.lemonsqueezy.com/)** as merchant of record; it issues checkout receipts and tax documents under its terms. Bartłomiej Janczak issues the License Confirmation. Custom payment arrangements are stated in the quote.
+Buy **Single Product, Unlimited Company or Enterprise Group** directly through the **[secure checkout](https://shop.bjanczak.com/checkout/buy/9035f5b4-c5a2-4b03-867d-109b48d49134)**. Select the matching plan and verify the total before payment; an enquiry is not required first. For Custom / OEM, unclear scope, upgrades or transfers, email [barek122@gmail.com](mailto:barek122@gmail.com) before paying. Standard license payments are handled through **[Lemon Squeezy](https://www.lemonsqueezy.com/)** as merchant of record; it issues checkout receipts and tax documents under its terms. Bartłomiej Janczak issues the License Confirmation. Custom payment arrangements are stated in the quote.
 
 ### Standard order checklist
 
-Send:
+Have these details ready for the order and License Confirmation; send any scope details not collected by checkout to [barek122@gmail.com](mailto:barek122@gmail.com):
 
 - Legal name of the intended licensee, billing country, billing email, and applicable company/tax identifier.
 - Requested plan. For Single Product, the Product name, short description, and URL if available.
@@ -343,7 +345,7 @@ Send:
 - Any source delivery, customer-cloud/on-premises installation, reseller rights, or reusable kit distribution.
 - Existing license references if requesting an upgrade or transfer.
 
-We confirm scope, applicable terms/version, price, and any agreed exceptions **before payment** and provide the payment link. After confirmed payment, the Copyright Holder issues/authenticates the License Confirmation. Commercial rights start when both requirements are satisfied, unless the agreed instrument expressly specifies otherwise. A tax receipt alone is not the grant.
+Standard purchases use the published plan scope, applicable License version and checkout price. Custom rights, exceptions, upgrades and transfers require prior written agreement. After confirmed payment, the Copyright Holder issues/authenticates the License Confirmation. Commercial rights start when both requirements are satisfied, unless the agreed instrument expressly specifies otherwise. A tax receipt alone is not the grant.
 
 Keep the confirmation and receipt together. The confirmation should record the licensee, plan, named Product or parent/group scope, applicable License version, effective date, price/currency, payment reference, and any replaced licenses or expressly agreed variations. Newly issued terms cannot silently reduce the scope accepted at purchase.
 

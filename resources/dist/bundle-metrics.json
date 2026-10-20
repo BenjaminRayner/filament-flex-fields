@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T18:16:24.522Z",
+  "generatedAt": "2026-10-20T12:51:04.225Z",
   "css": {
     "address-autocomplete.css": {
       "bytes": 1501,
@@ -57,8 +57,8 @@
       "gzipKb": 0.87
     },
     "core.css": {
-      "bytes": 25970,
-      "kb": 25.36,
+      "bytes": 25975,
+      "kb": 25.37,
       "gzipKb": 5.3
     },
     "country-map-field.css": {
@@ -92,9 +92,9 @@
       "gzipKb": 1.09
     },
     "date-value-presentation.css": {
-      "bytes": 3922,
-      "kb": 3.83,
-      "gzipKb": 1.01
+      "bytes": 4905,
+      "kb": 4.79,
+      "gzipKb": 1.18
     },
     "dual-listbox.css": {
       "bytes": 10654,
@@ -162,19 +162,19 @@
       "gzipKb": 0.88
     },
     "flex-slider.css": {
-      "bytes": 22778,
-      "kb": 22.24,
+      "bytes": 22759,
+      "kb": 22.23,
       "gzipKb": 3.79
     },
     "flex-text-input.css": {
-      "bytes": 18607,
-      "kb": 18.17,
-      "gzipKb": 3.54
+      "bytes": 19509,
+      "kb": 19.05,
+      "gzipKb": 3.69
     },
     "flex-textarea.css": {
-      "bytes": 26004,
-      "kb": 25.39,
-      "gzipKb": 3.65
+      "bytes": 26142,
+      "kb": 25.53,
+      "gzipKb": 3.68
     },
     "flex-time-picker.css": {
       "bytes": 474,
@@ -187,9 +187,9 @@
       "gzipKb": 1.51
     },
     "flex-verification-code.css": {
-      "bytes": 9202,
-      "kb": 8.99,
-      "gzipKb": 1.97
+      "bytes": 9251,
+      "kb": 9.03,
+      "gzipKb": 1.98
     },
     "font-select.css": {
       "bytes": 3504,
@@ -207,9 +207,9 @@
       "gzipKb": 0.66
     },
     "icon-picker-field.css": {
-      "bytes": 4982,
-      "kb": 4.87,
-      "gzipKb": 1.35
+      "bytes": 5202,
+      "kb": 5.08,
+      "gzipKb": 1.43
     },
     "image-choice-cards.css": {
       "bytes": 18425,
@@ -267,9 +267,9 @@
       "gzipKb": 1.24
     },
     "phone-field.css": {
-      "bytes": 8491,
-      "kb": 8.29,
-      "gzipKb": 1.73
+      "bytes": 8939,
+      "kb": 8.73,
+      "gzipKb": 1.8
     },
     "playground.css": {
       "bytes": 22777,
@@ -307,9 +307,9 @@
       "gzipKb": 1.46
     },
     "rich-editor-field.css": {
-      "bytes": 19990,
-      "kb": 19.52,
-      "gzipKb": 3.5
+      "bytes": 20846,
+      "kb": 20.36,
+      "gzipKb": 3.62
     },
     "schedule-display.css": {
       "bytes": 2728,
@@ -322,19 +322,19 @@
       "gzipKb": 2.37
     },
     "segment-control.css": {
-      "bytes": 17500,
-      "kb": 17.09,
-      "gzipKb": 3.19
+      "bytes": 17546,
+      "kb": 17.13,
+      "gzipKb": 3.2
     },
     "segment-tabs.css": {
-      "bytes": 2224,
-      "kb": 2.17,
-      "gzipKb": 0.77
+      "bytes": 3622,
+      "kb": 3.54,
+      "gzipKb": 1.07
     },
     "select-field.css": {
-      "bytes": 120747,
-      "kb": 117.92,
-      "gzipKb": 14.25
+      "bytes": 121270,
+      "kb": 118.43,
+      "gzipKb": 14.32
     },
     "selection-indicator.css": {
       "bytes": 1647,
@@ -352,14 +352,14 @@
       "gzipKb": 0.52
     },
     "slug-field.css": {
-      "bytes": 9190,
-      "kb": 8.97,
-      "gzipKb": 1.89
+      "bytes": 9279,
+      "kb": 9.06,
+      "gzipKb": 1.91
     },
     "social-links-field.css": {
-      "bytes": 2993,
-      "kb": 2.92,
-      "gzipKb": 0.9
+      "bytes": 3949,
+      "kb": 3.86,
+      "gzipKb": 1.05
     },
     "status-chip-column.css": {
       "bytes": 2541,
@@ -382,9 +382,9 @@
       "gzipKb": 0.58
     },
     "teleported-menu.css": {
-      "bytes": 10302,
-      "kb": 10.06,
-      "gzipKb": 2.08
+      "bytes": 10347,
+      "kb": 10.1,
+      "gzipKb": 2.11
     },
     "timezone-field.css": {
       "bytes": 7368,
@@ -392,9 +392,9 @@
       "gzipKb": 1.6
     },
     "todo-list-field.css": {
-      "bytes": 28276,
-      "kb": 27.61,
-      "gzipKb": 5.23
+      "bytes": 28471,
+      "kb": 27.8,
+      "gzipKb": 5.27
     },
     "track-slider.css": {
       "bytes": 6498,
@@ -417,9 +417,9 @@
       "gzipKb": 1.32
     },
     "user-select.css": {
-      "bytes": 4230,
-      "kb": 4.13,
-      "gzipKb": 1
+      "bytes": 5015,
+      "kb": 4.9,
+      "gzipKb": 1.09
     },
     "video-field.css": {
       "bytes": 41603,
@@ -569,9 +569,9 @@
       "gzipKb": 0.28
     },
     "flex-rich-editor.js": {
-      "bytes": 16446,
-      "kb": 16.06,
-      "gzipKb": 5.07
+      "bytes": 16532,
+      "kb": 16.14,
+      "gzipKb": 5.1
     },
     "flex-runtime-sdk.js": {
       "bytes": 836,
@@ -828,7 +828,7 @@
       "kb": 9.62,
       "gzipKb": 3.94
     },
-    "flex-fields-components-segments-runtime-66KI3FPY.js": {
+    "flex-fields-components-segments-runtime-APEQ2ZHB.js": {
       "bytes": 4939,
       "kb": 4.82,
       "gzipKb": 1.86
@@ -993,12 +993,12 @@
       "kb": 7.79,
       "gzipKb": 3.2
     },
-    "flex-fields-first-paint-segment-f2131028e67183fd71ed6f4742d4ff7606defe7dbd3fa210176d2a1c29167382.js": {
+    "flex-fields-first-paint-segment-e16845aebc624c07df00aadef4c4cae226eaaed410f1d45f8bdda0e60573a036.js": {
       "bytes": 3823,
       "kb": 3.73,
       "gzipKb": 1.45
     },
-    "flex-fields-first-paint-timezone-0bc3b10d7a73883e69f441250f7367baea86586e9b4d090bba85729cc123c545.js": {
+    "flex-fields-first-paint-timezone-3470bf35e8e188248d87a91a7d1c303b77879d43a97495d70f73db64035a2719.js": {
       "bytes": 2505,
       "kb": 2.45,
       "gzipKb": 1.1
@@ -1178,12 +1178,12 @@
       "kb": 6.11,
       "gzipKb": 2.32
     },
-    "flex-fields-runtime-filament-presentation-segment-FH5L3ECJ.js": {
+    "flex-fields-runtime-filament-presentation-segment-QVYDCAUY.js": {
       "bytes": 170,
       "kb": 0.17,
       "gzipKb": 0.15
     },
-    "flex-fields-runtime-filament-presentation-timezone-O4TYM5KU.js": {
+    "flex-fields-runtime-filament-presentation-timezone-773U3M5Y.js": {
       "bytes": 519,
       "kb": 0.51,
       "gzipKb": 0.35
@@ -1343,7 +1343,7 @@
       "kb": 2.21,
       "gzipKb": 1.12
     },
-    "flex-fields-virtual-first-paint-v1-segment-ZEPKOTRI.js": {
+    "flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js": {
       "bytes": 930,
       "kb": 0.91,
       "gzipKb": 0.51

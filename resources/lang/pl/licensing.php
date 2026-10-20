@@ -11,8 +11,8 @@ return [
     'notice_title' => 'Dobierz licencję do swojego projektu.',
     'notice' => 'Użytek prywatny i narzędzia wewnętrzne spełniające warunki licencji są bezpłatne. Komercyjny SaaS wymaga licencji Standard, a instalacje u klientów, gotowe startery i OEM — uzgodnionych uprawnień Custom.',
     'check_scope' => 'Dobierz licencję',
-    'intro' => 'Zaznacz, jak chcesz używać FLEX Fields. Pomożemy Ci określić zakres opisany w LICENSE v2.0.',
-    'selection_hint' => 'Zaznacz wszystkie planowane zastosowania i potwierdź ich warunki. Każde oceniamy osobno, w tym Twoje produkty i produkty klienta. Liczymy odrębne produkty, a nie użytkowników, domeny czy serwery.',
+    'intro' => 'Oceń funkcję korzystającą z FLEX Fields, a nie każdą funkcję w tej samej aplikacji Laravel. Wspólny kod ani osobny panel Filament nie rozstrzygają, czy dane użycie jest bezpłatne czy komercyjne.',
+    'selection_hint' => 'Zaznacz każde planowane zastosowanie FLEX i potwierdź warunki. Monitoring wewnętrzny może pozostać bezpłatny obok odrębnego produktu komercyjnego; konfiguracja jego funkcji przez pracowników jest komercyjna. Sam tryb odczytu lub edycji nie rozstrzyga. Każde użycie oceniamy osobno; liczymy odrębne produkty, nie użytkowników, domeny czy serwery.',
     'assess' => 'Sprawdź zastosowanie',
     'assessing' => 'Sprawdzamy…',
     'result' => 'Twój zakres zastosowania',
@@ -26,7 +26,7 @@ return [
     'client_use' => [
         'internal' => [
             'label' => 'Wewnętrzne działania operacyjne klienta',
-            'description' => 'Aplikacja na zamówienie dla własnych działań klienta, a nie produkt programistyczny oferowany innym.',
+            'description' => 'FLEX obsługuje administrację lub monitoring firmy klienta, bez tworzenia ani konfiguracji jego komercyjnego produktu programistycznego. Wspólny backend nie rozstrzyga zakresu.',
         ],
         'hosted' => [
             'label' => 'Komercyjny produkt hostowany klienta',
@@ -53,7 +53,7 @@ return [
         ],
         'internal' => [
             'label' => 'Własne działania operacyjne firmy',
-            'description' => 'Własny CRM, sklep, rezerwacje lub administracja firmy. Panel pracowników kwalifikuje się tylko wtedy, gdy obsługuje firmę niezależnie od sprzedawanej usługi programistycznej.',
+            'description' => 'Kwalifikujący się CRM, sklep, rezerwacje, kadry, księgowość lub monitoring operacyjny. Sam wspólny backend z produktem komercyjnym nie czyni tego zastosowania FLEX komercyjnym.',
         ],
         'evaluation' => [
             'label' => 'Prywatny rozwój i testowanie',
@@ -69,7 +69,7 @@ return [
         ],
         'hosted' => [
             'label' => 'Komercyjny produkt hostowany / SaaS',
-            'description' => 'Monetyzowana lub freemium usługa programistyczna. Panel pracownika konfigurujący sprzedawaną usługę również należy do tego zakresu.',
+            'description' => 'FLEX tworzy funkcję monetyzowanej usługi, wyświetla jej wyniki dla klientów lub konfiguruje reguły i parametry produktu. Dostęp tylko dla pracowników nie zwalnia takich funkcji z licencji komercyjnej.',
         ],
         'distribution' => [
             'label' => 'Instalacje u klientów lub przekazanie pakietu/kodu',
@@ -87,7 +87,7 @@ return [
     'conditions' => [
         'free_scope' => [
             'label' => 'Użytek prywatny/wewnętrzny spełnia §1.7(a)',
-            'description' => 'Nie dostarczasz samej aplikacji jako komercyjnego produktu programistycznego; zachowujesz oznaczenia i pozostajesz w dozwolonym zakresie.',
+            'description' => 'Oceniana funkcja FLEX służy kwalifikującym się działaniom prywatnym/wewnętrznym; nie tworzy ani nie konfiguruje produktu komercyjnego. Odrębna funkcja komercyjna w tym samym backendzie sama nie wyklucza bezpłatnego użycia. Zachowujesz oznaczenia i dozwolony zakres.',
         ],
         'evaluation_private' => [
             'label' => 'Testowanie jest prywatne i nieprodukcyjne',
@@ -103,7 +103,7 @@ return [
         ],
         'client_free_scope' => [
             'label' => 'Klient sam spełnia warunki bezpłatnego użytku wewnętrznego',
-            'description' => 'Klient spełnia §1.7(a) na podstawie własnych uprawnień. Aplikacja obsługuje jego działania operacyjne, zamiast być usługą programistyczną oferowaną innym.',
+            'description' => 'Klient sam spełnia §1.7(a). Oceniane zastosowanie FLEX obsługuje jego działania wewnętrzne, bez tworzenia lub konfiguracji produktu komercyjnego; sam wspólny backend nie rozstrzyga.',
         ],
         'hosted_scope' => [
             'label' => 'Komercyjni klienci otrzymują tylko dostęp runtime',
@@ -199,7 +199,7 @@ return [
         'portfolio' => 'Wybrano trzy lub więcej produktów albo zakres portfolio dla przyszłych produktów.',
         'evaluation' => 'Bezpłatna ocena dotyczy tylko okresu przed produkcją, obsługą prawdziwych klientów i płatnym pilotażem.',
         'bespoke_runtime' => 'Muszą być spełnione wszystkie warunki udokumentowanego zlecenia, użytku wewnętrznego i wyłącznie dostępu runtime.',
-        'free_scope' => 'Potwierdź kwalifikujący się użytek prywatny/wewnętrzny, a nie produkt programistyczny dostarczany innym.',
+        'free_scope' => 'Potwierdź, że oceniane zastosowanie FLEX to kwalifikująca się administracja lub monitoring, a nie tworzenie lub konfiguracja produktu komercyjnego. Oceń funkcję, a nie granice aplikacji Laravel lub panelu.',
         'client_free' => 'Rzeczywista wewnętrzna aplikacja klienta na zamówienie może kwalifikować się na podstawie własnych bezpłatnych uprawnień klienta.',
         'permitted_free' => 'Wybrane zastosowania i potwierdzone warunki odpowiadają podsumowanym ścieżkom bezpłatnego użytku.',
     ],

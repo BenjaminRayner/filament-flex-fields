@@ -9,7 +9,7 @@ Choose the application's storage model before configuring upload chrome:
 | Existing requirement | Integration |
 | --- | --- |
 | Attribute holding disk paths | Native disk-backed field and matching attribute/cast |
-| One SQL row per original in a related gallery | Application relation hydration/save mapping; complete gallery recipe below |
+| One SQL row per original in a related gallery | Explicit HasManyMediaCollection adapter or application mapper; related gallery guide below |
 | Spatie Media Library model | FLEX Spatie adapter; keep collections, conversions and Spatie persistence |
 
 Do not add an upload JSON column to a Post that should own related gallery rows.
@@ -48,6 +48,12 @@ basename; configure folders separately. Do not accept absolute paths or overwrit
 the same fixed destination. Conversion names identify variants, not guessed suffixes.
 
 Full application recipes and contracts:
+- https://flex-fields.bjanczak.com/docs/media-os-relations — optional same-connection
+  hasMany adapter, explicit columns/auth/admission, original-only SQL rows,
+  unique disk/path constraint and captured revisions for stale edits. Sync needs
+  the parent's transaction; keep commit-aware field acceptance separate. Do not
+  refresh an edit's expected revision immediately before saving or pass raw
+  request paths as admitted uploads. Spatie keeps its own integration.
 - https://flex-fields.bjanczak.com/docs/file-upload-api — method groups, inherited
   Filament options and the optional Spatie field. Inspect actual installed traits
   and signatures for callbacks; discovery is not a complete fluent-method list.
@@ -66,3 +72,7 @@ production workers/migrations as a side effect of demonstrating an example.
 
 Complete opt-in application files ship at `resources/recipes/post-gallery`. Adapt them
 after reading the gallery guide; do not autoload or run their migration blindly.
+
+For the official relation mapper, `MediaRelationColumns(metadata: 'metadata')` opts into an application's existing JSON metadata column with an Eloquent `array` cast. `sync(..., metadata: [$path => $validatedMetadata])` preserves omitted entries, clears explicit `[]`, and includes changes in the revision. Validate the application's allowed keys/locales first.
+
+`HasManyMediaConversions` projects a complete trusted `ImageBundle` or ready queued snapshot to an explicit `HasMany` conversion table. Read `revision()` before changing the projection, pass it to `sync()` inside the outer transaction, and authorize the freshly reloaded original row. Its authority callback must match each receipt to the current server plan and return the correct `MediaWrite`; a path prefix is insufficient. Do not pass browser conversion paths or project pending work as an empty ready plan. See `/docs/media-os-relations#project-ready-conversions-into-sql` for columns, hashes and examples. This is SQL indexing only; Spatie continues to own its native conversions.

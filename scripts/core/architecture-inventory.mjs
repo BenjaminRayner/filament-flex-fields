@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises'
 import { dirname, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { reportDestination } from './acceptance-contract.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
@@ -165,8 +166,8 @@ serviceBindings.sort((left, right) => left.service.localeCompare(right.service, 
 const output = `${JSON.stringify({ format: 1, scope: 'core-and-shared-boundaries',
     excludes: ['individual component implementations', 'catalog demos', 'generated assets', 'tests'],
     modules, serviceBindings, files: records }, null, 2)}\n`
-const destination = resolve(root, '.internal/core-architecture-inventory.json')
-if (process.argv.includes('--check')) {
+const { destination, check } = reportDestination(root, 'core-architecture-inventory.json')
+if (check) {
     if (await readFile(destination, 'utf8') !== output) throw new Error('Core inventory is stale. Regenerate it after source changes.')
 } else {
     await mkdir(dirname(destination), { recursive: true })

@@ -28,6 +28,6 @@ trait HasFieldFocusOutline
 
     protected function defaultFocusOutline(): bool
     {
-        return false;
+        return true;
     }
 }

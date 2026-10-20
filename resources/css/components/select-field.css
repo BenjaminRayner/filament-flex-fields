@@ -5,6 +5,7 @@
     --fff-select-bg: var(--fff-field-bg);
     --fff-select-border: var(--fff-field-border);
     --fff-select-border-width: var(--fff-field-border-width);
+    --fff-select-vertical-border: calc(2 * var(--fff-select-border-width));
     --fff-select-shadow: var(--fff-field-shadow);
     --fff-select-text: rgb(24 24 27);
     --fff-select-placeholder: rgb(161 161 170);
@@ -81,8 +82,9 @@
     --fff-select-search-border: rgb(228 228 231);
     --fff-select-search-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
     --fff-select-chevron-color: rgb(161 161 170);
+    --fff-select-edge-inset: var(--fff-select-px);
     --fff-select-affix-icon-size: 1rem;
-    --fff-select-affix-end: 0.5rem;
+    --fff-select-affix-end: var(--fff-select-edge-inset);
     --fff-select-affix-gap: 0.25rem;
     --fff-select-affix-divider: rgb(228 228 231);
     --fff-select-affix-padding-inline: 0.625rem;
@@ -95,9 +97,9 @@
 }
 
 .fff-select-field--sm {
-    --fff-select-min-h: var(--fff-track-h-sm);
+    --fff-select-min-h: calc(var(--fff-track-h-sm) - var(--fff-select-vertical-border));
     --fff-select-text-size: var(--fff-text-sm);
-    --fff-select-px: 0.75rem;
+    --fff-select-px: 0.5rem;
     --fff-select-affix-icon-size: 0.875rem;
     --fff-select-trigger-icon-size: 1.125rem;
     --fff-select-chip-padding-inline-start: 0.375rem;
@@ -114,17 +116,17 @@
 }
 
 .fff-select-field--md {
-    --fff-select-min-h: var(--fff-track-h-md);
+    --fff-select-min-h: calc(var(--fff-track-h-md) - var(--fff-select-vertical-border));
     --fff-select-text-size: var(--fff-text-md);
-    --fff-select-px: 0.875rem;
+    --fff-select-px: 0.625rem;
     --fff-select-affix-icon-size: 1rem;
     --fff-select-trigger-icon-size: 1.375rem;
 }
 
 .fff-select-field--lg {
-    --fff-select-min-h: var(--fff-track-h-lg);
+    --fff-select-min-h: calc(var(--fff-track-h-lg) - var(--fff-select-vertical-border));
     --fff-select-text-size: var(--fff-text-lg);
-    --fff-select-px: 1rem;
+    --fff-select-px: 0.75rem;
     --fff-select-affix-icon-size: 1.125rem;
     --fff-select-trigger-icon-size: 1.625rem;
     --fff-select-chip-padding-inline-start: 0.625rem;
@@ -371,7 +373,7 @@
     height: 100%;
     min-height: var(--fff-select-min-h);
     padding-block: 0;
-    padding-inline-start: var(--fff-select-px);
+    padding-inline-start: var(--fff-select-edge-inset);
     padding-inline-end: var(--fff-select-trigger-padding-end);
     font-size: var(--fff-select-text-size);
     line-height: 1.25;
@@ -727,6 +729,7 @@
 }
 
 .fi-input-wrp.fff-select-field--underlined {
+    --fff-select-vertical-border: 1px;
     border-width: 0 0 1px 0;
     border-radius: 0;
     background-color: transparent;
@@ -745,7 +748,7 @@
     background-color: transparent;
     box-shadow: none;
     font-size: var(--fff-select-text-size);
-    padding-inline-start: var(--fff-select-px);
+    padding-inline-start: var(--fff-select-edge-inset);
     padding-inline-end: var(--fff-select-trigger-padding-end);
     background-image: none;
     background-repeat: no-repeat;
@@ -3756,4 +3759,9 @@ mark.fff-select-entity-mention__highlight {
 
 .fff-select-field .fi-select-input-btn.is-loading :is(.fff-select-trigger-chevron, .fff-select-item-card-trigger__chevron) {
     visibility: hidden;
+}
+
+/* Plain values share the input's regular weight; rich option layouts keep theirs. */
+.fi-input-wrp.fff-select-field.fff-select-field--plain-trigger .fi-select-input-value-label :is(.fff-select-option__label, .fff-select-option__trigger-label) {
+    font-weight: var(--fff-select-value-font-weight, 400);
 }

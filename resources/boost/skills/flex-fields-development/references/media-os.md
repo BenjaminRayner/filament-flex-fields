@@ -60,3 +60,10 @@ Verify allowed/rejected content, the application's record mapping, private URL
 failure, save failure, and the selected queue or Spatie path in an isolated test
 environment. Include staging retry/confirmation where used. Report the exercised
 configuration; do not claim every option or provider combination was verified.
+
+Use `fff:media:doctor --json` for read-only configuration diagnosis. The separate
+`fff:media:probe --write` creates synthetic data on explicit `--disk` and
+`--lock-store` targets or performs bundled `--format` conversions in PHP temporary
+files. It is an active backend operation and requires operator authorization;
+do not run it merely because a diagnostic example includes it. A passed probe is
+local and scoped, not proof of shared hosts, worker liveness or application save.

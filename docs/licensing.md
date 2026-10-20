@@ -45,6 +45,25 @@ Every condition of the [free-use grant](/docs/license-terms#section-1-definition
 
 There is no revenue threshold. A profitable company's eligible internal application can remain free; a small commercial SaaS needs the appropriate grant. A live freemium tier belongs to the commercial product.
 
+## Internal panel and commercial product in the same application
+
+Assess **the functionality implemented using FLEX**, in the context of the service being supplied. Sharing a Laravel application, database or backend with a commercial product does not by itself make a separate internal FLEX use commercial. A separate Filament panel or staff-only login does not by itself make product functionality free.
+
+The examples below concern a company operating a commercial hosted software product. Other free-use conditions still apply.
+
+| Use of FLEX | Scope | Why |
+|---|---|---|
+| Staff inspect processing statuses, failed jobs and error logs for operational monitoring; FLEX does not implement or configure the customer service | Free internal use | This is internal monitoring, even in the same backend |
+| Employee records, internal accounting or company administration | Free internal use | FLEX serves the company's own business administration |
+| Staff inspect existing records for internal monitoring or troubleshooting, without implementing or configuring consumer-product features through FLEX | Free internal use | Customer-related data alone does not make an internal dashboard a product feature |
+| Customers use FLEX fields, uploads or charts as features of the commercial application | Commercial use | FLEX implements functionality supplied with the product |
+| Staff use FLEX controls to define comparison rules, calculation parameters or service features used by the consumer product | Commercial use | Staff-only access does not exempt product configuration |
+| FLEX renders an analysis or report supplied to customers as a feature of the commercial software service | Commercial use | FLEX implements a product output, rather than only displaying operational information internally |
+
+**Read-only versus editable is not the dividing line.** A read-only FLEX chart supplied as a customer feature of the commercial product is commercial use. An editable employee-directory form can be free internal use.
+
+In the [license guide](/docs/request-license), select the actual use of FLEX. Do not select commercial hosted use solely because another part of the same application is a commercial product. Select commercial hosted use when FLEX itself implements or configures that product's functionality, including staff-only product controls. If FLEX has several intended uses, assess each; a qualifying internal use does not exempt a separate commercial use.
+
 ## Choose the right commercial scope
 
 <Steps>
@@ -54,8 +73,8 @@ There is no revenue threshold. A profitable company's eligible internal applicat
   <Step title="Identify the product owner and operator">
     One named product can use Single Product. One entity's current and future products can use Unlimited Company. A named parent and its qualifying wholly owned subsidiaries can use Enterprise Group.
   </Step>
-  <Step title="Confirm scope before payment">
-    Email [barek122@gmail.com](mailto:barek122@gmail.com) with your application and delivery model. You receive the agreed scope and payment instructions before purchase, followed by an authenticated License Confirmation after confirmed payment.
+  <Step title="Buy the matching plan">
+    [Buy a standard license](https://shop.bjanczak.com/checkout/buy/9035f5b4-c5a2-4b03-867d-109b48d49134) directly, selecting the matching plan in checkout. No enquiry is required first. For Custom / OEM, unclear scope, upgrades or transfers, contact [barek122@gmail.com](mailto:barek122@gmail.com) before payment. Keep the authenticated License Confirmation issued after confirmed payment; a checkout receipt alone is not the grant.
   </Step>
 </Steps>
 

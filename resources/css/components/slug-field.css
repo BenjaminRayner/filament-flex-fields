@@ -19,8 +19,8 @@
 .fff-slug-field__changed { font-size: .6875rem; font-weight: 600; text-transform: uppercase; color: var(--fff-slug-custom); }
 .fff-slug-field__shell { width: 100%; min-width: 0; }
 .fff-slug-field.is-editing .fff-slug-field__shell { border-color: var(--fff-slug-accent); }
-.fff-slug-field__row { width: 100%; min-width: 0; padding-inline-start: .375rem; gap: .5rem; }
-.fff-slug-field.has-permalink .fff-slug-field__row { padding-inline-start: .25rem; }
+.fff-slug-field__row { width: 100%; min-width: 0; padding-inline-start: var(--fff-flex-text-input-p); gap: .5rem; }
+.fff-slug-field.has-permalink .fff-slug-field__row { padding-inline: .25rem; }
 .fff-slug-field__control { display: flex; align-items: center; flex: 1 1 0; width: 100%; min-width: 0; height: 100%; }
 .fff-slug-field__secure { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 1.9rem; height: 1.9rem; border-radius: var(--fff-global-radius, .75rem); background: rgb(220 252 231); color: rgb(22 163 74); }
 .dark .fff-slug-field__secure { background: rgb(20 83 45 / .35); color: rgb(74 222 128); }
@@ -46,3 +46,7 @@
     .fff-slug-field__commands .fff-segment-item { width: var(--fff-command-height); padding-inline: 0; flex: none; }
     .fff-slug-field__commands .fff-segment-separator { display: none; }
 }
+
+/* Keep permalink and native command icons at the same visual weight. */
+.fff-slug-field svg[stroke],
+.fff-slug-field svg [stroke] { stroke-width: 2; }

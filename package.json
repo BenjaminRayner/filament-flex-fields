@@ -33,6 +33,7 @@
         "check:budgets": "node scripts/check-bundle-budgets.mjs",
         "compare:budgets": "node scripts/compare-bundle-metrics.mjs",
         "audit:components": "node scripts/audit-components.mjs",
+        "audit:core:startup": "node scripts/core/measure-startup.mjs",
         "audit:core:coverage": "node scripts/core/audit-coverage.mjs",
         "audit:core:complete": "node scripts/core/audit-coverage.mjs --require-complete",
         "audit:core:composition": "php scripts/compatibility/core-child-configuration.php",
@@ -54,7 +55,11 @@
         "audit:core:locality": "node scripts/compatibility/core-local-ownership.mjs && node scripts/compatibility/core-local-ownership-browser.mjs && node scripts/compatibility/core-panel-locality-browser.mjs",
         "audit:core:release": "node scripts/core/release-acceptance.mjs",
         "docs:recipes": "node scripts/generate-recipe-docs.mjs",
-        "docs:recipes:check": "node scripts/generate-recipe-docs.mjs --check"
+        "docs:recipes:check": "node scripts/generate-recipe-docs.mjs --check",
+        "audit:core:certify": "node scripts/core/certify-acceptance.mjs",
+        "audit:security-policy": "node scripts/core/security-policy.mjs",
+        "audit:core:api": "node scripts/core/check-public-api.mjs",
+        "audit:core:metadata": "node scripts/core/generate-release-metadata.mjs --output=build/core-reports/release-metadata"
     },
     "devDependencies": {
         "@playwright/test": "^1.64.0",

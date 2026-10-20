@@ -11,8 +11,8 @@ return [
     'notice_title' => 'The right license for your project.',
     'notice' => 'Personal use and qualifying internal tools are free. Commercial SaaS needs a Standard license; customer installations, reusable kits and OEM need agreed Custom rights.',
     'check_scope' => 'Find your license',
-    'intro' => 'Choose how you plan to use FLEX Fields. We’ll help you identify the scope described in LICENSE v2.0.',
-    'selection_hint' => 'Select every intended use and confirm its conditions. We assess each use separately, including your products and a client’s products. Product count follows independent product identities, not users, domains or servers.',
+    'intro' => 'Assess the functionality using FLEX Fields, not every feature in the same Laravel application. Shared code or a separate Filament panel does not decide whether that use is free or commercial.',
+    'selection_hint' => 'Select every intended FLEX use and confirm its conditions. Internal monitoring can remain free alongside a separate commercial product; staff-only product configuration is commercial use. Read-only versus editable is not the test. We assess each selected use separately. Product count follows product identities, not users, domains or servers.',
     'assess' => 'Check my use',
     'assessing' => 'Checking…',
     'result' => 'Your scope guide',
@@ -26,7 +26,7 @@ return [
     'client_use' => [
         'internal' => [
             'label' => 'Client’s internal operations',
-            'description' => 'A bespoke application for that client’s own operations, not a software product it supplies to others.',
+            'description' => 'FLEX serves the client’s own business administration or monitoring, without implementing or configuring its commercial software product. A shared backend does not decide the scope.',
         ],
         'hosted' => [
             'label' => 'Client’s commercial hosted product',
@@ -53,7 +53,7 @@ return [
         ],
         'internal' => [
             'label' => 'My own business operations',
-            'description' => 'Your staff CRM, shop, bookings or business administration. A back office qualifies only when it administers the business independently of a software service you sell.',
+            'description' => 'Qualifying staff CRM, shop, bookings, employee records, accounting or operational monitoring. Sharing a backend with a commercial product does not alone make this FLEX use commercial.',
         ],
         'evaluation' => [
             'label' => 'Private development & evaluation',
@@ -69,7 +69,7 @@ return [
         ],
         'hosted' => [
             'label' => 'Commercial hosted product / SaaS',
-            'description' => 'A monetized or freemium software service. A staff-only screen that configures that service also belongs to this scope.',
+            'description' => 'FLEX implements a feature of a monetized/freemium software service, renders its customer outputs or configures product rules/parameters. Staff-only access does not exempt those functions.',
         ],
         'distribution' => [
             'label' => 'Customer installations or package/source delivery',
@@ -87,7 +87,7 @@ return [
     'conditions' => [
         'free_scope' => [
             'label' => 'Personal/internal use meets §1.7(a)',
-            'description' => 'Not supplying the application itself as a commercial software product; retain notices and stay within the grant.',
+            'description' => 'The assessed FLEX functionality serves qualifying personal/internal operations; it does not implement or configure a commercial software product. A separate commercial feature in the same backend does not alone disqualify it. Retain notices and stay within the grant.',
         ],
         'evaluation_private' => [
             'label' => 'Evaluation is private and non-production',
@@ -103,7 +103,7 @@ return [
         ],
         'client_free_scope' => [
             'label' => 'The client independently qualifies for free internal use',
-            'description' => 'The client meets §1.7(a) in its own right. It uses the application for its operations, rather than supplying a software service to others.',
+            'description' => 'The client meets §1.7(a) in its own right. The assessed FLEX use serves its internal operations, without implementing or configuring its commercial software product; a shared backend alone does not decide this.',
         ],
         'hosted_scope' => [
             'label' => 'Commercial customers receive runtime access only',
@@ -199,7 +199,7 @@ return [
         'portfolio' => 'You selected three or more products, or portfolio coverage for future products.',
         'evaluation' => 'Evaluation is free only before production, live customer operations and paid pilots.',
         'bespoke_runtime' => 'The documented engagement, internal use and runtime-only access conditions must all hold.',
-        'free_scope' => 'Confirm that the application is for qualifying personal/internal operations, not a software product supplied to others.',
+        'free_scope' => 'Confirm that the assessed FLEX use is qualifying personal/internal administration or monitoring, rather than implementing or configuring a commercial product. Judge its function, not the Laravel application or panel boundary.',
         'client_free' => 'A genuine bespoke client-owned internal application can qualify under the client’s own free-use entitlement.',
         'permitted_free' => 'Your selected use and confirmed conditions fit the summarized free-use routes.',
     ],

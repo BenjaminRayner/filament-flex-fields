@@ -94,6 +94,15 @@ There is no dependency graph or loading budget to configure before using a
 built-in field. The sections below explain what FLEX manages for you. If you
 want to start building, go straight to [your first component](/docs/first-component).
 
+Panels without rendered FLEX controls keep a lightweight startup layer and the
+shared foundation stylesheet. The full runtime starts when a FLEX consumer
+appears or the first native Livewire action needs to run. That first action
+waits for runtime installation, so fields introduced by its response use the
+same loading and readiness checks as fields present from the start. Subsequent
+actions use the installed runtime directly. Integrations without the required
+native interception API retain eager startup; an explicit integrity preload
+can also prepare runtime resources earlier.
+
 ## Watch ownership in action
 
 <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9' }}>

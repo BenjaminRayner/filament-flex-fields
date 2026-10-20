@@ -1,5 +1,6 @@
 /* User data chrome only; Select and user-display own the menu and avatars. */
-.fff-user-select {
+.fi-input-wrp.fff-user-select {
+    --fff-select-edge-inset: .375rem;
     --fff-user-select-trigger-min-h: var(--fff-select-min-h);
     --fff-user-select-avatar-size: 1.625rem;
     min-width: 0;
@@ -67,3 +68,8 @@
 .fi-input-wrp.fff-user-select .fff-user-select-option--trigger .fff-user-select-option__name { font-size: .875rem; line-height: 1rem; }
 .fi-input-wrp.fff-user-select .fff-user-select-option--trigger .fff-user-select-option__email { font-size: .6875rem; line-height: .875rem; }
 .fi-input-wrp.fff-user-select .fff-user-select__trigger-names { line-height: 1.25rem; }
+.fi-input-wrp.fff-user-select .fff-user-select-option--trigger .fff-user-select-option__content { gap:0; justify-content:center; }
+.fi-input-wrp.fff-user-select .fff-user-select-option--trigger :is(.fff-user-select-option__name, .fff-user-select-option__email) { margin-block:0; }
+.fi-input-wrp.fff-user-select:is(.fff-select-field--sm, .fff-select-field--md) :is(.fi-select-input-btn, .fff-select-trigger-ssr__btn) { padding-block:.125rem !important; }
+.fi-input-wrp.fff-user-select.fff-select-field--sm .fff-user-select-option--trigger .fff-user-select-option__name { font-size:.75rem; line-height:.8125rem; }
+.fi-input-wrp.fff-user-select.fff-select-field--sm .fff-user-select-option--trigger .fff-user-select-option__email { font-size:.625rem; line-height:.6875rem; }

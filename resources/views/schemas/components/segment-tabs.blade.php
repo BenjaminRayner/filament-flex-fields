@@ -5,6 +5,10 @@
     $tabs = $getVisibleTabs();
     $items = $getSegmentItems();
     $helperText = $getHelperText();
+    $radius = match ($getRounding()) {
+        'none' => '0px', 'native' => '.5rem', 'md' => '.75rem',
+        'lg' => '1rem', 'xl' => '1.25rem', default => '9999px',
+    };
 @endphp
 
 <div x-fff-load
@@ -21,7 +25,9 @@
     })"
     wire:ignore.self
     {{ $attributes->merge(['id' => $id, 'wire:key' => $getLivewireKey().'.container'], escape: false)
-        ->merge($getExtraAttributes(), escape: false)->class(['fff-segment-tabs']) }}
+        ->merge($getExtraAttributes(), escape: false)
+        ->style(["--fff-tabs-radius: {$radius}"])
+        ->class(['fff-segment-tabs']) }}
 >
     <x-filament-flex-fields::assets :component="$getSegmentAssetComponent()"
         :consumer="$getLivewireKey()" :schema-component="$schemaComponent" />

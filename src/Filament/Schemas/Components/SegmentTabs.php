@@ -15,6 +15,7 @@ use Filament\Schemas\Components\Concerns\CanPersistTab;
 use Filament\Schemas\Components\Concerns\HasLabel;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class SegmentTabs extends Component
 {
@@ -22,6 +23,8 @@ class SegmentTabs extends Component
     use HasControlSize;
     use HasLabel;
     use HasSegmentAppearance;
+
+    protected string|Closure|null $rounding = null;
 
     protected string $view = 'filament-flex-fields::schemas.components.segment-tabs';
 
@@ -42,6 +45,28 @@ class SegmentTabs extends Component
         $component->configure();
 
         return $component;
+    }
+
+    public function rounding(string|Closure|null $rounding): static
+    {
+        $this->rounding = $rounding;
+
+        return $this;
+    }
+
+    public function getRounding(): string
+    {
+        $rounding = $this->evaluate($this->rounding);
+
+        if ($rounding === null || $rounding === 'default') {
+            return 'full';
+        }
+
+        if (! in_array($rounding, ['none', 'native', 'md', 'lg', 'xl', 'full'], true)) {
+            throw new InvalidArgumentException('Unsupported SegmentTabs rounding.');
+        }
+
+        return $rounding;
     }
 
     protected function setUp(): void

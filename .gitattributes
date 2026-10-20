@@ -46,3 +46,6 @@
 /update-blade-css.js export-ignore
 /components_list.txt export-ignore
 /snippets/ export-ignore
+
+# Maintainer compiler boundary; Composer consumers use the sealed browser release.
+/tsconfig.json export-ignore

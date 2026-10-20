@@ -27,7 +27,7 @@
         @if ($timezoneControl)
             <div class="fff-schedule-field__timezone">
                 <label class="fff-schedule-field__timezone-label">{{ $labels['timezone'] }}</label>
-                <x-filament-flex-fields::select-control :field="$timezoneControl" state-expression="scheduleState.timezone" on-change="values => updateTimezone(values[0])" disabled-expression="!isInteractive" :label="$labels['timezone']" size="md" :variant="$variant" :initial-value="$initialState['timezone'] ?? $config['defaultTimezone']" />
+                <x-filament-flex-fields::select-control :field="$timezoneControl" state-expression="scheduleState.timezone" on-change="values => updateTimezone(values[0])" disabled-expression="!isInteractive" :label="$labels['timezone']" :size="$size" :variant="$variant" :initial-value="$initialState['timezone'] ?? $config['defaultTimezone']" />
             </div>
         @endif
         <div class="fff-schedule-field__days">

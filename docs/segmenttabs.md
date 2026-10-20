@@ -184,7 +184,23 @@ All methods accept `Closure` unless noted.
 | `iconOnly(bool\|Closure $on)` | Setup | `false` | Hide tab labels; show icons only. |
 | `expandSelectedLabel(bool\|Closure $on)` | Setup | `false` | Animate the selected tab to a wider width. |
 | `helperText(string\|Htmlable\|Closure\|null $text)` | Setup | `null` | Helper copy below the tab panels (same idea as form fields). |
-| `size(string\|Closure $size)` | Setup | `'md'` | Control size: `sm`, `md`, `lg`. |
+| `size(string\|Closure $size)` | Setup | `'md'` | Tab rail height at default density: `sm` 32 px, `md` 40 px, `lg` 48 px. |
+| `rounding(string\|Closure\|null $rounding)` | Setup | `full` | `none`, `native`, `md`, `lg`, `xl`, `full`; `null` or `default` resolves to `full`. |
+
+#### Tab height and rounding
+
+```php
+SegmentTabs::make('Settings')
+    ->size('md') // 40 px including track padding
+    ->rounding('lg') // 16 px, for this tab switcher only
+    ->tabs([...]);
+```
+
+Rounding values are `none` (0), `native` (8 px), `md` (12 px), `lg` (16 px),
+`xl` (20 px) and `full` (pill). Omitting `rounding()`, passing `null`, or using
+`default` uses the full pill radius. Track, active indicator and segment buttons
+use the same instance radius. Nested fields retain their own radius and sizes.
+The separate SegmentControl form field retains its 32 / 36 / 42 px size scale.
 
 #### SegmentTab API
 

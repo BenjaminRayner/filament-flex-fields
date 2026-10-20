@@ -12,15 +12,15 @@
   "builds": [
     {
       "id": "bootstrap",
-      "inputs": 4,
+      "inputs": 5,
       "outputs": 1,
-      "outputBytes": 4165
+      "outputBytes": 5676
     },
     {
       "id": "components",
-      "inputs": 1306,
+      "inputs": 1307,
       "outputs": 183,
-      "outputBytes": 2089427
+      "outputBytes": 2089513
     },
     {
       "id": "flex-rich-editor-block-image-extension",
@@ -44,7 +44,7 @@
       "id": "injector",
       "inputs": 1,
       "outputs": 1,
-      "outputBytes": 260
+      "outputBytes": 256
     },
     {
       "id": "inspector",

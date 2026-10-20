@@ -40,7 +40,7 @@ These are regular Filament form fields. Use [events and validation](/docs/date-t
 | `size()` | `sm`, `md`, `lg`; default `md` | Shared FLEX input size |
 | `variant()` | `primary`, `secondary`, `flat`; default `primary` | Shared input surface style |
 | `rounding()` | `none`, `sm`, `md`, `lg`, `xl`, `full`, `native`; panel default when omitted | Input corner style |
-| `focusOutline()` | Boolean; default off | Explicit input focus outline |
+| `focusOutline()` | Boolean; default on | Input focus outline; pass `false` to disable it |
 | `isInvalid()` | Boolean/closure/null; default null | Present an external invalid state; does not add validation rules |
 | `segmentInvalidMessage()` | String/closure/null | Custom message for malformed temporal values and date-input feedback |
 

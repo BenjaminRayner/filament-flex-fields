@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { reportDestination } from './acceptance-contract.mjs'
 import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises'
 import { resolve, relative, dirname } from 'node:path'
 import { analyzeStylesheetCascade } from '../assets/css-cascade-report.mjs'
@@ -25,9 +26,9 @@ const foundationDuplicates = report.duplicateRules.filter(group => {
     return paths.has('resources/dist/css/core.css') && paths.has('resources/dist/css/playground.css')
 }).length
 assert.equal(foundationDuplicates, 0, 'Core owns the shared foundation; catalog must reference it without recompiling its rules.')
-const destination = resolve(root, '.internal/core-css-cascade-report.json')
+const { destination, check } = reportDestination(root, 'core-css-cascade-report.json')
 const output = JSON.stringify(report, null, 2) + '\n'
-if (process.argv.includes('--check')) {
+if (check) {
     if (await readFile(destination, 'utf8') !== output) throw Error('CSS cascade report is stale; rebuild and regenerate it.')
 } else {
     await mkdir(dirname(destination), { recursive: true })

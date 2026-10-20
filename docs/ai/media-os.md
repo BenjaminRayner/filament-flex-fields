@@ -102,3 +102,32 @@ not mount that field.
 
 Pure server-side storage needs no browser asset initialization. A custom capture
 interface has a separate browser lifecycle and still needs server validation.
+
+## Existing related gallery tables
+
+For ordinary same-connection `hasMany` galleries, inspect `HasManyMediaCollection`,
+`MediaRelationColumns` and `MediaRelationSnapshot`. The
+[related gallery guide](/docs/media-os-relations) covers explicit model columns,
+authorization and new-file admission, unique disk/path ownership, locked revision
+baselines, transaction/rollback, order and detach. `sync()` maps originals into
+SQL; it does not upload files, accept stages, convert or delete physical objects.
+Keep the mounted field's native/custom commit-aware acceptance contract.
+Spatie remains a separate integration. Do not invent a disk uploader
+`relationship()` option or treat a revision as authorization.
+
+## Check the deployment configuration
+
+Ask the assistant to run `fff:media:doctor` with the profile matching the actual
+workflow. Use `--queued` with the selected connection, queue and job timeout for
+native background conversions, and `--custom-encoder` when the application supplies
+its own encoder. The [diagnostic report](/docs/media-os-diagnostics) does not execute
+extension factories or modify storage. Treat `unverified` findings as checks still
+required; a valid configuration is not proof of a running worker or a successful
+upload/save/reopen workflow.
+
+For explicitly approved infrastructure checks, `fff:media:probe --write` can
+exercise a named `--disk`, named `--lock-store` and requested `--format` values.
+It creates synthetic diagnostic data and invokes the selected backend adapters.
+Do not run it as a read-only inspection or select production targets without the
+operator's authorization. Its [active probe report](/docs/media-os-diagnostics#active-probes)
+states what was exercised, any failed cleanup and the remaining deployment checks.

@@ -324,6 +324,8 @@
             "group": "Lifecycle and integrations",
             "pages": [
               "docs/media-os-lifecycle",
+              "docs/media-os-relations",
+              "docs/media-os-diagnostics",
               "docs/media-os-extensions",
               "docs/media-os-capture",
               "docs/media-os-browser",
@@ -472,6 +474,10 @@
   },
   "navbar": {
     "links": [
+      {
+        "label": "Buy a license",
+        "href": "https://shop.bjanczak.com/checkout/buy/9035f5b4-c5a2-4b03-867d-109b48d49134"
+      },
       {
         "type": "github",
         "label": "GitHub",

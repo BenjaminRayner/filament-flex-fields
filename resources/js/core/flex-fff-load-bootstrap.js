@@ -3,9 +3,8 @@
  * so the directive registers on alpine:init before Alpine.start().
  */
 import { installStartupGate } from './startup/startup-gate.js'
+import { observeStartupDemand } from './startup/demand-startup.js'
 
 const script = document.currentScript
 const startup = installStartupGate({ document, moduleUrl: script?.dataset.fffRuntimeSrc })
-void startup.start().catch(() => {
-    document.dispatchEvent(new CustomEvent('fff-core-runtime-error'))
-})
+observeStartupDemand(document, startup)

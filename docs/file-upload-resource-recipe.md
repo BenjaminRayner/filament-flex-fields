@@ -14,6 +14,11 @@ models, policy, filename generator, `GalleryRows` and `GalleryFields`. Skip its
 custom `PostGallery` page and Blade view. Both integrations use exactly the same
 field configuration and map originals to related SQL rows.
 
+The [related gallery adapter](/docs/media-os-relations) can replace the recipe's
+`GalleryRows` implementation when you want package-owned row synchronization and
+stale-edit detection. Preserve the native page transaction and acceptance hooks
+described here.
+
 ## What happens on save?
 
 1. Filament validates the form and stores temporary uploads.

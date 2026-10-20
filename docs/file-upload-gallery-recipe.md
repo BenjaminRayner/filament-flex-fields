@@ -81,6 +81,10 @@ The basic flow is **upload → save the post and gallery rows → reopen the sav
 
 The main example uses public JPEG, PNG and WebP images, synchronous named conversions and two independent galleries. It enables the image editor only for main photos and uses `appendFiles()` so ascending SQL order matches the visible order. It keeps removed physical files for a separate retention process. You can stop after step 6; the later sections are alternatives and optional additions.
 
+For a reusable package-owned SQL mapper with stale-edit detection, see
+[the related gallery adapter](/docs/media-os-relations). The complete application
+mapper below remains an alternative; choose one synchronization implementation.
+
 ## 1. Create the tables
 
 The example assumes the application already has Laravel's `users` table. `user_id` supplies an explicit owner for the authorization examples.

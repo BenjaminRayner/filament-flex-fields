@@ -20,7 +20,7 @@ trait PresentsSchedule
         return TimezoneField::make('timezone')->container($this->getContainer())
             ->statePath($this->getStatePath(false).'.timezone')->id($this->getId().'-timezone')->key($this->getKey().'-timezone')
             ->timezones($this->getResolvedTimezoneIdentifiers())->defaultTimezone($this->getDefaultTimezoneIdentifier())
-            ->size('md')->variant($this->getVariant())->disabled($this->isDisabled() || $this->isReadOnly());
+            ->size($this->getSize())->variant($this->getVariant())->disabled($this->isDisabled() || $this->isReadOnly());
     }
 
     /** The shared Switch owns presentation and pointer/keyboard motion. Schedule owns the value. */

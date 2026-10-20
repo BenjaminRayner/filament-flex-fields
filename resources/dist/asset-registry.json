@@ -273,12 +273,12 @@
       "sha256": "76a716241200371041c9344bdfa6eaea5c96bed38d31fca3823c66193e847577",
       "bytes": 9851
     },
-    "distribution:components/flex-fields-components-segments-runtime-66KI3FPY.js": {
+    "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-components-segments-runtime-66KI3FPY.js",
+      "path": "components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
       "type": "module",
-      "sha256": "49b21f13abf1880ecbc74e4c478dff3502c82d2dfda097f3e02d8219680f856c",
+      "sha256": "31951f47b89026a233101958d7668cc91f710ea58a2db543cbd760aa176cf659",
       "bytes": 4939
     },
     "distribution:components/flex-fields-components-text-input-counters-FY6RVV2S.js": {
@@ -737,12 +737,12 @@
       "sha256": "4753dccd242c89ab49151ee09b3e024b4828e6ab2401e348c62569acbbbf5847",
       "bytes": 1005
     },
-    "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZEPKOTRI.js": {
+    "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-virtual-first-paint-v1-segment-ZEPKOTRI.js",
+      "path": "components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js",
       "type": "module",
-      "sha256": "1c4b624402c331830f88775d841f2962323d33b79f8c526f25b77f0b5b4e8e8e",
+      "sha256": "161fb053947edc7770d669727eb21a0a0262c9e453474b2ca690ccb7a679b381",
       "bytes": 930
     },
     "distribution:components/flex-file-upload.js": {
@@ -750,7 +750,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-file-upload.js",
       "type": "module",
-      "sha256": "ea3d2e7351ab51880980d5025c66821058a74d9537e059304196f9c62bb577b9",
+      "sha256": "2362ad108a4d995dd44cf9eda32e914be7e75a2d7491ae71379278013f24c015",
       "bytes": 28834
     },
     "distribution:components/flex-radiolist.js": {
@@ -902,7 +902,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/nps-field.js",
       "type": "module",
-      "sha256": "6a622ecb7ade9a7ddf2f7223960eeea6ae7ec2c9de1b9094d923b97bf2670d97",
+      "sha256": "6cc8623dd9ccd3301f31f048b392b68b48d748345e0b9f10acab73474cd4e003",
       "bytes": 4104
     },
     "distribution:components/number-stepper.js": {
@@ -958,7 +958,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/segment-control.js",
       "type": "module",
-      "sha256": "5f00f99738c8d6aa5af7682ce022e778b4525b933d9eb9d3174ab6a87c5b8409",
+      "sha256": "32307bb0ce7b748dfd23be26a1062f9ada23c514fa9b994631a28bd383fdfc7c",
       "bytes": 463
     },
     "distribution:components/segment-tabs.js": {
@@ -966,7 +966,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/segment-tabs.js",
       "type": "module",
-      "sha256": "f0d77b931e701b3bbf75d4f4857fc576c917e4ffe69c6c12b089b6e52bf63b85",
+      "sha256": "9ca48d939a5e72860e65ea872dd4014c8ddac0c646d847f478fb2c5d6540b005",
       "bytes": 1365
     },
     "distribution:components/select-field.js": {
@@ -990,7 +990,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/slug-field.js",
       "type": "module",
-      "sha256": "430192012c37316dbda1ca0820afb4f52d5759cc469d38dd9b8f0a52d6d28cf5",
+      "sha256": "8ebf990cc89c22afd391ea4a60b0277d66710b0daa5b59b67e501b27c00d5371",
       "bytes": 9016
     },
     "distribution:components/social-links-field.js": {
@@ -1198,8 +1198,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/date-value-presentation.css",
       "type": "stylesheet",
-      "sha256": "b7fc6e0d2e9b2751e86589fcad6f806289bc8535cb78999cfd8167c4e624ec78",
-      "bytes": 3922
+      "sha256": "e5b51975165e7e7b385682acc4bedd220ea60d6cc7ceb929bfc06b9a4ee03d07",
+      "bytes": 4599
     },
     "distribution:css/dual-listbox.css": {
       "origin": "distribution",
@@ -1254,8 +1254,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/flex-catalog.css",
       "type": "stylesheet",
-      "sha256": "a8c3df806e9999247ef3cb0a00fbecb717973edac7686fa35b4e5ceedda6b0e0",
-      "bytes": 37181
+      "sha256": "4deb915faf6110d6a45f83a1db8d607169f7d0e50ade1326263b9cf8f28b51fb",
+      "bytes": 37329
     },
     "distribution:css/flex-checklist.css": {
       "origin": "distribution",
@@ -1310,24 +1310,24 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/flex-slider.css",
       "type": "stylesheet",
-      "sha256": "56c3f0f3cadc4a1057d97b4d77f607410d01c976406e99a40cc723f54244c6c7",
-      "bytes": 22778
+      "sha256": "bf8ab295ee0f28da41830dd596fca351f3704ac2210090ebce81921ae5ccdf3e",
+      "bytes": 22759
     },
     "distribution:css/flex-text-input.css": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "css/flex-text-input.css",
       "type": "stylesheet",
-      "sha256": "7961c321d7bd648e0b6a1bb5f2227ea5f66b2a7a32f99ed553749a44187fa1dd",
-      "bytes": 18607
+      "sha256": "6ab620ea59ce4cebcf34e7a7f9a6f560997286f5f021d84a4f8e4424476f66d7",
+      "bytes": 19245
     },
     "distribution:css/flex-textarea.css": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "css/flex-textarea.css",
       "type": "stylesheet",
-      "sha256": "1f8acc200c87e0e16e23dd16b0d48d788ac5f98d236b294dfdcd505059de1152",
-      "bytes": 26004
+      "sha256": "2d787534baa49e88860dc217d5676dceddc8f486504d97d7b2b9858ef84e8a40",
+      "bytes": 26142
     },
     "distribution:css/flex-time-picker.css": {
       "origin": "distribution",
@@ -1350,8 +1350,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/flex-verification-code.css",
       "type": "stylesheet",
-      "sha256": "b9da5743c598501e0d9a13e961ecf063cd05fe44707ff3a9a94391cead1a00f4",
-      "bytes": 9202
+      "sha256": "93d0c54c9a382374a6a68191cbfe98a6d8c22cc0df6cbce5414b1055503f8421",
+      "bytes": 9251
     },
     "distribution:css/font-select.css": {
       "origin": "distribution",
@@ -1382,8 +1382,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/icon-picker-field.css",
       "type": "stylesheet",
-      "sha256": "f0d86de7053583f7c1009597d79e2359a978509277e71143bc2c73395837b52a",
-      "bytes": 4982
+      "sha256": "9befb8fbad19dc665dc347d7c9121d39032bf834d2cab711ae40fb4f3e120113",
+      "bytes": 5202
     },
     "distribution:css/image-choice-cards.css": {
       "origin": "distribution",
@@ -1478,8 +1478,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/phone-field.css",
       "type": "stylesheet",
-      "sha256": "82c4914e62850a37d51b2191853f650099746842cddc243c17c3b22f4b286b18",
-      "bytes": 8491
+      "sha256": "9fb0af9d662a490877b956cb28f361c9f29215546a884f01a3fd8fe5302da954",
+      "bytes": 8939
     },
     "distribution:css/price-range.css": {
       "origin": "distribution",
@@ -1534,8 +1534,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/rich-editor-field.css",
       "type": "stylesheet",
-      "sha256": "30f9696fcfc9337e24f1ef36d3654b64daf3e32d0917ce0ed432a3e33c2c12bc",
-      "bytes": 19990
+      "sha256": "b8cc01f6f649b50a62ad801db3ce43b79c5e35b758e07d7d9d593e4120437fad",
+      "bytes": 20846
     },
     "distribution:css/schedule-display.css": {
       "origin": "distribution",
@@ -1558,8 +1558,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/segment-control.css",
       "type": "stylesheet",
-      "sha256": "f3fcab22a067fde4b232ded114f3d2b5ab18b7aba9d855c71553a818e96d4aa1",
-      "bytes": 17500
+      "sha256": "a850cdf4a5a56112e1756d208558bd20ea05b6d6d42478d164290dfa62106875",
+      "bytes": 17546
     },
     "distribution:css/segment-tabs.css": {
       "origin": "distribution",
@@ -1574,8 +1574,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/select-field.css",
       "type": "stylesheet",
-      "sha256": "ab4ab8705a13b0032553f8feda03a0966390a3632707566450250e9eb473fa0f",
-      "bytes": 120747
+      "sha256": "b2827618bdf89bda2765ba51780568e56afc32e70afd007ada84b38b4ca81205",
+      "bytes": 121270
     },
     "distribution:css/selection-indicator.css": {
       "origin": "distribution",
@@ -1606,16 +1606,16 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/slug-field.css",
       "type": "stylesheet",
-      "sha256": "edf13209ee23db7b404652e8ddc8b8846315f0f9c304e62319271e3a08d75961",
-      "bytes": 9190
+      "sha256": "4fefde34727bb81d8e0dbcc7e716bf66b8eb865d67f0abec54a7b742e299a07e",
+      "bytes": 9279
     },
     "distribution:css/social-links-field.css": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "css/social-links-field.css",
       "type": "stylesheet",
-      "sha256": "d30a23580861634121456382367a85c84e5f53978aac00a8b84ef479b986bb50",
-      "bytes": 2993
+      "sha256": "23559776b35f3eb4f943579816c43c974d0f4cb791a742601eaca18d23524d91",
+      "bytes": 3949
     },
     "distribution:css/status-chip-column.css": {
       "origin": "distribution",
@@ -1654,8 +1654,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/teleported-menu.css",
       "type": "stylesheet",
-      "sha256": "b260fc607c6da0954d170aab669ae87d859ef7f3d83139dc56250653b6ac1afc",
-      "bytes": 10302
+      "sha256": "0524911ee98c8cd71fac454f5ea6cf2886c2fc9bc581139957a53211e7a36128",
+      "bytes": 10347
     },
     "distribution:css/timezone-field.css": {
       "origin": "distribution",
@@ -1670,8 +1670,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/todo-list-field.css",
       "type": "stylesheet",
-      "sha256": "38b037fabcf0bf9939cf3bad5faace4a1afd7ef585b1e9b1b419ffa6b72a36fc",
-      "bytes": 28276
+      "sha256": "84b02e4b46fab3a45ac917d4650d6479ef95748aa7fa86eeb2bba4f918f46bba",
+      "bytes": 28471
     },
     "distribution:css/track-slider.css": {
       "origin": "distribution",
@@ -1710,8 +1710,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/user-select.css",
       "type": "stylesheet",
-      "sha256": "d63552b3a142a5a2f67f5f79764d504dbe01d2be9b9731d11d87d755fe2067f0",
-      "bytes": 4230
+      "sha256": "80e146da0834bfd56f22c4565f9e6d3bf73bd504cb7a0a3973488656e574899d",
+      "bytes": 5015
     },
     "distribution:css/video-field.css": {
       "origin": "distribution",
@@ -3158,7 +3158,7 @@
         "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
         "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
         "distribution:components/flex-file-upload.js",
-        "distribution:components/flex-fields-components-segments-runtime-66KI3FPY.js",
+        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
         "distribution:components/flex-fields-file-upload-runtime-camera-state-YDHDUZQS.js",
         "distribution:components/flex-fields-file-upload-viewer-motion-entry-chrome-DLFXQ5WQ.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
@@ -3170,7 +3170,7 @@
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
         "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZEPKOTRI.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
       ],
       "entry": null,
       "kind": "styles-only",
@@ -3509,7 +3509,7 @@
         "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
         "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
         "distribution:components/flex-file-upload.js",
-        "distribution:components/flex-fields-components-segments-runtime-66KI3FPY.js",
+        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
         "distribution:components/flex-fields-file-upload-runtime-camera-state-YDHDUZQS.js",
         "distribution:components/flex-fields-file-upload-viewer-motion-entry-chrome-DLFXQ5WQ.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
@@ -3521,7 +3521,7 @@
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
         "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZEPKOTRI.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
       ],
       "entry": "distribution:components/flex-file-upload.js",
       "kind": "full",
@@ -4510,7 +4510,7 @@
         "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZEPKOTRI.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
       ],
       "entry": "distribution:components/nps-field.js",
       "kind": "full",
@@ -4947,11 +4947,11 @@
       ],
       "chunks": [
         "distribution:components/segment-control.js",
-        "distribution:components/flex-fields-components-segments-runtime-66KI3FPY.js",
+        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
         "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
         "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZEPKOTRI.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
       ],
       "entry": "distribution:components/segment-control.js",
       "kind": "full",
@@ -4974,11 +4974,11 @@
       ],
       "chunks": [
         "distribution:components/segment-tabs.js",
-        "distribution:components/flex-fields-components-segments-runtime-66KI3FPY.js",
+        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
         "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
         "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZEPKOTRI.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
       ],
       "entry": "distribution:components/segment-tabs.js",
       "kind": "full",
@@ -5115,9 +5115,9 @@
         "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
         "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
         "distribution:components/segment-control.js",
-        "distribution:components/flex-fields-components-segments-runtime-66KI3FPY.js",
+        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZEPKOTRI.js",
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js",
         "distribution:components/slug-field.js",
         "distribution:components/flex-fields-components-text-input-presentation-UZ6BEZDV.js"
       ],
@@ -5554,11 +5554,11 @@
       ],
       "chunks": [
         "distribution:components/segment-tabs.js",
-        "distribution:components/flex-fields-components-segments-runtime-66KI3FPY.js",
+        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
         "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
         "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZEPKOTRI.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
       ],
       "entry": null,
       "kind": "styles-only",

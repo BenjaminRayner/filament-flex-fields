@@ -1,6 +1,10 @@
 import { createHash } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 
+export const STANDARD_CHECKOUT_URL = 'https://shop.bjanczak.com/checkout/buy/9035f5b4-c5a2-4b03-867d-109b48d49134';
+
+const purchaseLink = (plan, quantity = 1) => `<br><br><a href="${STANDARD_CHECKOUT_URL}${quantity > 1 ? `?quantity=${quantity}` : ''}" target="_blank" rel="noopener noreferrer">Buy ${plan}${quantity > 1 ? ` × ${quantity}` : ''}</a><br>Select ${plan}${quantity > 1 ? ` and quantity ${quantity}` : ''} in checkout and check the total before paying. No enquiry submission is needed.`;
+
 // Stable field identities preserve response references when updating this form.
 const id = (name) => {
     const hex = createHash('sha256').update(`flex-fields:license-request:v1:${name}`).digest('hex');
@@ -57,13 +61,14 @@ export function buildLicenseRequestForm() {
         }
     };
 
-    add('title', 'FORM_TITLE', { title: 'FLEX Fields — License request', html: 'FLEX Fields — License request', button: { label: 'Continue' } }, 'TEXT');
+    add('title', 'FORM_TITLE', { title: 'FLEX Fields — License guide', html: 'FLEX Fields — License guide', button: { label: 'Continue' } }, 'TEXT');
     add('heading:use', 'HEADING_2', { html: 'Find the right license for your project' });
-    text('intro', 'Answer a few questions about your project. We’ll suggest a starting point, then you can ask for a quote or confirm your scope.');
-    radio('use', 'How will you use FLEX Fields?', [
+    text('intro', 'Answer a few questions to check free eligibility or find a standard plan with a direct purchase link. You can send an optional enquiry for Custom rights or help with your scope.');
+    text('scope:function', 'Assess the functionality using FLEX, not every feature in the same Laravel application. Internal monitoring can remain free alongside a separate commercial product; a staff-only panel implementing or configuring product features is commercial use. Read-only versus editable is not the test.');
+    radio('use', 'What functionality will use FLEX Fields?', [
         ['personal', 'Personal projects, learning or research'],
-        ['internal', 'An internal tool for my own business'],
-        ['hosted', 'A commercial hosted product or SaaS'],
+        ['internal', 'My own business administration or operational monitoring'],
+        ['hosted', 'Implementing or configuring a commercial hosted product / SaaS'],
         ['client', 'Bespoke work for a client'],
         ['distribution', 'Customer installations, reusable kits, OEM or resale'],
         ['evaluation', 'Private evaluation before a product launch'],
@@ -72,9 +77,9 @@ export function buildLicenseRequestForm() {
 
     page('page:scope', 0, 'License scope', 'See my starting point');
     add('heading:scope', 'HEADING_2', { html: 'A little more about your project' });
-    radio('client_use', 'How will your client use the application?', [
-        ['internal', 'Only for the client’s own internal operations'],
-        ['hosted', 'As a commercial hosted product / SaaS'],
+    radio('client_use', 'What will the FLEX functionality do for your client?', [
+        ['internal', 'Only the client’s internal administration or monitoring'],
+        ['hosted', 'Implement or configure the client’s commercial hosted product / SaaS'],
         ['distribution', 'Delivering software or installations to its customers'],
         ['unknown', 'Not confirmed yet'],
     ], true);
@@ -82,8 +87,8 @@ export function buildLicenseRequestForm() {
         ['yes', 'Yes — I work as the client’s authorized contractor'],
         ['unsure', 'No, or I need help confirming this'],
     ], true);
-    radio('free_scope', 'Is this solely personal, educational, research or internal business use, rather than a software service supplied to others?', [
-        ['yes', 'Yes — the application is only for that qualifying use'],
+    radio('free_scope', 'Does the functionality using FLEX meet the personal, educational, research or internal-use conditions, without implementing or configuring a commercial software product?', [
+        ['yes', 'Yes — this FLEX use qualifies; a separate commercial feature in the same backend does not change it'],
         ['unsure', 'No, or I’m not sure'],
     ], true);
     radio('private_evaluation', 'Will evaluation remain private and outside production, with no live customer operations or paid pilots?', [
@@ -116,7 +121,7 @@ export function buildLicenseRequestForm() {
     visibility('show:custom', custom, [customNote.uuid]);
     visibility('show:mixed', condition('use', 'mixed'), [mixedNote.uuid]);
 
-    page('page:contact', 1, 'Your recommendation and contact details', 'Send license request');
+    page('page:contact', 1, 'Your recommendation and optional enquiry', 'Send enquiry');
     add('heading:recommendation', 'HEADING_2', { html: 'Your starting point' });
     const validHosted = and(hosted, condition('hosted_scope', 'yes'), or(condition('use', 'hosted'), condition('direct_client', 'yes')));
     const free = or(
@@ -125,21 +130,33 @@ export function buildLicenseRequestForm() {
         and(client, condition('client_use', 'internal'), condition('direct_client', 'yes'), condition('free_scope', 'yes')),
     );
     const outcomes = [
-        ['free', free, '<strong>May qualify for free use</strong><br>No commercial purchase is required if the relevant free-use conditions hold. Tell us about your project if you would like to confirm the scope.'],
-        ['single', and(validHosted, condition('ownership', 'one'), condition('products', 'one')), '<strong>Single Product · $249</strong><br>For one named hosted product and one licensee. One-time purchase; unlimited users, developers and environments within scope.'],
-        ['two', and(validHosted, condition('ownership', 'one'), condition('products', 'two')), '<strong>Two Single Product licenses · $498</strong><br>At current prices, two Singles cost less. Unlimited Company ($699) is an alternative if you want coverage for a growing portfolio owned by that same entity.'],
-        ['unlimited', and(validHosted, condition('ownership', 'one'), condition('products', 'portfolio')), '<strong>Unlimited Company · $699</strong><br>For current and future eligible hosted products owned and operated by one named entity. Separate Single Product licenses remain an option.'],
-        ['enterprise', and(validHosted, condition('ownership', 'group')), '<strong>Enterprise Group · $1,499</strong><br>For a named parent and its qualifying 100%-owned subsidiaries. Separate adequate licenses can also be an alternative. This plan does not add OEM or distribution rights.'],
+        ['free', free, '<strong>May qualify for free use</strong><br>No commercial purchase is required if the relevant free-use conditions hold. Internal employee records, accounting or operational monitoring can qualify even in a shared backend. FLEX implementing product features, defining comparison/calculation rules or rendering a customer analysis as a commercial software feature is commercial use, including staff-only product configuration. You can continue using the package without submitting this form. Send an enquiry only if you need help confirming the scope.'],
+        ['single', and(validHosted, condition('ownership', 'one'), condition('products', 'one')), '<strong>Single Product · $249</strong><br>For one named hosted product and one licensee. One-time purchase; unlimited users, developers and environments within scope.' + purchaseLink('Single Product')],
+        ['two', and(validHosted, condition('ownership', 'one'), condition('products', 'two')), '<strong>Two Single Product licenses · $498</strong><br>At current prices, two Singles cost less. Unlimited Company ($699) is an alternative if you want coverage for a growing portfolio owned by that same entity.' + purchaseLink('Single Product', 2) + purchaseLink('Unlimited Company')],
+        ['unlimited', and(validHosted, condition('ownership', 'one'), condition('products', 'portfolio')), '<strong>Unlimited Company · $699</strong><br>For current and future eligible hosted products owned and operated by one named entity. Separate Single Product licenses remain an option.' + purchaseLink('Unlimited Company')],
+        ['enterprise', and(validHosted, condition('ownership', 'group')), '<strong>Enterprise Group · $1,499</strong><br>For a named parent and its qualifying 100%-owned subsidiaries. Separate adequate licenses can also be an alternative. This plan does not add OEM or distribution rights.' + purchaseLink('Enterprise Group')],
         ['separate', and(validHosted, condition('ownership', 'other')), '<strong>Separate licenses or an agreed arrangement</strong><br>Unrelated clients, partly owned companies and other separate owners do not automatically share one license. Describe the ownership model so we can help.'],
         ['custom', custom, '<strong>Custom / OEM · individually quoted</strong><br>Quotes start at $2,999 for a narrowly defined scope. Pricing, delivery rights and terms depend on your project; this is not a fixed price or unlimited distribution grant.'],
     ];
-    outcomes.push(['review', inverse(or(...outcomes.map(([, match]) => match))), '<strong>Let’s confirm your scope</strong><br>Your answers need an individual review. Describe the intended uses, owners and delivery model below.']);
+    // Route review through explicit active answers rather than depending on
+    // the platform to negate every plan's nested conditions for the fallback.
+    const review = or(
+        and(or(condition('use', 'personal'), condition('use', 'internal')), condition('free_scope', 'unsure')),
+        and(condition('use', 'evaluation'), condition('private_evaluation', 'unsure')),
+        and(client, condition('client_use', 'unknown')),
+        and(client, or(condition('client_use', 'internal'), condition('client_use', 'hosted')), condition('direct_client', 'unsure')),
+        and(client, condition('client_use', 'internal'), condition('free_scope', 'unsure')),
+        and(hosted, condition('hosted_scope', 'unsure')),
+        condition('use', 'mixed'),
+    );
+    outcomes.push(['review', review, '<strong>Let’s confirm your scope</strong><br>The answers do not establish a standard or Free scope. If FLEX implements or configures a commercial hosted product, select that use on the first page. Otherwise describe the intended uses, owners and delivery model below for an individual review.']);
     for (const [key, match, html] of outcomes) {
         const result = text(`result:${key}`, html, true);
         visibility(`show:result:${key}`, match, [result.uuid]);
     }
-    text('recommendation:note', 'This is a guide to License v2.0, not a license grant. Prices are in USD before tax. Existing licenses retain their agreed terms. We’ll confirm scope and price before any payment.');
-    add('heading:contact', 'HEADING_2', { html: 'Where should we send your reply?' });
+    text('recommendation:note', 'This is a guide to License v2.0, not a license grant. Prices are in USD before tax. Existing licenses retain their agreed terms. Standard plans can be purchased directly. Custom rights, upgrades, transfers and unclear scope require individual agreement before payment. Keep the authenticated License Confirmation issued after confirmed payment; a receipt alone is not the grant.');
+    add('heading:contact', 'HEADING_2', { html: 'Need help or Custom rights? Send an optional enquiry' });
+    text('contact:optional', 'You do not need to fill in the fields below to use a purchase link or qualify for Free use. Complete them only if you want to send an enquiry.');
     input('contact_name', 'Your name', 'INPUT_TEXT', true, 'Full name');
     input('contact_email', 'Email address', 'INPUT_EMAIL', true, 'you@company.com');
     input('licensee', 'Person or company that will hold the license', 'INPUT_TEXT', true, 'Your legal name, or your client’s legal name');

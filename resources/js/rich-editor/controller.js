@@ -160,6 +160,7 @@ export default function flexRichEditorFormComponent(options) {
                 }
 
                 if (owner.disposed) { base.destroy?.call(this); this._baseDestroy = null; return }
+                this.$refs.editor?.querySelector(':scope > [data-fff-rich-editor-initial]')?.remove()
                 this._filamentRichEditorBootstrapped = true
                 booting = false
 

@@ -11,11 +11,6 @@ on:
     # Daily Filament compat + 5.x-dev canary (~06:00 UTC).
     - cron: '0 6 * * *'
   workflow_dispatch:
-    inputs:
-      certify_release:
-        description: 'Require every original core audit acceptance criterion, including physical devices'
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -85,11 +80,12 @@ jobs:
 
       # Select playground stress suites (~8k+) excluded from Pest — see composer test:select-atomics.
       - name: Run Pest
+        if: matrix.php != '8.3'
         run: php -d memory_limit=2G vendor/bin/pest --compact
 
-      - name: Run PHPStan
+      - name: Run source-stamped PHP, JavaScript and static regression suites
         if: matrix.php == '8.3'
-        run: vendor/bin/phpstan analyse --memory-limit=512M
+        run: node scripts/core/release-acceptance.mjs --phase=regression
 
       - name: Run component audit
         if: matrix.php == '8.3'
@@ -100,10 +96,6 @@ jobs:
         run: |
           node scripts/core/release-acceptance.mjs --phase=reproducibility
           npm run check:budgets
-
-      - name: Run the complete JavaScript regression suite
-        if: matrix.php == '8.3'
-        run: npm run test:js
 
       - name: Install Chromium for measured production runtime budgets
         if: matrix.php == '8.3'
@@ -164,19 +156,70 @@ jobs:
           path: build/core-acceptance/**
 
   core-release-gate:
-    name: Require complete original audit acceptance before release certification
-    if: github.event_name == 'workflow_dispatch' && inputs.certify_release
+    name: Verify source-matched core acceptance
+    if: ${{ !cancelled() }}
     needs: [quality, core-browsers, core-integrations, core-sql, filament-compat]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     steps:
+      - name: Require every prerequisite job
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          node -e 'const jobs = JSON.parse(process.env.JOB_RESULTS); for (const [name, job] of Object.entries(jobs)) { if (job.result !== "success") throw Error("Required job failed or was skipped: " + name); }'
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24'
-      - name: Refuse omitted, stale or incomplete original acceptance criteria
-        run: node scripts/core/audit-coverage.mjs --require-complete
+      - name: Download acceptance evidence from this workflow run
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: core-acceptance-*-${{ github.sha }}
+          path: build/downloaded-acceptance
+      - name: Verify complete phases, commit, source, asset release and log digests
+        run: node scripts/core/certify-acceptance.mjs --input=build/downloaded-acceptance --output=build/release-acceptance.json
+      - name: Retain the automated acceptance report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-acceptance-${{ github.sha }}
+          path: |
+            build/release-acceptance.json
+            build/release-metadata/*
+
+  core-release-attestation:
+    name: Attest verified core release metadata
+    needs: core-release-gate
+    if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    steps:
+      - name: Download metadata accepted by the release gate
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-acceptance-${{ github.sha }}
+          path: build/verified-release
+      - name: Sign provenance for the accepted metadata
+        id: provenance_attestation
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: |
+            build/verified-release/release-acceptance.json
+            build/verified-release/release-metadata/build-provenance.json
+            build/verified-release/release-metadata/sbom.cdx.json
+      - name: Retain the verification bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-attestation-${{ github.sha }}
+          path: ${{ steps.provenance_attestation.outputs.bundle-path }}
 
   core-integrations:
     name: Core · real Spatie adapters and Octane lifecycle (PHP 8.5)
@@ -265,7 +308,9 @@ jobs:
           FFF_DATA_PORT: ${{ job.services.database.ports[matrix.database.port] }}
           FFF_DATA_USERNAME: ${{ matrix.database.username }}
           FFF_DATA_PASSWORD: disposable-core-ci
-        run: php scripts/compatibility/core-data-boundaries.php --disposable-sql
+        run: |
+          php scripts/compatibility/core-data-boundaries.php --disposable-sql
+          php vendor/bin/pest --compact tests/Integration/MediaRelationConcurrencyTest.php
 
   filament-compat:
     name: Filament ${{ matrix.label }} · PHP ${{ matrix.php }}

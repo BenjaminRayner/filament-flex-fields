@@ -24,7 +24,7 @@ const contracts = {
 export function firstPaintContract(root, name) {
     const contract = contracts[name]
     if (!contract) throw new Error('Unknown first-paint contract.')
-    const provenance = [contract.source, contract.entry, 'scripts/assets/first-paint-esbuild-plugin.mjs', 'node_modules/esbuild/package.json']
+    const provenance = ['tsconfig.json', contract.source, contract.entry, 'scripts/assets/first-paint-esbuild-plugin.mjs', 'node_modules/esbuild/package.json']
     const version = createHash('sha256').update(JSON.stringify(provenance.map(file =>
         [file, fs.readFileSync(path.join(root, file), 'utf8')]))).digest('hex')
     return { ...contract, name, version, key: `fff.first-paint.${name}.v1`, provenance }

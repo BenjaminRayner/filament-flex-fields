@@ -3,6 +3,7 @@
 }
 
 .fff-todo-list-field {
+    --fff-todo-list-input-height: var(--fff-track-h-md);
     --fff-todo-list-accent: var(--primary-500, #6e7bf2);
     --fff-todo-list-border: rgb(228 228 231);
     --fff-todo-list-bg: var(--color-gray-100, rgb(243 244 246));
@@ -43,6 +44,9 @@
     @apply relative flex w-full flex-col;
     gap: 0.75rem;
 }
+
+.fff-todo-list-field--sm { --fff-todo-list-input-height: var(--fff-track-h-sm); }
+.fff-todo-list-field--lg { --fff-todo-list-input-height: var(--fff-track-h-lg); }
 
 .dark .fff-todo-list-field {
     --fff-todo-list-border: rgb(63 63 70);

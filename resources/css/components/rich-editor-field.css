@@ -7,6 +7,7 @@
     --fff-rich-editor-tool-size: 2rem;
     --fff-rich-editor-icon-size: 1.125rem;
     --fff-rich-editor-content-p: 1rem;
+    --fff-rich-editor-content-py: .5rem;
     --fff-rich-editor-min-h: 12rem;
     --fff-rich-editor-tooltip-z: 20;
 }
@@ -189,20 +190,24 @@
 .fff-rich-editor__content {
     @apply relative;
     min-height: var(--fff-rich-editor-config-min-h, var(--fff-rich-editor-min-h));
-    padding: var(--fff-rich-editor-content-p);
+    padding: var(--fff-rich-editor-content-py) var(--fff-rich-editor-content-p);
     color: var(--fff-rich-editor-text);
     background: var(--fff-rich-editor-bg);
 }
 
-.fff-rich-editor__content .tiptap {
-    min-height: calc(var(--fff-rich-editor-config-min-h, var(--fff-rich-editor-min-h)) - (var(--fff-rich-editor-content-p) * 2));
+.fff-rich-editor__content :is(.tiptap, .fff-rich-editor__initial-content) {
+    min-height: calc(var(--fff-rich-editor-config-min-h, var(--fff-rich-editor-min-h)) - (var(--fff-rich-editor-content-py) * 2));
     outline: none;
     contain: layout style;
     font-size: .9375rem;
     line-height: 1.75;
 }
 
-.fff-rich-editor__content .tiptap p.is-editor-empty:first-child::before {
+/* The document surface owns its edge spacing, including headings and lists. */
+.fff-rich-editor__content :is(.tiptap, .fff-rich-editor__initial-content) > :first-child { margin-block-start: 0; }
+.fff-rich-editor__content :is(.tiptap, .fff-rich-editor__initial-content) > :last-child { margin-block-end: 0; }
+
+.fff-rich-editor__content :is(.tiptap, .fff-rich-editor__initial-content) p.is-editor-empty:first-child::before {
     color: var(--fff-rich-editor-muted);
     content: attr(data-placeholder);
     float: left;
@@ -214,23 +219,23 @@
     outline: 2px solid color-mix(in srgb, var(--primary-500, rgb(59 130 246)) 35%, transparent);
 }
 
-.fff-rich-editor__content .tiptap img {
+.fff-rich-editor__content :is(.tiptap, .fff-rich-editor__initial-content) img {
     display: block;
     max-width: 100%;
     height: auto;
     margin-inline: auto;
 }
 
-.fff-rich-editor__content .tiptap p:has(> img:only-child),
-.fff-rich-editor__content .tiptap p:has(> [data-resize-container]:only-child) {
+.fff-rich-editor__content :is(.tiptap, .fff-rich-editor__initial-content) p:has(> img:only-child),
+.fff-rich-editor__content :is(.tiptap, .fff-rich-editor__initial-content) p:has(> [data-resize-container]:only-child) {
     margin-block: 0.75rem;
 }
 
-.fff-rich-editor__content .tiptap div[data-youtube-video] {
+.fff-rich-editor__content :is(.tiptap, .fff-rich-editor__initial-content) div[data-youtube-video] {
     @apply relative my-3 w-full;
 }
 
-.fff-rich-editor__content .tiptap div[data-youtube-video] iframe {
+.fff-rich-editor__content :is(.tiptap, .fff-rich-editor__initial-content) div[data-youtube-video] iframe {
     @apply block w-full border-0;
     aspect-ratio: 16 / 9;
     height: auto;
@@ -556,3 +561,9 @@
 .fff-rich-editor :is(.fff-rich-editor__toolbar, .fff-rich-editor__bubble, .fff-rich-editor__panels, .fff-rich-editor__footer, .fff-rich-editor__image-overlay) svg [stroke-width] {
     stroke-width: 2;
 }
+
+/* Preserve the server document while the native editing factory is preparing. */
+.fff-rich-editor__initial-content { pointer-events:none; }
+.fff-rich-editor__content:has(> .tiptap) > .fff-rich-editor__initial-content { display:none; }
+.fff-rich-editor__main { overflow-x:hidden; scrollbar-gutter:stable; }
+.fff-rich-editor__main:has([data-fff-rich-editor-initial]):not(:has(.tiptap)) { overflow-y:hidden; }

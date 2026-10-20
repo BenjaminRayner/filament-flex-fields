@@ -210,7 +210,7 @@ FlexRichEditor-specific options only. The field extends Filament `RichEditor`; i
 |--------|---------------|---------|-----------------|
 | `variant()` | `primary`, `secondary`, `soft`, `flat` | `secondary` | [Variants](#shell-variants) |
 | `size()` | `sm`, `md`, `lg` | `md` | [Sizes](#shell-sizes) |
-| `focusOutline()` | `bool` | `false` | [Focus outline](#focus-outline) |
+| `focusOutline()` | `bool` | `true` | [Focus outline](#focus-outline) |
 | `wordCount()` | `bool` | `false` | [Word count](#word-count) |
 | `jsonBadge()` | `bool` | `false` | [JSON badge](#json-debug-badge) |
 

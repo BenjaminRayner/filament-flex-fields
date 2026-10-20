@@ -235,7 +235,7 @@ FlexColorPickerField::make('accent')
 | `size()` | `sm`, `md`, `lg` | `md` |
 | `variant()` | `primary`, `secondary`, `soft`, `flat` | `primary` |
 | `rounding()` | `native`, `none`, `sm`, `md`, `lg`, `xl`, `full` | Shared `field_rounding` setting, normally `md` |
-| `focusOutline()` | `true`, `false` | `false` |
+| `focusOutline()` | `true`, `false` | `true` |
 
 See [Configuration](/docs/configuration) for shared appearance settings. The picker supports light and dark themes. Its format selector uses the FLEX Select control, and its value inputs use shared FLEX input controls.
 
@@ -529,6 +529,6 @@ These are the Color Picker's configuration methods. Setters with a value paramet
 | `placement()` | `bottom-start` | Preferred dropdown alignment |
 | `animationDuration()` | `150` | Entry duration in milliseconds |
 | `variant()` / `size()` | `primary` / `md` | Shared FLEX field appearance |
-| `rounding()` / `focusOutline()` | Shared rounding / `false` | Field rounding and focus outline |
+| `rounding()` / `focusOutline()` | Shared rounding / `true` | Field rounding and focus outline |
 
 Invalid layout names, unsupported formats and out-of-range panel or grid settings are rejected when the field configuration is resolved.

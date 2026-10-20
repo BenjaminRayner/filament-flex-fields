@@ -177,7 +177,7 @@
 
 /* Create dock owns the separator — compact padding, same height idle + editing */
 .fff-todo-list-field__row--create {
-    --fff-todo-list-create-control-height: 1.75rem;
+    --fff-todo-list-create-control-height: var(--fff-todo-list-input-height);
     --fff-todo-list-create-row-py: 0.375rem;
     border-top: 0;
     padding-top: var(--fff-todo-list-create-row-py);
@@ -263,8 +263,8 @@
     }
 }
 
-.fff-todo-list-field__row:not(.is-settled):not(.fff-todo-list-field__row--create):hover:not(.is-disabled):not(.is-create-disabled),
-.fff-todo-list-field__row:not(.is-settled):not(.fff-todo-list-field__row--create):focus-visible:not(.is-disabled) {
+.fff-todo-list-field__row:not(.fff-todo-list-field__row--create):hover:not(.is-disabled):not(.is-create-disabled),
+.fff-todo-list-field__row:not(.fff-todo-list-field__row--create):focus-visible:not(.is-disabled) {
     background: var(--fff-todo-list-item-bg-hover, #ebebec);
 }
 

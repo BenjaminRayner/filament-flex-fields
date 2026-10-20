@@ -392,7 +392,7 @@ Writes the primary display value into the active field, normalizes it, syncs Liv
 | `rounding(string\|Closure\|null $rounding)` | Setup | config | Border radius token |
 | `placeholder(string\|Closure\|null $placeholder)` | Setup | `'0'` (translated) | Empty input hint |
 | `calculatorIcon(string\|BackedEnum\|Htmlable\|Closure\|null $icon)` | Setup | Gravity `calculator` | Trigger button icon |
-| `focusOutline(bool\|Closure $condition = true)` | Setup | `false` | Show focus ring on input |
+| `focusOutline(bool\|Closure $condition = true)` | Setup | `true` | Show focus ring on input; pass `false` to disable it |
 | `minValue`, `maxValue`, `step`, `integer`, `decimalPlaces`, `maxLength`, `roundingMode` | Setup | see above | Numeric constraints |
 | `required()`, `disabled()`, `readOnly()` | Setup | — | Standard Filament field APIs |
 

@@ -30,16 +30,96 @@ Workflow declarations are acceptance requirements, not evidence of a remote run.
 
 ## Release gate (required checks)
 
-On `main` / release tags, require at least:
+Require **Verify source-matched core acceptance** in branch protection. It waits
+for all stable PHP/Filament, browser, integration and SQL jobs, then verifies the
+complete automated acceptance evidence from that workflow run. The canary stays
+advisory.
 
-- `quality (PHP 8.3)`
-- `Filament latest-5.x · PHP 8.3` and the exact `Filament 5.6.0 · PHP 8.3` floor
+The gate checks all ten required phase/engine reports, their exact checks, commit,
+source fingerprint, immutable asset release and log digests. Missing, duplicated,
+failed, modified or stale evidence is rejected. PHP 8.3 regression results include
+the complete PHP/JavaScript suites and static analysis; PHP 8.4/8.5 retain their
+full PHP suite.
 
-Optional but recommended: all `quality` PHP axes and every Filament stable matrix leg.
+Reports and executable criteria live in public tooling. Private historical audit
+notes are not build inputs. Passing this gate confirms the recorded automated
+scope; physical-device checks, deployment approval and the complete historical
+audit remain separate requirements. It does not publish a release or deployment.
 
 Configure under **Settings → Branches → Branch protection rules → Require status checks**.
+The workflow defines the check; repository administrators must require it in the
+repository settings.
+
+## Public API and release metadata
+
+The core acceptance job compares the reviewed extension PHP SPI and Media OS
+declarations with the ABI 1 fixture, and checks the compiled public JavaScript SDK
+exports. Removed or changed declarations require explicit compatibility review;
+additions are reported. This conservative check does not prove runtime behavior,
+every form component method, SDK option-object semantics or stored-data migrations.
+The fixture is a reviewed compatibility contract; routine CI never rewrites it.
+
+Acceptance also verifies every sealed asset against its actual bytes and generates
+a CycloneDX 1.6 inventory of the exact maintainer Composer/npm lockfiles. It includes
+development and optional platform packages. Customer resolutions, optional CDN
+resources and application overrides are outside that inventory.
+
+The unsigned local provenance record binds source/commit identity, lockfiles, the
+SBOM and all sealed asset hashes. The release gate verifies and retains these
+attachments. Successful main/tag push runs then use GitHub's keyless attestation
+service to sign the accepted metadata files. Local hashes are not signatures;
+the separate Sigstore bundle provides signature verification. Pull requests do
+not receive attestation write permissions through a running signing job.
+
+The signed provenance record carries the asset hashes. Compare a downloaded
+asset against its recorded hash after verifying the provenance file's attestation.
+This is not a claim of a particular SLSA level or automatic package publication.
 
 ## Local commands
+
+For a repeatable browser startup profile, run `npm run audit:core:startup --
+--samples=10 --verify-dynamic=true --output=build/core-reports/startup-current.json`. This renders four
+real Filament panel documents in separate Testbench boots and publishes matching
+assets into a disposable directory. No host application routes, assets or data
+are changed. Install the selected Playwright browser first.
+
+The report separates native resources from FLEX, decoded payload from HTTP
+transfer, and fresh contexts from primed HTTP-cache contexts. It also retains
+individual observations, source/release identity and explicit measurement limits.
+The optional dynamic check uses the real native Livewire Action endpoint with
+an isolated file session and deliberately held runtime import. It checks that
+the first modal request waits and its first FLEX field becomes usable.
+Add `--cycles=100` to exercise native modal cancellation and Livewire navigation
+round trips. This checks mounted field/binding disposal, real component-owned
+status timers and released consumer/resource claims. It does not certify every
+capture stream or browser heap. Each required browser acceptance phase runs this
+scenario for Chromium, Firefox or WebKit, alongside its existing browser probes.
+An existing report is never overwritten. This is a local startup profile, not a
+production latency claim or an interaction-performance certificate.
+
+For installation support, `php artisan fff:assets:doctor --published --share`
+exports redacted JSON with specific repair advice. It excludes raw exception
+messages, local paths, file URLs and extension inventories. Ordinary `--json`
+retains local error details and adds the corresponding `diagnosis`. The command
+does not repair assets or test queue/storage/media health.
+
+For Media OS defaults, `php artisan fff:media:doctor --json` inspects media policy,
+original/recovery disks, encryption, staging bounds, lock-store declarations and
+real scheduler registrations. Add `--images` for bundled GD checks, or `--queued`
+with the application's connection, queue and job timeout. `--custom-encoder`
+selects an application encoder profile without resolving its factory. Reports
+separate known configuration failures from operational facts still unverified;
+exit 0 is not an end-to-end deployment certificate. No storage, queue or extension
+operation is invoked. See the customer Media OS diagnostics guide.
+
+For explicitly authorized active checks, `fff:media:probe --write` exercises a
+named disk/cache store or selected bundled image formats with synthetic data.
+Reports include the random diagnostic run ID, redacted findings, repair advice
+and failed-cleanup status. Storage cleanup targets only that run's object;
+cache cleanup never flushes the store or force-releases a foreign owner.
+The process-local probe does not certify workers, sharing between hosts, Spatie
+conversions or application authorization/save/reopen. See the active probes
+section of the Media OS diagnostics guide before choosing production targets.
 
 ```bash
 composer install

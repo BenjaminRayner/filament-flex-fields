@@ -343,7 +343,7 @@ The signatures below show which settings accept closures. Closures use Filament'
 | `dropdownAlign(string\|Closure $align)` | Setup | `start` (`end` for `item-card`) | Align dropdown to the logical start or end of the field |
 | `size(string\|ControlSize\|Closure $size)` | Setup | `'md'` | Control size: `sm`, `md`, `lg` |
 | `rounding(string\|Closure\|null $rounding)` | Setup | config | Border radius token |
-| `focusOutline(bool\|Closure $condition = true)` | Setup | `false` | Enables the optional focus outline on this field |
+| `focusOutline(bool\|Closure $condition = true)` | Setup | `true` | Shows the field focus outline; pass `false` to disable it |
 | `optionGroupSeparators(bool\|Closure $condition = true)` | Presentation | `true` | Dividers between option groups |
 | `disabledOptions(array\|Closure $keys)` | Selection | `[]` | Disable particular keys; combines with `disableOptionWhen()` |
 | `selectionIndicator(bool\|Closure $condition = true)` | Presentation | `true` | Show the selected-row indicator |
@@ -418,7 +418,7 @@ SelectField::make('status')
     ->focusOutline();
 ```
 
-`inlineFieldLabel(false)` restores the outer label. `color(null)` restores the default accent. `rounding(null)` uses the global `ui.field_rounding` setting; `rounding('full')` creates a pill. `focusOutline()` enables the optional outer focus outline and defaults to off.
+`inlineFieldLabel(false)` restores the outer label. `color(null)` restores the default accent. `rounding(null)` uses the global `ui.field_rounding` setting; `rounding('full')` creates a pill. The outer focus outline is enabled by default; `focusOutline(false)` disables it.
 
 #### Secondary text beside the option label
 

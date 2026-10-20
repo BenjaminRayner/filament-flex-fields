@@ -26,6 +26,7 @@ export function installStartupGate({ document, moduleUrl, importModule = url => 
                 throw new Error('FLEX runtime is missing its startup ABI.')
             }
             module.installCoreRuntime({ startup })
+            startup.demand?.stop()
             return module
         }).catch(error => {
             if (flight === current) flight = null

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\Media;
 
 use Bjanczak\FilamentFlexFields\Support\Events\ActivityDispatcher;
+use Bjanczak\FilamentFlexFields\Support\Events\MediaOperationObserved;
 use Bjanczak\FilamentFlexFields\Support\Events\UploadFailed;
 use Bjanczak\FilamentFlexFields\Support\Events\UploadSucceeded;
 use Bjanczak\FilamentFlexFields\Support\Media\Data\MediaFailure;
@@ -186,6 +187,9 @@ final class MediaOs
             : new UploadFailed($intent->field, $intent->adapter, $reason, $intent->kind, $intent->operationId);
 
         $this->activity->dispatch($event);
+        $parent = $intent->metadata['original_operation'] ?? $intent->operationId;
+        $this->activity->dispatch(new MediaOperationObserved($success ? 'stored' : 'rejected',
+            is_string($parent) ? $parent : null, $intent->operationId, reason: $reason));
     }
 
     private function report(Throwable $error): void

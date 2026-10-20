@@ -16,6 +16,8 @@
 }
 
 .fff-segment-tabs {
+    --fff-tabs-radius: 9999px;
+    --fff-tabs-track-background: var(--ft-neutral-track, color-mix(in srgb, var(--color-zinc-100, oklch(96.7% .001 286.375)) 97%, #000 3%));
     @apply relative flex w-full min-w-0 max-w-full flex-col;
 }
 
@@ -41,6 +43,7 @@
 }
 
 .fff-translatable-fields.fff-segment-tabs {
+    --fff-tabs-radius: 9999px;
     @apply min-w-0 max-w-full;
 }
 
@@ -66,4 +69,33 @@
 
 .dark .fff-translatable-fields--bordered .fff-segment-tabs__panel.is-active {
     @apply border-zinc-700 bg-zinc-900;
+}
+
+/* Schema tabs have a separate height scale from single-line form inputs. */
+.fff-segment-tabs > .fff-segment-tabs__control {
+    --fff-track-h-sm: calc(2rem * var(--fff-density-scale, 1));
+    --fff-track-h-md: calc(2.5rem * var(--fff-density-scale, 1));
+    --fff-track-h-lg: calc(3rem * var(--fff-density-scale, 1));
+    --fff-control-h-sm: calc(var(--fff-track-h-sm) - (var(--fff-track-p-sm) * 2));
+    --fff-control-h-md: calc(var(--fff-track-h-md) - (var(--fff-track-p-md) * 2));
+    --fff-control-h-lg: calc(var(--fff-track-h-lg) - (var(--fff-track-p-lg) * 2));
+}
+
+.fff-segment-tabs > .fff-segment-tabs__control :is(
+    .fff-segment-track,
+    .fff-segment-overflow-shell,
+    .fff-segment-item,
+    .fff-segment-indicator
+) {
+    border-radius: var(--fff-tabs-radius, var(--fff-global-radius, 0.75rem));
+}
+
+/* Filled schema rails match Theme; ghost and input SegmentControls stay independent. */
+.dark .fff-segment-tabs {
+    --fff-tabs-track-background: var(--ft-neutral-track, var(--color-zinc-800, oklch(27.4% .006 286.033)));
+}
+
+.fff-segment-tabs > .fff-segment-tabs__control .fff-segment-overflow-shell:not(.fff-segment-overflow-shell--ghost),
+.fff-segment-tabs > .fff-segment-tabs__control .fff-segment-track:not(.fff-segment-track--ghost):not(.fff-segment-track--in-shell) {
+    background-color: var(--fff-tabs-track-background);
 }

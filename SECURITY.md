@@ -7,7 +7,7 @@ before reporting an issue where possible.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 4.x     | In development; not yet publicly released |
+| 4.x     | Security updates for the latest 4.x patch |
 | 3.x     | Security updates for the latest 3.x patch |
 | < 3.0   | No longer supported |
 

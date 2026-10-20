@@ -1,1 +1,1 @@
-"use strict";(()=>{var r=window[Symbol.for("fff.core.startup.v1")],e=document.currentScript?.dataset.fffRuntimeSrc,n=r?r.start():import(e).then(t=>(t.installCoreRuntime(),t));n.catch(()=>document.dispatchEvent(new CustomEvent("fff-core-runtime-error")));})();
+"use strict";(()=>{var r=window[Symbol.for("fff.core.startup.v1")],n=document.currentScript?.dataset.fffRuntimeSrc,e=r?null:import(n).then(t=>(t.installCoreRuntime(),t));e?.catch(()=>document.dispatchEvent(new CustomEvent("fff-core-runtime-error")));})();
