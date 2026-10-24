@@ -6,8 +6,13 @@ import { readRawOptionSnapshot } from '../../options/option-snapshot.js'
 export function createSelectEngineBindingMixin({ engineConfig, userOnChange }) {
     return {
         createSelectEngine(initialSelectedValues) {
+            // Publish the same snapshot the engine receives. Initialization must
+            // not immediately flatten and replace this identical collection again.
+            const options = flattenHeadlessOptions(readRawOptionSnapshot(this.options))
+            this.flatOptions = options
+            this._engineOptionsFingerprint = this.fingerprintHeadlessOptions(options)
             this._engine = createComboboxEngine({
-                options: flattenHeadlessOptions(readRawOptionSnapshot(this.options)),
+                options,
                 multiple: this.multiple,
                 searchable: this.searchable,
                 getOptionLabel: engineConfig.getOptionLabel ?? ((option) => headlessOptionLabelHtml(option, 'dropdown')),

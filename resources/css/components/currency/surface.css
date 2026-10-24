@@ -15,13 +15,15 @@
 }
 .fff-currency-field__currency {
     position: relative; display: flex; flex: none; align-self: stretch;
-    block-size: 100%; margin-inline-start: calc(-1 * var(--fff-flex-text-input-border-width, 1px));
+    block-size: 100%;
 }
 .fff-currency-field__currency-trigger {
     display: inline-flex; align-items: center; justify-content: center; gap: .25rem;
     block-size: 100%; min-block-size: 100%;
     padding-inline: calc(var(--fff-flex-text-input-p) * 1.15) calc(var(--fff-flex-text-input-p) * .85);
-    border: 0; border-radius: 0 var(--fff-global-radius, .75rem) var(--fff-global-radius, .75rem) 0;
+    border: 0; border-radius: var(--fff-flex-text-input-radius, var(--fff-global-radius, .75rem));
+    border-start-start-radius: max(0px, calc(var(--fff-flex-text-input-radius, var(--fff-global-radius, .75rem)) - var(--fff-flex-text-input-border-width, 1px)));
+    border-end-start-radius: max(0px, calc(var(--fff-flex-text-input-radius, var(--fff-global-radius, .75rem)) - var(--fff-flex-text-input-border-width, 1px)));
     background: var(--fff-currency-field-chip-bg); color: var(--fff-flex-text-input-text);
     font-size: var(--fff-flex-text-input-text-size); font-weight: 600; cursor: pointer;
 }

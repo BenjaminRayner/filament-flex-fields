@@ -9,6 +9,7 @@ import { digest, sourceSnapshot } from './acceptance-contract.mjs'
 import { safeReleaseFile, verifyReleaseSeal } from './release-metadata.mjs'
 import { startupCases, startupFields, startupBudgets, startupResourcePolicy, assertStartupResourceBudget, summarizeStartup } from './startup-cost.mjs'
 import { verifyNativeStartupCycles } from './native-startup-cycles.mjs'
+import { verifyNativeSelectPortals } from './native-select-portals.mjs'
 
 const root = path.resolve(import.meta.dirname, '../..')
 let cpuRate = 1, networkProfile = 'loopback', headed = false
@@ -41,16 +42,16 @@ const render = name => JSON.parse(execFileSync(php, ['scripts/core/fixtures/star
     cwd: root, encoding: 'utf8', timeout: 120000, maxBuffer: 8 * 1024 * 1024,
 }).trim())
 const samples = [], serverErrors = []
-let browser, server, failure, failedSample, environment, rendering, dynamicMount, nativeLifecycle, nestedModal, returningFilamentTab
+let browser, server, failure, failedSample, environment, rendering, dynamicMount, nativeLifecycle, nestedModal, returningFilamentTab, selectPortals
 try {
     environment = render('publish')
-    const pages = [...startupCases, ...(verifyDynamic ? ['dynamic', 'tabs'] : [])].map(render)
+    const pages = [...startupCases, ...(verifyDynamic ? ['dynamic', 'tabs', 'portal', 'portal-page'] : [])].map(render)
     const cookies = Object.fromEntries(pages.map(page => [page.case, page.cookies]))
     // Fixture session cookies stay ephemeral, never in the exported evidence.
     rendering = pages.map(({ cookies: ignored, ...page }) => page)
     // Use the installed Livewire distribution, never a replacement Alpine runtime.
     const livewire = path.join(root, 'vendor/livewire/livewire/dist/livewire.min.js')
-    const html = Object.fromEntries([...startupCases, ...(verifyDynamic ? ['dynamic', 'tabs'] : [])].map(name => [name, fs.readFileSync(path.join(directory, name + '.html'), 'utf8')]))
+    const html = Object.fromEntries([...startupCases, ...(verifyDynamic ? ['dynamic', 'tabs', 'portal', 'portal-page'] : [])].map(name => [name, fs.readFileSync(path.join(directory, name + '.html'), 'utf8')]))
     let nativeRequests = 0
     server = createServer((request, response) => {
         const url = new URL(request.url, 'http://localhost')
@@ -301,6 +302,7 @@ try {
             await page.waitForFunction(() => window.FffAssetInjector.getConsumerGraph().getActiveConsumerIds().length === 1)
             nestedModal = { passed: true, childAndParentOwners: nestedOwners, remainingParentOwners: 1, parentValuePreserved: true }
             if (cycles) nativeLifecycle = await verifyNativeStartupCycles(page, cycles)
+            selectPortals = await verifyNativeSelectPortals(page, origin)
             assert.deepEqual(errors, [])
         } catch (error) {
             dynamicMount = { passed: false, nativeRequests, errors,
@@ -356,7 +358,7 @@ finally {
             'Fixture-only wrappers measure real FlexTextInput init promises; instrumentation and V8 tracing add overhead. Parse/compile event durations may overlap.',
             'PHP boot/render metrics are single observations; browser distributions are repeated.'],
         cpuRate, networkProfile, headed, networkEmulation: networkProfile === 'cdn-simulated' ? { latencyMs: 80, downloadMbps: 20, uploadMbps: 5, actualCdn: false } : null,
-        repetitions, samples, dynamicMount, nestedModal, returningFilamentTab, nativeLifecycle, serverErrors, ...(failure ? { error: failure.stack, failedSample } : { summary: summarizeStartup(samples, repetitions) }) }
+        repetitions, samples, dynamicMount, nestedModal, returningFilamentTab, nativeLifecycle, selectPortals, serverErrors, ...(failure ? { error: failure.stack, failedSample } : { summary: summarizeStartup(samples, repetitions) }) }
     fs.mkdirSync(path.dirname(output), { recursive: true }); fs.writeFileSync(output, JSON.stringify(report, null, 2) + '\n')
     fs.rmSync(directory, { recursive: true, force: true })
     if (!failure) console.log(JSON.stringify({ passed: true, sourceSha256: report.sourceSha256, release: seal.release,

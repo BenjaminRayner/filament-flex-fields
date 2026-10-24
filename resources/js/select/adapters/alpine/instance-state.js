@@ -7,6 +7,11 @@ export function createSelectInstanceState() {
         triggerLabelEpoch: 0,
         _knownLabelEntries: new Map(),
         comboboxOpen: false,
+        // The field initializes eagerly; a closed standard Select menu mounts
+        // once on first intent and stays owned by this instance until destroy.
+        headlessMenuMounted: false,
+        prepareHeadlessPortal: null,
+        _focusFirstMountedMenu: false,
         inlineSearchFocused: false,
         comboboxQuery: '',
         comboboxHighlightedIndex: -1,
@@ -21,6 +26,7 @@ export function createSelectInstanceState() {
         checkExitTick: 0,
         menuTriggerResizeObserver: null,
         menuOptionsResizeObserver: null,
+        _dropdownOverflowFrame: null,
         virtualScrollTick: 0,
         virtualRowWindowStart: 0,
         _userHasMutatedSelection: false,

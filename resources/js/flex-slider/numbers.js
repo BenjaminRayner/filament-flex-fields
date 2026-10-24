@@ -1,12 +1,12 @@
 import { normalizeLocale } from '../core/number-format.js'
+import { displayNumber, displayPrecision } from './value.js'
 
 /** The same NumberFlow custom element and shared module used by NumberStepper. */
 export function createSliderNumbers(root, config, reduced) {
     const entries = [...root.querySelectorAll('[data-slider-number]')].map(node => ({ node, flow: node.querySelector('number-flow'), previous: null }))
     let initial = true, disposed = false
     entries.forEach(({ flow }) => {
-        const precision = config.decimalPlaces ?? (Number.isInteger(config.step) && config.step !== null ? 0 : null)
-        flow.format = { minimumFractionDigits: precision ?? 0, maximumFractionDigits: precision ?? 20, useGrouping: !!config.locale }
+        flow.format = { minimumFractionDigits: config.decimalPlaces ?? 0, maximumFractionDigits: displayPrecision(config), useGrouping: !!config.locale }
         flow.locales = normalizeLocale(config.locale)
         flow.numberPrefix = config.prefix ?? ''; flow.numberSuffix = config.suffix ?? ''
         flow.transformTiming = { duration: 380, easing: 'cubic-bezier(.22,1,.36,1)' }
@@ -17,7 +17,7 @@ export function createSliderNumbers(root, config, reduced) {
         update(values) {
             if (disposed) return
             entries.forEach(entry => {
-                const value = values[Number(entry.node.dataset.sliderNumber)] ?? values[0]
+                const value = displayNumber(values[Number(entry.node.dataset.sliderNumber)] ?? values[0], config)
                 if (entry.previous === value) return
                 entry.flow.animated = !initial && !reduced()
                 entry.flow.update(value)

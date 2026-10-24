@@ -1,4 +1,4 @@
-@props(['field' => null, 'dynamicId' => false, 'controlId' => null, 'label' => '', 'searchable' => false, 'inlineSearch' => false, 'grid' => false, 'optionView' => null, 'loadingView' => null, 'loadMoreView' => null, 'rendererData' => [], 'panelClasses' => [], 'panelStyle' => null, 'recycleRows' => false])
+@props(['field' => null, 'ownerField' => null, 'dynamicId' => false, 'controlId' => null, 'label' => '', 'searchable' => false, 'inlineSearch' => false, 'grid' => false, 'optionView' => null, 'loadingView' => null, 'loadMoreView' => null, 'rendererData' => [], 'panelClasses' => [], 'panelStyle' => null, 'recycleRows' => false])
 @php
     $headlessComponentKey = $field?->getKey() ?? $controlId;
     $statePath = $field?->getStatePath() ?? $controlId;
@@ -20,5 +20,10 @@
     $canOptionLabelsWrap = $field?->canOptionLabelsWrap() ?? false;
     $headlessSearchClearIconHtml = \Filament\Support\generate_icon_html($field?->getClearIcon() ?? 'hugeicons-multiplication-sign')?->toHtml() ?? '';
     $headlessSmartCreateIconHtml = \Filament\Support\generate_icon_html('hugeicons-plus-sign')?->toHtml() ?? '';
+    $composedTransport = $ownerField ? app(\Bjanczak\FilamentFlexFields\Support\Select\Bootstrap\RenderedSelectMenu::class)->composedTransport($ownerField, get_defined_vars()) : null;
 @endphp
-@include('filament-flex-fields::forms.components.partials.select-field.menu-shell')
+@if ($composedTransport)
+    <template x-if="headlessMenuMounted" data-fff-portal-template-owner @if ($composedTransport['id']) data-fff-portal-template-id="{{ $composedTransport['id'] }}" @endif>{!! $composedTransport['html'] !!}</template>
+@else
+    @include('filament-flex-fields::forms.components.partials.select-field.menu-shell')
+@endif

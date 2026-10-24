@@ -301,7 +301,7 @@ return [
         ],
         'segment-control' => [
             'label' => 'Controllo segmento',
-            'description' => 'Controllo segmentato a selezione singola in stile IOS con indicatori scorrevoli, icone ed espansione di etichette animate.',
+            'description' => 'Controllo segmentato a selezione singola con indicatori scorrevoli, icone ed espansione di etichette animate.',
         ],
         'segment-tabs' => [
             'label' => 'Schede Segmento',

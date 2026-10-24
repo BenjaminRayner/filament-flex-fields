@@ -110,6 +110,7 @@
 .fff-dt-range__summary { display:grid; min-width:0; gap:1px; font-weight:500; font-variant-numeric:tabular-nums; }
 .fff-dt-range__summary > span { white-space:nowrap; }
 .fff-dt-range__summary > small { min-height:1.4em; color:var(--fff-dt-muted); font-size:12px; font-weight:400; }
+.fff-dt-range__summary > small:empty { display:none; }
 .fff-dt-range__actions { display:flex; flex:none; gap:6px; }
 .fff-dt-range__actions > button { height:36px; padding:0 14px; border:0; border-radius:18px; background:transparent; color:var(--fff-dt-ink); font:inherit; font-weight:500; cursor:pointer; }
 .fff-dt-range__actions > button:hover { background:var(--fff-dt-hover); }

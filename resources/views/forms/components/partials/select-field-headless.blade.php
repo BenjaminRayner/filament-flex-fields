@@ -1,10 +1,9 @@
 @php
     use Bjanczak\FilamentFlexFields\Support\FlexIcon;
     use Filament\Support\Enums\IconSize;
-    use Illuminate\Support\Js;
 
-    $headlessSearchClearIconHtml = \Filament\Support\generate_icon_html(FlexIcon::CircleXmarkFill, size: IconSize::Small)?->toHtml() ?? '';
-    $headlessSmartCreateIconHtml = \Filament\Support\generate_icon_html(FlexIcon::Plus, size: IconSize::Small)?->toHtml() ?? '';
+    $headlessSearchClearIconHtml = app(\Bjanczak\FilamentFlexFields\Support\Rendering\RenderedControlIcon::class)->render(FlexIcon::CircleXmarkFill, size: IconSize::Small);
+    $headlessSmartCreateIconHtml = app(\Bjanczak\FilamentFlexFields\Support\Rendering\RenderedControlIcon::class)->render(FlexIcon::Plus, size: IconSize::Small);
     $headlessComponentKey = $getKey();
     $headlessTriggerDir = $getExtraAttributeBag()->get('dir');
     $headlessInlineSearchSsrValue = ($isInlineSearch && $isSearchable && ! $isMultiple)
@@ -18,7 +17,14 @@
     $headlessListboxId = $id.'-listbox';
     $headlessSearchId = $id.'-search';
     $headlessMenuDomId = $id.'-fff-headless-menu';
-    $headlessAlpineConfig = $getHeadlessAlpineConfig();
+    if (! ($reuseInitialPresentation ?? false)) {
+        $headlessAlpineConfig = $getHeadlessAlpineConfig();
+    }
+    $headlessTransportConfig = app(\Bjanczak\FilamentFlexFields\Support\Rendering\CatalogPayloadTransport::class)->configuration($field, $headlessAlpineConfig);
+    $headlessStockMenu = in_array(get_class($field), [\Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField::class, \Bjanczak\FilamentFlexFields\Filament\Forms\Components\CountryField::class, \Bjanczak\FilamentFlexFields\Filament\Forms\Components\TimezoneField::class], true);
+    $headlessMenuTransport = $headlessStockMenu
+        ? app(\Bjanczak\FilamentFlexFields\Support\Select\Bootstrap\RenderedSelectMenu::class)->transport($field, get_defined_vars())
+        : null;
 @endphp
 
 <div
@@ -52,14 +58,15 @@
     @endif
 
         <div
+            @if ($headlessTransportConfig['presentationConfigurationId'] ?? null) data-fff-control-configuration-id="{{ $headlessTransportConfig['presentationConfigurationId'] }}" @endif
+            @if ($headlessMenuTransport['id'] ?? null) data-fff-portal-template-id="{{ $headlessMenuTransport['id'] }}" @endif
             x-fff-load
             x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('select-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
             x-data="fffHeadlessSelectField({
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
-            ...{{ Js::from($headlessAlpineConfig) }},
-        })"
+        }, $el)"
             x-on:keydown="onHeadlessMenuKeydown($event)"
-            x-on:click.outside="if (isEventInsideHeadlessMenu($event)) { return }; comboboxCloseMenu({ immediate: true, reason: 'outside' })"
+            x-on:click.outside="if (!comboboxOpen || isEventInsideHeadlessMenu($event)) { return }; comboboxCloseMenu({ immediate: true, reason: 'outside' })"
             @class([
                 'fff-select-field__interactive',
             ])
@@ -69,9 +76,16 @@
                     ->merge($getExtraAlpineAttributes(), escape: false)
             }}
         >
+        <template data-fff-select-configuration>{!! json_encode($headlessTransportConfig, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR) !!}</template>
         @include('filament-flex-fields::forms.components.partials.select-field.trigger')
 
-        @include('filament-flex-fields::forms.components.partials.select-field.menu-shell')
+        @if ($headlessStockMenu)
+            <template x-if="headlessMenuMounted" data-fff-portal-template-owner>
+                {!! $headlessMenuTransport['html'] !!}
+            </template>
+        @else
+            @include('filament-flex-fields::forms.components.partials.select-field.menu-shell')
+        @endif
         </div>
 
     @if ($shouldDeferHeadlessAlpine)

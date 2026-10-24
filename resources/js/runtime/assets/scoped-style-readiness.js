@@ -2,11 +2,38 @@ const GUARD_GROUP = '(--fff-asset-paint-guard:1)'
 const FALLBACK_GROUP = '(--fff-asset-paint-fallback:1)'
 const condition = rule => rule.conditionText?.replace(/\s/g, '')
 
-/** Progressive CSS-only scoping. Consumer readiness stays entirely data-owned;
- * no observer, flag or async task is responsible for sealing newly inserted HTML.
+/** Progressive root annotation. Readiness remains per marker and CSS owns the
+ * opacity seal; unsupported/CSP-blocked annotation retains the full fallback.
  */
-export function enableScopedStyleReadiness({ document, window }) {
+function createScopedStyleReadiness({ document, window }) {
     if (typeof window.CSSScopeRule !== 'function') return () => {}
+    const Observer = window.MutationObserver
+    if (typeof Observer !== 'function') return () => {}
+    // Presentation identity only: CSS readiness still belongs to each marker.
+    // The generic parent opacity seal stays installed even before annotation.
+    const mark = batch => {
+        const owner = batch.parentElement
+        if (owner && !['HTML', 'BODY'].includes(owner.tagName) && !owner.hasAttribute('data-fff-paint-owner')) {
+            owner.setAttribute('data-fff-paint-owner', '')
+        }
+    }
+    const annotate = root => {
+        if (root.matches?.('[data-fff-asset-batch]')) mark(root)
+        for (const batch of root.querySelectorAll?.('[data-fff-asset-batch]') ?? []) mark(batch)
+    }
+    const observer = new Observer(mutations => {
+        const roots = new Set()
+        for (const mutation of mutations) for (const node of mutation.addedNodes) {
+            if (node.nodeType === 1) roots.add(node)
+        }
+        for (const root of roots) {
+            let ancestor = root.parentElement
+            while (ancestor && !roots.has(ancestor)) ancestor = ancestor.parentElement
+            if (!ancestor) annotate(root)
+        }
+    })
+    observer.observe(document, { subtree: true, childList: true })
+    annotate(document)
     const inspected = new WeakSet()
     const retired = new Map()
     let disposed = false
@@ -54,8 +81,32 @@ export function enableScopedStyleReadiness({ document, window }) {
     return () => {
         if (disposed) return
         disposed = true
+        observer.disconnect()
         document.removeEventListener?.('load', loaded, true)
         for (const [group, entries] of retired) restore(group, entries)
         retired.clear()
+    }
+}
+
+// The blocking stylesheet helper lends its inspection to the first runtime
+// retainer. No field readiness or factory is installed by this early lease.
+const documents = new WeakMap()
+
+export function primeScopedStyleReadiness({ document, window }) {
+    if (documents.has(document)) return
+    documents.set(document, { users: 0, dispose: createScopedStyleReadiness({ document, window }) })
+}
+
+export function enableScopedStyleReadiness({ document, window }) {
+    primeScopedStyleReadiness({ document, window })
+    const context = documents.get(document)
+    context.users++
+    let retained = true
+    return () => {
+        if (!retained) return
+        retained = false
+        if (--context.users) return
+        context.dispose()
+        documents.delete(document)
     }
 }

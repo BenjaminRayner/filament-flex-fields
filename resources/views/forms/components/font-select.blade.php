@@ -6,7 +6,7 @@
     $previewSelectedFont = $field->isSelectedFontPreviewEnabled();
     $configuration = [
         'seed' => $seed, 'tabs' => $field->getFontCategoryTabs(), 'perPage' => $field->getFontPerPage(),
-        'componentKey' => $getKey(), 'livewireId' => $field->getLivewire()->getId(), 'menuDomId' => $controlId.'-fff-headless-menu',
+        'menuLabel' => (string) $getLabel(), 'componentKey' => $getKey(), 'livewireId' => $field->getLivewire()->getId(), 'menuDomId' => $controlId.'-fff-headless-menu',
         'disabled' => $locked, 'clearable' => $isClearable(), 'placeholder' => $getPlaceholder(),
         'previewSelectedFont' => $previewSelectedFont,
         'labels' => ['search' => __('filament-flex-fields::font-select.search'), 'empty' => __('filament-flex-fields::font-select.empty'),
@@ -22,7 +22,7 @@
         <div wire:ignore wire:key="{{ $getLivewireKey() }}.font.{{ hash('xxh128', serialize([$field->getFontPolicy(), $field->getFontPreviewPolicy(), $previewSelectedFont, $field->getFontCategoryTabs(), $field->getFontPerPage(), \Bjanczak\FilamentFlexFields\Support\Fonts\Providers\GoogleFonts::revision()])) }}"
             class="fi-select-input fff-font-select" x-fff-load
             x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('font-select', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-            x-data="fontSelectFormComponent({ ...@js($configuration), state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }} })"
+            x-data="fontSelectFormComponent({ ...@js($configuration), state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }} }, $el)"
             x-on:keydown="onHeadlessMenuKeydown($event)"
             x-on:click.outside="if (!isEventInsideHeadlessMenu($event)) comboboxCloseMenu({ immediate:true, reason:'outside' })">
             @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'font-select', 'livewireKey' => $getLivewireKey()])
@@ -42,7 +42,7 @@
                     </button>
                 @endif
             </div>
-            <x-filament-flex-fields::select-menu :control-id="$controlId" :label="$getLabel()" :searchable="true"
+            <x-filament-flex-fields::select-menu :owner-field="$field" :control-id="$controlId" :label="$getLabel()" :searchable="true"
                 option-view="filament-flex-fields::forms.components.partials.font-select.option"
                 :panel-classes="['fff-font-select__menu']" :recycle-rows="true">
                 <x-slot:toolbar>

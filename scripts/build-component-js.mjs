@@ -52,7 +52,7 @@ await withComponentOutputLock(packageRoot, async lease => {
             // Facades import their synchronous owner from the same directory.
             // Normalize only its graph key; do not encode the source output
             // directory in emitted browser URLs and shorten attribution later.
-            if (edge.external && /^\.\/chunk-first-paint-(segment|timezone)-[a-f0-9]{64}\.js$/.test(edge.path)) {
+            if (edge.external && /^\.\/chunk-first-paint-(segment|timezone|readiness)-[a-f0-9]{64}\.js$/.test(edge.path)) {
                 edge.path = `resources/dist/components/${edge.path.slice(2)}`
             }
             if (!Object.hasOwn(result.metafile.outputs, edge.path)) continue
@@ -71,7 +71,7 @@ await withComponentOutputLock(packageRoot, async lease => {
         const modules = inputs.map((input) => virtualInputs.get(input)?.identity ?? path.relative(jsRoot, path.resolve(packageRoot, input)))
             .filter((relative) => !relative.startsWith('..')).sort()
         chunkModules[name] = { modules, inputs }
-        const firstPaint = name.match(/^chunk-first-paint-(segment|timezone)-([a-f0-9]{64})\.js$/)
+        const firstPaint = name.match(/^chunk-first-paint-(segment|timezone|readiness)-([a-f0-9]{64})\.js$/)
         if (firstPaint) {
             renameMap[name] = `flex-fields-first-paint-${firstPaint[1]}-${firstPaint[2]}.js`
             continue

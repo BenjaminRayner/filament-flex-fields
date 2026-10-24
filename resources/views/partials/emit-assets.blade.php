@@ -22,33 +22,37 @@
         $consumerComponent = $stylesheets[0] ?? $chunks[0] ?? $externalStylesheets[0] ?? 'asset-batch';
     }
 
-    $stylesheetHrefs = array_map(
+    $preparedAssetPlan = $preparedAssetPlan ?? null;
+    if ($preparedAssetPlan !== null && ! $preparedAssetPlan instanceof \Bjanczak\FilamentFlexFields\Support\Assets\Rendering\RenderedAssetPlan) {
+        throw new \InvalidArgumentException('Expected immutable rendered asset metadata.');
+    }
+    $stylesheetHrefs = $preparedAssetPlan?->stylesheets ?? array_map(
         static fn (string $stylesheet): string => FlexFieldAssets::stylesheetHref($stylesheet),
         $stylesheets,
     );
-    $chunkHrefs = array_map(
+    $chunkHrefs = $preparedAssetPlan?->chunks ?? array_map(
         static fn (string $chunk): string => FlexFieldAssets::alpineChunkSrc($chunk),
         $chunks,
     );
     $stylesheetHrefs = array_values(array_unique([...$stylesheetHrefs, ...$externalStylesheets]));
     $deliveryPolicy = app(\Bjanczak\FilamentFlexFields\Support\Assets\Delivery\AssetDeliveryContext::class)->policy();
-    foreach ([...$stylesheetHrefs, ...$chunkHrefs] as $resourceUrl) {
+    foreach ($preparedAssetPlan !== null ? $externalStylesheets : [...$stylesheetHrefs, ...$chunkHrefs] as $resourceUrl) {
         $deliveryPolicy->attributes($resourceUrl, request()->getSchemeAndHttpHost());
     }
     $consumerAttributes = filled($consumerComponent)
         ? FlexFieldAssets::consumerAttributesForComponent((string) $consumerComponent, $livewireKey)
         : [];
-    $assetSizes = [];
-    $factoryOwners = $factoryOwners ?? [];
+    $assetSizes = $preparedAssetPlan?->sizes ?? [];
+    $factoryOwners = $preparedAssetPlan?->factoryOwners ?? $factoryOwners ?? [];
 
-    foreach ($stylesheets as $index => $stylesheet) {
+    foreach ($preparedAssetPlan !== null ? [] : $stylesheets as $index => $stylesheet) {
         $bytes = FlexFieldAssets::stylesheetBytes($stylesheet);
         if ($bytes !== null) {
             $assetSizes[$stylesheetHrefs[$index]] = $bytes;
         }
     }
 
-    foreach ($chunks as $index => $chunk) {
+    foreach ($preparedAssetPlan !== null ? [] : $chunks as $index => $chunk) {
         $bytes = FlexFieldAssets::chunkBytes($chunk);
         if ($bytes !== null) {
             $assetSizes[$chunkHrefs[$index]] = $bytes;
@@ -62,7 +66,7 @@
         if (! $planDictionary instanceof \Bjanczak\FilamentFlexFields\Support\Assets\Rendering\AssetPlanDictionary) {
             throw new \InvalidArgumentException('Expected a fragment asset plan dictionary.');
         }
-        $renderedPlanId = $planDictionary->register(new \Bjanczak\FilamentFlexFields\Support\Assets\Rendering\RenderedAssetPlan(
+        $renderedPlanId = $planDictionary->register($preparedAssetPlan !== null && $externalStylesheets === [] ? $preparedAssetPlan : new \Bjanczak\FilamentFlexFields\Support\Assets\Rendering\RenderedAssetPlan(
             (string) $consumerComponent, $stylesheetHrefs, $chunkHrefs, $assetSizes, $factoryOwners,
         ));
     }

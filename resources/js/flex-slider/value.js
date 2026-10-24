@@ -32,11 +32,16 @@ export function formatValue(value, config, index = 0, tooltip = false) {
     if (tooltip && custom && typeof custom.to === 'function') return String(custom.to(value))
     let formatter = formatters.get(config)
     if (!formatter) {
-        const precision = config.decimalPlaces ?? (config.step && Number.isInteger(config.step) ? 0 : null)
-        formatter = createDecimalFormatter({ locale: config.locale, decimalPlaces: precision })
+        if (!config.locale && config.decimalPlaces == null) {
+            const precision = displayPrecision(config)
+            formatter = value => {
+                const text = value.toFixed(precision)
+                return precision ? text.replace(/\.?0+$/, '') : text
+            }
+        } else formatter = createDecimalFormatter({ locale: config.locale, decimalPlaces: config.decimalPlaces ?? null })
         formatters.set(config, formatter)
     }
-    return (config.prefix ?? '') + formatter(value) + (config.suffix ?? '')
+    return (config.prefix ?? '') + formatter(displayNumber(value, config)) + (config.suffix ?? '')
 }
 export function keyboardValue(event, value, config) {
     const step = config.step ?? (config.maxValue - config.minValue) / 100
@@ -71,4 +76,15 @@ export function valueAtRatio(position, config) {
         }
     }
     return config.maxValue
+}
+
+/** Display precision is independent of continuous input and submitted values. */
+export function displayPrecision(config) {
+    if (config.decimalPlaces != null) return config.decimalPlaces
+    const [mantissa, exponent = '0'] = String(config.step ?? 1).toLowerCase().split('e')
+    return clamp((mantissa.split('.')[1]?.length ?? 0) - Number(exponent), 0, 20)
+}
+
+export function displayNumber(value, config) {
+    return Number(value.toFixed(displayPrecision(config))) || 0
 }

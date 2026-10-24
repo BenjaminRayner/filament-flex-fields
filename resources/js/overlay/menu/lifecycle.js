@@ -144,6 +144,11 @@ export function createMenuLifecycleMixin({ openKey, readyKey, ownerIdPrefix, min
                                     return
                                 }
 
+                                // A menu mounted by the first open intent becomes
+                                // available after Alpine's DOM flush. Claim its
+                                // actual focus boundary before revealing it.
+                                mountOwnedMenuPortal(this.resolveMenuPortalAnchor?.() ?? this._pickerHostElement, menu)
+
                                 const overlayMode = (this.resolveMenuPresentation?.() ?? resolveOverlayMode(window))
 
                                 applyOverlayPresentation(menu, overlayMode)
@@ -190,6 +195,7 @@ export function createMenuLifecycleMixin({ openKey, readyKey, ownerIdPrefix, min
                                     playSheetEnter(menu)
                                     this.syncOpenOverlaySheetEnvironment('sheet', menu)
                                 }
+                                this.onMenuSurfaceAnchored?.()
                                 // readyKey is set by scheduleMenuPosition after onAnchored returns
                                 // so first paint already includes overlay geometry.
 

@@ -744,6 +744,8 @@ FlexSlider::make('optional_limit')
 
 `decimalPlaces()` accepts 0–20 and sets rounding/display precision. It does not define increments: use `step()` for that. Choose a step compatible with your precision, such as `step(0.25)->decimalPlaces(2)`. Steps are multiples of the step value: with `range(1, 10)->step(2)`, permitted values are 2, 4, 6, 8 and 10. Set bounds and defaults on that same grid. A non-linear segment can have its own step, but submitted values must also pass the field's configured Laravel step rules.
 
+Without `decimalPlaces()`, readouts display whole numbers for continuous sliders and use the fractional precision of `step()` when provided. This display rounding also applies to initial values and accessible value text; it does not round a continuous slider's stored value. Set `decimalPlaces()` explicitly when you need a fixed number of decimal places. Custom JavaScript tooltip formatters continue to receive the actual numeric value.
+
 ## Schema option reference
 
 Use PHP configuration for advanced combinations such as non-linear scales, pips formatters and per-handle tooltip formats. The saved FLEX schema exposes the following slider options; JavaScript functions and PHP closures do not belong in JSON.

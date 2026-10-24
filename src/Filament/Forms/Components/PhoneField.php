@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldFocusOutline;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
+use Bjanczak\FilamentFlexFields\Concerns\RendersStockFieldView;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Phone\ConfiguresPhone;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Phone\NormalizesPhoneState;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Phone\PresentsPhone;
@@ -27,6 +28,7 @@ class PhoneField extends Field
     use HasPlaceholder;
     use NormalizesPhoneState;
     use PresentsPhone;
+    use RendersStockFieldView;
     use ResolvesPhoneCatalog;
 
     protected string $view = 'filament-flex-fields::forms.components.phone-field';

@@ -90,7 +90,7 @@
     border-radius: var(--fff-tabs-radius, var(--fff-global-radius, 0.75rem));
 }
 
-/* Filled schema rails match Theme; ghost and input SegmentControls stay independent. */
+/* Filled schema rails and input SegmentControls share Theme's neutral track. */
 .dark .fff-segment-tabs {
     --fff-tabs-track-background: var(--ft-neutral-track, var(--color-zinc-800, oklch(27.4% .006 286.033)));
 }

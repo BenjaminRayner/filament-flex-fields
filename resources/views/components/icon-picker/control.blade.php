@@ -1,7 +1,7 @@
         <div wire:ignore wire:key="{{ $getLivewireKey() }}.icon.{{ hash('xxh128', serialize([array_diff_key($configuration, array_flip(['initialSelectedName', 'initialSelectedHtml'])), $field->getVariant()])) }}"
             @class(['fff-icon-select', 'fi-select-input' => !$inline, 'fff-icon-select--inline' => $inline]) x-fff-load
             x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('icon-picker-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-            x-data="iconPickerFieldFormComponent({ ...@js($configuration), state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }} })"
+            x-data="iconPickerFieldFormComponent({ ...@js($configuration), state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }} }, $el)"
             x-on:keydown="onHeadlessMenuKeydown($event)"
             x-on:click.outside="if (!isEventInsideHeadlessMenu($event)) comboboxCloseMenu({ immediate:true, reason:'outside' })">
             @include('filament-flex-fields::partials.load-stylesheet', ['component' => 'icon-picker-field', 'livewireKey' => $getLivewireKey(), 'capabilities' => $inline ? ['inline'] : []])
@@ -35,7 +35,7 @@
                 @endif
             </div>
             @endif
-            <x-filament-flex-fields::select-menu :control-id="$controlId" :label="$getLabel()" :searchable="true" :grid="$layout !== 'list'"
+            <x-filament-flex-fields::select-menu :owner-field="$field" :control-id="$controlId" :label="$getLabel()" :searchable="true" :grid="$layout !== 'list'"
                 option-view="filament-flex-fields::forms.components.partials.icon-select.option"
                 loading-view="filament-flex-fields::forms.components.partials.icon-select.loading"
                 load-more-view="filament-flex-fields::forms.components.partials.icon-select.loading-more"

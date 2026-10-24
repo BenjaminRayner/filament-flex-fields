@@ -1,4 +1,4 @@
-import { createOwnedSubscriptions } from '../lifecycle/owned-subscriptions.js'
+import { createOwnedSubscriptions } from '../lifecycle/callback-effects.js'
 
 const PHASES = new Set(['boot', 'transport', 'preparation', 'evaluation', 'init', 'ownership', 'cleanup', 'callback', 'observer'])
 const CODES = new Set(['asset_load_failed', 'asset_policy_failed', 'asset_timeout', 'asset_cancelled', 'owner_plan_failed', 'module_import_failed', 'factory_init_failed', 'cleanup_failed', 'callback_failed', 'callback_contract_failed', 'observer_failed'])

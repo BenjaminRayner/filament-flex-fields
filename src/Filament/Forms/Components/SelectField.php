@@ -8,6 +8,7 @@ use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldFocusOutline;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
 use Bjanczak\FilamentFlexFields\Concerns\InteractsWithRestrictedModelQueries;
+use Bjanczak\FilamentFlexFields\Concerns\RendersStockFieldView;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\HasSelectFieldIcons;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectField\ConfiguresSelectDependencies;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectField\ConfiguresSelectPresentation;
@@ -45,6 +46,7 @@ class SelectField extends Select
     use InteractsWithSelectOptionTransport;
     use InteractsWithSelectTriggerPresentation;
     use RendersSelectOptionViews;
+    use RendersStockFieldView;
     use TransformsSelectRichOptions;
     use ValidatesSelectValues;
 

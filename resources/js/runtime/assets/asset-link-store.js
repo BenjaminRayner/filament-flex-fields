@@ -2,7 +2,7 @@ import { resolveAssetUrl, STYLESHEET_SELECTOR, CHUNK_SELECTOR } from './asset-ur
 import { retainAssetAdmission } from './shared-admission.js'
 import { getRuntimeState } from '../runtime-state.js'
 import { assertResourceKind } from './resource-descriptor.js'
-import { createOwnedSubscriptions } from '../lifecycle/owned-subscriptions.js'
+import { createOwnedSubscriptions } from '../lifecycle/callback-effects.js'
 import { createAssetStoreClients } from './asset-store-clients.js'
 import { retainRuntimeDiagnostics } from '../diagnostics/document-diagnostics.js'
 import { createStylesheetOrder } from './stylesheet-order.js'

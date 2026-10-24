@@ -26,7 +26,8 @@ function firstPaintCheck(bool $condition, string $message): void
 $state = $app->make(FirstPaintScripts::class);
 $segment = [FlexFieldAssets::segmentOverflowSsrInlineContents(), FlexFieldAssets::segmentOverflowSsrInlineContents()];
 $timezone = [FlexFieldAssets::timezoneBrowserSsrInlineContents(), FlexFieldAssets::timezoneBrowserSsrInlineContents()];
-foreach (['segment' => $segment, 'timezone' => $timezone] as $name => $scripts) {
+$readiness = [$state->inline('readiness'), $state->inline('readiness')];
+foreach (['segment' => $segment, 'timezone' => $timezone, 'readiness' => $readiness] as $name => $scripts) {
     firstPaintCheck(str_starts_with($scripts[0], '// fff-first-paint:'.$name.':'), 'First boundary did not emit synchronous owner.');
     firstPaintCheck(! str_contains($scripts[1], 'Object.freeze') && strlen($scripts[1]) < 400, 'Repeated boundary copied implementation.');
     firstPaintCheck(str_contains($scripts[1], 'api.paint(document.currentScript)'), 'Repeated boundary lost its own local boot.');
@@ -40,7 +41,7 @@ firstPaintCheck(FlexFieldAssets::segmentOverflowSsrInlineContents() === $segment
 firstPaintCheck(FlexFieldAssets::timezoneBrowserSsrInlineContents() === $timezone[0], 'Timezone emission leaked across scopes.');
 $manifest = new AlpineBuildManifest;
 $registered = (new AssetRegistration)->scripts();
-foreach ([FlexFieldAssets::SEGMENT_OVERFLOW_SSR_SCRIPT_ID => 'segment', FlexFieldAssets::TIMEZONE_BROWSER_SSR_BOOT_SCRIPT_ID => 'timezone'] as $id => $name) {
+foreach ([FlexFieldAssets::SEGMENT_OVERFLOW_SSR_SCRIPT_ID => 'segment', FlexFieldAssets::TIMEZONE_BROWSER_SSR_BOOT_SCRIPT_ID => 'timezone', 'flex-fields-scoped-style-readiness' => 'readiness'] as $id => $name) {
     $asset = array_values(array_filter($registered, fn ($asset): bool => $asset->getId() === $id))[0];
     $chunk = $manifest->firstPaintFile($name);
     firstPaintCheck(str_ends_with($asset->getRelativePublicPath(), '/components/'.$chunk), 'Helper publishes duplicate alias URL.');

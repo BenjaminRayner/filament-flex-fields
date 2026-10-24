@@ -12,14 +12,16 @@ export function createSelectMenu() { return createSearchableSelectMenuMixin({
     ownerIdPrefix: 'fff-headless-select',
     minMenuWidth: 288,
     onMenuClose() {
+        const preserveQuery = this.shouldPreserveHeadlessQueryAfterClose?.() === true
         this._engine?.close?.()
         this.comboboxHighlightedIndex = -1
         this._highlightedDisplayRowKey = null
         this.inlineSearchFocused = false
-        this._engine?.setQuery?.('')
+        if (!preserveQuery) this._engine?.setQuery?.('')
         this.cancelRelationshipSearch?.()
         this._syncFromEngine()
 
+        if (preserveQuery) return
         if (typeof this.usesInlineSearchTriggerInput === 'function' && this.usesInlineSearchTriggerInput()) {
             this.syncInlineSearchInputAfterClose()
         } else {

@@ -93,7 +93,10 @@ trait PresentsSlider
         if ($value === null && $this->isRangeState()) {
             return implode(' – ', array_map($this->formatDisplayValue(...), $this->getNormalizedStateValues()));
         }
-        $number = $this->normalizeNumeric($value ?? $this->getNormalizedStateValues()[0]);
+        $number = round($this->normalizeNumeric($value ?? $this->getNormalizedStateValues()[0]), $this->getDisplayDecimalPlaces());
+        if ($number === 0.0) {
+            $number = 0.0;
+        }
         $precision = $this->getDecimalPlaces();
         if ($precision !== null) {
             $text = $this->formatNumberForLocale($number, $precision);
@@ -106,6 +109,19 @@ trait PresentsSlider
         }
 
         return ($this->getDisplayPrefix() ?? '').$text.($this->getDisplaySuffix() ?? '');
+    }
+
+    /** Display rounding never changes continuous input or submitted state. */
+    public function getDisplayDecimalPlaces(): int
+    {
+        if (($precision = $this->getDecimalPlaces()) !== null) {
+            return $precision;
+        }
+
+        $parts = explode('e', strtolower(json_encode((float) ($this->getStep() ?? 1), JSON_THROW_ON_ERROR)));
+        $fraction = rtrim(explode('.', $parts[0])[1] ?? '', '0');
+
+        return min(20, max(0, strlen($fraction) - (int) ($parts[1] ?? 0)));
     }
 
     public function formatRatio(float $ratio): string

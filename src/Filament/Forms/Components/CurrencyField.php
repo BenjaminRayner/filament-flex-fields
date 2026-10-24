@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldFocusOutline;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
+use Bjanczak\FilamentFlexFields\Concerns\RendersStockFieldView;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Currency\ConfiguresCurrency;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Currency\NormalizesCurrencyState;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Currency\PresentsCurrency;
@@ -27,6 +28,7 @@ class CurrencyField extends Field
     use HasPlaceholder;
     use NormalizesCurrencyState;
     use PresentsCurrency;
+    use RendersStockFieldView;
     use ResolvesCurrencyCatalog;
 
     protected string $view = 'filament-flex-fields::forms.components.currency-field';

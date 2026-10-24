@@ -51,6 +51,21 @@ trait TransformsSelectRichOptions
                 ? $this->optionsContainRichShape($options) : null;
 
         try {
+            // Exact stock, text-only options need neither rich normalization nor
+            // two identical label renders. Keep native disabled-option callbacks
+            // and the same bounded, shape-preserving traversal for every leaf.
+            if ($this::class === SelectField::class && $this->transformingRichOptionHtml === false) {
+                return (new OptionTree)->map($options, fn (array $label): bool => $this->isOptionGroupArray($label),
+                    function (string|int $value, mixed $label): array {
+                        if (! is_string($label)) {
+                            throw new \InvalidArgumentException('Select options must contain strings, rich records or groups.');
+                        }
+
+                        return ['label' => $label, 'value' => (string) $value,
+                            'isDisabled' => $this->isOptionDisabled($value, $label)];
+                    });
+            }
+
             return $this->getRichOptionJsTransformer()->transform(
                 $options,
                 fn (string|int $value, array|string $label): array => $this->normalizeOption($value, $label),

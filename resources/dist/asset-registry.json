@@ -6,8 +6,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/address-autocomplete.js",
       "type": "module",
-      "sha256": "2855b658d6050b1e432b40ee08713c2df778708da8356eb22b968a4c9d2c6016",
-      "bytes": 2107
+      "sha256": "2f1ae2945a46497a9aaf0ca5e3261d6edf5e3577ab598acd4102c3a049df4e8f",
+      "bytes": 2109
     },
     "distribution:components/asset-diagnostics.js": {
       "origin": "distribution",
@@ -22,40 +22,40 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/audio-field.js",
       "type": "module",
-      "sha256": "044ce572c69356ffffaaec49e6e708228bf2eca883a7c31c5ee07062dc5d048b",
-      "bytes": 13887
+      "sha256": "fe0ebbbac13a3968f255282ddc48b5db66a3aeab3218a3fb15b13eb014735188",
+      "bytes": 13889
     },
     "distribution:components/barcode-scanner-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/barcode-scanner-field.js",
       "type": "module",
-      "sha256": "49f94b04e3134ed39ec5c0f8af981844b4bf583ef7fddd57aa996cf57a4b8c90",
-      "bytes": 8958
+      "sha256": "df5552a81926be56dbdf1562d208604dc1e6b802ddd2187fe2334debd77e0f56",
+      "bytes": 8960
     },
     "distribution:components/bubble-choice.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/bubble-choice.js",
       "type": "module",
-      "sha256": "899d7c15f01501ac4aa387a3ca0de5ef488cfcf78f2b657eb8bf5726fcec63ec",
-      "bytes": 14839
+      "sha256": "aea3b4ecab966205a62c124475bc6b236d6e573a6feab96a28d7fbb6711f52c7",
+      "bytes": 14841
     },
     "distribution:components/calculator-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/calculator-field.js",
       "type": "module",
-      "sha256": "0126ae1e16ac1c989897e05253edddc09efaee166c67f6920732c1ee9b82edf6",
-      "bytes": 9956
+      "sha256": "5231f3155a4d28d7dd4b78a2baa2e0294833b6b14f703f84cbcdadaadc7667d8",
+      "bytes": 9958
     },
     "distribution:components/choice-cards.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/choice-cards.js",
       "type": "module",
-      "sha256": "571373b2d2a50bfc0a6d4bcbe96351c4ab4c818cd6b43a3ad76bbe2591bf1d0c",
-      "bytes": 549
+      "sha256": "0c95a6ab1acf434233bf04b78d9a4959348d3dee24a441d01358f0d3d84c039d",
+      "bytes": 551
     },
     "distribution:components/color-swatch.js": {
       "origin": "distribution",
@@ -78,80 +78,80 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/credit-card.js",
       "type": "module",
-      "sha256": "d6a846c98796ef5c2b1695899f4bf6d3588cbf7177c9653d65d99907455f0d5d",
-      "bytes": 4617
+      "sha256": "89c6d71e94e19eb1031ba07f75fe85eb8f5614d02baa4157c0efb4d6c2cc86bc",
+      "bytes": 4619
     },
     "distribution:components/currency-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/currency-field.js",
       "type": "module",
-      "sha256": "b4729b6cdf9c2c806d12ae1d906e75b30ef56d322e3292d536e300b06b742fe3",
-      "bytes": 11489
+      "sha256": "91471e82d22abc83f53680ecbbb5af5faf495f1d5ce7d588e5c99a63643a7e00",
+      "bytes": 11491
     },
     "distribution:components/dual-listbox.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/dual-listbox.js",
       "type": "module",
-      "sha256": "c4734e9ac075859c8bcb44bef1c89cb179935c3f5ad3b92244058ce28bf23427",
-      "bytes": 16781
+      "sha256": "1fca6e1156f84ce7733fc961e23241bd40d0d466c6ab09ae92ec4f52b957fb04",
+      "bytes": 16783
     },
     "distribution:components/file-upload-editor-transport.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/file-upload-editor-transport.js",
       "type": "module",
-      "sha256": "63d76f0eb28d6a339dc095d83392fda3d3e61f858d6e180ccaf8a7f09994f4ad",
-      "bytes": 3741
+      "sha256": "514170ec3700be1d4ce0b05795c75f6e7d9e7d9cecafeb54216eb3209e4d4e3a",
+      "bytes": 3743
     },
     "distribution:components/file-upload-transport.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/file-upload-transport.js",
       "type": "module",
-      "sha256": "0f547d814e7cb25a83cacd586879b24a6a7acde1dfe5f430117f85f151e5e53e",
-      "bytes": 715
+      "sha256": "314c8182d55c3b741e92ecb293952362e423c3b9f83bd1accb8988c53b334f84",
+      "bytes": 717
     },
     "distribution:components/file-upload-viewer.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/file-upload-viewer.js",
       "type": "module",
-      "sha256": "69db3738681fbbb1afcdd7738dfb6a9216ead42bde09463704f8a4c20429c060",
-      "bytes": 16319
+      "sha256": "cfdd813caeb6747f7972f13eae1acf3f673b77bf0085b03f414ec41e7bb4ebfb",
+      "bytes": 16321
     },
     "distribution:components/flex-catalog-detail.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-catalog-detail.js",
       "type": "module",
-      "sha256": "b2ffc58316aa37e747e2b64846d7c228a442b42437b0c09a7ec1e00df9e23109",
-      "bytes": 1906
+      "sha256": "13303a0be16d081311dc6cf98afda9d3e4b3d39a2a58ba92674815655fb8ac6c",
+      "bytes": 1908
     },
     "distribution:components/flex-catalog-recording.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-catalog-recording.js",
       "type": "module",
-      "sha256": "07709c572dd446c48bcb27ae8340ff5bfb3163dc4fab2d08eb0a86c89ece4e4f",
-      "bytes": 8876
+      "sha256": "e45da826b922d6eb5cf0a089b245ac0459e81fc28a2e16307cdcbf43491a2e6f",
+      "bytes": 8878
     },
     "distribution:components/flex-catalog.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-catalog.js",
       "type": "module",
-      "sha256": "63493b3312b99d8c96e8c466ac34257cf94f8197b9d21b4ab827384c18d505e4",
-      "bytes": 5109
+      "sha256": "19ad5d3be0bb443ebd59ae23a0814a217fb2f2b530168a756d73e0568277e6f0",
+      "bytes": 7212
     },
     "distribution:components/flex-checklist.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-checklist.js",
       "type": "module",
-      "sha256": "ea06de301d07af1497b04b2ac4ce5a0c91d8a5d5c38a9bcc700c8a99f6244e97",
-      "bytes": 557
+      "sha256": "61d404be462054e2e56e7f3b980adb426b3acc815952476683418560811f679c",
+      "bytes": 559
     },
     "distribution:components/flex-code-preview.js": {
       "origin": "distribution",
@@ -166,32 +166,32 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-color-picker.js",
       "type": "module",
-      "sha256": "6226ec6bdca7238e977b2330a7ce916768f1752a280cd09f000eac58848b27c0",
-      "bytes": 13834
+      "sha256": "2c39f134b4649b53a55ca575a8e804234dca72faddcb5da47aa4adfc35bbe456",
+      "bytes": 16926
     },
     "distribution:components/flex-date-picker.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-date-picker.js",
       "type": "module",
-      "sha256": "4a590babe22a29ee11c80820c5a08c26c9a158c5ee6691008afb00bfa731b5ce",
-      "bytes": 12223
+      "sha256": "212530575e6f634607e650ebc6013cc23e8b9dccf8868174edd9d6417a0e7ad6",
+      "bytes": 12225
     },
     "distribution:components/flex-date-time-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-date-time-field.js",
       "type": "module",
-      "sha256": "4b6ee97585d9114273f8809a6cf4f97437ac93f0746eb999eab54e333d9eb17a",
-      "bytes": 30800
+      "sha256": "654ae02db250437baef8827bfc0dfb3275eb569f36109eb5d1aeb68e54cfb188",
+      "bytes": 30802
     },
     "distribution:components/flex-duration.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-duration.js",
       "type": "module",
-      "sha256": "b33d89143ef3c7fb4a9fa9f74ec7c9fdf11c0c881ca72cff3fd2d9f54677fb14",
-      "bytes": 3176
+      "sha256": "6df80b81a5ff3b3f6cf66638c130b6523b62b76fda257fdfb9a2c59565179fce",
+      "bytes": 3178
     },
     "distribution:components/flex-fields-alpine-readiness-EBTFJVOB.js": {
       "origin": "distribution",
@@ -201,20 +201,20 @@
       "sha256": "fde07affffe591932981ea20f9dd3dbcafcd7b89a3922dd44406d43c60150e61",
       "bytes": 485
     },
-    "distribution:components/flex-fields-audio-3GJ53BX4.js": {
+    "distribution:components/flex-fields-audio-PUVD7B3D.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-audio-3GJ53BX4.js",
+      "path": "components/flex-fields-audio-PUVD7B3D.js",
       "type": "module",
-      "sha256": "f9d1013681c78c1af4601bacafbe77441be3e5accbbcb091d6540790300df5d3",
+      "sha256": "9ebcfb5338c7145c83810fc4c137189f0ab912e045b15286eb0544eae1001987",
       "bytes": 7567
     },
-    "distribution:components/flex-fields-audio-load-buffer-A7EXGR22.js": {
+    "distribution:components/flex-fields-audio-load-buffer-Q6Y7Y2IF.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-audio-load-buffer-A7EXGR22.js",
+      "path": "components/flex-fields-audio-load-buffer-Q6Y7Y2IF.js",
       "type": "module",
-      "sha256": "4bc8ef305ca645d60daeecd7a0334305d5d2bc38ceff9d709d95c50e8ef31087",
+      "sha256": "9e3b5a95fccb9a263b9a668366e3ec6fe3ecc0996d899fef82e26591178b52fb",
       "bytes": 1272
     },
     "distribution:components/flex-fields-barcode-validation-UIQO57RM.js": {
@@ -233,13 +233,13 @@
       "sha256": "c7a2a3b477dd824682cb10230577cc091646bd228730f5c01fc72aa95bb01a04",
       "bytes": 3149
     },
-    "distribution:components/flex-fields-choice-cards-effects-ST5RK2GE.js": {
+    "distribution:components/flex-fields-choice-cards-effects-ENW7EGPI.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-choice-cards-effects-ST5RK2GE.js",
+      "path": "components/flex-fields-choice-cards-effects-ENW7EGPI.js",
       "type": "module",
-      "sha256": "57635a165e616cb51169aa48512b9676599d56040ffa75f941470460c0624b93",
-      "bytes": 5212
+      "sha256": "0b34efe2985e84ceac946980126e859d91cbb990ff823b0eabd220b588f99e0c",
+      "bytes": 5211
     },
     "distribution:components/flex-fields-choice-lists-keyboard-DW75QHU5.js": {
       "origin": "distribution",
@@ -249,13 +249,13 @@
       "sha256": "4df3f8632eafcb4f249d643983310959c82b57ec708f6a98ae1e3a098e45479e",
       "bytes": 281
     },
-    "distribution:components/flex-fields-choice-lists-presentation-5DGQM6NX.js": {
+    "distribution:components/flex-fields-choice-lists-presentation-5CEZDU7P.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-choice-lists-presentation-5DGQM6NX.js",
+      "path": "components/flex-fields-choice-lists-presentation-5CEZDU7P.js",
       "type": "module",
-      "sha256": "34dfbefce8deed983ffb0c03e7288d26702f68daf0c8f09be81b692d363f624f",
-      "bytes": 3857
+      "sha256": "f20e9ae22864b29155de2871e1ef423b27a3f8310f04d61685c65930308d6d62",
+      "bytes": 3856
     },
     "distribution:components/flex-fields-choice-lists-selection-G5SJWXG2.js": {
       "origin": "distribution",
@@ -265,21 +265,21 @@
       "sha256": "5c216f63f1655f63c4966ad56840e91085996dce736edc279f7029f322555007",
       "bytes": 590
     },
-    "distribution:components/flex-fields-combobox-engine-D42A64ER.js": {
+    "distribution:components/flex-fields-combobox-engine-QLL4USML.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-combobox-engine-D42A64ER.js",
+      "path": "components/flex-fields-combobox-engine-QLL4USML.js",
       "type": "module",
-      "sha256": "76a716241200371041c9344bdfa6eaea5c96bed38d31fca3823c66193e847577",
+      "sha256": "592aa1a6169ef66a4d32fc1a14b9e08c4be031cabbb3ae60ca88be9cfb3d4a40",
       "bytes": 9851
     },
-    "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js": {
+    "distribution:components/flex-fields-components-segments-runtime-P5DS3WRU.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
+      "path": "components/flex-fields-components-segments-runtime-P5DS3WRU.js",
       "type": "module",
-      "sha256": "31951f47b89026a233101958d7668cc91f710ea58a2db543cbd760aa176cf659",
-      "bytes": 4939
+      "sha256": "c88cc4092db915670c664e6fd5702093fb10f0477da74ad5f6058c3735b27729",
+      "bytes": 4938
     },
     "distribution:components/flex-fields-components-text-input-counters-FY6RVV2S.js": {
       "origin": "distribution",
@@ -361,12 +361,12 @@
       "sha256": "da38a9b8f235e256311456dc66ad517a3469bcc78fc00710d2709ab748df8b90",
       "bytes": 7982
     },
-    "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js": {
+    "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+      "path": "components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
       "type": "module",
-      "sha256": "47b02b168db651570047120c4d03af4ff73b6620b5232fa424ec93e7ac0b1569",
+      "sha256": "45b1a42095bda223a7f95915918d8b4520bbc97a08b439c6f45dd24a568dc90d",
       "bytes": 7391
     },
     "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js": {
@@ -377,13 +377,13 @@
       "sha256": "e2d46f659421b041384b5261f9745aecd3be7608a3dbbc086ce684b5663d3f36",
       "bytes": 3750
     },
-    "distribution:components/flex-fields-flex-slider-value-3T5VG7DB.js": {
+    "distribution:components/flex-fields-flex-slider-value-DGYCPT2R.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-flex-slider-value-3T5VG7DB.js",
+      "path": "components/flex-fields-flex-slider-value-DGYCPT2R.js",
       "type": "module",
-      "sha256": "4a6c5c88d12ccecc7c58acd9253d4227bdaa28231666453543632c2faf3be7f7",
-      "bytes": 2030
+      "sha256": "797868653bbb61b440b2685c9fdca928a917d72e6baef5b8f799ab167c21d753",
+      "bytes": 2339
     },
     "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js": {
       "origin": "distribution",
@@ -401,20 +401,20 @@
       "sha256": "2a53a0c8276d9457de2dd5ba797faa1a7a2b1a3f983660a3108819a87d1b09c0",
       "bytes": 5952
     },
-    "distribution:components/flex-fields-media-capture-device-session-VIDGRVTQ.js": {
+    "distribution:components/flex-fields-media-capture-device-session-KOXEXUQO.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-media-capture-device-session-VIDGRVTQ.js",
+      "path": "components/flex-fields-media-capture-device-session-KOXEXUQO.js",
       "type": "module",
-      "sha256": "b36a0fe7301dea32d03b8316796261fa0f247acd4167095a65eef4e23fc428e9",
+      "sha256": "13880de78035399f61c988b9c8afbe7ea629cd99343b90dc1e375c8fa4d1977c",
       "bytes": 1691
     },
-    "distribution:components/flex-fields-media-capture-photo-TXGLWXPO.js": {
+    "distribution:components/flex-fields-media-capture-photo-43CV7OJR.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-media-capture-photo-TXGLWXPO.js",
+      "path": "components/flex-fields-media-capture-photo-43CV7OJR.js",
       "type": "module",
-      "sha256": "6b505cb82bd44dce09ef15be817c78ff3737714b2cee1f595a0fb52016fd0cb7",
+      "sha256": "40d4b8343a2694bdc343e6ba6f40e9c92e5060c92e7738305d7a8ae51ce81e10",
       "bytes": 1803
     },
     "distribution:components/flex-fields-media-lifecycle-native-operation-72ZTRVCE.js": {
@@ -425,36 +425,36 @@
       "sha256": "694bd12d37bbe8e4c4903a2049f9e2f779d1d92f22977b62b3aa7060753368b0",
       "bytes": 264
     },
-    "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js": {
+    "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
+      "path": "components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
       "type": "module",
-      "sha256": "f84c3489376160cdb6fb4c9a3603b297173bc1b0af88e5075bf57fb00ee50a3d",
-      "bytes": 1453
+      "sha256": "2986b03bf07e3a005728b24dcce4ed5b527b79d9a918c4c5eee60e57e61d7cb8",
+      "bytes": 1452
     },
-    "distribution:components/flex-fields-media-upload-form-processing-IUUKBRLW.js": {
+    "distribution:components/flex-fields-media-upload-form-processing-SZXAAXTS.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-media-upload-form-processing-IUUKBRLW.js",
+      "path": "components/flex-fields-media-upload-form-processing-SZXAAXTS.js",
       "type": "module",
-      "sha256": "38d2d0f040e3fcacc66ded6f4dfc0d33194b88fbb085783688d463313d7642a0",
+      "sha256": "14f359eb26216fa8a89e40dd3e9c302fcb00845ab2f2b54965b464f11e748427",
       "bytes": 7501
     },
-    "distribution:components/flex-fields-media-upload-livewire-upload-TSRA4GM2.js": {
+    "distribution:components/flex-fields-media-upload-livewire-upload-MVRTQIPC.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-media-upload-livewire-upload-TSRA4GM2.js",
+      "path": "components/flex-fields-media-upload-livewire-upload-MVRTQIPC.js",
       "type": "module",
-      "sha256": "558e774a2bd19acb8ca89480dfbb57aa4e800b514d34b5b9dd5adaf31d9d2b70",
+      "sha256": "ad139792ed47299ea5638610884f6cb08f7a6b1e4020f02e97b7eb6a3593048c",
       "bytes": 1536
     },
-    "distribution:components/flex-fields-media-upload-submit-barrier-UFXFV5UW.js": {
+    "distribution:components/flex-fields-media-upload-submit-barrier-C7QKD4L2.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-media-upload-submit-barrier-UFXFV5UW.js",
+      "path": "components/flex-fields-media-upload-submit-barrier-C7QKD4L2.js",
       "type": "module",
-      "sha256": "4aadf97a5754e12a92fa9b7fde23c9161317a3753dc0571ce0064ccb1e89bb63",
+      "sha256": "0fa7171adc4691d0acbd1dc0fed5d0f28a8914c064fae328e387ebd5450943ef",
       "bytes": 2020
     },
     "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js": {
@@ -473,13 +473,13 @@
       "sha256": "ea119b28b687ad961dd18f272f65a34730eda853122e9ae004897259fe1dc592",
       "bytes": 15757
     },
-    "distribution:components/flex-fields-number-format-TBWOFLS6.js": {
+    "distribution:components/flex-fields-number-format-AYQWRVAT.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-number-format-TBWOFLS6.js",
+      "path": "components/flex-fields-number-format-AYQWRVAT.js",
       "type": "module",
-      "sha256": "0b798d5c36137ca824b66282171fa47d8750614014ffc6a4f51efbe01009db36",
-      "bytes": 603
+      "sha256": "2673a267f6154ee691e494ad8fe78706410b3aa92d842fdf3c84d77abbd27417",
+      "bytes": 469
     },
     "distribution:components/flex-fields-number-stepper-value-AZZGZJVH.js": {
       "origin": "distribution",
@@ -497,29 +497,29 @@
       "sha256": "b70542af477244bf5b11e6e80b3e7a887accad02b8a2cd3a6542d80c53e84b6a",
       "bytes": 206
     },
-    "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js": {
+    "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-overlay-backdrop-SIZG7TPM.js",
+      "path": "components/flex-fields-overlay-backdrop-3MNXNS2X.js",
       "type": "module",
-      "sha256": "be71bc039c771a051c94ac68618bbf873eee361486cc5f4ee69f3e0deb01de4f",
-      "bytes": 66495
+      "sha256": "fbee995977ffcf4759f7a767a2175377acd891a66f3ce69ded701ff269fec03b",
+      "bytes": 65861
     },
-    "distribution:components/flex-fields-overlay-menu-imperative-surface-A55OHYF2.js": {
+    "distribution:components/flex-fields-overlay-menu-imperative-surface-NPL3ESCR.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-overlay-menu-imperative-surface-A55OHYF2.js",
+      "path": "components/flex-fields-overlay-menu-imperative-surface-NPL3ESCR.js",
       "type": "module",
-      "sha256": "0db423ae2b298a94383dc2c569da5acf1d93e9cb9f815513c9fd8de3b3100592",
-      "bytes": 2025
+      "sha256": "e67990009a276ec0de6d1bb14ea54c1e5f8bb85b6bcd8a77b486698adb29f15c",
+      "bytes": 2089
     },
-    "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js": {
+    "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+      "path": "components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
       "type": "module",
-      "sha256": "3e10153c581eeb4ada2da3f47b33d9e89fb6b779be85e9f57fe111ca9bfd0f4a",
-      "bytes": 727
+      "sha256": "8ebbc69629924eee82df9fe4570421ea8e01dc4fa18cc4114003e6b22156588f",
+      "bytes": 726
     },
     "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js": {
       "origin": "distribution",
@@ -529,12 +529,20 @@
       "sha256": "be71b21f8e63b6f420bb4bfccb683e25c43da736b8f753f7521d66bf48907dc0",
       "bytes": 3000
     },
-    "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js": {
+    "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+      "path": "components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
       "type": "module",
-      "sha256": "73fe4213ff803f041e37b3cea3d247fed0220bf7241173da85913b739271201e",
+      "sha256": "2b2d094568de3f8287d5c6f21e7ece83273cfd0384aaffa1a53c3120e5be8e11",
+      "bytes": 3234
+    },
+    "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js": {
+      "origin": "distribution",
+      "package": "janczakb/filament-flex-fields",
+      "path": "components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
+      "type": "module",
+      "sha256": "bcc6243d17c3491850153b9f48f75b0bd7dc4be2ea9657e35cded50fe16478a2",
       "bytes": 9890
     },
     "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js": {
@@ -561,21 +569,21 @@
       "sha256": "85083447726af29540561835acaa22b1178f35c7eebcfdf4078be8be1d8e7f88",
       "bytes": 1199
     },
-    "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js": {
+    "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
+      "path": "components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
       "type": "module",
-      "sha256": "5390ec09539b2a73fd38549e9526db5bd3c1cb8c5a19586a6302835cd8cf1f54",
-      "bytes": 20945
+      "sha256": "da2b4d93764f272a98f7329e8ff49a2ec7085b31a1f9ccce6cfb54f2b40ecf30",
+      "bytes": 20942
     },
-    "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js": {
+    "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+      "path": "components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
       "type": "module",
-      "sha256": "8b46a3b8930f201b91b47bfb9a11eb1f9c35a5904da5d79428f96cc6d9d1b083",
-      "bytes": 6017
+      "sha256": "8c74b3137fc01b1d6b9c9ecf109c437c9254e533082a74bf4d8fc45832d85e14",
+      "bytes": 6014
     },
     "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js": {
       "origin": "distribution",
@@ -585,37 +593,29 @@
       "sha256": "2e99b57027b39e57fa7b6e7068d2668c490ff389cd026f46940d7f30eed1865a",
       "bytes": 6253
     },
-    "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js": {
+    "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
+      "path": "components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
       "type": "module",
-      "sha256": "a9501fffc344d7e69668446a93c52777a94b32a65c84f449c760b48ff6662b76",
-      "bytes": 225
+      "sha256": "d7eafd492b1bf8fa6e38b27aeabf25602664d8c2a6ec4d98ddb14ddbda81cfae",
+      "bytes": 1819
     },
-    "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js": {
+    "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
+      "path": "components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
       "type": "module",
-      "sha256": "94ae824ec29e65ede9d660eb1e8b6342f901259d2f70a135ea7563acc95f46ec",
-      "bytes": 1688
+      "sha256": "59eef434781f1a98d4f84d62b90dd24c254dd12b3fea937d07d2e6e2638e2383",
+      "bytes": 2921
     },
-    "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js": {
+    "distribution:components/flex-fields-runtime-motion-spring-transition-BZG35VHD.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+      "path": "components/flex-fields-runtime-motion-spring-transition-BZG35VHD.js",
       "type": "module",
-      "sha256": "8f65dff946b2bdefcf6e5939973c411b50b0b127b3477b705b3e573de213593f",
-      "bytes": 2918
-    },
-    "distribution:components/flex-fields-runtime-motion-spring-transition-5W5B5PQV.js": {
-      "origin": "distribution",
-      "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-runtime-motion-spring-transition-5W5B5PQV.js",
-      "type": "module",
-      "sha256": "56d9824ae17b6d9f84826c750e952393940e00e438a562ad54adb163a8ec02d3",
-      "bytes": 485
+      "sha256": "f98dc113181cec9b349246235aa03215ff16baf4a8db8d84cd6d27db4cad19ee",
+      "bytes": 480
     },
     "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js": {
       "origin": "distribution",
@@ -649,12 +649,12 @@
       "sha256": "a1412ee977e847553a02003991080cf6519ac11b73372d54c475a54d278c16fe",
       "bytes": 565
     },
-    "distribution:components/flex-fields-select-async-page-publication-LFM4IXZL.js": {
+    "distribution:components/flex-fields-select-async-page-publication-TM6J3UWC.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-select-async-page-publication-LFM4IXZL.js",
+      "path": "components/flex-fields-select-async-page-publication-TM6J3UWC.js",
       "type": "module",
-      "sha256": "ccdf51394b1e204a1a90459de470be9097e0851b15f6bf32118d4bf32e9cf195",
+      "sha256": "04cdbbf0bcb74c66c9857a232355cd4e4b4c71d80029018a41539143eeba2f23",
       "bytes": 1388
     },
     "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js": {
@@ -665,6 +665,14 @@
       "sha256": "9d59249f658b6ed8fb931f54e9abc10457cae2da9859aaf7564d9c4dd17b5b31",
       "bytes": 568
     },
+    "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js": {
+      "origin": "distribution",
+      "package": "janczakb/filament-flex-fields",
+      "path": "components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
+      "type": "module",
+      "sha256": "d5cf97e75ba3fa031cf555bace29cf974dac3a44020858a46169dc7ac7a706af",
+      "bytes": 1909
+    },
     "distribution:components/flex-fields-select-menu-NYMR53KH.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
@@ -673,29 +681,29 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0
     },
-    "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js": {
+    "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
+      "path": "components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
       "type": "module",
-      "sha256": "ac09e5949e95cd0d2c345143702494166057629bc87b15705ed3a8c73dd15327",
-      "bytes": 4010
+      "sha256": "1a1ecbfd0e1d673eb6cda928ab0f0c279a40278a525e9ca8e178a7834ebdadb8",
+      "bytes": 4032
     },
-    "distribution:components/flex-fields-select-trigger-IEEIKS4X.js": {
+    "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-select-trigger-IEEIKS4X.js",
+      "path": "components/flex-fields-select-trigger-4RKFPUYQ.js",
       "type": "module",
-      "sha256": "464466e1affb18592a4f555ab7938ba643579564e189a3e78585e8707c21fc8e",
-      "bytes": 74812
+      "sha256": "86adef5ca5235de6c4c97502308df8873fec465a89b1a5664ac8d531cb3b1921",
+      "bytes": 76617
     },
-    "distribution:components/flex-fields-shared-AWU2O33E.js": {
+    "distribution:components/flex-fields-shared-GVAJQGES.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-shared-AWU2O33E.js",
+      "path": "components/flex-fields-shared-GVAJQGES.js",
       "type": "module",
-      "sha256": "c4ba2ebc32c4964e447c95a41e46ad5cbb258246fc9e5cc15a23aefe3b813933",
-      "bytes": 50700
+      "sha256": "3406037e7aa9da13b65e67806511ff31260b12472a1466c4d27f613ad10ad4aa",
+      "bytes": 50692
     },
     "distribution:components/flex-fields-shared-LBK4CWZD.js": {
       "origin": "distribution",
@@ -713,13 +721,13 @@
       "sha256": "3aa639b8b956677e36abf511f9dcb4ef6c5c3582a5d2b8b66d307c0d1e9c91bf",
       "bytes": 24980
     },
-    "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js": {
+    "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+      "path": "components/flex-fields-teleported-menu-position-IZGK2RFU.js",
       "type": "module",
-      "sha256": "63743fcca02efc267723617ef08f5d13f17c25336bad7647ea2c88719f0f4a03",
-      "bytes": 1801
+      "sha256": "5f415a9b0a2f20551c91736467c8f46f4380eb6f7242625883a00688387e7a09",
+      "bytes": 2554
     },
     "distribution:components/flex-fields-theme-utils-NVH3CBRX.js": {
       "origin": "distribution",
@@ -737,12 +745,12 @@
       "sha256": "4753dccd242c89ab49151ee09b3e024b4828e6ab2401e348c62569acbbbf5847",
       "bytes": 1005
     },
-    "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js": {
+    "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZIAOASLC.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
-      "path": "components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js",
+      "path": "components/flex-fields-virtual-first-paint-v1-segment-ZIAOASLC.js",
       "type": "module",
-      "sha256": "161fb053947edc7770d669727eb21a0a0262c9e453474b2ca690ccb7a679b381",
+      "sha256": "8abc0eeff15a45abb5a2225c6a44e4dc423898162548ddd225327fcb1f7f7be3",
       "bytes": 930
     },
     "distribution:components/flex-file-upload.js": {
@@ -750,184 +758,184 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-file-upload.js",
       "type": "module",
-      "sha256": "2362ad108a4d995dd44cf9eda32e914be7e75a2d7491ae71379278013f24c015",
-      "bytes": 28834
+      "sha256": "3814070ef1a7f680a9e52ef63b6e76728cc11bea888d012bd3778999b24ce5f1",
+      "bytes": 28836
     },
     "distribution:components/flex-radiolist.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-radiolist.js",
       "type": "module",
-      "sha256": "d5f1ef6f31f2ab75292a468fcf05d6504bcb9ec3e36b0b36a049811ee0288273",
-      "bytes": 557
+      "sha256": "37d728807334cc932df19e7e106cbe87bebc3c46dfd6360db5e0f9e7072c580b",
+      "bytes": 559
     },
     "distribution:components/flex-rich-editor.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-rich-editor.js",
       "type": "module",
-      "sha256": "d7d47a741f1ddcdb77e2eabe8b9c2d08a2e9886e266387e63f7d04a3607db30d",
-      "bytes": 16446
+      "sha256": "c0b585b2fa606505094dea502649db28764b7e78f4b724e63e5a0bcb20e33560",
+      "bytes": 16534
     },
     "distribution:components/flex-slider.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-slider.js",
       "type": "module",
-      "sha256": "bb22dc7a6931b21151ca33cbc5bb284ba29a63dc51d34dd956fbd0ef6476fd9b",
-      "bytes": 10180
+      "sha256": "7ec24999ecd545b0264e11989ce2a8b5c5d064cd4c29d731326e219c10e85b46",
+      "bytes": 10142
     },
     "distribution:components/flex-text-input.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-text-input.js",
       "type": "module",
-      "sha256": "cfd1c3a4b2740073b5153efef9ea23bba0d8c2ca09c1c4ea109f7e6df8208421",
-      "bytes": 12658
+      "sha256": "1cd8ba3a97a7ef9f2c63d59eec43b8757b96ad32ef22a7672c791db9df416093",
+      "bytes": 12660
     },
     "distribution:components/flex-textarea.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-textarea.js",
       "type": "module",
-      "sha256": "288d4917c959e6da2b9c41f88476f28f186366f2b6e13cf1a0ba12b903248839",
-      "bytes": 4984
+      "sha256": "be7ec5107c83cc6d9220fe413ac123acbd9d6513c9c40f1de0f5776e8480c376",
+      "bytes": 7332
     },
     "distribution:components/flex-time-picker.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-time-picker.js",
       "type": "module",
-      "sha256": "30a4b524e76a9a1486455cbb4a4f6cc4f4639875300ada21013a3c28befb74d1",
-      "bytes": 5248
+      "sha256": "754ac1a33cfebf60823e2a0346747ca1a4c2c7a0924d62ecedfc92cc6dbbd36b",
+      "bytes": 5250
     },
     "distribution:components/flex-time-segments.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-time-segments.js",
       "type": "module",
-      "sha256": "35aef6957c7fabedb04fcaf53e509924f3fc46e648a1c0efee315fba99b0ca26",
-      "bytes": 6188
+      "sha256": "9654a5a141720a3706e5120f13a2fe5ed10ef8e7a2692baa63c3cfd6eecf42b8",
+      "bytes": 6190
     },
     "distribution:components/flex-verification-code.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-verification-code.js",
       "type": "module",
-      "sha256": "794e3540b56e4b915a81ef93316540ad90cbc6e28c0f0125d83dfc41c14dec3f",
-      "bytes": 4330
+      "sha256": "8d385ce156d7c45c6f29008497eefd49d5081a8857a3a0223bcd3c486f633a8d",
+      "bytes": 4332
     },
     "distribution:components/font-select.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/font-select.js",
       "type": "module",
-      "sha256": "c8a65ba8720e4ecebb28fbee6899c6cf76d588fe1e35c3fa117702f46cf6a927",
-      "bytes": 14136
+      "sha256": "5336247e398cae72dc1432337a0478fff91ed0739b92c79ec446c2f75618be86",
+      "bytes": 14360
     },
     "distribution:components/hold-confirm-action.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/hold-confirm-action.js",
       "type": "module",
-      "sha256": "7896fbefe3c1b80154f0384f060faa95c9c98272cd7dbbaf4a3f969d101581c2",
-      "bytes": 11583
+      "sha256": "b40540cefac26906606b65d24a1d46fc2c0c43f39040a607c559ff59481227e9",
+      "bytes": 11585
     },
     "distribution:components/icon-picker-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/icon-picker-field.js",
       "type": "module",
-      "sha256": "a8203131d190daf25022300938b1dc197ee14c5ae6fc5589bdb55797913610cf",
-      "bytes": 6129
+      "sha256": "8ecfeaec262a9fa77e03311df2b79d77acd39e96d689003f3c08befe7c4c05ae",
+      "bytes": 6409
     },
     "distribution:components/image-choice-cards.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/image-choice-cards.js",
       "type": "module",
-      "sha256": "e96d27ab4fbabd170aa8716aab802cc152717e3bf83353c7c4e450d7a6b923a4",
-      "bytes": 552
+      "sha256": "a516166f9322aff6d5fa7cc0abd3eb11196d32955306c15281dff7fd5921193c",
+      "bytes": 554
     },
     "distribution:components/item-card-interaction.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/item-card-interaction.js",
       "type": "module",
-      "sha256": "4c4be2c09b6f1a2a0c231418c2f419da8fd843ac41190cb00aa9bf0c365edee9",
-      "bytes": 1466
+      "sha256": "557614e21f553a9ff6a33b7c0fc629a8a81e43fc833226da281597f00e533bfc",
+      "bytes": 1468
     },
     "distribution:components/link-preview-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/link-preview-field.js",
       "type": "module",
-      "sha256": "2cf61aa8cf69f7bd61b5f58ff1f62ff18eb52d5bd3f67cae79548519474e7304",
-      "bytes": 10704
+      "sha256": "7bca976b69273303a9c94556545c43cec5d983f3443aba38865e060fa77a0fbb",
+      "bytes": 10706
     },
     "distribution:components/location-select.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/location-select.js",
       "type": "module",
-      "sha256": "6d83d880da2fec7f377815075466a59b70b138235169182ae8279ee192e73ad8",
-      "bytes": 4913
+      "sha256": "23e1769dbdb55a96b7763982152bfb5b4cfe987039b896a00c4f97f266730232",
+      "bytes": 5043
     },
     "distribution:components/map-picker.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/map-picker.js",
       "type": "module",
-      "sha256": "73c235d0caca1c38fdd930ba62acaf7656c6639f8fe73cf73f9de1a6be4e5026",
-      "bytes": 99882
+      "sha256": "6fdea3ce17aa69ff806eeff32d3e9809fced94e545952ca34def82cbf6fa4d08",
+      "bytes": 99884
     },
     "distribution:components/matrix-choice-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/matrix-choice-field.js",
       "type": "module",
-      "sha256": "c464ab9fa66492f571b791c7dbb8d8f5d40cd504666b999878d8b30c4c07f2f4",
-      "bytes": 5244
+      "sha256": "c5c2b942f332430183e75b7997371a8b50caf55af8e657057155c1b42b08c585",
+      "bytes": 5246
     },
     "distribution:components/media-os.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/media-os.js",
       "type": "module",
-      "sha256": "0eda5566d8dc2cbe4a65760970390f6e3ad7acf62a613334e20b7e97c638622b",
-      "bytes": 753
+      "sha256": "7efc88f883b70361c1e576e05161a9dfbcd716eb16291f655b7f3cd22656334d",
+      "bytes": 755
     },
     "distribution:components/nps-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/nps-field.js",
       "type": "module",
-      "sha256": "6cc8623dd9ccd3301f31f048b392b68b48d748345e0b9f10acab73474cd4e003",
-      "bytes": 4104
+      "sha256": "f281bcaf902241172170fad766d4eff8e32c95a6d7e8bf62951dcad4e114bbdf",
+      "bytes": 4106
     },
     "distribution:components/number-stepper.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/number-stepper.js",
       "type": "module",
-      "sha256": "18b3fcde617fb6b400aa6bec07abaebfa20ef707df0caff6aabcfa3797103e20",
-      "bytes": 9575
+      "sha256": "03a646bcac50c66d3e015526be0e69c15982dc3ffc5fa77ff2133f3dfffd100e",
+      "bytes": 9707
     },
     "distribution:components/phone-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/phone-field.js",
       "type": "module",
-      "sha256": "50e433861a487c280b2d008f22cd64d769ccf066eba96ee467d1fff73f795e78",
-      "bytes": 3641
+      "sha256": "f268f1990162fc021a12f33ffc2d10b9de73936daed624e186d38031849b2bc9",
+      "bytes": 3949
     },
     "distribution:components/price-range.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/price-range.js",
       "type": "module",
-      "sha256": "b1a66ff891a7476a908bf67bc82aa96bf12e900841fe1d6ff29cda7521b3d6cb",
-      "bytes": 7556
+      "sha256": "72368321727ef11a7bc93892a5fa1344677eeb1e32a9f442adcd7240b45d2b8a",
+      "bytes": 7558
     },
     "distribution:components/progress-circle-breakdown.js": {
       "origin": "distribution",
@@ -942,120 +950,120 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/rating-field.js",
       "type": "module",
-      "sha256": "b79d25dda04f32865a4050e9748a8a2e79e7ab5e9b6a5b862d39b19572a59b23",
-      "bytes": 3422
+      "sha256": "6448c7b4e62661c2e35960ca3d9c1f79e79c68178d9f18980366efbfd167f4a4",
+      "bytes": 3424
     },
     "distribution:components/schedule-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/schedule-field.js",
       "type": "module",
-      "sha256": "329cb77d6e91718465f48a0fc834ec98b14c22a356d955cad3ee1f72fa7d9317",
-      "bytes": 10301
+      "sha256": "a2cf98cfc5a18e455597aafe395d3bc95b153846cd96d1905bc5f80032d0b2e6",
+      "bytes": 10303
     },
     "distribution:components/segment-control.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/segment-control.js",
       "type": "module",
-      "sha256": "32307bb0ce7b748dfd23be26a1062f9ada23c514fa9b994631a28bd383fdfc7c",
-      "bytes": 463
+      "sha256": "585552de91ec5775af7a8eef596600e9020c129e99416c33662a078d3f5c1de0",
+      "bytes": 465
     },
     "distribution:components/segment-tabs.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/segment-tabs.js",
       "type": "module",
-      "sha256": "9ca48d939a5e72860e65ea872dd4014c8ddac0c646d847f478fb2c5d6540b005",
-      "bytes": 1365
+      "sha256": "4b4fbad07917ac47ebda846f9c6e0d7fde0f53544aa36f275673ee267ea809cf",
+      "bytes": 1367
     },
     "distribution:components/select-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/select-field.js",
       "type": "module",
-      "sha256": "d0e3b1a2eb65bd70468b720ee700bd7fcdbe426113785d31dbee50ad2920cf53",
-      "bytes": 2628
+      "sha256": "176c15fc5bab47729251fc390f577f934d549193500c4fc10f874a256c20110d",
+      "bytes": 3317
     },
     "distribution:components/signature-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/signature-field.js",
       "type": "module",
-      "sha256": "b46e0516aae819e67b135d42fad25533be5690e37109129a5e29f21f0b44a742",
-      "bytes": 27340
+      "sha256": "a09850465c2550b62af4da94a2f6242e45c08384524d2374535d5763f563a26c",
+      "bytes": 27342
     },
     "distribution:components/slug-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/slug-field.js",
       "type": "module",
-      "sha256": "8ebf990cc89c22afd391ea4a60b0277d66710b0daa5b59b67e501b27c00d5371",
-      "bytes": 9016
+      "sha256": "6f90a1b73d677c8e5e90927e3c0c8154a339b6953f31f5479c6ee1f309ec655a",
+      "bytes": 9018
     },
     "distribution:components/social-links-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/social-links-field.js",
       "type": "module",
-      "sha256": "c7ccbebed3c746983e1286cff532a9765fa98634337a357af17ec82925220f73",
-      "bytes": 8514
+      "sha256": "8364c23a385fff92ef64d78a03f4c40efc39f1961a7a29454664dff404dac858",
+      "bytes": 8516
     },
     "distribution:components/switch.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/switch.js",
       "type": "module",
-      "sha256": "d50ad8bbf3d1b32d598b70235539ad78b12cf199c074f9c4fea1f8316842e3fa",
-      "bytes": 4263
+      "sha256": "e3849eeda3833498eb32d399a05bdc61b116eb995f7efa2090120ff611c87403",
+      "bytes": 4265
     },
     "distribution:components/tags-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/tags-field.js",
       "type": "module",
-      "sha256": "c81666b70abc334e19d2e7c5dc826baa918c666459f3aca6c40342d3c797a6a5",
-      "bytes": 5679
+      "sha256": "51abc274b022993aacf237eca44a46e211eec36339252edabd86112e7b9f6b14",
+      "bytes": 6643
     },
     "distribution:components/todo-list-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/todo-list-field.js",
       "type": "module",
-      "sha256": "f6c8b3e958b38e9f539bb7f1b1c6b10e14232dd63d2cb173c7c0c52de3f21fc6",
-      "bytes": 60479
+      "sha256": "3bbc529f9845bf0ace53f17dbdeaac3c6b0a8f58a17fc883aa01fc088b343db1",
+      "bytes": 60481
     },
     "distribution:components/track-slider.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/track-slider.js",
       "type": "module",
-      "sha256": "01115b0dbe93ac27843f860b32ffed659b04ed34e9a85c0fb0d64822c6f31895",
-      "bytes": 4663
+      "sha256": "418b20b3ece96fd90d689d0a6d4f50d07fd032c61cb552d7c849de1ef85c48ec",
+      "bytes": 4665
     },
     "distribution:components/traffic-split.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/traffic-split.js",
       "type": "module",
-      "sha256": "df3ba1fffb447caf79d141ba43d6bc330bdd9d7e1449f46e42a3441b840c25b8",
-      "bytes": 5736
+      "sha256": "4c278291ad62d9205cf76a077a3ab4c863bfed746fcec5b8c590ad1a48e20617",
+      "bytes": 5738
     },
     "distribution:components/video-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/video-field.js",
       "type": "module",
-      "sha256": "fabb052ec0796ec41c6188a32bacba728b321cc9858ecc6c62a988ddabbaebb5",
-      "bytes": 38368
+      "sha256": "7e2f5c20004a41ee3f7af434c24b65bae6c380204898d1e43186b6557b8072d2",
+      "bytes": 38370
     },
     "distribution:components/voice-note-recorder-field.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/voice-note-recorder-field.js",
       "type": "module",
-      "sha256": "14e0fc7ffac6b565c1473ff8e3bc04ac96d922756dca6f3d2f419b2df8e9990c",
-      "bytes": 12996
+      "sha256": "8eff2691258844912106d7835f47b32eafcd5c5f10c09ffd1082d954b50649ea",
+      "bytes": 12998
     },
     "distribution:css/address-autocomplete.css": {
       "origin": "distribution",
@@ -1174,16 +1182,16 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/currency-field.css",
       "type": "stylesheet",
-      "sha256": "b020d2deb92f34bcf72ddbc639d7de44a9b04fadf80005bf308d8bdd0d8b0a15",
-      "bytes": 5495
+      "sha256": "d931336bc6bf94a727252367e45b883806174b861422998ead5dc2a275b8343c",
+      "bytes": 5724
     },
     "distribution:css/date-time-calendar.css": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "css/date-time-calendar.css",
       "type": "stylesheet",
-      "sha256": "cc433dd14f514e8666c08165c27337058d94bcd711e7169c63f8be6a3ed014ac",
-      "bytes": 14488
+      "sha256": "852a371453b9fd532bd427e3cec2f4118657e4a53452f4ec4a8ae35329d769eb",
+      "bytes": 14536
     },
     "distribution:css/date-time-clock.css": {
       "origin": "distribution",
@@ -1198,8 +1206,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/date-value-presentation.css",
       "type": "stylesheet",
-      "sha256": "e5b51975165e7e7b385682acc4bedd220ea60d6cc7ceb929bfc06b9a4ee03d07",
-      "bytes": 4599
+      "sha256": "932b7891bf414c8670aaa0b4fce136b4107e50e0264145b403363522f845425c",
+      "bytes": 4905
     },
     "distribution:css/dual-listbox.css": {
       "origin": "distribution",
@@ -1254,8 +1262,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/flex-catalog.css",
       "type": "stylesheet",
-      "sha256": "4deb915faf6110d6a45f83a1db8d607169f7d0e50ade1326263b9cf8f28b51fb",
-      "bytes": 37329
+      "sha256": "ab4793911846f59697c4e5cab8254c42b77bb9597975668489d709e5bf580ed1",
+      "bytes": 37636
     },
     "distribution:css/flex-checklist.css": {
       "origin": "distribution",
@@ -1318,8 +1326,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/flex-text-input.css",
       "type": "stylesheet",
-      "sha256": "6ab620ea59ce4cebcf34e7a7f9a6f560997286f5f021d84a4f8e4424476f66d7",
-      "bytes": 19245
+      "sha256": "0c0890fceb18bf00b2a9749f82bfc71086f220f1cdc7c440df43f090414f3335",
+      "bytes": 19509
     },
     "distribution:css/flex-textarea.css": {
       "origin": "distribution",
@@ -1558,24 +1566,24 @@
       "package": "janczakb/filament-flex-fields",
       "path": "css/segment-control.css",
       "type": "stylesheet",
-      "sha256": "a850cdf4a5a56112e1756d208558bd20ea05b6d6d42478d164290dfa62106875",
-      "bytes": 17546
+      "sha256": "778ebbad3052d1007fe0531fbddc891d488ac50a2cda9ea14ceb7272be3e8c67",
+      "bytes": 18073
     },
     "distribution:css/segment-tabs.css": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "css/segment-tabs.css",
       "type": "stylesheet",
-      "sha256": "d463743aa5a7076ea020b14864d6edef1ca2f4de3406cb2310f0db7cf9ace5cb",
-      "bytes": 2224
+      "sha256": "f75f7eab74af644c98993d8025c368eb099ee4e9b4b6bd148705a484748c8baa",
+      "bytes": 3622
     },
     "distribution:css/select-field.css": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "css/select-field.css",
       "type": "stylesheet",
-      "sha256": "b2827618bdf89bda2765ba51780568e56afc32e70afd007ada84b38b4ca81205",
-      "bytes": 121270
+      "sha256": "5f0451c8b5cee6f64055bf3c9f378e6a5fee2128aaace7cf0a87ab6edc232c16",
+      "bytes": 121273
     },
     "distribution:css/selection-indicator.css": {
       "origin": "distribution",
@@ -2227,32 +2235,33 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/location-select.js",
         "distribution:components/flex-fields-mapbox-XLP5JEIG.js",
@@ -2313,14 +2322,14 @@
       ],
       "chunks": [
         "distribution:components/audio-field.js",
-        "distribution:components/flex-fields-audio-3GJ53BX4.js",
-        "distribution:components/flex-fields-audio-load-buffer-A7EXGR22.js",
+        "distribution:components/flex-fields-audio-PUVD7B3D.js",
+        "distribution:components/flex-fields-audio-load-buffer-Q6Y7Y2IF.js",
         "distribution:components/flex-fields-media-lifecycle-native-operation-72ZTRVCE.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/audio-field.js",
@@ -2351,11 +2360,11 @@
         "distribution:components/barcode-scanner-field.js",
         "distribution:components/flex-fields-barcode-validation-UIQO57RM.js",
         "distribution:components/flex-fields-media-lifecycle-native-operation-72ZTRVCE.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/barcode-scanner-field.js",
@@ -2375,8 +2384,8 @@
       "chunks": [
         "distribution:components/bubble-choice.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/bubble-choice.js",
@@ -2404,15 +2413,15 @@
         "distribution:components/flex-text-input.js",
         "distribution:components/flex-fields-components-text-input-counters-FY6RVV2S.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/calculator-field.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-menu-imperative-surface-A55OHYF2.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-menu-imperative-surface-NPL3ESCR.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js"
       ],
       "entry": "distribution:components/calculator-field.js",
@@ -2484,13 +2493,13 @@
       ],
       "chunks": [
         "distribution:components/choice-cards.js",
-        "distribution:components/flex-fields-choice-cards-effects-ST5RK2GE.js",
+        "distribution:components/flex-fields-choice-cards-effects-ENW7EGPI.js",
         "distribution:components/flex-fields-choice-lists-keyboard-DW75QHU5.js",
         "distribution:components/flex-fields-choice-lists-selection-G5SJWXG2.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/choice-cards.js",
@@ -2512,13 +2521,13 @@
       ],
       "chunks": [
         "distribution:components/choice-cards.js",
-        "distribution:components/flex-fields-choice-cards-effects-ST5RK2GE.js",
+        "distribution:components/flex-fields-choice-cards-effects-ENW7EGPI.js",
         "distribution:components/flex-fields-choice-lists-keyboard-DW75QHU5.js",
         "distribution:components/flex-fields-choice-lists-selection-G5SJWXG2.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": null,
@@ -2572,32 +2581,33 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js"
       ],
       "entry": null,
@@ -2644,32 +2654,33 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/country-map-field.js"
       ],
@@ -2708,8 +2719,8 @@
       "chunks": [
         "distribution:components/credit-card.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/credit-card.js",
@@ -2736,35 +2747,36 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/currency-field.js",
-        "distribution:components/flex-fields-number-format-TBWOFLS6.js"
+        "distribution:components/flex-fields-number-format-AYQWRVAT.js"
       ],
       "entry": "distribution:components/currency-field.js",
       "kind": "full",
@@ -2792,8 +2804,8 @@
         "distribution:components/flex-fields-date-time-input-value-motion-HZFIOFHN.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-duration.js"
       ],
@@ -2823,8 +2835,8 @@
         "distribution:components/flex-fields-date-time-input-value-motion-HZFIOFHN.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-text-input.js",
         "distribution:components/flex-fields-components-text-input-counters-FY6RVV2S.js",
@@ -2855,8 +2867,8 @@
         "distribution:components/flex-fields-date-time-input-value-motion-HZFIOFHN.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": null,
@@ -2936,38 +2948,39 @@
         "distribution:components/flex-fields-date-time-input-value-motion-HZFIOFHN.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-time-picker.js",
         "distribution:components/flex-duration.js",
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/switch.js",
-        "distribution:components/flex-fields-runtime-motion-spring-transition-5W5B5PQV.js",
-        "distribution:components/flex-fields-shared-AWU2O33E.js",
+        "distribution:components/flex-fields-runtime-motion-spring-transition-BZG35VHD.js",
+        "distribution:components/flex-fields-shared-GVAJQGES.js",
         "distribution:components/schedule-field.js",
         "distribution:components/flex-fields-time-utils-Z3U324ME.js"
       ],
@@ -3009,8 +3022,8 @@
         "distribution:components/dual-listbox.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js"
       ],
@@ -3071,10 +3084,10 @@
       ],
       "chunks": [
         "distribution:components/file-upload-editor-transport.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js"
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js"
       ],
       "entry": "distribution:components/file-upload-editor-transport.js",
       "kind": "full",
@@ -3090,10 +3103,10 @@
       "stylesheets": [],
       "chunks": [
         "distribution:components/file-upload-transport.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js"
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js"
       ],
       "entry": "distribution:components/file-upload-transport.js",
       "kind": "full",
@@ -3118,14 +3131,14 @@
       ],
       "chunks": [
         "distribution:components/media-os.js",
-        "distribution:components/flex-fields-media-capture-device-session-VIDGRVTQ.js",
-        "distribution:components/flex-fields-media-capture-photo-TXGLWXPO.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
-        "distribution:components/flex-fields-media-upload-form-processing-IUUKBRLW.js",
-        "distribution:components/flex-fields-media-upload-livewire-upload-TSRA4GM2.js",
-        "distribution:components/flex-fields-media-upload-submit-barrier-UFXFV5UW.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-media-capture-device-session-KOXEXUQO.js",
+        "distribution:components/flex-fields-media-capture-photo-43CV7OJR.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
+        "distribution:components/flex-fields-media-upload-form-processing-SZXAAXTS.js",
+        "distribution:components/flex-fields-media-upload-livewire-upload-MVRTQIPC.js",
+        "distribution:components/flex-fields-media-upload-submit-barrier-C7QKD4L2.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/file-upload-viewer.js",
         "distribution:components/flex-fields-file-upload-viewer-motion-entry-chrome-DLFXQ5WQ.js"
       ],
@@ -3149,28 +3162,28 @@
       ],
       "chunks": [
         "distribution:components/media-os.js",
-        "distribution:components/flex-fields-media-capture-device-session-VIDGRVTQ.js",
-        "distribution:components/flex-fields-media-capture-photo-TXGLWXPO.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
-        "distribution:components/flex-fields-media-upload-form-processing-IUUKBRLW.js",
-        "distribution:components/flex-fields-media-upload-livewire-upload-TSRA4GM2.js",
-        "distribution:components/flex-fields-media-upload-submit-barrier-UFXFV5UW.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-media-capture-device-session-KOXEXUQO.js",
+        "distribution:components/flex-fields-media-capture-photo-43CV7OJR.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
+        "distribution:components/flex-fields-media-upload-form-processing-SZXAAXTS.js",
+        "distribution:components/flex-fields-media-upload-livewire-upload-MVRTQIPC.js",
+        "distribution:components/flex-fields-media-upload-submit-barrier-C7QKD4L2.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-file-upload.js",
-        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
+        "distribution:components/flex-fields-components-segments-runtime-P5DS3WRU.js",
         "distribution:components/flex-fields-file-upload-runtime-camera-state-YDHDUZQS.js",
         "distribution:components/flex-fields-file-upload-viewer-motion-entry-chrome-DLFXQ5WQ.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-menu-imperative-surface-A55OHYF2.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-menu-imperative-surface-NPL3ESCR.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZIAOASLC.js"
       ],
       "entry": null,
       "kind": "styles-only",
@@ -3195,11 +3208,11 @@
         "distribution:components/flex-catalog-detail.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js"
       ],
       "entry": "distribution:components/flex-catalog-detail.js",
@@ -3233,8 +3246,8 @@
       ],
       "chunks": [
         "distribution:components/flex-catalog-recording.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js"
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js"
       ],
       "entry": "distribution:components/flex-catalog-recording.js",
       "kind": "full",
@@ -3261,32 +3274,33 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/flex-catalog.js"
       ],
@@ -3310,12 +3324,12 @@
       "chunks": [
         "distribution:components/flex-checklist.js",
         "distribution:components/flex-fields-choice-lists-keyboard-DW75QHU5.js",
-        "distribution:components/flex-fields-choice-lists-presentation-5DGQM6NX.js",
+        "distribution:components/flex-fields-choice-lists-presentation-5CEZDU7P.js",
         "distribution:components/flex-fields-choice-lists-selection-G5SJWXG2.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/flex-checklist.js",
@@ -3366,7 +3380,7 @@
         "distribution:components/flex-color-picker.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js"
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js"
       ],
       "entry": "distribution:components/flex-color-picker.js",
       "kind": "full",
@@ -3401,8 +3415,8 @@
         "distribution:components/flex-fields-date-time-input-value-motion-HZFIOFHN.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/flex-date-picker.js",
@@ -3433,14 +3447,14 @@
         "distribution:components/flex-fields-date-time-segmented-input-GDW223WE.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
         "distribution:components/flex-fields-shared-LBK4CWZD.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js"
       ],
       "entry": "distribution:components/flex-date-time-field.js",
@@ -3462,8 +3476,8 @@
       "chunks": [
         "distribution:components/flex-duration.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js"
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js"
       ],
       "entry": "distribution:components/flex-duration.js",
       "kind": "full",
@@ -3500,28 +3514,28 @@
       ],
       "chunks": [
         "distribution:components/media-os.js",
-        "distribution:components/flex-fields-media-capture-device-session-VIDGRVTQ.js",
-        "distribution:components/flex-fields-media-capture-photo-TXGLWXPO.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
-        "distribution:components/flex-fields-media-upload-form-processing-IUUKBRLW.js",
-        "distribution:components/flex-fields-media-upload-livewire-upload-TSRA4GM2.js",
-        "distribution:components/flex-fields-media-upload-submit-barrier-UFXFV5UW.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-media-capture-device-session-KOXEXUQO.js",
+        "distribution:components/flex-fields-media-capture-photo-43CV7OJR.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
+        "distribution:components/flex-fields-media-upload-form-processing-SZXAAXTS.js",
+        "distribution:components/flex-fields-media-upload-livewire-upload-MVRTQIPC.js",
+        "distribution:components/flex-fields-media-upload-submit-barrier-C7QKD4L2.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-file-upload.js",
-        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
+        "distribution:components/flex-fields-components-segments-runtime-P5DS3WRU.js",
         "distribution:components/flex-fields-file-upload-runtime-camera-state-YDHDUZQS.js",
         "distribution:components/flex-fields-file-upload-viewer-motion-entry-chrome-DLFXQ5WQ.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-menu-imperative-surface-A55OHYF2.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-menu-imperative-surface-NPL3ESCR.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZIAOASLC.js"
       ],
       "entry": "distribution:components/flex-file-upload.js",
       "kind": "full",
@@ -3546,13 +3560,13 @@
       ],
       "chunks": [
         "distribution:components/choice-cards.js",
-        "distribution:components/flex-fields-choice-cards-effects-ST5RK2GE.js",
+        "distribution:components/flex-fields-choice-cards-effects-ENW7EGPI.js",
         "distribution:components/flex-fields-choice-lists-keyboard-DW75QHU5.js",
         "distribution:components/flex-fields-choice-lists-selection-G5SJWXG2.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": null,
@@ -3592,12 +3606,12 @@
       "chunks": [
         "distribution:components/flex-radiolist.js",
         "distribution:components/flex-fields-choice-lists-keyboard-DW75QHU5.js",
-        "distribution:components/flex-fields-choice-lists-presentation-5DGQM6NX.js",
+        "distribution:components/flex-fields-choice-lists-presentation-5CEZDU7P.js",
         "distribution:components/flex-fields-choice-lists-selection-G5SJWXG2.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/flex-radiolist.js",
@@ -3618,14 +3632,14 @@
       ],
       "chunks": [
         "distribution:components/media-os.js",
-        "distribution:components/flex-fields-media-capture-device-session-VIDGRVTQ.js",
-        "distribution:components/flex-fields-media-capture-photo-TXGLWXPO.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
-        "distribution:components/flex-fields-media-upload-form-processing-IUUKBRLW.js",
-        "distribution:components/flex-fields-media-upload-livewire-upload-TSRA4GM2.js",
-        "distribution:components/flex-fields-media-upload-submit-barrier-UFXFV5UW.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-media-capture-device-session-KOXEXUQO.js",
+        "distribution:components/flex-fields-media-capture-photo-43CV7OJR.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
+        "distribution:components/flex-fields-media-upload-form-processing-SZXAAXTS.js",
+        "distribution:components/flex-fields-media-upload-livewire-upload-MVRTQIPC.js",
+        "distribution:components/flex-fields-media-upload-submit-barrier-C7QKD4L2.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-rich-editor.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js"
       ],
@@ -3645,11 +3659,11 @@
       ],
       "chunks": [
         "distribution:components/flex-slider.js",
-        "distribution:components/flex-fields-flex-slider-value-3T5VG7DB.js",
-        "distribution:components/flex-fields-number-format-TBWOFLS6.js",
+        "distribution:components/flex-fields-flex-slider-value-DGYCPT2R.js",
+        "distribution:components/flex-fields-number-format-AYQWRVAT.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/flex-slider.js",
@@ -3682,8 +3696,8 @@
         "distribution:components/flex-text-input.js",
         "distribution:components/flex-fields-components-text-input-counters-FY6RVV2S.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js"
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js"
       ],
       "entry": "distribution:components/flex-text-input.js",
       "kind": "full",
@@ -3710,10 +3724,11 @@
         "distribution:components/flex-textarea.js",
         "distribution:components/flex-fields-components-text-input-counters-FY6RVV2S.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/flex-textarea.js",
@@ -3746,8 +3761,8 @@
         "distribution:components/flex-fields-date-time-input-value-motion-HZFIOFHN.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/flex-time-picker.js",
@@ -3775,12 +3790,12 @@
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/flex-fields-time-utils-Z3U324ME.js"
       ],
@@ -3802,8 +3817,8 @@
         "distribution:components/flex-verification-code.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/flex-verification-code.js",
@@ -3827,36 +3842,37 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/font-select.js",
         "distribution:components/flex-fields-sdk-appearance-namespace-XZ3I2QBZ.js",
-        "distribution:components/flex-fields-select-async-page-publication-LFM4IXZL.js"
+        "distribution:components/flex-fields-select-async-page-publication-TM6J3UWC.js"
       ],
       "entry": "distribution:components/font-select.js",
       "kind": "full",
@@ -3875,8 +3891,8 @@
       "chunks": [
         "distribution:components/hold-confirm-action.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/hold-confirm-action.js",
@@ -3898,8 +3914,8 @@
       "chunks": [
         "distribution:components/hold-confirm-action.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": null,
@@ -3942,35 +3958,36 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/icon-picker-field.js",
-        "distribution:components/flex-fields-select-async-page-publication-LFM4IXZL.js"
+        "distribution:components/flex-fields-select-async-page-publication-TM6J3UWC.js"
       ],
       "entry": "distribution:components/icon-picker-field.js",
       "kind": "full",
@@ -3988,13 +4005,13 @@
       ],
       "chunks": [
         "distribution:components/image-choice-cards.js",
-        "distribution:components/flex-fields-choice-cards-effects-ST5RK2GE.js",
+        "distribution:components/flex-fields-choice-cards-effects-ENW7EGPI.js",
         "distribution:components/flex-fields-choice-lists-keyboard-DW75QHU5.js",
         "distribution:components/flex-fields-choice-lists-selection-G5SJWXG2.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/image-choice-cards.js",
@@ -4029,8 +4046,8 @@
       "chunks": [
         "distribution:components/item-card-interaction.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/item-card-interaction.js",
@@ -4072,8 +4089,8 @@
       "chunks": [
         "distribution:components/link-preview-field.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/link-preview-field.js",
@@ -4130,32 +4147,33 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/location-select.js",
         "distribution:components/flex-fields-mapbox-XLP5JEIG.js"
@@ -4183,10 +4201,10 @@
         "distribution:components/flex-fields-alpine-readiness-EBTFJVOB.js",
         "distribution:components/flex-fields-mapbox-XLP5JEIG.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js"
       ],
@@ -4213,10 +4231,10 @@
         "distribution:components/flex-fields-alpine-readiness-EBTFJVOB.js",
         "distribution:components/flex-fields-mapbox-XLP5JEIG.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js"
       ],
@@ -4243,10 +4261,10 @@
         "distribution:components/flex-fields-alpine-readiness-EBTFJVOB.js",
         "distribution:components/flex-fields-mapbox-XLP5JEIG.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js"
       ],
@@ -4273,10 +4291,10 @@
         "distribution:components/flex-fields-alpine-readiness-EBTFJVOB.js",
         "distribution:components/flex-fields-mapbox-XLP5JEIG.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js"
       ],
@@ -4332,10 +4350,10 @@
         "distribution:components/flex-fields-alpine-readiness-EBTFJVOB.js",
         "distribution:components/flex-fields-mapbox-XLP5JEIG.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js"
       ],
@@ -4377,10 +4395,10 @@
         "distribution:components/flex-fields-alpine-readiness-EBTFJVOB.js",
         "distribution:components/flex-fields-mapbox-XLP5JEIG.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js"
       ],
@@ -4403,8 +4421,8 @@
         "distribution:components/flex-fields-choice-lists-selection-G5SJWXG2.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/matrix-choice-field.js",
@@ -4428,8 +4446,8 @@
         "distribution:components/flex-fields-choice-lists-selection-G5SJWXG2.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": null,
@@ -4472,14 +4490,14 @@
       "stylesheets": [],
       "chunks": [
         "distribution:components/media-os.js",
-        "distribution:components/flex-fields-media-capture-device-session-VIDGRVTQ.js",
-        "distribution:components/flex-fields-media-capture-photo-TXGLWXPO.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
-        "distribution:components/flex-fields-media-upload-form-processing-IUUKBRLW.js",
-        "distribution:components/flex-fields-media-upload-livewire-upload-TSRA4GM2.js",
-        "distribution:components/flex-fields-media-upload-submit-barrier-UFXFV5UW.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js"
+        "distribution:components/flex-fields-media-capture-device-session-KOXEXUQO.js",
+        "distribution:components/flex-fields-media-capture-photo-43CV7OJR.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
+        "distribution:components/flex-fields-media-upload-form-processing-SZXAAXTS.js",
+        "distribution:components/flex-fields-media-upload-livewire-upload-MVRTQIPC.js",
+        "distribution:components/flex-fields-media-upload-submit-barrier-C7QKD4L2.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js"
       ],
       "entry": "distribution:components/media-os.js",
       "kind": "full",
@@ -4506,11 +4524,11 @@
       "chunks": [
         "distribution:components/nps-field.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZIAOASLC.js"
       ],
       "entry": "distribution:components/nps-field.js",
       "kind": "full",
@@ -4529,10 +4547,10 @@
       "chunks": [
         "distribution:components/number-stepper.js",
         "distribution:components/flex-fields-number-flow-AHJHQTPZ.js",
-        "distribution:components/flex-fields-number-format-TBWOFLS6.js",
+        "distribution:components/flex-fields-number-format-AYQWRVAT.js",
         "distribution:components/flex-fields-number-stepper-value-AZZGZJVH.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js"
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js"
       ],
       "entry": "distribution:components/number-stepper.js",
       "kind": "full",
@@ -4574,32 +4592,33 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/phone-field.js"
       ],
@@ -4641,10 +4660,10 @@
       ],
       "chunks": [
         "distribution:components/price-range.js",
-        "distribution:components/flex-fields-number-format-TBWOFLS6.js",
+        "distribution:components/flex-fields-number-format-AYQWRVAT.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/price-range.js",
@@ -4751,8 +4770,8 @@
       "chunks": [
         "distribution:components/rating-field.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/rating-field.js",
@@ -4789,8 +4808,8 @@
       "chunks": [
         "distribution:components/rating-field.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": null,
@@ -4811,14 +4830,14 @@
       ],
       "chunks": [
         "distribution:components/media-os.js",
-        "distribution:components/flex-fields-media-capture-device-session-VIDGRVTQ.js",
-        "distribution:components/flex-fields-media-capture-photo-TXGLWXPO.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
-        "distribution:components/flex-fields-media-upload-form-processing-IUUKBRLW.js",
-        "distribution:components/flex-fields-media-upload-livewire-upload-TSRA4GM2.js",
-        "distribution:components/flex-fields-media-upload-submit-barrier-UFXFV5UW.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-media-capture-device-session-KOXEXUQO.js",
+        "distribution:components/flex-fields-media-capture-photo-43CV7OJR.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
+        "distribution:components/flex-fields-media-upload-form-processing-SZXAAXTS.js",
+        "distribution:components/flex-fields-media-upload-livewire-upload-MVRTQIPC.js",
+        "distribution:components/flex-fields-media-upload-submit-barrier-C7QKD4L2.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-rich-editor.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js"
       ],
@@ -4898,36 +4917,37 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/switch.js",
-        "distribution:components/flex-fields-runtime-motion-spring-transition-5W5B5PQV.js",
-        "distribution:components/flex-fields-shared-AWU2O33E.js",
+        "distribution:components/flex-fields-runtime-motion-spring-transition-BZG35VHD.js",
+        "distribution:components/flex-fields-shared-GVAJQGES.js",
         "distribution:components/schedule-field.js",
         "distribution:components/flex-fields-time-utils-Z3U324ME.js"
       ],
@@ -4947,11 +4967,11 @@
       ],
       "chunks": [
         "distribution:components/segment-control.js",
-        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-components-segments-runtime-P5DS3WRU.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZIAOASLC.js"
       ],
       "entry": "distribution:components/segment-control.js",
       "kind": "full",
@@ -4974,11 +4994,11 @@
       ],
       "chunks": [
         "distribution:components/segment-tabs.js",
-        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-components-segments-runtime-P5DS3WRU.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZIAOASLC.js"
       ],
       "entry": "distribution:components/segment-tabs.js",
       "kind": "full",
@@ -5002,32 +5022,33 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js"
       ],
       "entry": "distribution:components/select-field.js",
@@ -5063,14 +5084,14 @@
       ],
       "chunks": [
         "distribution:components/media-os.js",
-        "distribution:components/flex-fields-media-capture-device-session-VIDGRVTQ.js",
-        "distribution:components/flex-fields-media-capture-photo-TXGLWXPO.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
-        "distribution:components/flex-fields-media-upload-form-processing-IUUKBRLW.js",
-        "distribution:components/flex-fields-media-upload-livewire-upload-TSRA4GM2.js",
-        "distribution:components/flex-fields-media-upload-submit-barrier-UFXFV5UW.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-media-capture-device-session-KOXEXUQO.js",
+        "distribution:components/flex-fields-media-capture-photo-43CV7OJR.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
+        "distribution:components/flex-fields-media-upload-form-processing-SZXAAXTS.js",
+        "distribution:components/flex-fields-media-upload-livewire-upload-MVRTQIPC.js",
+        "distribution:components/flex-fields-media-upload-submit-barrier-C7QKD4L2.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/signature-field.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js"
       ],
@@ -5112,12 +5133,12 @@
         "distribution:components/flex-text-input.js",
         "distribution:components/flex-fields-components-text-input-counters-FY6RVV2S.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/segment-control.js",
-        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
+        "distribution:components/flex-fields-components-segments-runtime-P5DS3WRU.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js",
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZIAOASLC.js",
         "distribution:components/slug-field.js",
         "distribution:components/flex-fields-components-text-input-presentation-UZ6BEZDV.js"
       ],
@@ -5145,32 +5166,33 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/social-links-field.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js"
@@ -5233,11 +5255,11 @@
       "chunks": [
         "distribution:components/switch.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
-        "distribution:components/flex-fields-runtime-motion-spring-transition-5W5B5PQV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
+        "distribution:components/flex-fields-runtime-motion-spring-transition-BZG35VHD.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
-        "distribution:components/flex-fields-shared-AWU2O33E.js"
+        "distribution:components/flex-fields-shared-GVAJQGES.js"
       ],
       "entry": "distribution:components/switch.js",
       "kind": "full",
@@ -5280,32 +5302,33 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js",
         "distribution:components/tags-field.js"
       ],
@@ -5386,8 +5409,8 @@
         "distribution:components/flex-fields-date-time-input-value-motion-HZFIOFHN.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": null,
@@ -5410,32 +5433,33 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js"
       ],
       "entry": null,
@@ -5486,8 +5510,8 @@
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js"
       ],
@@ -5507,11 +5531,11 @@
       ],
       "chunks": [
         "distribution:components/track-slider.js",
-        "distribution:components/flex-fields-number-format-TBWOFLS6.js",
+        "distribution:components/flex-fields-number-format-AYQWRVAT.js",
         "distribution:components/flex-fields-number-stepper-value-AZZGZJVH.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/track-slider.js",
@@ -5531,8 +5555,8 @@
       "chunks": [
         "distribution:components/traffic-split.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/traffic-split.js",
@@ -5554,11 +5578,11 @@
       ],
       "chunks": [
         "distribution:components/segment-tabs.js",
-        "distribution:components/flex-fields-components-segments-runtime-APEQ2ZHB.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-components-segments-runtime-P5DS3WRU.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-segment-indicator-KLHWJSOK.js",
-        "distribution:components/flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js"
+        "distribution:components/flex-fields-virtual-first-paint-v1-segment-ZIAOASLC.js"
       ],
       "entry": null,
       "kind": "styles-only",
@@ -5619,32 +5643,33 @@
       ],
       "chunks": [
         "distribution:components/select-field.js",
-        "distribution:components/flex-fields-combobox-engine-D42A64ER.js",
-        "distribution:components/flex-fields-flex-alpine-load-gate-BGVAAIL4.js",
+        "distribution:components/flex-fields-combobox-engine-QLL4USML.js",
+        "distribution:components/flex-fields-flex-alpine-load-gate-3MLBBZ7S.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-flex-text-input-caret-5WBJDQLJ.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-observability-ZSQ5ZUOF.js",
-        "distribution:components/flex-fields-overlay-backdrop-SIZG7TPM.js",
-        "distribution:components/flex-fields-overlay-picker-lifetime-TIEM4SYP.js",
+        "distribution:components/flex-fields-overlay-backdrop-3MNXNS2X.js",
+        "distribution:components/flex-fields-overlay-picker-lifetime-LW42B3HX.js",
         "distribution:components/flex-fields-overlay-scrollbar-IQF2C74O.js",
-        "distribution:components/flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js",
+        "distribution:components/flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js",
+        "distribution:components/flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js",
         "distribution:components/flex-fields-runtime-alpine-owner-data-KGASJP7X.js",
         "distribution:components/flex-fields-runtime-alpine-runtime-readiness-2B6V6YGX.js",
-        "distribution:components/flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js",
-        "distribution:components/flex-fields-runtime-assets-asset-url-I7JBWAKY.js",
+        "distribution:components/flex-fields-runtime-assets-asset-link-store-CTH4THYP.js",
+        "distribution:components/flex-fields-runtime-assets-asset-url-LFOCIXUG.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js",
         "distribution:components/flex-fields-search-normalize-WCBTD3TJ.js",
         "distribution:components/flex-fields-select-async-request-coordinator-M2LTV7A2.js",
+        "distribution:components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js",
         "distribution:components/flex-fields-select-menu-NYMR53KH.js",
-        "distribution:components/flex-fields-select-options-catalog-presentation-STNBSOW4.js",
-        "distribution:components/flex-fields-select-trigger-IEEIKS4X.js",
+        "distribution:components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js",
+        "distribution:components/flex-fields-select-trigger-4RKFPUYQ.js",
         "distribution:components/flex-fields-shared-TG5QT42P.js",
-        "distribution:components/flex-fields-teleported-menu-position-OCN7C4TI.js",
+        "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js",
         "distribution:components/flex-fields-theme-utils-NVH3CBRX.js"
       ],
       "entry": null,
@@ -5667,8 +5692,8 @@
         "distribution:components/flex-verification-code.js",
         "distribution:components/flex-fields-runtime-alpine-owned-watch-SBKX7D3X.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": null,
@@ -5689,8 +5714,8 @@
         "distribution:components/video-field.js",
         "distribution:components/flex-fields-flex-dropdown-coordinator-PX45RHEK.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js"
       ],
       "entry": "distribution:components/video-field.js",
@@ -5714,17 +5739,17 @@
       ],
       "chunks": [
         "distribution:components/media-os.js",
-        "distribution:components/flex-fields-media-capture-device-session-VIDGRVTQ.js",
-        "distribution:components/flex-fields-media-capture-photo-TXGLWXPO.js",
-        "distribution:components/flex-fields-media-lifecycle-owner-NHCBPEZB.js",
-        "distribution:components/flex-fields-media-upload-form-processing-IUUKBRLW.js",
-        "distribution:components/flex-fields-media-upload-livewire-upload-TSRA4GM2.js",
-        "distribution:components/flex-fields-media-upload-submit-barrier-UFXFV5UW.js",
-        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js",
-        "distribution:components/flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js",
+        "distribution:components/flex-fields-media-capture-device-session-KOXEXUQO.js",
+        "distribution:components/flex-fields-media-capture-photo-43CV7OJR.js",
+        "distribution:components/flex-fields-media-lifecycle-owner-KLOZQRQC.js",
+        "distribution:components/flex-fields-media-upload-form-processing-SZXAAXTS.js",
+        "distribution:components/flex-fields-media-upload-livewire-upload-MVRTQIPC.js",
+        "distribution:components/flex-fields-media-upload-submit-barrier-C7QKD4L2.js",
+        "distribution:components/flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js",
+        "distribution:components/flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js",
         "distribution:components/voice-note-recorder-field.js",
-        "distribution:components/flex-fields-audio-3GJ53BX4.js",
-        "distribution:components/flex-fields-audio-load-buffer-A7EXGR22.js",
+        "distribution:components/flex-fields-audio-PUVD7B3D.js",
+        "distribution:components/flex-fields-audio-load-buffer-Q6Y7Y2IF.js",
         "distribution:components/flex-fields-media-lifecycle-native-operation-72ZTRVCE.js",
         "distribution:components/flex-fields-merge-alpine-component-data-QM7C5ZRT.js",
         "distribution:components/flex-fields-runtime-filament-activation-mutation-KPJKTX57.js",

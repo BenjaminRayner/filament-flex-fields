@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
+use Bjanczak\FilamentFlexFields\Concerns\RendersStockFieldView;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\HasNumberLocale;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\NumberStepper\ConfiguresStepperAppearance;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\NumberStepper\ConfiguresStepperValue;
@@ -24,6 +25,7 @@ class NumberStepper extends Field implements CanHaveNumericState
     use HasControlSize;
     use HasNumberLocale;
     use PresentsStepper;
+    use RendersStockFieldView;
 
     protected string $view = 'filament-flex-fields::forms.components.number-stepper';
 

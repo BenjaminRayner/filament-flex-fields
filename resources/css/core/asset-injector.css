@@ -211,7 +211,7 @@ html.dark .fff-flex-fields-assets-skeleton::before,
         }
     }
 
-    @scope (:where(*:not(html):not(body)):has(> [data-fff-asset-batch]:not([data-fff-assets-ready=""]))) {
+    @scope (:where([data-fff-paint-owner]):has(> [data-fff-asset-batch]:not([data-fff-assets-ready=""]))) {
         /* Repeated :scope preserves the fallback's two-attribute specificity. */
         :scope:scope * {
             visibility: hidden !important;
@@ -224,7 +224,7 @@ html.dark .fff-flex-fields-assets-skeleton::before,
         }
     }
 
-    @scope (:where(*:not(html):not(body)):has(> [data-fff-assets-settling])) {
+    @scope (:where([data-fff-paint-owner]):has(> [data-fff-assets-settling])) {
         :scope,
         :scope * {
             transition: none !important;

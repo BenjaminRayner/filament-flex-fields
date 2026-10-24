@@ -1,6 +1,7 @@
 @php
     use Filament\Support\Enums\IconSize;
 
+    $fffPresentations = app(\Bjanczak\FilamentFlexFields\Support\Rendering\BladePresentation::class);
     $presentation = $field->getTextareaPresentation();
     $options = $presentation->configuration;
     $statePath = $options['statePath'];
@@ -29,21 +30,25 @@
         'emojiInputStylesUrl' => $shouldEnableEmojiPicker ? \Bjanczak\FilamentFlexFields\Support\FlexFieldAssets::stylesheetHref('flex-text-input') : null,
         'emojiShadowStylesUrl' => $shouldEnableEmojiPicker ? \Bjanczak\FilamentFlexFields\Support\Assets\PublishedResourceUrl::for('emoji-picker', 'shadow-styles', 'shadow.css') : null,
     ];
+    $bootstrapOptions = app(\Bjanczak\FilamentFlexFields\Support\Rendering\ControlConfigurationDictionary::class)->bootstrap('flex-textarea', $clientOptions);
 @endphp
 
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
-    :attributes="
-        \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
-            ->class($wrapperClasses)
-    "
->
+@php
+    $fffPresentationView = $fffPresentations->view('filament-flex-fields::field-wrapper', [
+        'component' => $getFieldWrapperView(),
+        'field' => $field,
+        'attributes' => \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())->class($wrapperClasses),
+    ]);
+    if ($fffPresentationView['view'] !== null):
+@endphp
+@component($fffPresentationView['view'], $fffPresentationView['data'])
     <div
+        data-fff-paint-owner
+        @if (isset($bootstrapOptions['configurationId'])) data-fff-control-configuration-id="{{ $bootstrapOptions['configurationId'] }}" @endif
         wire:key="{{ $getLivewireKey() }}.{{ $presentation->identity }}"
         x-fff-load
         x-fff-load-src="{{ \Bjanczak\FilamentFlexFields\Support\FlexFieldAssets::alpineEntrySrc('flex-textarea') }}"
-        x-data="flexTextareaFormComponent(@js($clientOptions))"
+        x-data="flexTextareaFormComponent(@js($bootstrapOptions), $el)"
         {{ $getExtraAlpineAttributeBag() }}
         @class([
             'fff-flex-textarea',
@@ -180,4 +185,5 @@
             <p class="fff-flex-textarea__footer">{{ $footer }}</p>
         @endif
     </div>
-</x-dynamic-component>
+@endcomponent
+@php endif; @endphp

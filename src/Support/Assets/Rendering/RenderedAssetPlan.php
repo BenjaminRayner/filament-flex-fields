@@ -13,6 +13,18 @@ final readonly class RenderedAssetPlan
 
     public string $id;
 
+    /** @var list<string> */
+    public array $stylesheets;
+
+    /** @var list<string> */
+    public array $chunks;
+
+    /** @var array<string, int> */
+    public array $sizes;
+
+    /** @var array<string, array{package: string, component: string, export: string, abi: 1}> */
+    public array $factoryOwners;
+
     /** Validate a self-contained nested fragment before merging its dictionary. */
     public static function fromJson(string $json): self
     {
@@ -67,6 +79,10 @@ final readonly class RenderedAssetPlan
         }
         ksort($sizes, SORT_STRING);
         ksort($factoryOwners, SORT_STRING);
+        $this->stylesheets = $stylesheets;
+        $this->chunks = $chunks;
+        $this->sizes = $sizes;
+        $this->factoryOwners = $factoryOwners;
         $this->json = json_encode([
             'format' => 1, 'component' => $component,
             'stylesheets' => $stylesheets, 'chunks' => $chunks,

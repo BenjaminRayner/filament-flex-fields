@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Assets\Rendering;
 
+use Bjanczak\FilamentFlexFields\Support\Rendering\ControlConfigurationDictionary;
+use Bjanczak\FilamentFlexFields\Support\Rendering\PortalTemplateDictionary;
+use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
 use Closure;
 use LogicException;
 
@@ -36,7 +39,12 @@ final class AssetPlanDictionary
     /** Final serialized fragment; discarded renders never consume an emitted flag. */
     public function project(string $html, bool $rooted = true): string
     {
-        return FragmentPlanProjection::project($html, $this->plans, $rooted);
+        $portals = str_contains($html, 'data-fff-portal-template-')
+            ? RequestState::resolve(PortalTemplateDictionary::class)->all() : [];
+        $configurations = str_contains($html, 'data-fff-control-configuration-')
+            ? RequestState::resolve(ControlConfigurationDictionary::class)->all() : [];
+
+        return FragmentPlanProjection::project($html, $this->plans, $rooted, $portals, $configurations);
     }
 
     /** @param Closure(self): string $renderer */

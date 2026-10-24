@@ -1,9 +1,10 @@
+import { prepareRenderedSelectPortal } from '../../configuration/rendered-portal.js'
 import headlessComboboxAlpine from '../../../components/select-field/headless-combobox-alpine.js'
 import { createIconOptionSource } from './source.js'
 import { createIconSelectionPreview } from './preview.js'
 
 /** Icon-specific commands compose one real Select engine and one owned portal. */
-export function createIconSelect(configuration) {
+export function createIconSelect(configuration, root = null) {
     let owner = null, preview = null
     let previewWindow = null, previewRows = new Set()
     const paintedPreviews = new WeakMap()
@@ -16,7 +17,7 @@ export function createIconSelect(configuration) {
     const base = headlessComboboxAlpine({
         state:configuration.state, initialState:initial,
         options:initial ? [{value:initial,label:initial,preview:configuration.initialSelectedHtml ?? ''}] : [],
-        initialOptionLabel:initial, componentKey:configuration.componentKey,
+        initialOptionLabel:initial, menuLabel:configuration.menuLabel,componentKey:configuration.componentKey,
         livewireId:configuration.livewireId, menuDomId:configuration.menuDomId,
         dataSource:source, hasPaginatedSearchResults:true, optionsLimit:0,
         searchDebounce:120, minSearchLength:0, isPreloaded:true,
@@ -33,6 +34,7 @@ export function createIconSelect(configuration) {
         noSearchResultsMessage:configuration.labels.noResults,
         noOptionsMessage:configuration.labels.noResults, loadingMoreMessage:configuration.labels.loadMore,
     })
+    if (root) base.prepareHeadlessPortal = prepareRenderedSelectPortal(root)
     const initialize = base.init, destroy = base.destroy
     return {
         ...base,

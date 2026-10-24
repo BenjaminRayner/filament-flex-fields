@@ -1,10 +1,10 @@
 @php
+    $fffPresentations = app(\Bjanczak\FilamentFlexFields\Support\Rendering\BladePresentation::class);
     use Filament\Support\Enums\IconSize;
 
     $fieldWrapperView = $getFieldWrapperView();
-    $clearIconHtml = \Filament\Support\generate_icon_html($field->getClearIcon(), attributes: new \Illuminate\View\ComponentAttributeBag(['stroke-width' => 2]), size: IconSize::ExtraSmall)?->toHtml() ?? '';
-    $chevronIconHtml = \Filament\Support\generate_icon_html($field->getChevronIcon(), attributes: new \Illuminate\View\ComponentAttributeBag(['stroke-width' => 2]), size: IconSize::ExtraSmall)?->toHtml() ?? '';
-    $selectedOptionCheckIconHtml = \Filament\Support\generate_icon_html($field->getSelectedOptionCheckIcon(), size: IconSize::Small)?->toHtml() ?? '';
+    $clearIconHtml = app(\Bjanczak\FilamentFlexFields\Support\Rendering\RenderedControlIcon::class)->render($field->getClearIcon(), attributes: new \Illuminate\View\ComponentAttributeBag(['stroke-width' => 2]), size: IconSize::ExtraSmall);
+    $chevronIconHtml = app(\Bjanczak\FilamentFlexFields\Support\Rendering\RenderedControlIcon::class)->render($field->getChevronIcon(), attributes: new \Illuminate\View\ComponentAttributeBag(['stroke-width' => 2]), size: IconSize::ExtraSmall);
     $extraInputAttributeBag = $getExtraInputAttributeBag();
     $canSelectPlaceholder = $canSelectPlaceholder();
     $isAutofocused = $isAutofocused();
@@ -48,15 +48,30 @@
     $variant = $getVariant();
     $isItemCardVariant = $variant === 'item-card';
     $itemCardInitialTriggerLabel = $field->getItemCardInitialTriggerLabel();
-    $initialTriggerLabel = $field->getInitialTriggerLabel();
-    $initialTriggerBadges = $field->getInitialTriggerBadges();
     $isInitialTriggerPlaceholder = blank($state);
     $isUserSelectField = method_exists($field, 'renderUserOption');
+    // The guarded stock renderer has no custom view data or partials. Reuse
+    // this instance's bootstrap snapshot for its SSR label/chips; never share
+    // selections, resolver results or callbacks between fields/renders.
+    $reuseInitialPresentation = ($fffStockViewContext ?? false) && ! $isNative;
+    if ($reuseInitialPresentation) {
+        $headlessAlpineConfig = $getHeadlessAlpineConfig();
+    }
+    $initialTriggerLabel = $reuseInitialPresentation && filled($state)
+        ? $headlessAlpineConfig['initialOptionLabel'] : $field->getInitialTriggerLabel();
+    $initialTriggerBadges = $reuseInitialPresentation && filled($state) && ! $isItemCardVariant
+        ? ($isMultiple ? array_map(static fn (array $entry): array => [
+            'value' => $entry['value'], 'label' => $entry['triggerLabel'] ?? $entry['label'],
+        ], $headlessAlpineConfig['initialOptionLabels']) : []) : $field->getInitialTriggerBadges();
+    $selectedOptionCheckIconHtml = $reuseInitialPresentation
+        ? $headlessAlpineConfig['selectedOptionCheckIconHtml']
+        : (app(\Bjanczak\FilamentFlexFields\Support\Rendering\RenderedControlIcon::class)->render($field->getSelectedOptionCheckIcon(), size: IconSize::Small));
     $initialUserSelectDisplay = $isUserSelectField && $isMultiple ? $field->getInitialUserSelectDisplay() : null;
     $initialMultipleTriggerHtml = $initialUserSelectDisplay['triggerHtml'] ?? null;
     $userSelectTagsHtml = $initialUserSelectDisplay['tagsHtml'] ?? null;
     $initialSelectedUserEntriesForJs = $isUserSelectField ? $field->getInitialSelectedUserEntriesForJs() : [];
-    $chipRemoveIconHtml = view('filament-flex-fields::forms.components.partials.tag-pill-remove-icon')->render();
+    $chipRemoveIconHtml = ($fffStockViewContext ?? false) && ! $isMultiple && ! $isUserSelectField
+        ? '' : view('filament-flex-fields::forms.components.partials.tag-pill-remove-icon')->render();
     $tagRemoveIconHtml = $isUserSelectField
         ? $chipRemoveIconHtml
         : $clearIconHtml;
@@ -76,32 +91,35 @@
         && $itemCardInitialTriggerLabel !== null;
 @endphp
 
-<x-dynamic-component
-    :component="$fieldWrapperView"
-    :field="$field"
-    :label-sr-only="$showInlineFieldLabel || $isLabelHidden()"
-    class="fi-fo-select-wrp fff-select-field-wrapper fi-fixed-positioning-context"
-    data-fff-lazy-alpine-mount="select-field"
->
+@php
+    $fffPresentationView = $fffPresentations->view('filament-flex-fields::field-wrapper', [
+        'component' => $fieldWrapperView,
+        'field' => $field,
+        'labelSrOnly' => $showInlineFieldLabel || $isLabelHidden(),
+        'attributes' => new \Illuminate\View\ComponentAttributeBag(['class' => 'fi-fo-select-wrp fff-select-field-wrapper fi-fixed-positioning-context', 'data-fff-lazy-alpine-mount' => 'select-field'])
+    ]);
+    if ($fffPresentationView['view'] !== null):
+@endphp
+@component($fffPresentationView['view'], $fffPresentationView['data'])
     @include('filament-flex-fields::partials.load-stylesheet', ['component' => $field->getAssetComponent(),
         'livewireKey' => $getLivewireKey(),
     ])
     {{ $field->getSelectCatalogMarkup() }}
-    <x-filament::input.wrapper
-        :disabled="$isDisabled"
-        :inline-prefix="$isPrefixInline"
-        :inline-suffix="$isSuffixInline"
-        :prefix="$prefixLabel"
-        :prefix-actions="$prefixActions"
-        :prefix-icon="$prefixIcon"
-        :prefix-icon-color="$prefixIconColor"
-        :suffix="$suffixLabel"
-        :suffix-actions="$suffixActions"
-        :suffix-icon="$suffixIcon"
-        :suffix-icon-color="$suffixIconColor"
-        :valid="! $errors->has($statePath)"
-        :x-on:focus-input.stop="$isNative ? '$el.querySelector(\'select\')?.focus()' : '$el.querySelector(\'.fi-select-input-btn\')?.focus()'"
-        :attributes="
+    @php
+    $fffPresentationView = $fffPresentations->view('filament::input.wrapper', [
+        'disabled' => $isDisabled,
+        'inlinePrefix' => $isPrefixInline,
+        'inlineSuffix' => $isSuffixInline,
+        'prefix' => $prefixLabel,
+        'prefixActions' => $prefixActions,
+        'prefixIcon' => $prefixIcon,
+        'prefixIconColor' => $prefixIconColor,
+        'suffix' => $suffixLabel,
+        'suffixActions' => $suffixActions,
+        'suffixIcon' => $suffixIcon,
+        'suffixIconColor' => $suffixIconColor,
+        'valid' => ! $errors->has($statePath),
+        'attributes' => (
             \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
                 ->class([
                     'fi-fo-select',
@@ -109,8 +127,11 @@
                     'fi-fo-select-native' => $isNative,
                     ...$wrapperClasses,
                 ])
-        "
-    >
+        )->merge(['x-on:focus-input.stop' => $isNative ? '$el.querySelector(\'select\')?.focus()' : '$el.querySelector(\'.fi-select-input-btn\')?.focus()'])
+    ]);
+    if ($fffPresentationView['view'] !== null):
+@endphp
+@component($fffPresentationView['view'], $fffPresentationView['data'])
         @if ($isNative)
             @php
                 $options = $getOptions();
@@ -167,7 +188,8 @@
         @else
             @include('filament-flex-fields::forms.components.partials.select-field-headless')
         @endif
-    </x-filament::input.wrapper>
+    @endcomponent
+@php endif; @endphp
 
     @if ($isUserSelectField && $isMultiple && $field->shouldRenderMultipleUserTags())
         @if (($userSelectTagsHtml ?? null) !== null)
@@ -176,4 +198,5 @@
             <div class="fff-user-select__selected-tags" data-fff-user-select-tags hidden></div>
         @endif
     @endif
-</x-dynamic-component>
+@endcomponent
+@php endif; @endphp

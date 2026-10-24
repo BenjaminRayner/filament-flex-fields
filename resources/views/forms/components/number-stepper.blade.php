@@ -19,7 +19,16 @@
     }
 @endphp
 
-<x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
+@php
+    $fffPresentations = app(\Bjanczak\FilamentFlexFields\Support\Rendering\BladePresentation::class);
+    $fffPresentationView = $fffPresentations->view('filament-flex-fields::field-wrapper', [
+        'component' => $getFieldWrapperView(),
+        'field' => $field,
+        'attributes' => new \Illuminate\View\ComponentAttributeBag,
+    ]);
+    if ($fffPresentationView['view'] !== null):
+@endphp
+@component($fffPresentationView['view'], $fffPresentationView['data'])
     @include('filament-flex-fields::partials.load-stylesheet', [
         'component' => 'number-stepper',
         'livewireKey' => $getLivewireKey(),
@@ -49,4 +58,5 @@
         @include('filament-flex-fields::forms.components.partials.number-stepper.display')
         @include('filament-flex-fields::forms.components.partials.number-stepper-button', $buttons[1])
     </div>
-</x-dynamic-component>
+@endcomponent
+@php endif; @endphp

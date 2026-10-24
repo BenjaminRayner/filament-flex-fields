@@ -1,3 +1,4 @@
+import { materializeControlMetadata } from '../runtime/alpine/control-configurations.js';
 /**
  * SelectField Alpine entry — headless combobox (v3+ / FFART).
  */
@@ -9,6 +10,8 @@ export {
 
 import { getAlpineLoadGate } from '../core/flex-alpine-load-gate.js';
 import headlessComboboxAlpine from './select-field/headless-combobox-alpine.js';
+import { readRenderedSelectConfiguration } from '../select/configuration/rendered-configuration.js';
+import { prepareRenderedSelectPortal } from '../select/configuration/rendered-portal.js';
 
 const gate = getAlpineLoadGate();
 
@@ -20,8 +23,12 @@ export function markSelectFieldShellAttached(shell, attached) {
     shell.dataset.fffSelectAttached = attached ? 'true' : 'false';
 }
 
-export function fffHeadlessSelectField(config = {}) {
-    return headlessComboboxAlpine(config);
+export function fffHeadlessSelectField(config = {}, root = null) {
+    let configuration = root?.querySelector?.(':scope > template[data-fff-select-configuration]') ? { ...readRenderedSelectConfiguration(root), ...config } : config;
+    if (configuration.presentationConfigurationId) configuration = { ...materializeControlMetadata(configuration.presentationConfigurationId, 'select-configuration', root), ...configuration };
+    const component = headlessComboboxAlpine(configuration);
+    if (root) component.prepareHeadlessPortal = prepareRenderedSelectPortal(root);
+    return component;
 }
 
 export default fffHeadlessSelectField;

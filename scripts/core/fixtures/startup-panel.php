@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Bjanczak\BladeHugeicons\BladeHugeiconsServiceProvider;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
+use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
 use Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin;
 use Bjanczak\FilamentFlexFields\FilamentFlexFieldsServiceProvider;
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
@@ -37,7 +38,7 @@ require dirname(__DIR__, 3).'/vendor/autoload.php';
 
 $case = $argv[1] ?? '';
 $directory = realpath($argv[2] ?? '');
-if (! in_array($case, ['publish', 'native', 'enabled-empty', 'one', 'twenty', 'hundred', 'dynamic', 'tabs'], true)
+if (! in_array($case, ['publish', 'native', 'enabled-empty', 'one', 'twenty', 'hundred', 'dynamic', 'tabs', 'portal', 'portal-page'], true)
     || $directory === false || ! is_file($directory.'/.startup-fixture')) {
     throw new InvalidArgumentException('An isolated startup fixture directory and a known case are required.');
 }
@@ -107,7 +108,7 @@ class StartupCostPanel extends Page
     public function mount(): void
     {
         $this->scenario = (string) request()->query('case');
-        $this->dynamicDemo = $this->scenario === 'dynamic';
+        $this->dynamicDemo = in_array($this->scenario, ['dynamic', 'portal'], true);
         $this->form->fill();
     }
 
@@ -116,15 +117,29 @@ class StartupCostPanel extends Page
         return Action::make('firstFlex')->label('Open first FLEX field')
             ->schema(fn (): array => [
                 FlexTextInput::make('message')->label('Message')->required(),
+                ...($this->scenario === 'portal' ? $this->portalFields('Parent') : []),
                 Action::make('nestedFlex')->label('Open child FLEX field')
-                    ->schema([FlexTextInput::make('child_message')->label('Child message')->required()])
+                    ->schema(fn (): array => [FlexTextInput::make('child_message')->label('Child message')->required(),
+                        ...($this->scenario === 'portal' ? $this->portalFields('Child') : []),
+                    ])
                     ->action(static fn (): null => null),
             ])
             ->action(static fn (): null => null);
     }
 
+    /** @return list<SelectField> */
+    private function portalFields(string $prefix): array
+    {
+        return array_map(static fn (int $index): SelectField => SelectField::make(strtolower($prefix).'_'.$index)
+            ->label($prefix.' select '.$index)->options(['a' => 'Alpha', 'b' => 'Beta', 'c' => 'Gamma'])
+            ->searchable()->default('a'), [1, 2]);
+    }
+
     public function form(Schema $schema): Schema
     {
+        if (($this->scenario ?: request()->query('case')) === 'portal-page') {
+            return $schema->statePath('data')->components($this->portalFields('Page'));
+        }
         if (($this->scenario ?: request()->query('case')) === 'tabs') {
             return $schema->statePath('data')->components([Tabs::make('Startup tabs')->tabs([
                 Tab::make('Basics')->schema([TextInput::make('title')->label('Title')]),

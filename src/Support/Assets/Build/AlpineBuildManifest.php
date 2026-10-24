@@ -100,6 +100,7 @@ final class AlpineBuildManifest
         $source = match ($name) {
             'segment' => 'core/segment-overflow-ssr.js',
             'timezone' => 'core/timezone-browser-ssr-entry.js',
+            'readiness' => 'core/scoped-style-readiness-ssr.js',
             default => throw new RuntimeException('Unknown first-paint contract.'),
         };
         $data = $this->data();

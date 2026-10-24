@@ -301,7 +301,7 @@ return [
         ],
         'segment-control' => [
             'label' => 'Control de segmentos',
-            'description' => 'Control segmentado de selección única estilo IOS con indicadores deslizantes, íconos y expansión de etiquetas animadas.',
+            'description' => 'Control segmentado de selección única con indicadores deslizantes, íconos y expansión de etiquetas animadas.',
         ],
         'segment-tabs' => [
             'label' => 'Pestañas de segmentos',

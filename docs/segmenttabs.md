@@ -1,6 +1,6 @@
 ---
 title: "SegmentTabs"
-description: Schema layout component featuring iOS-style segmented tabs with per-tab form schemas and query-string persistence.
+description: Schema layout component featuring segmented tabs with per-tab form schemas and query-string persistence.
 icon: "panels-left-bottom"
 "canonical": "https://flex-fields.bjanczak.com/docs/segmenttabs"
 "og:type": "article"
@@ -48,7 +48,7 @@ icon: "panels-left-bottom"
       "@id": "https://flex-fields.bjanczak.com/docs/segmenttabs#webpage",
       "url": "https://flex-fields.bjanczak.com/docs/segmenttabs",
       "name": "SegmentTabs",
-      "description": "Schema layout component featuring iOS-style segmented tabs with per-tab form schemas and query-string persistence.",
+      "description": "Schema layout component featuring segmented tabs with per-tab form schemas and query-string persistence.",
       "inLanguage": "en",
       "isPartOf": {
         "@id": "https://flex-fields.bjanczak.com/#website"
@@ -62,7 +62,7 @@ icon: "panels-left-bottom"
       "@id": "https://flex-fields.bjanczak.com/docs/segmenttabs#article",
       "url": "https://flex-fields.bjanczak.com/docs/segmenttabs",
       "headline": "SegmentTabs",
-      "description": "Schema layout component featuring iOS-style segmented tabs with per-tab form schemas and query-string persistence.",
+      "description": "Schema layout component featuring segmented tabs with per-tab form schemas and query-string persistence.",
       "inLanguage": "en",
       "mainEntityOfPage": {
         "@id": "https://flex-fields.bjanczak.com/docs/segmenttabs#webpage"
@@ -78,7 +78,7 @@ icon: "panels-left-bottom"
       "@type": "VideoObject",
       "@id": "https://flex-fields.bjanczak.com/art/previews/segment-tabs-motion.mp4#video",
       "name": "SegmentTabs — FLEX Fields demonstration",
-      "description": "A recorded demonstration of SegmentTabs in the FLEX Fields playground for Filament. Schema layout component featuring iOS-style segmented tabs with per-tab form schemas and query-string persistence.",
+      "description": "A recorded demonstration of SegmentTabs in the FLEX Fields playground for Filament. Schema layout component featuring segmented tabs with per-tab form schemas and query-string persistence.",
       "thumbnailUrl": [
         "https://flex-fields.bjanczak.com/art/previews/segment-tabs.webp"
       ],
@@ -118,7 +118,7 @@ icon: "panels-left-bottom"
 
 ### Summary
 
-Schema layout component providing **iOS-style segmented tabs**. Each tab wraps a nested form schema, allowing for clean organization of complex forms. Shares the same visual language as [SegmentControl](/docs/segmentcontrol).
+Schema layout component providing **segmented tabs**. Each tab wraps a nested form schema, allowing for clean organization of complex forms. Shares the same visual language as [SegmentControl](/docs/segmentcontrol).
 
 | | |
 |---|---|

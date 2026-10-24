@@ -24,8 +24,14 @@
     @if ($configuration['inline'])
         @include('filament-flex-fields::forms.components.partials.color-picker.panel', ['colorInline' => true])
     @else
-        <template x-teleport="body">
-            @include('filament-flex-fields::forms.components.partials.color-picker.panel', ['colorInline' => false])
+        <template x-if="panelMounted" data-fff-color-lazy-panel>
+            <template x-teleport="body">
+                @include('filament-flex-fields::forms.components.partials.color-picker.panel', ['colorInline' => false])
+            </template>
         </template>
+        <div class="fff-color-error" role="alert" x-cloak x-show="panelLoadError">
+            {{ __('filament-flex-fields::default.select_field.load_error') }}
+            <button type="button" x-on:click="openPanel()">{{ __('filament-flex-fields::default.select_field.retry') }}</button>
+        </div>
     @endif
 </div>

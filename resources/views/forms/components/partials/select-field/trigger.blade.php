@@ -49,6 +49,7 @@
                             x-text="triggerLabelHtml()"
                         >{{ $itemCardInitialTriggerLabel }}</span>
                     @else
+                    @if ($isMultiple && ! $isUserSelectField)
                     <template x-if="! isUserSelectField && multiple && selectedChips().length > 0">
                         <span
                             class="fi-select-input-value-badges-ctn"
@@ -104,6 +105,7 @@
                         </span>
                     </template>
 
+                    @endif
                     @if ($showHeadlessStaticTriggerLabel)
                         <span
                             @class([

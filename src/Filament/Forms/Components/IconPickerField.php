@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldFocusOutline;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
+use Bjanczak\FilamentFlexFields\Concerns\RendersStockFieldView;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\HasSelectFieldIcons;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\IconPicker\ConfiguresIconPicker;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\IconPicker\PresentsIconPicker;
@@ -34,6 +35,7 @@ class IconPickerField extends Field
     use HasFieldRounding;
     use HasPlaceholder;
     use HasSelectFieldIcons;
+    use RendersStockFieldView;
 
     protected string $view = 'filament-flex-fields::forms.components.icon-picker-field';
 

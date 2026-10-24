@@ -13,6 +13,7 @@ assert.equal(tags.addTag('OLD'), false)
 assert.equal(tags.addTag('new'), true)
 assert.equal(tags.addTag('free'), true)
 assert.deepEqual(tags.state, ['old', 'new', 'free'])
+assert.equal(tags.labelEntry('free').label, 'free')
 assert.equal(tags.addTag('fourth'), false)
 tags.deleteTag('new'); assert.deepEqual(tags.state, ['old', 'free'])
 tags.isReorderable = true; tags.reorderTags({oldIndex: 1, newIndex: 0})
@@ -37,5 +38,18 @@ assert.deepEqual(splitTagPaste('a\tb\nc', ['Tab', 'Enter']), ['a', 'b', 'c'])
 assert.deepEqual(acceptTagBatch(['OLD', 'new', 'new', 'free', 'extra'], {selected:['old'], options:[row('new')], maximum:3, insensitive:true}), ['old','new','free'])
 assert.equal(acceptTagBatch(Array.from({length:10000}, (_,i)=>`tag-${i}`), {selected:[], options:[]}).length,10000)
 assert.equal(acceptTag('😀'.repeat(20000), {selected:[], options:[]}), null)
-assert(view.includes("array_diff_key($selectConfiguration, array_flip(['initialState', 'state']))"))
+assert(view.includes("array_diff_key($selectConfiguration, array_flip(['initialState', 'initialOptionLabels', 'state']))"))
 console.log('PASS: bounded linear clipboard batches, semantic paste separators, UTF-8 byte limits and stable structural identity independent of selected state.')
+
+const {createSelectMenuRequestsMixin} = await import('../../resources/js/select/adapters/livewire/menu-requests.js')
+for (const overrides of [{}, {searchPending:true}, {comboboxOpen:false}, {disabled:true}, {comboboxQuery:''}, {hasDynamicSearchResults:false}]) {
+    const recovered=[]
+    const host={...createSelectMenuRequestsMixin(), _selectDisposed:false, disabled:false, comboboxOpen:true,
+        _selectOpenEffectsGeneration:1, hasDynamicOptions:false, hasDynamicSearchResults:true,
+        hasPaginatedSearchResults:false, isPreloaded:false, comboboxQuery:'typed before module',
+        searchPending:false, flatOptions:[], hasMissingSelectedLabels:()=>false,
+        scheduleAsyncSearch:query=>recovered.push(query), ...overrides}
+    await host.onHeadlessMenuOpenedForLivewire()
+    assert.deepEqual(recovered, Object.keys(overrides).length ? [] : ['typed before module'])
+}
+console.log('PASS: opening recovers an early remote query; pending searches, closed/disabled owners, empty queries and local controls do not restart search.')

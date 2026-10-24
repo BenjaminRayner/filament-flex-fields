@@ -17,6 +17,7 @@ export function createSurfaceOpeningMixin({}) {
         return;
       }
       this._highlightedDisplayRowKey = null;
+      this.prepareHeadlessPortal?.();
       const ownerId = resolveDropdownOwnerId(this, 'fff-headless-select');
       if (ownerId) {
         openExclusiveFlexDropdown(ownerId);
@@ -26,6 +27,8 @@ export function createSurfaceOpeningMixin({}) {
       this._engine?.open();
       this._syncFromEngine();
       this.menuReady = false;
+      this._focusFirstMountedMenu = !this.headlessMenuMounted && !this.resolveMenuElement?.();
+      this.headlessMenuMounted = true;
       this.comboboxOpen = true;
 
       // Optimistic glass reveal for desktop panels — do not wait for Livewire

@@ -20,7 +20,7 @@ export const optionKey = (value) => String(value)
 export function createOptionCollection({ getOptionValue, getOptionLabel, filterFn, isOptionDisabled }) {
     let entries = []
     let byValue = new Map()
-    let searchLabels = []
+    let searchLabels = null
     let projection = null
     let revision = 0
 
@@ -34,7 +34,7 @@ export function createOptionCollection({ getOptionValue, getOptionLabel, filterF
                 const key = optionKey(getOptionValue(option))
                 if (!byValue.has(key)) byValue.set(key, option)
             }
-            searchLabels = filterFn ? [] : entries.map((option) => normalizeSearchQuery(getOptionLabel(option)))
+            searchLabels = null
             revision++
             projection = null
         },
@@ -42,6 +42,9 @@ export function createOptionCollection({ getOptionValue, getOptionLabel, filterF
         project(query, searchable, isHidden = null, selectionRevision = 0) {
             const normalized = searchable ? normalizeSearchQuery(query) : ''
             if (projection?.query === normalized && projection.selectionRevision === selectionRevision) return projection
+            if (normalized !== '' && !filterFn) {
+                searchLabels ??= entries.map((option) => normalizeSearchQuery(getOptionLabel(option)))
+            }
             const options = normalized === '' && !isHidden ? entries : entries.filter((option, index) => (
                 (!isHidden || !isHidden(option)) && (normalized === '' || (
                 filterFn ? filterFn(option, normalized, getOptionLabel)
@@ -63,6 +66,6 @@ export function createOptionCollection({ getOptionValue, getOptionLabel, filterF
             projection = { query: normalized, selectionRevision, options, positions, selectable, selectablePositions }
             return projection
         },
-        dispose() { entries = []; searchLabels = []; byValue.clear(); projection = null },
+        dispose() { entries = []; searchLabels = null; byValue.clear(); projection = null },
     }
 }

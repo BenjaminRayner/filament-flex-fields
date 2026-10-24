@@ -50,7 +50,6 @@ export function createSelectLifecycleMixin({ capabilities }) {
             }
             this.bindSelectReactiveObservers()
             this.seedInitialTriggerLabels()
-            this.syncEngineOptions()
             this._syncFromEngine()
             this.syncClearablePresentation()
             this.bumpTriggerLabelEpoch()

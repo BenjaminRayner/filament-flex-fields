@@ -30,9 +30,11 @@ trait PresentsTags
     public function getTagSelectConfiguration(): array
     {
         $remote = $this->shouldSearchSuggestions();
+        $initialTags = $this->getInitialTagsForSsr();
 
         return [...$this->getSelectSurfaceConfiguration(),
-            'initialState' => $this->getInitialTagsForSsr(),
+            'initialState' => $initialTags,
+            'initialOptionLabels' => array_map(static fn (string $tag): array => ['value' => $tag, 'label' => $tag], $initialTags),
             'options' => array_map(static fn (string $value): array => ['value' => $value, 'label' => $value], $this->getSuggestionsForJs()),
             'componentKey' => $this->getKey(), 'statePath' => $this->getStatePath(),
             'livewireId' => $this->getLivewire()->getId(),

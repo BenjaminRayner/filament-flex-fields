@@ -26,6 +26,9 @@ export function createSelectConfiguration(userConfig = {}) {
         noSearchResultsMessage: '',
         componentKey: null,
         menuDomId: null,
+        listboxDomId: null,
+        searchDomId: null,
+        menuLabel: '',
         hasDynamicSearchResults: false,
         hasPaginatedSearchResults: false,
         hasDynamicOptions: false,
@@ -88,6 +91,8 @@ export function createSelectConfiguration(userConfig = {}) {
     }
     const state = {}
     for (const [key, fallback] of Object.entries(defaults)) state[key] = userConfig[key] === undefined ? fallback : userConfig[key]
+    state.listboxDomId ??= state.menuDomId ? `${state.menuDomId}-listbox` : null
+    state.searchDomId ??= state.menuDomId ? `${state.menuDomId}-search` : null
     if (userConfig.dataSource) state.hasDynamicSearchResults = true
     state.flatOptions = flattenHeadlessOptions(state.options)
     Object.assign(state, createSelectInstanceState())

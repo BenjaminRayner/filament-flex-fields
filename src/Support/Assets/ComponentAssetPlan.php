@@ -15,12 +15,14 @@ final readonly class ComponentAssetPlan
      * @param  list<string>  $components
      * @param  list<string>  $stylesheets
      * @param  list<string>  $chunks
+     * @param  list<string>  $queuedStylesheets
      */
     private function __construct(
         public string $component,
         public array $components,
         public array $stylesheets,
         public array $chunks,
+        public array $queuedStylesheets,
     ) {}
 
     /** @param list<string> $capabilities */
@@ -45,14 +47,20 @@ final readonly class ComponentAssetPlan
         }
 
         $stylesheets = [];
+        $queuedStylesheets = [];
         $chunks = [];
 
         foreach ($components as $root) {
-            $stylesheets = [...$stylesheets, ...FlexFieldAssets::stylesheetsFor($root)];
+            $rootStylesheets = FlexFieldAssets::stylesheetsFor($root);
+            $stylesheets = [...$stylesheets, ...$rootStylesheets];
+            $queueRoot = FlexFieldAssets::resolveStylesheetComponent($root);
+            $queuedStylesheets = [...$queuedStylesheets, ...($queueRoot === $root
+                ? $rootStylesheets : FlexFieldAssets::stylesheetsFor($queueRoot))];
             $chunks = [...$chunks, ...FlexFieldAssets::alpineChunksFor($root)];
         }
 
-        $plan = new self($component, $components, StylesheetCascade::forGraph($registry->compiledGraph())->project($stylesheets), array_values(array_unique($chunks)));
+        $plan = new self($component, $components, StylesheetCascade::forGraph($registry->compiledGraph())->project($stylesheets),
+            array_values(array_unique($chunks)), array_values(array_unique($queuedStylesheets)));
         if (count($partition['plans']) >= 256) {
             unset($partition['plans'][array_key_first($partition['plans'])]);
         }

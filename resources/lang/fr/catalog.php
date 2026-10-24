@@ -301,7 +301,7 @@ return [
         ],
         'segment-control' => [
             'label' => 'Contrôle des segments',
-            'description' => 'Contrôle segmenté à sélection unique de style IOS avec indicateurs coulissants, icônes et expansion d\'étiquettes animées.',
+            'description' => 'Contrôle segmenté à sélection unique avec indicateurs coulissants, icônes et expansion d\'étiquettes animées.',
         ],
         'segment-tabs' => [
             'label' => 'Onglets de segments',

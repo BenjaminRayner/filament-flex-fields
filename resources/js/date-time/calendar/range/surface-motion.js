@@ -12,6 +12,8 @@ export function createRangeSurfaceMotion(panel, anchor) {
     let valueOffset = null, triggerChrome = null, panelChrome = null, triggerTransition = null
     let requestedWidth = null, materialDrift = { left: 0, top: 0 }, valueDrift = { left: 0, top: 0 }
     let phaseEffects = null
+    let materialPaintEffect = null
+    let summaryVisibility = null
     let glyphs = [], glyphDrift = { left: 0, top: 0 }
     const summary = panel.querySelector('[data-range-summary]'), input = anchor.querySelector('input')
     const display = anchor.querySelector('[data-fff-date-value]') || input
@@ -28,6 +30,17 @@ export function createRangeSurfaceMotion(panel, anchor) {
     }
     function releaseValue() {
         valueClone?.remove(); valueClone = null
+    }
+    function hideSummary() {
+        summaryVisibility ??= [summary.style.getPropertyValue('visibility'), summary.style.getPropertyPriority('visibility')]
+        summary.style.setProperty('visibility', 'hidden', 'important')
+    }
+    function restoreSummary() {
+        if (!summaryVisibility) return
+        const [value, priority] = summaryVisibility
+        if (value) summary.style.setProperty('visibility', value, priority)
+        else summary.style.removeProperty('visibility')
+        summaryVisibility = null
     }
     function releaseGlyphs() { for (const glyph of glyphs) glyph.remove(); glyphs = [] }
     function measureGlyphs(nextEntering) {
@@ -89,9 +102,10 @@ export function createRangeSurfaceMotion(panel, anchor) {
         active?.cancel(); active = null; path = null
         const retained = []
         for (const effect of effects) {
-            if (keepPresentation && effect !== valueEffect) retained.push(effect)
+            if (keepPresentation && effect !== valueEffect && effect !== materialPaintEffect) retained.push(effect)
             else effect.cancel()
         }
+        materialPaintEffect = null
         effects = retained; releaseValue()
         if (!keepPresentation) releaseGlyphs()
         valuePath = valueEffect = null
@@ -105,8 +119,19 @@ export function createRangeSurfaceMotion(panel, anchor) {
         for (const [name, value] of [['background', 'transparent'], ['box-shadow', 'none'], ['backdrop-filter', 'none'], ['-webkit-backdrop-filter', 'none'], ['border-color', 'transparent'], ['margin', '0']])
             panel.style.setProperty(name, value, 'important')
     }
+    function sourceChrome() {
+        const hidden = anchor.hasAttribute('data-range-surface-active')
+        // The source transition is disabled for this owned phase. Resolve its
+        // current resting paint without exposing an intermediate browser frame.
+        if (hidden) anchor.removeAttribute('data-range-surface-active')
+        const style = getComputedStyle(anchor)
+        const paint = { backgroundColor: style.backgroundColor, borderColor: style.borderColor, boxShadow: style.boxShadow }
+        if (hidden) anchor.setAttribute('data-range-surface-active', '')
+        return paint
+    }
     function release() {
         suspend(); paused = valuePose = valueOffset = null
+        restoreSummary()
         if (marker) {
             marker.replaceWith(panel); marker = null
             Object.assign(panel.style, { position: 'fixed', left: `${layout.left}px`, top: `${layout.top}px`, opacity: oldOpacity })
@@ -152,46 +177,81 @@ export function createRangeSurfaceMotion(panel, anchor) {
         Object.assign(panel.style, { position: 'absolute', top: '-1px', left: '-1px', opacity: '1' })
         anchor.setAttribute('data-range-surface-active', '')
     }
-    function measureValue() {
-        if (!input?.value || !summary?.textContent || !display) return null
-        const inputStyle = getComputedStyle(display)
-        const resting = display.getBoundingClientRect(), expanded = summary.getBoundingClientRect()
+    function measureValue(nextEntering = entering) {
+        if (!input || !summary?.textContent) return null
+        // Empty readonly fields still have a dormant rolling-value span. The
+        // actual placeholder is painted by the input, not that zero-size span.
+        const source = display?.getClientRects().length ? display : input
+        const inputStyle = getComputedStyle(source), summaryStyle = getComputedStyle(summary)
+        const resting = source.getBoundingClientRect(), expanded = summary.getBoundingClientRect()
         const fontHeight = parseFloat(inputStyle.lineHeight) || parseFloat(inputStyle.fontSize) * 1.5
         const start = parseFloat(inputStyle.paddingInlineStart) || 0, end = parseFloat(inputStyle.paddingInlineEnd) || 0
         const width = Math.max(0, resting.width - start - end), rtl = inputStyle.direction === 'rtl'
         const origin = { left: resting.left + (rtl ? end : start), top: resting.top + (resting.height - fontHeight) / 2 }
         const bounds = (material || panel).getBoundingClientRect()
         valueOffset = { left: (rtl ? expanded.right - width : expanded.left) - bounds.left, top: expanded.top - bounds.top }
-        return { origin, width, opacity: valueClone ? Number(getComputedStyle(valueClone).opacity) : null, direction: inputStyle.direction, color: inputStyle.color,
+        return { origin, width, source, text: input.value || input.placeholder,
+            sourceOpacity: valueClone ? Number(getComputedStyle(valueClone.querySelector('[data-range-flight-source]')).opacity) : nextEntering ? 1 : 0,
+            summaryOpacity: valueClone ? Number(getComputedStyle(valueClone.querySelector('[data-range-flight-summary]')).opacity) : nextEntering ? 0 : 1,
+            summarySize: { width: expanded.width, height: expanded.height },
+            summaryTypography: rangeValueTypography(summaryStyle), summaryColor: summaryStyle.color,
+            summaryWhiteSpace: summaryStyle.whiteSpace, summaryOverflowWrap: summaryStyle.overflowWrap,
+            direction: inputStyle.direction, color: input.value ? inputStyle.color : getComputedStyle(input, '::placeholder').color,
             type: { family: inputStyle.fontFamily, size: parseFloat(inputStyle.fontSize), height: fontHeight, weight: inputStyle.fontWeight },
             typography: rangeValueTypography(inputStyle) }
     }
     function flyValue(metrics = measureValue(), deferred = false) {
         if (!metrics) return () => {}
-        const { origin, type } = metrics, destination = { left: layout.left + valueOffset.left, top: layout.top + valueOffset.top }
-        const from = valuePose?.values || (entering ? origin : destination), to = entering ? destination : origin
+        const { origin, type } = metrics
+        const sourcePose = { ...origin, width: metrics.width, height: type.height, radius: type.size }
+        const destination = { left: layout.left + valueOffset.left, top: layout.top + valueOffset.top,
+            width: metrics.width, height: type.height, radius: type.size }
+        const from = valuePose?.values || (entering ? sourcePose : destination), to = entering ? destination : sourcePose
         const velocity = valuePose?.velocity || {}
         valuePose = null
         valueClone = document.createElement('span'); valueClone.className = 'fff-dt-range-value-flight'
         valueDrift = { left: 0, top: 0 }
-        if (display !== input && display.textContent === input.value && !display.querySelector('[data-retiring]')) {
-            for (const child of display.childNodes) valueClone.append(child.cloneNode(true))
-        } else valueClone.textContent = input.value
         valueClone.setAttribute('aria-hidden', 'true')
-        // The input text keeps its exact typography and clipping rectangle.
-        // Footer content can have a different format or two lines on mobile;
-        // it crossfades separately rather than changing the source mid-flight.
-        Object.assign(valueClone.style, metrics.typography, { display: 'flex', alignItems: 'center', whiteSpace: 'pre', left: `${to.left}px`, top: `${to.top}px`, width: `${metrics.width}px`,
-            fontFamily: type.family, fontSize: `${type.size}px`, fontWeight: type.weight, lineHeight: `${type.height}px`,
-            direction: metrics.direction, textAlign: 'start', overflow: 'hidden',
-            color: metrics.color, zIndex: material.style.zIndex, visibility: 'hidden' })
+        const sourceLabel = document.createElement('span'), summaryLabel = document.createElement('span')
+        sourceLabel.dataset.rangeFlightSource = ''; summaryLabel.dataset.rangeFlightSummary = ''
+        if (metrics.source !== input && metrics.source.textContent === input.value && !metrics.source.querySelector('[data-retiring]')) {
+            for (const child of metrics.source.childNodes) sourceLabel.append(child.cloneNode(true))
+        } else sourceLabel.textContent = metrics.text
+        for (const child of summary.childNodes) summaryLabel.append(child.cloneNode(true))
+        // Shared-position text stays painted for the entire spring. Two owned
+        // labels allow placeholder/format/two-line footer differences without
+        // fading both copies out or imposing footer typography on the input.
+        Object.assign(sourceLabel.style, metrics.typography, { position: 'absolute', insetBlockStart: '0', insetInlineStart: '0',
+            width: `${metrics.width}px`, height: `${type.height}px`,
+            whiteSpace: 'pre', overflow: 'hidden', textOverflow: 'ellipsis', color: metrics.color })
+        Object.assign(summaryLabel.style, metrics.summaryTypography, { position: 'absolute', insetBlockStart: '0', insetInlineStart: '0',
+            width: `${metrics.summarySize.width}px`, height: `${metrics.summarySize.height}px`,
+            whiteSpace: metrics.summaryWhiteSpace, overflowWrap: metrics.summaryOverflowWrap,
+            overflow: 'hidden', color: metrics.summaryColor })
+        valueClone.append(sourceLabel, summaryLabel)
+        Object.assign(valueClone.style, { left: `${to.left}px`, top: `${to.top}px`, width: `${metrics.width}px`, height: `${type.height}px`,
+            direction: metrics.direction, textAlign: 'start', overflow: 'visible',
+            zIndex: material.style.zIndex, visibility: 'hidden' })
         material.after(valueClone)
-        valuePath = createRangeMaterialPath({ ...from, width: metrics.width, height: type.height, radius: type.size },
-            { ...to, width: metrics.width, height: type.height, radius: type.size }, entering, velocity)
+        const sharedText = metrics.text === summary.textContent && metrics.summarySize.height <= type.height + .5
+            && sourceLabel.scrollWidth <= sourceLabel.clientWidth
+        hideSummary()
+        valuePath = createRangeMaterialPath(from, to, entering, velocity)
         const play = () => {
-            valueEffect = syncClock(valueClone.animate(valuePath.frames.map(({ transform }, index) => ({ transform,
-                opacity: entering ? (metrics.opacity ?? 1) * Math.max(0, 1 - index * 1000 / 120 / 180) : (metrics.opacity ?? 0) + (1 - (metrics.opacity ?? 0)) * Math.min(1, Math.max(0, (index * 1000 / 120 - 100) / 220)),
-            })), { duration: Number(active?.effect.getTiming().duration) || valuePath.duration, easing: 'linear', fill: 'both' }))
+            const duration = Number(active?.effect.getTiming().duration) || valuePath.duration
+            // Only position participates in the shared text spring. Interpolated
+            // label widths can undershoot by a fraction of a glyph and suddenly
+            // introduce ellipsis or rewrap the footer before the final handoff.
+            // Each label retains its actual source/destination layout instead.
+            valueEffect = syncClock(valueClone.animate(valuePath.frames.map(({ transform }) => ({ transform })),
+                { duration, easing: 'linear', fill: 'both' }))
+            // Identical single-line labels need one painted copy. Crossfading
+            // duplicate glyphs changes their alpha even when weights sum to one.
+            const labels = sharedText ? [[sourceLabel, 1, 1], [summaryLabel, 0, 0]]
+                : [[sourceLabel, metrics.sourceOpacity, entering ? 0 : 1], [summaryLabel, metrics.summaryOpacity, entering ? 1 : 0]]
+            for (const [label, opacity, target] of labels) {
+                effects.push(syncClock(label.animate([{ opacity }, { opacity: target }], { duration, easing: 'linear', fill: 'both' })))
+            }
             valueClone.style.visibility = ''
             effects.push(valueEffect)
         }
@@ -208,31 +268,34 @@ export function createRangeSurfaceMotion(panel, anchor) {
         path = createRangeMaterialPath(from.values, to, entering, from.velocity)
         write(to)
         material.style.willChange = 'width,height,transform'
-        const paint = rangeMaterialPaint(entering && firstPaint ? triggerChrome : paintedChrome, entering ? panelChrome : triggerChrome, from.values, to)
-        const frames = path.frames.map(frame => ({ ...frame, ...paint(frame) }))
+        const paint = rangeMaterialPaint(entering && firstPaint ? triggerChrome : paintedChrome, entering ? panelChrome : triggerChrome, from.values, to, path.frames)
         // Both physical routes finish at the same handoff. Otherwise the
         // wrapper may release a still-moving value a few subpixels early.
-        active = syncClock(material.animate(frames, { duration: Math.max(path.duration, valuePath?.duration || 0), easing: 'linear', fill: 'both' }))
+        const duration = Math.max(path.duration, valuePath?.duration || 0)
+        active = syncClock(material.animate(path.frames, { duration, easing: 'linear', fill: 'both' }))
+        materialPaintEffect = syncClock(material.animate(paint.keyframes, { duration, easing: paint.easing, fill: 'both' }))
+        effects.push(materialPaintEffect)
         const effect = active
         if (entering) effect.finished.then(() => {
             if (disposed || active !== effect) return
             write(layout); Object.assign(material.style, panelChrome); active = null; path = null; effect.cancel()
             for (const animation of effects) animation.cancel()
-            effects = []; releaseValue(); releaseGlyphs(); valuePath = valueEffect = null; material.style.willChange = ''
+            effects = []; materialPaintEffect = null; releaseValue(); restoreSummary(); releaseGlyphs(); valuePath = valueEffect = null; material.style.willChange = ''
         }, () => {})
         return active
     }
     function run(nextEntering) {
         const first = !material
         const origin = box(anchor)
-        const valueMetrics = measureValue()
+        const valueMetrics = measureValue(nextEntering)
         const glyphMetrics = measureGlyphs(nextEntering)
-        const content = [...panel.children].filter(child => child.matches('.fff-dt-range__body,.fff-dt-range__footer,[data-calendar-time]')).map(child => ({ child,
+        const content = [...panel.querySelectorAll(':scope > .fff-dt-range__body,:scope > [data-calendar-time],.fff-dt-range__summary > small,.fff-dt-range__actions')].map(child => ({ child,
             opacity: getComputedStyle(child).opacity, transform: getComputedStyle(child).transform,
             filter: getComputedStyle(child).filter }))
         suspend(); entering = nextEntering
         if (disposed || reduced()) { release(); return null }
         mount()
+        if (!entering) triggerChrome = sourceChrome()
         if (first) for (const { child } of content) child.style.visibility = 'hidden'
         if (first) paused = { values: origin, velocity: {} }
         anchor.toggleAttribute('data-range-surface-returning', !entering)
@@ -292,7 +355,7 @@ export function createRangeSurfaceMotion(panel, anchor) {
             }
             suspend(true); layout = next
             valueOffset = null
-            if (entering && paused) { move(layout); flyValue() }
+            if (entering && paused) { const playValue = flyValue(undefined, true); move(layout); playValue() }
             else if (entering) write(layout)
     }
     const sizeObserver = typeof ResizeObserver === 'function' ? new ResizeObserver(entries => {

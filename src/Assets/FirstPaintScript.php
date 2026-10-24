@@ -14,7 +14,7 @@ final class FirstPaintScript extends FlexFieldsJs implements AssetPublicationAli
 
     public function chunk(string $file): static
     {
-        if (preg_match('/^flex-fields-first-paint-(segment|timezone)-[a-f0-9]{64}\.js$/D', $file) !== 1) {
+        if (preg_match('/^flex-fields-first-paint-(segment|timezone|readiness)-[a-f0-9]{64}\.js$/D', $file) !== 1) {
             throw new InvalidArgumentException('Invalid first-paint module identity.');
         }
         $this->chunk = $file;

@@ -25,15 +25,17 @@
 }
 
 .fff-segment-track {
-    @apply relative inline-flex items-center isolate bg-gray-100 gap-0;
+    @apply relative inline-flex items-center isolate gap-0;
+    background-color: var(--ft-neutral-track, color-mix(in srgb, var(--color-zinc-100, oklch(96.7% .001 286.375)) 97%, #000 3%));
     border-radius: var(--fff-global-radius, 0.75rem);
 }
 
 .dark .fff-segment-track {
-    @apply bg-zinc-800;
+    background-color: var(--ft-neutral-track, var(--color-zinc-800, oklch(27.4% .006 286.033)));
 }
 
-.fff-segment-track--ghost {
+.fff-segment-track--ghost,
+.dark .fff-segment-track--ghost {
     @apply bg-transparent shadow-none;
 }
 
@@ -340,11 +342,11 @@
 }
 
 .fff-segment-overflow-shell:not(.fff-segment-overflow-shell--ghost) {
-    @apply bg-gray-100;
+    background-color: var(--ft-neutral-track, color-mix(in srgb, var(--color-zinc-100, oklch(96.7% .001 286.375)) 97%, #000 3%));
 }
 
 .dark .fff-segment-overflow-shell:not(.fff-segment-overflow-shell--ghost) {
-    @apply bg-zinc-800;
+    background-color: var(--ft-neutral-track, var(--color-zinc-800, oklch(27.4% .006 286.033)));
 }
 
 .fff-segment-overflow-shell--ghost {
@@ -359,7 +361,8 @@
     @apply mb-0 w-fit min-w-0 max-w-full;
 }
 
-.fff-segment-track--in-shell {
+.fff-segment-track--in-shell,
+.dark .fff-segment-track--in-shell {
     @apply bg-transparent;
     width: max-content;
 }

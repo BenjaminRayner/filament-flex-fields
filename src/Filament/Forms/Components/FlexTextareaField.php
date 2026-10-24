@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldFocusOutline;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
+use Bjanczak\FilamentFlexFields\Concerns\RendersStockFieldView;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Textarea\ConfiguresTextarea;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\Textarea\HasTextareaActions;
 use Bjanczak\FilamentFlexFields\Support\Textarea\TextareaRenderState;
@@ -25,6 +26,7 @@ class FlexTextareaField extends Textarea implements HasAffixActions
     use HasControlSize;
     use HasFieldFocusOutline;
     use HasFieldRounding;
+    use RendersStockFieldView;
 
     protected string $view = 'filament-flex-fields::forms.components.flex-textarea-field';
 

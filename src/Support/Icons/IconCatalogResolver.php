@@ -43,11 +43,18 @@ class IconCatalogResolver
         $cacheKey = 'fff.icon-index.'.IconCatalogFingerprint::namespace().'.'.$fingerprint;
         $ttlDays = (int) config('filament-flex-fields.ui.icon_picker_index_cache_days', 7);
 
-        $data = RequestState::resolve(OptionalSharedCache::class)->remember($cacheKey, min(90, max(1, $ttlDays)) * 86400, function () use ($catalog, $whitelist, $exclude, $limitPerSet): array {
-            return $this->buildIndex($catalog, $whitelist, $exclude, $limitPerSet)->toArray();
-        }, IconCatalogPayload::index(...));
+        $resolve = function () use ($cacheKey, $ttlDays, $catalog, $whitelist, $exclude, $limitPerSet): IconCatalogIndex {
+            $data = RequestState::resolve(OptionalSharedCache::class)->remember($cacheKey, min(90, max(1, $ttlDays)) * 86400, function () use ($catalog, $whitelist, $exclude, $limitPerSet): array {
+                return $this->buildIndex($catalog, $whitelist, $exclude, $limitPerSet)->toArray();
+            }, IconCatalogPayload::index(...));
 
-        return IconCatalogIndex::fromArray($data);
+            return IconCatalogIndex::fromArray($data);
+        };
+
+        // Custom resolver subclasses retain their complete original call policy.
+        return $this::class === self::class
+            ? RequestState::resolve(AdmittedIconIndexes::class)->remember($cacheKey, $resolve)
+            : $resolve();
     }
 
     /**

@@ -9,7 +9,7 @@
     $controlId = $getId();
     $configuration = [
         'catalogRevision' => $field->getIconPickerConfigurationFingerprint(), 'inline' => $inline,
-        'componentKey' => $getKey(), 'livewireId' => $field->getLivewire()->getId(), 'menuDomId' => $controlId.'-fff-headless-menu',
+        'menuLabel' => (string) $getLabel(), 'componentKey' => $getKey(), 'livewireId' => $field->getLivewire()->getId(), 'menuDomId' => $controlId.'-fff-headless-menu',
         'initialSelectedName' => $initialName, 'initialSelectedHtml' => $initialHtml,
         'availableSets' => $field->getAvailableSetsForJs(), 'layout' => $layout,
         'gridColumns' => $field->getGridColumns(), 'perPage' => $field->getPerPage(),

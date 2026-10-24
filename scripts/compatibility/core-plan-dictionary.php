@@ -7,6 +7,7 @@ require __DIR__.'/shared-overlay-v4-contract.php';
 ob_end_clean();
 
 use Bjanczak\FilamentFlexFields\Support\Assets\Rendering\AssetPlanDictionary;
+use Bjanczak\FilamentFlexFields\Support\Assets\Rendering\FragmentPlanProjection;
 use Bjanczak\FilamentFlexFields\Support\Assets\Rendering\RenderedAssetPlan;
 use Illuminate\Support\Facades\Blade;
 
@@ -51,7 +52,7 @@ $marker = '<span data-fff-asset-batch data-fff-plan-id="'.$dictionary->register(
 $opaque = '<!--'.$marker.'--><script>const example = `'.$marker.'`;</script><style>/* '.$marker.' */</style><textarea>'.$marker.'</textarea>';
 $inert = $dictionary->project($opaque.'<div data-note="x > y"><template x-if="open">'.$marker.'</template>'.$marker.'</div>');
 $assert(str_starts_with($inert, $opaque), 'Fragment projection changed comments or raw-text content.');
-$assert(str_contains($inert, '<div data-note="x > y"><template data-fff-plan-definition='), 'Dictionary was not inserted at the stable live fragment root.');
+$assert(str_contains($inert, '<div data-note="x > y"><template x-if="open">') && str_ends_with($inert, '</template></span></div>'), 'Dictionary was not appended inside the stable live fragment root.');
 $assert(substr_count($inert, 'data-fff-plan-definition=') === 1, 'An inert first owner duplicated or hid the fragment dictionary.');
 $publicInline = Blade::render('<div><x-filament-flex-fields::assets component="select-field" consumer="first" /><x-filament-flex-fields::assets component="select-field" consumer="second" /></div>');
 $second = AssetPlanDictionary::render(static fn (AssetPlanDictionary $plans): string => Blade::render($template, ['count' => 1, 'planDictionary' => $plans]));
@@ -98,7 +99,16 @@ $publicLargeInline = Blade::render($largeTemplate, ['plans' => null]);
 $assert(substr_count($publicLarge, 'data-fff-plan-definition=') === 1 && substr_count($publicLarge, 'data-fff-asset-batch') === 1000, 'Native large composition lost its shared descriptor or independent boundaries.');
 $reduction = 1 - strlen($publicLarge) / strlen($publicLargeInline);
 $assert($reduction >= .70, 'Native 1000-owner plan transport misses the 70 percent reduction target.');
+$morphRoot = '<section id="morph-root"><div><input id="native-edit" x-data="{ value: \'server\' }" x-model="value"></div><div id="flex-morph-owner">';
+$morphPlan = new RenderedAssetPlan('probe', ['/additional.css'], []);
+$morphPlans = [$plan->id => $plan, $morphPlan->id => $morphPlan];
+$morphMarker = fn (string $id): string => '<span hidden data-fff-asset-batch data-fff-plan-id="'.$id.'" data-fff-plan-generation="1" data-fff-asset-consumer="probe" data-fff-asset-consumer-id="morph-'.$id.'"></span>';
+$morph = [];
+foreach ([[], [$plan->id], [$plan->id, $morphPlan->id], []] as $ids) {
+    $morph[] = FragmentPlanProjection::project($morphRoot.implode('', array_map($morphMarker, $ids)).'</div></section>', $morphPlans);
+}
 echo json_encode([
+    'morph' => $morph,
     'html' => $html, 'partial' => $second, 'plan' => $plan->json, 'id' => $plan->id,
     'publicDictionaryBytes' => strlen($public), 'publicInlineBytes' => strlen($publicInline),
     'publicLargeDictionaryBytes' => strlen($publicLarge), 'publicLargeInlineBytes' => strlen($publicLargeInline),

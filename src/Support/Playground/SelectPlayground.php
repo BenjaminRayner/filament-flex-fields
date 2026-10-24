@@ -6,11 +6,15 @@ namespace Bjanczak\FilamentFlexFields\Support\Playground;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexTextInput;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
+use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs;
+use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs\SegmentTab;
+use Bjanczak\FilamentFlexFields\Support\FilamentSchemaCompatibility;
 use Bjanczak\FilamentFlexFields\Support\FlexIcon;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 
 class SelectPlayground
 {
@@ -339,7 +343,7 @@ class SelectPlayground
             'myshop' => 'myshop',
         ];
 
-        return [
+        $sections = [
             Section::make('SelectField')
                 ->description('Core SelectField demos: search, multi-select, rich options, grid layout, dynamic loading, and Filament parity.')
                 ->extraAttributes(['class' => 'fff-playground-section'])
@@ -963,6 +967,20 @@ class SelectPlayground
                         ]),
                 ]),
         ];
+
+        // The catalog is an inventory, not a form that needs every example on
+        // first paint. Each group still owns its fields and native deferred
+        // schema; opening it performs the normal asset/readiness lifecycle.
+        $labels = ['Overview', 'Sizes & surfaces', 'Configuration', 'Create options', 'Scale & RTL', 'Native API'];
+        $tabs = [];
+        foreach ($sections as $index => $section) {
+            $schema = FilamentSchemaCompatibility::supportsDeferredLoading()
+                ? Schema::make()->key('select-demo-'.$index)->deferLoading($index > 0)->components([$section])
+                : [$section];
+            $tabs[] = SegmentTab::make($labels[$index])->schema($schema);
+        }
+
+        return [SegmentTabs::make('select-features')->tabs($tabs)];
     }
 
     /**

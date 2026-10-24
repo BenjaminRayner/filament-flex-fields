@@ -7,9 +7,36 @@ rss: true
 
 {/* Generated from CHANGELOG.md by scripts/generate-changelog-docs.mjs. Do not edit this page directly. */}
 
-<Badge color="purple" shape="pill">Latest recorded version · 4.0.9</Badge>
+<Badge color="purple" shape="pill">Latest recorded version · 4.0.11</Badge>
 
 Filter the timeline by change type. Subscribe with RSS on the publicly hosted documentation.
+
+<Update label="v4.0.11" description="2026-10-21" tags={["Changed","Fixed"]} rss={{"title":"FLEX Fields 4.0.11","description":"Changes, improvements and fixes in FLEX Fields 4.0.11.","date":"2026-10-21"}}>
+
+### Changed
+
+- **Large forms** — reduced loading overhead for forms containing many text inputs, selects and textareas. Repeated Textarea settings use smaller shared metadata while field values remain independent.
+- **Select responsiveness** — improved dropdown responsiveness and reduced background work when interacting with large forms. Opening and closing animations are preserved.
+- **First render** — reduced the wait before active fields can be used, while preserving on-demand loading in tabs, wizards and modals.
+- **Textarea** — substantially faster loading of forms with many textareas, with automatic resizing, height limits and animations preserved.
+- **Tags** — fields with remote suggestions reuse the labels of their existing tags, avoiding unnecessary requests when the form loads.
+- **Catalog fields** — smaller form responses and faster loading for Country, Phone, Timezone, Currency, Icon Picker and Font Select. Identical catalog data and built-in dropdown templates are reused while selections remain independent. Closed dropdowns are prepared on first opening, with their existing animations preserved.
+- **Icon Picker** — faster rendering of forms with repeated icon catalogs, while preserving each field’s icon restrictions and search behavior.
+- **Color Picker and Tags** — faster initial loading of large forms by preparing closed dropdown content when first opened. Field values, inline color controls and opening and closing animations retain their existing behavior.
+- **Numeric controls** — reduced server rendering overhead in large forms with Number Stepper and Calculator fields. Localized steppers also reuse their number formatters during editing; formatting, limits and animations are preserved.
+
+### Fixed
+
+- **Tags suggestions** — hide the suggestion panel when a local search has no remaining matches, while preserving the draft tag and reopening suggestions when matches return. On mobile, closing an empty suggestion sheet returns focus to the tag input.
+- **Slider values** — prevent long fractional values from appearing in animated readouts. Continuous sliders display whole numbers by default; fractional steps and explicitly configured precision retain their decimal places, without changing stored values or thumb animations.
+- **Date Range border** — smooth the border, background and shadow transition when the calendar closes, including modern theme colors and changes to the field's state while the panel is open.
+- **Date Range animation** — keep placeholders and selected values visible throughout opening and closing, without temporary ellipsis or text reflow during the transition. The calendar uses the field's exact placeholder and centers empty summaries correctly, while preserving compact layouts with start/end times.
+- **Textarea loading** — resolved long loading delays when many autosizing fields initialize together.
+- **Textarea initial height** — preserve the browser's initial content height where native autosizing is available, including long prefilled text and placeholders, while retaining animated resizing during editing.
+- **Remote search** — preserve a search entered immediately after opening a field while its search features are still loading.
+- **Multiple Select appearance** — balanced the spacing above, below and before selected tags, including wrapped rows and right-to-left layouts. Light-mode tags have a lighter background and border, with a slightly smaller gap between tags. The standard field heights remain unchanged.
+
+</Update>
 
 <Update label="v4.0.9" description="2026-10-17" tags={["Added","Fixed"]} rss={{"title":"FLEX Fields 4.0.9","description":"Changes, improvements and fixes in FLEX Fields 4.0.9.","date":"2026-10-17"}}>
 

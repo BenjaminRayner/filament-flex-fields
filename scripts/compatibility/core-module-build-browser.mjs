@@ -52,7 +52,7 @@ try {
         // owners are required during facade evaluation, never optional UI code.
         for (const name of [...expected]) {
             for (const dependency of manifest.__dynamic_imports__[name] ?? []) {
-                if (/^flex-fields-first-paint-(segment|timezone)-/.test(dependency)) expected.add(dependency)
+                if (/^flex-fields-first-paint-(segment|timezone|readiness)-/.test(dependency)) expected.add(dependency)
             }
         }
         assert.deepEqual([...new Set(fetched)].sort(), [...expected].sort(), 'Loaded optional code or missed an eager dependency')

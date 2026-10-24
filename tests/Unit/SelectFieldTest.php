@@ -6,8 +6,11 @@ use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
 use Bjanczak\FilamentFlexFields\Support\GravityIcon;
 use Bjanczak\FilamentFlexFields\Support\Playground\SelectPlayground;
+use Bjanczak\FilamentFlexFields\Tests\Support\SchemaComponents;
+use Bjanczak\FilamentFlexFields\Tests\Support\TestableTranslatableForm;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Livewire\Livewire;
 
 function headlessSelectBladeSources(): string
 {
@@ -99,8 +102,9 @@ it('detects rich option shapes automatically', function () {
 });
 
 it('exposes focus outline api', function () {
-    expect(SelectField::make('status')->shouldShowFocusOutline())->toBeFalse()
-        ->and(SelectField::make('status')->focusOutline()->getWrapperClasses())->toHaveKey('has-focus-outline');
+    expect(SelectField::make('status')->shouldShowFocusOutline())->toBeTrue()
+        ->and(SelectField::make('status')->getWrapperClasses())->toHaveKey('has-focus-outline')
+        ->and(SelectField::make('status')->focusOutline(false)->getWrapperClasses())->not->toHaveKey('has-focus-outline');
 });
 
 it('defaults select trigger icons to gravity ui circle chevron and circle xmark', function () {
@@ -721,10 +725,26 @@ it('stores select field search results in request cache', function () {
     expect($calls)->toBe(2);
 });
 
-it('closes the x-load interactive root before lazy-alpine-mount ends so helper text stays outside input wrapper', function () {
-    $blade = headlessSelectBladeSources();
-
-    expect($blade)->toMatch('/<\/template>\s*<\/div>\s*@if \(\$shouldDeferHeadlessAlpine\)/');
+it('keeps rendered helper text and sibling controls outside the interactive input root', function () {
+    TestableTranslatableForm::$formSchema = [
+        SelectField::make('first')->options(['a' => 'Alpha'])->helperText('Outside select helper'),
+        SelectField::make('second')->options(['b' => 'Beta']),
+    ];
+    try {
+        $html = Livewire::test(TestableTranslatableForm::class)->html(false);
+        $document = new DOMDocument;
+        $document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_NOERROR | LIBXML_NOWARNING);
+        $xpath = new DOMXPath($document);
+        $interactive = 'contains(concat(" ", normalize-space(@class), " "), " fff-select-field__interactive ")';
+        $wrapper = 'contains(concat(" ", normalize-space(@class), " "), " fi-input-wrp ")';
+        $helpers = $xpath->query('//*[not(*) and normalize-space(.)="Outside select helper"]');
+        expect($helpers)->toHaveCount(1)
+            ->and($xpath->query('//*['.$interactive.']'))->toHaveCount(2)
+            ->and($xpath->query('//*['.$interactive.']/ancestor::*['.$interactive.']'))->toHaveCount(0);
+        expect($xpath->query('ancestor::*['.$interactive.' or '.$wrapper.']', $helpers->item(0)))->toHaveCount(0);
+    } finally {
+        TestableTranslatableForm::$formSchema = [];
+    }
 });
 
 it('uses headless shell for enhanced select fields without filament select coordinator markup', function () {
@@ -959,21 +979,7 @@ it('demos multi-select chips in small medium and large on the select playground'
     $playground = app(SelectPlayground::class);
     $state = $playground->defaultState();
 
-    $flatten = function (array $components) use (&$flatten): array {
-        $out = [];
-
-        foreach ($components as $component) {
-            $out[] = $component;
-
-            if (method_exists($component, 'getDefaultChildComponents')) {
-                $out = [...$out, ...$flatten($component->getDefaultChildComponents())];
-            }
-        }
-
-        return $out;
-    };
-
-    $fields = collect($flatten($playground->components()))
+    $fields = collect(SchemaComponents::all($playground->components()))
         ->filter(fn ($component) => $component instanceof SelectField)
         ->keyBy(fn ($field) => $field->getName());
 

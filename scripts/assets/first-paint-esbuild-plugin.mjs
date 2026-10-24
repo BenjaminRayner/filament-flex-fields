@@ -4,6 +4,12 @@ import path from 'node:path'
 import { createHash } from 'node:crypto'
 
 const contracts = {
+    readiness: {
+        source: 'resources/js/runtime/assets/scoped-style-readiness.js',
+        entry: 'resources/js/core/scoped-style-readiness-ssr.js',
+        exports: ['enableScopedStyleReadiness'],
+        constants: [],
+    },
     segment: {
         source: 'resources/js/core/segment-overflow-position.js',
         entry: 'resources/js/core/segment-overflow-ssr.js',
@@ -58,7 +64,7 @@ export function firstPaintEsbuildPlugin(root, virtualInputs, owners) {
     return {
         name: 'flex-first-paint',
         setup(build) {
-            build.onResolve({ filter: /(?:segment-overflow-position|timezone-browser-ssr-boot)\.js$/ }, args => {
+            build.onResolve({ filter: /(?:segment-overflow-position|timezone-browser-ssr-boot|scoped-style-readiness)\.js$/ }, args => {
                 const resolved = path.resolve(args.resolveDir, args.path)
                 const name = byPath.get(resolved)
                 return name ? { path: name, namespace: 'first-paint' } : null

@@ -301,7 +301,7 @@ return [
         ],
         'segment-control' => [
             'label' => 'Segment Control',
-            'description' => 'IOS-style single-select segmented control with sliding indicators, icons, and animated label expansion.',
+            'description' => 'Single-select segmented control with sliding indicators, icons, and animated label expansion.',
         ],
         'segment-tabs' => [
             'label' => 'Segment Tabs',

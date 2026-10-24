@@ -3,13 +3,38 @@ import { openExclusiveFlexDropdown, resolveDropdownOwnerId } from '../core/flex-
 import { resolveOverlayViewport, resolveOverlayBaseLayer } from '../overlay/geometry/viewport.js'
 import { resolveOwnedOverlayStack } from '../overlay/ownership/stacking.js'
 import { resolveTeleportedMenuHorizontalLeft, resolveTeleportedMenuVerticalPlacement } from '../core/teleported-menu-position.js'
+import { shouldHandlePickerKey } from '../overlay/keyboard-policy.js'
 export function createColorPopover() {
     return {
         panelOpen: false, panelStyle: { position: 'fixed', visibility: 'hidden' },
-        togglePanel() { if (this.readOnly || this.inline) return; this.panelOpen ? this.closePanel() : this.openPanel() },
+        togglePanel() { if (this.readOnly || this.inline) return; this.panelOpen || this.panelPreparing ? this.closePanel() : this.openPanel() },
         openPanel() {
             if (this.readOnly) return
-            if (this.panelOpen) return
+            if (this.panelOpen || this.panelPreparing) return
+            if (this.lazyPanel) {
+                const runtime = colorRuntime(this)
+                const owner = resolveDropdownOwnerId(this, 'fff-color')
+                const intent = owner ? openExclusiveFlexDropdown(owner) : null
+                runtime.panelIntent = intent
+                const document = this.__colorOwner.ownerDocument
+                const escape = event => {
+                    if (event.key === 'Escape' && shouldHandlePickerKey(event) && !event.defaultPrevented && (this.panelPreparing || this.panelOpen)) {
+                        event.preventDefault()
+                        this.closePanel(true)
+                    }
+                }
+                document.addEventListener('keydown', escape)
+                runtime.cleanup.push(() => document.removeEventListener('keydown', escape))
+                void this.prepareColorPanel().then(ready => {
+                    if (ready && (!intent || intent.current())) this.revealColorPanel()
+                    else if (runtime.panelIntent === intent) this.closePanel()
+                })
+                return
+            }
+            this.revealColorPanel()
+        },
+        revealColorPanel() {
+            if (this.readOnly || colorRuntime(this).disposed) return
             const owner = resolveDropdownOwnerId(this, 'fff-color')
             if (owner) openExclusiveFlexDropdown(owner)
             this.panelOpen = true
@@ -25,7 +50,10 @@ export function createColorPopover() {
                 window.addEventListener('resize', update); window.addEventListener('scroll', update, true)
                 r.cleanup.push(() => { window.removeEventListener('resize', update); window.removeEventListener('scroll', update, true); if (frame != null) cancelAnimationFrame(frame) })
                 if (typeof ResizeObserver === 'function') { const observer = new ResizeObserver(update); observer.observe(this.$refs.panel); observer.observe(this.$refs.trigger); r.cleanup.push(() => observer.disconnect()) }
-                this.$refs.panel.querySelector('input,button,[tabindex="0"]')?.focus({ preventScroll: true })
+                // panelStyle is reactive: focus only after visibility is committed.
+                this.$nextTick(() => {
+                    if (this.panelOpen && !colorRuntime(this).disposed) this.$refs.panel?.querySelector('input,button,[tabindex="0"]')?.focus({ preventScroll: true })
+                })
             })
         },
         positionPanel() {
@@ -46,6 +74,7 @@ export function createColorPopover() {
         },
         closePanel(restoreFocus = false) {
             const r = colorRuntime(this)
+            this.cancelColorPanelPreparation?.({ afterExit: this.panelOpen })
             if (r.drag) { this.hsva = { ...r.drag.before }; this.syncInputs() }
             cancelColorDrag(this); r.epoch++; r.dropper?.abort(); r.dropper = null
             r.cleanup.splice(0).forEach(cleanup => cleanup())
@@ -61,6 +90,8 @@ export function createColorPopover() {
             if (event.shiftKey && document.activeElement === first || !event.shiftKey && document.activeElement === last) { event.preventDefault(); this.closePanel(true) }
         },
         onOutsidePointer(event) {
+            if (!this.panelOpen && !this.panelPreparing) return
+            if (this.panelPreparing && !this.__colorOwner.contains(event.target)) { this.closePanel(); return }
             const nestedOwner = event.target?.closest?.('[data-fff-dropdown-parent]')?.dataset.fffDropdownParent
             if (nestedOwner === resolveDropdownOwnerId(this, 'fff-color')) return
             if (this.panelOpen && !this.__colorOwner.contains(event.target) && !this.$refs.panel?.contains(event.target)) this.closePanel()

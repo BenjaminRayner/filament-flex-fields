@@ -127,6 +127,19 @@ For application-specific workflows, configure **staging, recovery and cleanup**,
 
 [Media OS guide](https://flex-fields.bjanczak.com/docs/media-capture-os) · [Image conversions & workers](https://flex-fields.bjanczak.com/docs/media-os-images) · [File information](https://flex-fields.bjanczak.com/docs/file-upload-metadata) · [Events & recovery](https://flex-fields.bjanczak.com/docs/file-upload-events-and-recovery)
 
+### Automatic media cleanup schedules
+
+In v4, FLEX registers `flex-fields:prune-media-staging` **hourly** and `flex-fields:prune-media-conversions` **daily**, even when no media field is rendered. Disable their automatic registration independently in `config/filament-flex-fields.php`:
+
+```php
+'media_capture' => [
+    'staging' => ['schedule_enabled' => false],
+    'images' => ['queue' => ['prune_schedule_enabled' => false]],
+],
+```
+
+Merge these values into the existing configuration; keep your other settings. Capture-media retention is separate: `FLEX_FIELDS_RETENTION_SCHEDULE=false` disables its schedule only. Commands remain available for manual execution or your own scheduler. Rebuild cached configuration with `php artisan config:cache`; maintain the required cleanup for the media features you use. [Full schedule and opt-out reference](https://flex-fields.bjanczak.com/docs/media-os-configuration#scheduled-cleanup).
+
 ## Live calculations, checked before saving
 
 Connect prices, quantities, discounts and taxes with reusable calculation plans. **CalculatedFields** binds those plans to your form controls, keeps dependent results in sync and recalculates outputs in PHP during form saving. Submitted totals are replaced by results calculated from validated inputs.

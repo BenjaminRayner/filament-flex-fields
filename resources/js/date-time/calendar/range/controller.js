@@ -28,8 +28,11 @@ export function createDateRangeCalendar({ root, anchor, config, value, temporalV
     const dummy = element('span'); dummy.hidden = true
     const motion = createCalendarMotion(viewport, dummy, { animateHeight: false })
     const summary = panel.querySelector('[data-range-summary]'), count = panel.querySelector('[data-range-count]'), announcement = panel.querySelector('[data-calendar-announcement]')
-    const sourceValue = root.querySelector('[data-fff-date-value]') || anchor.querySelector('input')
-    if (sourceValue) Object.assign(summary.style, rangeValueTypography(getComputedStyle(sourceValue)))
+    const sourceInput = anchor.querySelector('input'), rollingValue = root.querySelector('[data-fff-date-value]')
+    const sourceValue = rollingValue?.getClientRects().length ? rollingValue : sourceInput
+    const sourceStyle = sourceValue ? getComputedStyle(sourceValue) : null
+    const valueColor = sourceStyle?.color, placeholderColor = sourceInput ? getComputedStyle(sourceInput, '::placeholder').color : valueColor
+    if (sourceStyle) Object.assign(summary.style, rangeValueTypography(sourceStyle))
     const apply = panel.querySelector('[data-command="apply"]'), status = panel.querySelector('[data-calendar-status]'), retry = panel.querySelector('[data-command="retry"]')
     const highlightAnimations = new Map(), highlightPaths = new WeakMap(), endpoints = new Map(); let presetMotion = null
     const hasPresets = config.rangePresets === null || config.rangePresets.length > 0
@@ -98,7 +101,10 @@ export function createDateRangeCalendar({ root, anchor, config, value, temporalV
         if (timed) {
             const selection = composed(range), endpointConfig = { ...config, mode: 'date', compactRangeLabel: false }
             summary.replaceChildren(...[selection.start, selection.end].map(value => element('span', 'fff-dt-range__summary-endpoint', showSelection(value, endpointConfig))))
-        } else summary.textContent = range ? showSelection(composed(range), config) : config.labels.choose_day
+        } else summary.textContent = range ? showSelection(composed(range), config)
+            : (sourceInput?.value || sourceInput?.placeholder || config.placeholder || '')
+        const color = range || sourceInput?.value ? valueColor : placeholderColor
+        if (color && summary.style.color !== color) summary.style.color = color
         count.textContent = range ? start && hover === start ? config.labels.pick_end : `${Math.round((Date.parse(`${range.end}T00:00:00Z`) - Date.parse(`${range.start}T00:00:00Z`)) / 86400000) + 1} ${config.labels.days}` : ''
         apply.disabled = !range || Boolean(blocked(range.start) || blocked(range.end) || selectionValidation(composed(range), config))
         if (range && config.storesTime) { clockTimes = [fitTime(range.start, clockTimes[0], config), fitTime(range.end, clockTimes[1], config)]; clock?.render() }

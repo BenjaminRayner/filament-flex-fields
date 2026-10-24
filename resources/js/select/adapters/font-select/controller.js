@@ -1,3 +1,4 @@
+import { prepareRenderedSelectPortal } from '../../configuration/rendered-portal.js'
 import headlessComboboxAlpine from '../../../components/select-field/headless-combobox-alpine.js'
 import {createFontOptionSource} from './source.js'
 import {getFontPreviewManager} from '../../../fonts/manager.js'
@@ -5,7 +6,7 @@ import {bindFontOwner} from '../../../fonts/owner-lifecycle.js'
 import {resolveFontMenuHeight} from '../../../fonts/menu-geometry.js'
 import {visibleFontDemand} from '../../../fonts/visible-demand.js'
 
-export function createFontSelect(configuration) {
+export function createFontSelect(configuration, root = null) {
     const previewSelectedFont = configuration.previewSelectedFont !== false
     let owner,manager,unbind,frame=null,intent=null,generation=0,active=false
     const lease = Symbol('font-select')
@@ -17,7 +18,7 @@ export function createFontSelect(configuration) {
     const seed=configuration.seed
     const base=headlessComboboxAlpine({state:configuration.state,initialState:seed?.value ?? null,
         options:seed ? [seed] : [],initialOptionLabel:seed?.label,
-        componentKey:configuration.componentKey,livewireId:configuration.livewireId,menuDomId:configuration.menuDomId,
+        menuLabel:configuration.menuLabel,componentKey:configuration.componentKey,livewireId:configuration.livewireId,menuDomId:configuration.menuDomId,
         dataSource:source,hasPaginatedSearchResults:true,optionsLimit:0,isPreloaded:true,
         searchable:true,clearable:configuration.clearable,disabled:configuration.disabled,
         searchDebounce:120,minSearchLength:0,placeholder:configuration.placeholder,
@@ -29,6 +30,7 @@ export function createFontSelect(configuration) {
         searchPrompt:configuration.labels.search,searchingMessage:configuration.labels.loading,
         noSearchResultsMessage:configuration.labels.empty,noOptionsMessage:configuration.labels.empty,
         loadingMoreMessage:configuration.labels.more})
+    if (root) base.prepareHeadlessPortal = prepareRenderedSelectPortal(root)
     const schedule = () => {
         if (!owner || owner._selectDisposed || frame !== null) return
         frame=requestAnimationFrame(()=>{frame=null;owner.publishFontDemand()})

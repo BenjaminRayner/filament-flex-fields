@@ -63,8 +63,8 @@ export function createTextareaRuntime(configuration) {
                     }
                 })
                 this.update(input.value)
-                autosize.measure()
-            })()
+                await autosize.initialize()
+            })().catch(error => { scope.dispose(); throw error })
             return ready
         },
         destroy() {

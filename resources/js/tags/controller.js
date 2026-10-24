@@ -12,6 +12,8 @@ export function createTagsController({ select, splitKeys = ['Tab'], duplicateIns
     const selectValue = base.comboboxSelectValue
     const createValue = base.selectCreateOption
     const disabledOption = base.isHeadlessOptionDisabled
+    const openMenu = base.comboboxOpenMenu
+    const applyQuery = base.applyComboboxQueryToEngine
     return {
         ...base, splitKeys, duplicateInsensitive, suggestionsOnly, tagPrefix, tagSuffix,
         tagAnnouncement: '', _lastTags: null,
@@ -35,6 +37,22 @@ export function createTagsController({ select, splitKeys = ['Tab'], duplicateIns
         displayLabel(tag) { return `${this.tagPrefix}${tag}${this.tagSuffix}` },
         tagCountLabel() { return this.maxItems === null ? `${this.comboboxSelectedValues.length}` : `${this.comboboxSelectedValues.length}/${this.maxItems}` },
         shouldShowMenuSearch() { return this.isSheetPresentation() },
+        comboboxOpenMenu() {
+            if (!this.hasTagSuggestions || (this._engine && !this.hasDynamicSearchResults && this.countVisibleDropdownOptions() === 0)) return
+            return openMenu.call(this)
+        },
+        shouldPreserveHeadlessQueryAfterClose() { return this._pickerCloseReason === 'empty-tag-suggestions' },
+        applyComboboxQueryToEngine() {
+            applyQuery.call(this)
+            if (!this.comboboxOpen || this.hasDynamicSearchResults || this.countVisibleDropdownOptions() > 0) return
+            const restoreInputFocus = this.$refs?.headlessSearchInput === this.$el?.ownerDocument?.activeElement
+            this.comboboxCloseMenu({ immediate: true, reason: 'empty-tag-suggestions' })
+            if (restoreInputFocus) this.$nextTick(() => {
+                if (!this._selectDisposed && !this.comboboxOpen && this._pickerCloseReason === 'empty-tag-suggestions') {
+                    this.$refs.headlessInlineSearchInput?.focus({ preventScroll: true })
+                }
+            })
+        },
         isHeadlessOptionDisabled(option) {
             const identity = tagIdentity(option.value, this.duplicateInsensitive)
             return disabledOption.call(this, option) || this.comboboxSelectedValues.some(value => tagIdentity(value, this.duplicateInsensitive) === identity)
@@ -56,6 +74,8 @@ export function createTagsController({ select, splitKeys = ['Tab'], duplicateIns
             if (value === null) { if (this.hasReachedMaxItems()) this.showMaxItemsMessage(); return false }
             if (this.optionRecord(value)) selectValue.call(this, value)
             else if (!createValue.call(this, value)) return false
+            // Newly created tag identities are also their display labels.
+            this.storeLabelEntry(value, { value, label: value, triggerLabel: value })
             this.finishTagChoice()
             return true
         },

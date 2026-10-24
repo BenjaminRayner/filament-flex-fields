@@ -6,7 +6,9 @@ namespace Bjanczak\FilamentFlexFields\Support\Select\Bootstrap;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
 use Bjanczak\FilamentFlexFields\Support\FlexIcon;
+use Bjanczak\FilamentFlexFields\Support\Rendering\RenderedControlIcon;
 use Filament\Support\Enums\IconSize;
+use Illuminate\Contracts\Support\Htmlable;
 
 /** One bootstrap snapshot; no persistent cache of tenant-dependent field data. */
 final class HeadlessConfiguration
@@ -24,6 +26,7 @@ final class HeadlessConfiguration
         $pages = $field->hasPaginatedSearchResults();
         $dynamic = $field->hasDynamicOptions();
         $state = $field->getRawState();
+        $label = $field->getLabel() ?? $field->getStatePath();
 
         return [
             'statePath' => $field->getStatePath(),
@@ -31,6 +34,9 @@ final class HeadlessConfiguration
             'resetOnDependencyChange' => $field->shouldResetOnDependencyChange(),
             'componentKey' => $field->getKey(),
             'menuDomId' => $field->getId().'-fff-headless-menu',
+            'listboxDomId' => $field->getId().'-listbox',
+            'searchDomId' => $field->getId().'-search',
+            'menuLabel' => $label instanceof Htmlable ? $label->toHtml() : $label,
             'livewireId' => $livewireId,
             ...$this->selection($state, $multiple, $users),
             ...$this->presentation($users, $searchable),
@@ -88,10 +94,10 @@ final class HeadlessConfiguration
             'dropdownAlign' => $field->getDropdownAlign(),
             'matchTriggerWidth' => $field->getVariant() !== 'item-card',
             'isUserSelectField' => $users,
-            'selectedOptionCheckIconHtml' => \Filament\Support\generate_icon_html($field->getSelectedOptionCheckIcon(), size: IconSize::Small)?->toHtml() ?? '',
+            'selectedOptionCheckIconHtml' => app(RenderedControlIcon::class)->render($field->getSelectedOptionCheckIcon(), size: IconSize::Small),
             // Do not render the UserSelect partial for every plain Select field.
             'tagRemoveIconHtml' => $users ? view('filament-flex-fields::forms.components.partials.tag-pill-remove-icon')->render()
-                : \Filament\Support\generate_icon_html($field->getClearIcon(), size: IconSize::ExtraSmall)?->toHtml() ?? '',
+                : app(RenderedControlIcon::class)->render($field->getClearIcon(), size: IconSize::ExtraSmall),
             'verifiedIconHtml' => $users ? $this->icon(FlexIcon::SealCheck, IconSize::ExtraSmall) : '',
             'userSelectNoOptionsIconHtml' => $users ? $this->icon(FlexIcon::Persons) : '',
             'userSelectNoResultsIconHtml' => $users ? $this->icon(FlexIcon::Magnifier) : '',
@@ -159,6 +165,6 @@ final class HeadlessConfiguration
 
     private function icon(string $icon, IconSize $size = IconSize::Large): string
     {
-        return \Filament\Support\generate_icon_html($icon, size: $size)?->toHtml() ?? '';
+        return app(RenderedControlIcon::class)->render($icon, size: $size);
     }
 }

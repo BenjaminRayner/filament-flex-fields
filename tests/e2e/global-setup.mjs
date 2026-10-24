@@ -7,7 +7,7 @@ import { chromium } from '@playwright/test'
 const packageRoot = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))))
 export const PLAYGROUND_AUTH_FILE = path.join(packageRoot, '.auth', 'playground.json')
 
-export const DEFAULT_PLAYGROUND_BASE_URL = 'https://wyachts-super-app.test/admin/flex-fields-playground'
+export const DEFAULT_PLAYGROUND_BASE_URL = 'https://wyachts-super-app.test/admin/flex-fields'
 
 /**
  * @returns {string}
@@ -59,11 +59,11 @@ export async function gotoPlaygroundPage(page, slug) {
     await page.goto(url, { waitUntil: 'domcontentloaded' })
     await loginToPlaygroundIfNeeded(page)
 
-    if (! page.url().includes('flex-fields-playground')) {
+    if (new URL(page.url()).pathname !== new URL(url).pathname) {
         await page.goto(url, { waitUntil: 'domcontentloaded' })
     }
 
-    await page.waitForURL(/flex-fields-playground\//, { timeout: 30_000 })
+    await page.waitForURL(current => current.pathname === new URL(url).pathname, { timeout: 30_000 })
     await page.locator('.fi-main, .fi-body, main, .fff-flex-file-upload, .fff-signature-field, .fff-voice-recorder').first().waitFor({
         state: 'visible',
         timeout: 30_000,
@@ -78,7 +78,7 @@ export async function ensurePlaygroundAuthenticated(page) {
         await loginToPlaygroundIfNeeded(page)
     }
 
-    await page.waitForURL(/flex-fields-playground\//, { timeout: 30_000 })
+    await page.waitForURL(current => current.pathname.startsWith(new URL(resolvePlaygroundBaseUrl()).pathname + '/'), { timeout: 30_000 })
 }
 
 /**
@@ -88,7 +88,10 @@ export default async function globalSetup() {
     fs.mkdirSync(path.dirname(PLAYGROUND_AUTH_FILE), { recursive: true })
 
     const browser = await chromium.launch()
-    const context = await browser.newContext()
+    const context = await browser.newContext({
+        ...(fs.existsSync(PLAYGROUND_AUTH_FILE) ? {storageState: PLAYGROUND_AUTH_FILE} : {}),
+        ignoreHTTPSErrors: true,
+    })
     const page = await context.newPage()
 
     try {

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-20T12:51:04.225Z",
+  "generatedAt": "2026-10-24T10:58:24.500Z",
   "css": {
     "address-autocomplete.css": {
       "bytes": 1501,
@@ -57,9 +57,9 @@
       "gzipKb": 0.87
     },
     "core.css": {
-      "bytes": 25975,
+      "bytes": 25979,
       "kb": 25.37,
-      "gzipKb": 5.3
+      "gzipKb": 5.31
     },
     "country-map-field.css": {
       "bytes": 3825,
@@ -77,14 +77,14 @@
       "gzipKb": 2.83
     },
     "currency-field.css": {
-      "bytes": 5495,
-      "kb": 5.37,
-      "gzipKb": 1.38
+      "bytes": 5724,
+      "kb": 5.59,
+      "gzipKb": 1.41
     },
     "date-time-calendar.css": {
-      "bytes": 14488,
-      "kb": 14.15,
-      "gzipKb": 3.11
+      "bytes": 14536,
+      "kb": 14.2,
+      "gzipKb": 3.12
     },
     "date-time-clock.css": {
       "bytes": 3883,
@@ -127,9 +127,9 @@
       "gzipKb": 1.17
     },
     "flex-catalog.css": {
-      "bytes": 37181,
-      "kb": 36.31,
-      "gzipKb": 7.38
+      "bytes": 37636,
+      "kb": 36.75,
+      "gzipKb": 7.48
     },
     "flex-checklist.css": {
       "bytes": 20392,
@@ -322,9 +322,9 @@
       "gzipKb": 2.37
     },
     "segment-control.css": {
-      "bytes": 17546,
-      "kb": 17.13,
-      "gzipKb": 3.2
+      "bytes": 18073,
+      "kb": 17.65,
+      "gzipKb": 3.29
     },
     "segment-tabs.css": {
       "bytes": 3622,
@@ -332,9 +332,9 @@
       "gzipKb": 1.07
     },
     "select-field.css": {
-      "bytes": 121270,
+      "bytes": 121273,
       "kb": 118.43,
-      "gzipKb": 14.32
+      "gzipKb": 14.33
     },
     "selection-indicator.css": {
       "bytes": 1647,
@@ -434,7 +434,7 @@
   },
   "js": {
     "address-autocomplete.js": {
-      "bytes": 2107,
+      "bytes": 2109,
       "kb": 2.06,
       "gzipKb": 0.87
     },
@@ -444,27 +444,27 @@
       "gzipKb": 1.14
     },
     "audio-field.js": {
-      "bytes": 13887,
+      "bytes": 13889,
       "kb": 13.56,
       "gzipKb": 4.35
     },
     "barcode-scanner-field.js": {
-      "bytes": 8958,
+      "bytes": 8960,
       "kb": 8.75,
-      "gzipKb": 3.42
+      "gzipKb": 3.43
     },
     "bubble-choice.js": {
-      "bytes": 14839,
+      "bytes": 14841,
       "kb": 14.49,
       "gzipKb": 6.05
     },
     "calculator-field.js": {
-      "bytes": 9956,
+      "bytes": 9958,
       "kb": 9.72,
       "gzipKb": 3.53
     },
     "choice-cards.js": {
-      "bytes": 549,
+      "bytes": 551,
       "kb": 0.54,
       "gzipKb": 0.28
     },
@@ -479,53 +479,53 @@
       "gzipKb": 2.08
     },
     "credit-card.js": {
-      "bytes": 4617,
+      "bytes": 4619,
       "kb": 4.51,
       "gzipKb": 2.04
     },
     "currency-field.js": {
-      "bytes": 11489,
+      "bytes": 11491,
       "kb": 11.22,
       "gzipKb": 3.91
     },
     "dual-listbox.js": {
-      "bytes": 16781,
+      "bytes": 16783,
       "kb": 16.39,
       "gzipKb": 6.09
     },
     "file-upload-editor-transport.js": {
-      "bytes": 3741,
-      "kb": 3.65,
+      "bytes": 3743,
+      "kb": 3.66,
       "gzipKb": 1.6
     },
     "file-upload-transport.js": {
-      "bytes": 715,
+      "bytes": 717,
       "kb": 0.7,
       "gzipKb": 0.42
     },
     "file-upload-viewer.js": {
-      "bytes": 16319,
+      "bytes": 16321,
       "kb": 15.94,
       "gzipKb": 5.21
     },
     "flex-catalog.js": {
-      "bytes": 5109,
-      "kb": 4.99,
-      "gzipKb": 2.09
+      "bytes": 7212,
+      "kb": 7.04,
+      "gzipKb": 2.88
     },
     "flex-catalog-detail.js": {
-      "bytes": 1906,
+      "bytes": 1908,
       "kb": 1.86,
       "gzipKb": 0.89
     },
     "flex-catalog-recording.js": {
-      "bytes": 8876,
+      "bytes": 8878,
       "kb": 8.67,
-      "gzipKb": 3.14
+      "gzipKb": 3.15
     },
     "flex-checklist.js": {
-      "bytes": 557,
-      "kb": 0.54,
+      "bytes": 559,
+      "kb": 0.55,
       "gzipKb": 0.28
     },
     "flex-code-preview.js": {
@@ -534,149 +534,149 @@
       "gzipKb": 0.54
     },
     "flex-color-picker.js": {
-      "bytes": 13834,
-      "kb": 13.51,
-      "gzipKb": 5.12
+      "bytes": 16926,
+      "kb": 16.53,
+      "gzipKb": 6.08
     },
     "flex-core-runtime.js": {
-      "bytes": 71607,
-      "kb": 69.93,
-      "gzipKb": 22.96
+      "bytes": 72440,
+      "kb": 70.74,
+      "gzipKb": 23.24
     },
     "flex-date-picker.js": {
-      "bytes": 12223,
+      "bytes": 12225,
       "kb": 11.94,
       "gzipKb": 4.57
     },
     "flex-date-time-field.js": {
-      "bytes": 30800,
+      "bytes": 30802,
       "kb": 30.08,
       "gzipKb": 7.58
     },
     "flex-duration.js": {
-      "bytes": 3176,
+      "bytes": 3178,
       "kb": 3.1,
       "gzipKb": 1.27
     },
     "flex-file-upload.js": {
-      "bytes": 28834,
+      "bytes": 28836,
       "kb": 28.16,
       "gzipKb": 10.2
     },
     "flex-radiolist.js": {
-      "bytes": 557,
-      "kb": 0.54,
+      "bytes": 559,
+      "kb": 0.55,
       "gzipKb": 0.28
     },
     "flex-rich-editor.js": {
-      "bytes": 16532,
-      "kb": 16.14,
+      "bytes": 16534,
+      "kb": 16.15,
       "gzipKb": 5.1
     },
     "flex-runtime-sdk.js": {
-      "bytes": 836,
-      "kb": 0.82,
-      "gzipKb": 0.38
+      "bytes": 766,
+      "kb": 0.75,
+      "gzipKb": 0.37
     },
     "flex-slider.js": {
-      "bytes": 10180,
-      "kb": 9.94,
-      "gzipKb": 3.89
+      "bytes": 10142,
+      "kb": 9.9,
+      "gzipKb": 3.88
     },
     "flex-text-input.js": {
-      "bytes": 12658,
+      "bytes": 12660,
       "kb": 12.36,
       "gzipKb": 4.17
     },
     "flex-textarea.js": {
-      "bytes": 4984,
-      "kb": 4.87,
-      "gzipKb": 2.19
+      "bytes": 7332,
+      "kb": 7.16,
+      "gzipKb": 3.15
     },
     "flex-time-picker.js": {
-      "bytes": 5248,
+      "bytes": 5250,
       "kb": 5.13,
       "gzipKb": 2.04
     },
     "flex-time-segments.js": {
-      "bytes": 6188,
+      "bytes": 6190,
       "kb": 6.04,
       "gzipKb": 1.91
     },
     "flex-verification-code.js": {
-      "bytes": 4330,
+      "bytes": 4332,
       "kb": 4.23,
-      "gzipKb": 1.77
+      "gzipKb": 1.76
     },
     "font-select.js": {
-      "bytes": 14136,
-      "kb": 13.8,
-      "gzipKb": 5.53
+      "bytes": 14360,
+      "kb": 14.02,
+      "gzipKb": 5.6
     },
     "hold-confirm-action.js": {
-      "bytes": 11583,
+      "bytes": 11585,
       "kb": 11.31,
       "gzipKb": 4.38
     },
     "icon-picker-field.js": {
-      "bytes": 6129,
-      "kb": 5.99,
-      "gzipKb": 2.59
+      "bytes": 6409,
+      "kb": 6.26,
+      "gzipKb": 2.69
     },
     "image-choice-cards.js": {
-      "bytes": 552,
+      "bytes": 554,
       "kb": 0.54,
       "gzipKb": 0.28
     },
     "item-card-interaction.js": {
-      "bytes": 1466,
+      "bytes": 1468,
       "kb": 1.43,
       "gzipKb": 0.83
     },
     "link-preview-field.js": {
-      "bytes": 10704,
-      "kb": 10.45,
+      "bytes": 10706,
+      "kb": 10.46,
       "gzipKb": 3.88
     },
     "location-select.js": {
-      "bytes": 4913,
-      "kb": 4.8,
-      "gzipKb": 1.94
+      "bytes": 5043,
+      "kb": 4.92,
+      "gzipKb": 1.98
     },
     "map-picker.js": {
-      "bytes": 99882,
+      "bytes": 99884,
       "kb": 97.54,
       "gzipKb": 30.65
     },
     "matrix-choice-field.js": {
-      "bytes": 5244,
+      "bytes": 5246,
       "kb": 5.12,
       "gzipKb": 2.17
     },
     "media-os.js": {
-      "bytes": 753,
+      "bytes": 755,
       "kb": 0.74,
-      "gzipKb": 0.34
+      "gzipKb": 0.35
     },
     "nps-field.js": {
-      "bytes": 4104,
+      "bytes": 4106,
       "kb": 4.01,
       "gzipKb": 1.85
     },
     "number-stepper.js": {
-      "bytes": 9575,
-      "kb": 9.35,
-      "gzipKb": 3.25
+      "bytes": 9707,
+      "kb": 9.48,
+      "gzipKb": 3.32
     },
     "phone-field.js": {
-      "bytes": 3641,
-      "kb": 3.56,
-      "gzipKb": 1.34
+      "bytes": 3949,
+      "kb": 3.86,
+      "gzipKb": 1.46
     },
     "price-range.js": {
-      "bytes": 7556,
+      "bytes": 7558,
       "kb": 7.38,
-      "gzipKb": 3.14
+      "gzipKb": 3.15
     },
     "progress-circle-breakdown.js": {
       "bytes": 726,
@@ -684,77 +684,77 @@
       "gzipKb": 0.36
     },
     "rating-field.js": {
-      "bytes": 3422,
+      "bytes": 3424,
       "kb": 3.34,
       "gzipKb": 1.59
     },
     "schedule-field.js": {
-      "bytes": 10301,
+      "bytes": 10303,
       "kb": 10.06,
       "gzipKb": 3.6
     },
     "segment-control.js": {
-      "bytes": 463,
+      "bytes": 465,
       "kb": 0.45,
       "gzipKb": 0.28
     },
     "segment-tabs.js": {
-      "bytes": 1365,
+      "bytes": 1367,
       "kb": 1.33,
       "gzipKb": 0.68
     },
     "select-field.js": {
-      "bytes": 2628,
-      "kb": 2.57,
-      "gzipKb": 1.11
+      "bytes": 3317,
+      "kb": 3.24,
+      "gzipKb": 1.36
     },
     "signature-field.js": {
-      "bytes": 27340,
+      "bytes": 27342,
       "kb": 26.7,
       "gzipKb": 9.02
     },
     "slug-field.js": {
-      "bytes": 9016,
-      "kb": 8.8,
+      "bytes": 9018,
+      "kb": 8.81,
       "gzipKb": 3.3
     },
     "social-links-field.js": {
-      "bytes": 8514,
-      "kb": 8.31,
-      "gzipKb": 3.36
+      "bytes": 8516,
+      "kb": 8.32,
+      "gzipKb": 3.37
     },
     "switch.js": {
-      "bytes": 4263,
-      "kb": 4.16,
+      "bytes": 4265,
+      "kb": 4.17,
       "gzipKb": 1.82
     },
     "tags-field.js": {
-      "bytes": 5679,
-      "kb": 5.55,
-      "gzipKb": 2.24
+      "bytes": 6643,
+      "kb": 6.49,
+      "gzipKb": 2.55
     },
     "todo-list-field.js": {
-      "bytes": 60479,
+      "bytes": 60481,
       "kb": 59.06,
       "gzipKb": 20.06
     },
     "track-slider.js": {
-      "bytes": 4663,
-      "kb": 4.55,
-      "gzipKb": 1.96
+      "bytes": 4665,
+      "kb": 4.56,
+      "gzipKb": 1.97
     },
     "traffic-split.js": {
-      "bytes": 5736,
+      "bytes": 5738,
       "kb": 5.6,
       "gzipKb": 2.55
     },
     "video-field.js": {
-      "bytes": 38368,
+      "bytes": 38370,
       "kb": 37.47,
       "gzipKb": 12.16
     },
     "voice-note-recorder-field.js": {
-      "bytes": 12996,
+      "bytes": 12998,
       "kb": 12.69,
       "gzipKb": 4.44
     },
@@ -763,12 +763,12 @@
       "kb": 0.47,
       "gzipKb": 0.29
     },
-    "flex-fields-audio-3GJ53BX4.js": {
+    "flex-fields-audio-PUVD7B3D.js": {
       "bytes": 7567,
       "kb": 7.39,
       "gzipKb": 3.18
     },
-    "flex-fields-audio-load-buffer-A7EXGR22.js": {
+    "flex-fields-audio-load-buffer-Q6Y7Y2IF.js": {
       "bytes": 1272,
       "kb": 1.24,
       "gzipKb": 0.68
@@ -778,8 +778,8 @@
       "kb": 0.41,
       "gzipKb": 0.31
     },
-    "flex-fields-barcode-decoder-index-MXWZS43M.js": {
-      "bytes": 2573,
+    "flex-fields-barcode-decoder-index-FOXYPVA3.js": {
+      "bytes": 2575,
       "kb": 2.51,
       "gzipKb": 1.2
     },
@@ -798,23 +798,23 @@
       "kb": 3.08,
       "gzipKb": 1.31
     },
-    "flex-fields-catalog-demo-focus-GUTA7KO2.js": {
-      "bytes": 646,
+    "flex-fields-catalog-demo-focus-H4T53ASM.js": {
+      "bytes": 648,
       "kb": 0.63,
       "gzipKb": 0.4
     },
-    "flex-fields-choice-cards-effects-ST5RK2GE.js": {
-      "bytes": 5212,
+    "flex-fields-choice-cards-effects-ENW7EGPI.js": {
+      "bytes": 5211,
       "kb": 5.09,
-      "gzipKb": 2.16
+      "gzipKb": 2.15
     },
     "flex-fields-choice-lists-keyboard-DW75QHU5.js": {
       "bytes": 281,
       "kb": 0.27,
       "gzipKb": 0.2
     },
-    "flex-fields-choice-lists-presentation-5DGQM6NX.js": {
-      "bytes": 3857,
+    "flex-fields-choice-lists-presentation-5CEZDU7P.js": {
+      "bytes": 3856,
       "kb": 3.77,
       "gzipKb": 1.58
     },
@@ -823,22 +823,22 @@
       "kb": 0.58,
       "gzipKb": 0.38
     },
-    "flex-fields-combobox-engine-D42A64ER.js": {
+    "flex-fields-combobox-engine-QLL4USML.js": {
       "bytes": 9851,
       "kb": 9.62,
       "gzipKb": 3.94
     },
-    "flex-fields-components-segments-runtime-APEQ2ZHB.js": {
-      "bytes": 4939,
+    "flex-fields-components-segments-runtime-P5DS3WRU.js": {
+      "bytes": 4938,
       "kb": 4.82,
       "gzipKb": 1.86
     },
-    "flex-fields-components-select-field-headless-combobox-livewire-search-EYDNGYKS.js": {
-      "bytes": 23585,
-      "kb": 23.03,
-      "gzipKb": 6.14
+    "flex-fields-components-select-field-headless-combobox-livewire-search-RS7GEO4V.js": {
+      "bytes": 23751,
+      "kb": 23.19,
+      "gzipKb": 6.15
     },
-    "flex-fields-components-select-field-headless-user-select-KHPOU6RR.js": {
+    "flex-fields-components-select-field-headless-user-select-HBWKK77J.js": {
       "bytes": 9102,
       "kb": 8.89,
       "gzipKb": 2.81
@@ -848,50 +848,50 @@
       "kb": 3.12,
       "gzipKb": 1.49
     },
-    "flex-fields-components-text-input-dictation-ECUVBBEG.js": {
-      "bytes": 3618,
-      "kb": 3.53,
+    "flex-fields-components-text-input-dictation-NFJ52KJM.js": {
+      "bytes": 3620,
+      "kb": 3.54,
       "gzipKb": 1.59
     },
-    "flex-fields-components-text-input-drafts-EZXFNOFY.js": {
-      "bytes": 1070,
-      "kb": 1.04,
-      "gzipKb": 0.56
+    "flex-fields-components-text-input-drafts-XMGLTVJD.js": {
+      "bytes": 1072,
+      "kb": 1.05,
+      "gzipKb": 0.57
     },
     "flex-fields-components-text-input-presentation-UZ6BEZDV.js": {
       "bytes": 415,
       "kb": 0.41,
       "gzipKb": 0.26
     },
-    "flex-fields-components-text-input-suggestions-7DCLXIUA.js": {
-      "bytes": 6196,
+    "flex-fields-components-text-input-suggestions-SDJ5BVK4.js": {
+      "bytes": 6198,
       "kb": 6.05,
       "gzipKb": 2.26
     },
-    "flex-fields-components-text-input-verification-YT5OHERH.js": {
-      "bytes": 1364,
+    "flex-fields-components-text-input-verification-FVHESD32.js": {
+      "bytes": 1366,
       "kb": 1.33,
       "gzipKb": 0.62
     },
-    "flex-fields-confirmation-motion-PMGBBQCF.js": {
+    "flex-fields-confirmation-motion-Y5MMQ54D.js": {
       "bytes": 2848,
       "kb": 2.78,
       "gzipKb": 1.49
     },
-    "flex-fields-date-time-calendar-availability-C5RKPD4C.js": {
+    "flex-fields-date-time-calendar-availability-4EBABUFD.js": {
       "bytes": 5807,
       "kb": 5.67,
       "gzipKb": 2.68
     },
-    "flex-fields-date-time-calendar-controller-XDGPES2M.js": {
-      "bytes": 11197,
-      "kb": 10.93,
-      "gzipKb": 4.23
+    "flex-fields-date-time-calendar-controller-QMDN4XMV.js": {
+      "bytes": 11199,
+      "kb": 10.94,
+      "gzipKb": 4.22
     },
-    "flex-fields-date-time-calendar-range-controller-TIQS2TF4.js": {
-      "bytes": 26474,
-      "kb": 25.85,
-      "gzipKb": 9.56
+    "flex-fields-date-time-calendar-range-controller-QJ6OQ2ER.js": {
+      "bytes": 28359,
+      "kb": 27.69,
+      "gzipKb": 9.97
     },
     "flex-fields-date-time-calendar-system-7PWZKDAE.js": {
       "bytes": 6266,
@@ -923,19 +923,19 @@
       "kb": 4.04,
       "gzipKb": 1.4
     },
-    "flex-fields-date-time-time-controls-E4N6PJVU.js": {
-      "bytes": 1877,
+    "flex-fields-date-time-time-controls-GPVVV7YR.js": {
+      "bytes": 1879,
       "kb": 1.83,
       "gzipKb": 0.89
     },
-    "flex-fields-date-time-time-menu-EJDJISQM.js": {
-      "bytes": 3839,
+    "flex-fields-date-time-time-menu-F5PMJECC.js": {
+      "bytes": 3838,
       "kb": 3.75,
       "gzipKb": 1.73
     },
-    "flex-fields-emoji-HWR3FAVI.js": {
-      "bytes": 17422,
-      "kb": 17.01,
+    "flex-fields-emoji-A7PZPZ24.js": {
+      "bytes": 17424,
+      "kb": 17.02,
       "gzipKb": 5.99
     },
     "flex-fields-entity-mention-4NPSHJHF.js": {
@@ -968,8 +968,8 @@
       "kb": 4.11,
       "gzipKb": 1.79
     },
-    "flex-fields-file-upload-runtime-camera-JOY5IX5L.js": {
-      "bytes": 15107,
+    "flex-fields-file-upload-runtime-camera-N7J5DJZX.js": {
+      "bytes": 15109,
       "kb": 14.75,
       "gzipKb": 5.49
     },
@@ -993,17 +993,22 @@
       "kb": 7.79,
       "gzipKb": 3.2
     },
-    "flex-fields-first-paint-segment-e16845aebc624c07df00aadef4c4cae226eaaed410f1d45f8bdda0e60573a036.js": {
+    "flex-fields-first-paint-readiness-2b2bf6dbc58f9281e98a9933ae92bc2ec07d6320c9049677c86d8aed39383e0b.js": {
+      "bytes": 2798,
+      "kb": 2.73,
+      "gzipKb": 1.33
+    },
+    "flex-fields-first-paint-segment-3f8eb6673bbe08542746b52ce117c1dcdbe92f90c76c9c82da3c2a18af451548.js": {
       "bytes": 3823,
       "kb": 3.73,
       "gzipKb": 1.45
     },
-    "flex-fields-first-paint-timezone-3470bf35e8e188248d87a91a7d1c303b77879d43a97495d70f73db64035a2719.js": {
+    "flex-fields-first-paint-timezone-ce2c01f7493ddabd58699dd17f10b9a541f378fd42c1aacadffc4bb43750b3d6.js": {
       "bytes": 2505,
       "kb": 2.45,
       "gzipKb": 1.1
     },
-    "flex-fields-flex-alpine-load-gate-BGVAAIL4.js": {
+    "flex-fields-flex-alpine-load-gate-3MLBBZ7S.js": {
       "bytes": 7391,
       "kb": 7.22,
       "gzipKb": 2.92
@@ -1013,25 +1018,25 @@
       "kb": 3.66,
       "gzipKb": 1.52
     },
-    "flex-fields-flex-slider-engines-nouislider-V52GPGRQ.js": {
+    "flex-fields-flex-slider-engines-nouislider-Q2A2WUUE.js": {
       "bytes": 29190,
       "kb": 28.51,
-      "gzipKb": 10.1
+      "gzipKb": 10.09
     },
-    "flex-fields-flex-slider-engines-pointer-EOB4IJQD.js": {
+    "flex-fields-flex-slider-engines-pointer-H5AEXXEB.js": {
       "bytes": 5056,
       "kb": 4.94,
       "gzipKb": 2.22
     },
-    "flex-fields-flex-slider-motion-elastic-4UAY75XL.js": {
+    "flex-fields-flex-slider-motion-elastic-G7NBDGY2.js": {
       "bytes": 4585,
       "kb": 4.48,
       "gzipKb": 1.98
     },
-    "flex-fields-flex-slider-value-3T5VG7DB.js": {
-      "bytes": 2030,
-      "kb": 1.98,
-      "gzipKb": 0.99
+    "flex-fields-flex-slider-value-DGYCPT2R.js": {
+      "bytes": 2339,
+      "kb": 2.28,
+      "gzipKb": 1.13
     },
     "flex-fields-flex-text-input-caret-5WBJDQLJ.js": {
       "bytes": 700,
@@ -1043,12 +1048,12 @@
       "kb": 5.81,
       "gzipKb": 2.32
     },
-    "flex-fields-media-capture-device-session-VIDGRVTQ.js": {
+    "flex-fields-media-capture-device-session-KOXEXUQO.js": {
       "bytes": 1691,
       "kb": 1.65,
       "gzipKb": 0.83
     },
-    "flex-fields-media-capture-photo-TXGLWXPO.js": {
+    "flex-fields-media-capture-photo-43CV7OJR.js": {
       "bytes": 1803,
       "kb": 1.76,
       "gzipKb": 0.98
@@ -1058,22 +1063,22 @@
       "kb": 0.26,
       "gzipKb": 0.2
     },
-    "flex-fields-media-lifecycle-owner-NHCBPEZB.js": {
-      "bytes": 1453,
+    "flex-fields-media-lifecycle-owner-KLOZQRQC.js": {
+      "bytes": 1452,
       "kb": 1.42,
       "gzipKb": 0.81
     },
-    "flex-fields-media-upload-form-processing-IUUKBRLW.js": {
+    "flex-fields-media-upload-form-processing-SZXAAXTS.js": {
       "bytes": 7501,
       "kb": 7.33,
       "gzipKb": 2.72
     },
-    "flex-fields-media-upload-livewire-upload-TSRA4GM2.js": {
+    "flex-fields-media-upload-livewire-upload-MVRTQIPC.js": {
       "bytes": 1536,
       "kb": 1.5,
       "gzipKb": 0.75
     },
-    "flex-fields-media-upload-submit-barrier-UFXFV5UW.js": {
+    "flex-fields-media-upload-submit-barrier-C7QKD4L2.js": {
       "bytes": 2020,
       "kb": 1.97,
       "gzipKb": 0.93
@@ -1088,10 +1093,10 @@
       "kb": 15.39,
       "gzipKb": 5.11
     },
-    "flex-fields-number-format-TBWOFLS6.js": {
-      "bytes": 603,
-      "kb": 0.59,
-      "gzipKb": 0.33
+    "flex-fields-number-format-AYQWRVAT.js": {
+      "bytes": 469,
+      "kb": 0.46,
+      "gzipKb": 0.29
     },
     "flex-fields-number-stepper-value-AZZGZJVH.js": {
       "bytes": 1106,
@@ -1103,18 +1108,18 @@
       "kb": 0.2,
       "gzipKb": 0.17
     },
-    "flex-fields-overlay-backdrop-SIZG7TPM.js": {
-      "bytes": 66495,
-      "kb": 64.94,
-      "gzipKb": 17.67
+    "flex-fields-overlay-backdrop-3MNXNS2X.js": {
+      "bytes": 65861,
+      "kb": 64.32,
+      "gzipKb": 17.38
     },
-    "flex-fields-overlay-menu-imperative-surface-A55OHYF2.js": {
-      "bytes": 2025,
-      "kb": 1.98,
-      "gzipKb": 1.04
+    "flex-fields-overlay-menu-imperative-surface-NPL3ESCR.js": {
+      "bytes": 2089,
+      "kb": 2.04,
+      "gzipKb": 1.06
     },
-    "flex-fields-overlay-picker-lifetime-TIEM4SYP.js": {
-      "bytes": 727,
+    "flex-fields-overlay-picker-lifetime-LW42B3HX.js": {
+      "bytes": 726,
       "kb": 0.71,
       "gzipKb": 0.34
     },
@@ -1133,12 +1138,17 @@
       "kb": 0.96,
       "gzipKb": 0.51
     },
-    "flex-fields-runtime-alpine-boundary-fallback-2CSRFIVL.js": {
-      "bytes": 764,
-      "kb": 0.75,
-      "gzipKb": 0.41
+    "flex-fields-runtime-alpine-boundary-fallback-JJKFU66R.js": {
+      "bytes": 695,
+      "kb": 0.68,
+      "gzipKb": 0.39
     },
-    "flex-fields-runtime-alpine-factory-contract-RM7EDNF6.js": {
+    "flex-fields-runtime-alpine-control-configurations-RUPQ5BOD.js": {
+      "bytes": 3234,
+      "kb": 3.16,
+      "gzipKb": 1.29
+    },
+    "flex-fields-runtime-alpine-factory-contract-3RU7K7E6.js": {
       "bytes": 9890,
       "kb": 9.66,
       "gzipKb": 3.51
@@ -1158,19 +1168,19 @@
       "kb": 1.17,
       "gzipKb": 0.62
     },
-    "flex-fields-runtime-assets-asset-demand-F2FX4F62.js": {
-      "bytes": 10354,
-      "kb": 10.11,
-      "gzipKb": 3.91
+    "flex-fields-runtime-assets-asset-demand-FDOYRMZV.js": {
+      "bytes": 9683,
+      "kb": 9.46,
+      "gzipKb": 3.71
     },
-    "flex-fields-runtime-assets-asset-link-store-5EJMJQD5.js": {
-      "bytes": 20945,
+    "flex-fields-runtime-assets-asset-link-store-CTH4THYP.js": {
+      "bytes": 20942,
       "kb": 20.45,
       "gzipKb": 7.36
     },
-    "flex-fields-runtime-assets-asset-url-I7JBWAKY.js": {
-      "bytes": 6017,
-      "kb": 5.88,
+    "flex-fields-runtime-assets-asset-url-LFOCIXUG.js": {
+      "bytes": 6014,
+      "kb": 5.87,
       "gzipKb": 2.51
     },
     "flex-fields-runtime-filament-activation-mutation-KPJKTX57.js": {
@@ -1178,38 +1188,33 @@
       "kb": 6.11,
       "gzipKb": 2.32
     },
-    "flex-fields-runtime-filament-presentation-segment-QVYDCAUY.js": {
+    "flex-fields-runtime-filament-presentation-segment-CMDTF2JA.js": {
       "bytes": 170,
       "kb": 0.17,
       "gzipKb": 0.15
     },
-    "flex-fields-runtime-filament-presentation-timezone-773U3M5Y.js": {
+    "flex-fields-runtime-filament-presentation-timezone-YK6MWHRH.js": {
       "bytes": 519,
       "kb": 0.51,
       "gzipKb": 0.35
     },
-    "flex-fields-runtime-lifecycle-effect-errors-TTAFSIST.js": {
-      "bytes": 225,
-      "kb": 0.22,
-      "gzipKb": 0.16
+    "flex-fields-runtime-lifecycle-callback-effects-2JDMHD5R.js": {
+      "bytes": 1819,
+      "kb": 1.78,
+      "gzipKb": 0.84
     },
-    "flex-fields-runtime-lifecycle-lifecycle-events-NWMUKSW5.js": {
-      "bytes": 4561,
-      "kb": 4.45,
-      "gzipKb": 1.98
-    },
-    "flex-fields-runtime-lifecycle-owned-subscriptions-MHJKDQQS.js": {
-      "bytes": 1688,
-      "kb": 1.65,
-      "gzipKb": 0.83
-    },
-    "flex-fields-runtime-lifecycle-resource-scope-3CAAIJTV.js": {
-      "bytes": 2918,
+    "flex-fields-runtime-lifecycle-effect-errors-ANGODKWZ.js": {
+      "bytes": 2921,
       "kb": 2.85,
-      "gzipKb": 1.19
+      "gzipKb": 1.2
     },
-    "flex-fields-runtime-motion-spring-transition-5W5B5PQV.js": {
-      "bytes": 485,
+    "flex-fields-runtime-lifecycle-lifecycle-events-JMSJ3D6V.js": {
+      "bytes": 4486,
+      "kb": 4.38,
+      "gzipKb": 1.96
+    },
+    "flex-fields-runtime-motion-spring-transition-BZG35VHD.js": {
+      "bytes": 480,
       "kb": 0.47,
       "gzipKb": 0.37
     },
@@ -1238,7 +1243,7 @@
       "kb": 0.66,
       "gzipKb": 0.39
     },
-    "flex-fields-select-async-page-publication-LFM4IXZL.js": {
+    "flex-fields-select-async-page-publication-TM6J3UWC.js": {
       "bytes": 1388,
       "kb": 1.36,
       "gzipKb": 0.73
@@ -1248,75 +1253,80 @@
       "kb": 0.55,
       "gzipKb": 0.33
     },
+    "flex-fields-select-configuration-rendered-portal-5QFCYY3C.js": {
+      "bytes": 1909,
+      "kb": 1.86,
+      "gzipKb": 0.83
+    },
     "flex-fields-select-menu-NYMR53KH.js": {
       "bytes": 0,
       "kb": 0,
       "gzipKb": 0.02
     },
-    "flex-fields-select-options-catalog-presentation-STNBSOW4.js": {
-      "bytes": 4010,
-      "kb": 3.92,
-      "gzipKb": 1.8
+    "flex-fields-select-options-catalog-presentation-SP2OO3SY.js": {
+      "bytes": 4032,
+      "kb": 3.94,
+      "gzipKb": 1.81
     },
-    "flex-fields-select-trigger-IEEIKS4X.js": {
-      "bytes": 74812,
-      "kb": 73.06,
-      "gzipKb": 18.81
+    "flex-fields-select-trigger-4RKFPUYQ.js": {
+      "bytes": 76617,
+      "kb": 74.82,
+      "gzipKb": 19.28
     },
     "flex-fields-shared-2GRLTSXG.js": {
       "bytes": 730,
       "kb": 0.71,
       "gzipKb": 0.41
     },
+    "flex-fields-shared-56DY2BDH.js": {
+      "bytes": 4849,
+      "kb": 4.74,
+      "gzipKb": 2.37
+    },
+    "flex-fields-shared-5RIWVSGE.js": {
+      "bytes": 743,
+      "kb": 0.73,
+      "gzipKb": 0.33
+    },
     "flex-fields-shared-6D2P2QGU.js": {
       "bytes": 47,
       "kb": 0.05,
       "gzipKb": 0.07
-    },
-    "flex-fields-shared-AWU2O33E.js": {
-      "bytes": 50700,
-      "kb": 49.51,
-      "gzipKb": 18.13
     },
     "flex-fields-shared-CEWOLNQU.js": {
       "bytes": 38338,
       "kb": 37.44,
       "gzipKb": 13.44
     },
-    "flex-fields-shared-ELT6ZO2N.js": {
-      "bytes": 366,
-      "kb": 0.36,
-      "gzipKb": 0.2
-    },
-    "flex-fields-shared-G4QHUK3N.js": {
+    "flex-fields-shared-DWDGL4YA.js": {
       "bytes": 202,
       "kb": 0.2,
       "gzipKb": 0.15
+    },
+    "flex-fields-shared-GVAJQGES.js": {
+      "bytes": 50692,
+      "kb": 49.5,
+      "gzipKb": 18.13
     },
     "flex-fields-shared-LBK4CWZD.js": {
       "bytes": 26157,
       "kb": 25.54,
       "gzipKb": 8.81
     },
-    "flex-fields-shared-SVGNXYPS.js": {
-      "bytes": 4849,
-      "kb": 4.74,
-      "gzipKb": 2.37
-    },
     "flex-fields-shared-TG5QT42P.js": {
       "bytes": 24980,
       "kb": 24.39,
       "gzipKb": 7.17
     },
-    "flex-fields-shared-WN5V6WJH.js": {
-      "bytes": 741,
-      "kb": 0.72,
-      "gzipKb": 0.34
+    "flex-fields-shared-X3K6DPQF.js": {
+      "bytes": 297,
+      "kb": 0.29,
+      "gzipKb": 0.18
     },
-    "flex-fields-teleported-menu-position-OCN7C4TI.js": {
-      "bytes": 1801,
-      "kb": 1.76,
-      "gzipKb": 0.89
+    "flex-fields-teleported-menu-position-IZGK2RFU.js": {
+      "bytes": 2554,
+      "kb": 2.49,
+      "gzipKb": 1.25
     },
     "flex-fields-theme-utils-NVH3CBRX.js": {
       "bytes": 561,
@@ -1333,17 +1343,17 @@
       "kb": 0.98,
       "gzipKb": 0.46
     },
-    "flex-fields-transformers-runtime-IBWJ423R.js": {
-      "bytes": 3564,
+    "flex-fields-transformers-runtime-SZRUKQY2.js": {
+      "bytes": 3566,
       "kb": 3.48,
-      "gzipKb": 1.64
+      "gzipKb": 1.63
     },
     "flex-fields-video-thumbnails-K3D2HR7G.js": {
       "bytes": 2263,
       "kb": 2.21,
       "gzipKb": 1.12
     },
-    "flex-fields-virtual-first-paint-v1-segment-E6OB3PGZ.js": {
+    "flex-fields-virtual-first-paint-v1-segment-ZIAOASLC.js": {
       "bytes": 930,
       "kb": 0.91,
       "gzipKb": 0.51

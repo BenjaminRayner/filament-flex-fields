@@ -1,6 +1,7 @@
 import { isAssetElementActive } from '../lifecycle/asset-activation.js'
 import { preserveMountedFactoryReadiness } from '../../core/alpine-readiness.js'
 import { admitFragmentPlans } from '../assets/plan-dictionary.js'
+import { admitControlConfigurations } from '../alpine/control-configurations.js'
 
 /** Filament's partial renderer calls Alpine.morph directly, without Livewire morph hooks.
  * Prepare only FLEX metadata in the response before that renderer's microtask runs.
@@ -33,6 +34,7 @@ export function prepareFilamentPartials({ message, payload, document, surfaces, 
             }
         }
         admitFragmentPlans(container, document)
+        admitControlConfigurations(container, document)
         const panel = live.closest('[data-fff-deferred-panel]')
         if (panel && !live.querySelector('[data-fff-asset-batch]') && incoming.querySelector('[data-fff-asset-batch]')) {
             // The user may leave before this response arrives. Preserve the

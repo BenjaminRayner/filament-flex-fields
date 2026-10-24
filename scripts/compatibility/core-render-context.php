@@ -89,6 +89,15 @@ renderContextCheck((string) $core->getHtml() === '' && (string) FilamentView::re
 renderContextCheck(trim(view('filament-flex-fields::partials.flex-fff-load-bootstrap')->render()) === '', 'Repeated direct include duplicated bootstrap.');
 renderContextCheck(trim(view('filament-flex-fields::partials.flex-field-asset-injector')->render()) === '', 'Repeated direct include duplicated injector.');
 echo 'PASS: active native panel preserves publication identities and emits each core tag/layout phase once.'.PHP_EOL;
+renderContextCheck(strpos($css, '<script>') > strpos($css, 'rel="stylesheet"'), 'Readiness helper must follow the blocking core stylesheet.');
+renderContextCheck(substr_count($css, '// fff-first-paint:readiness:') === 1, 'Core CSS lost its one synchronous readiness owner.');
+request()->attributes->set('fff.csp_nonce', 'fff-readiness-probe-nonce');
+$reset();
+$nonceCss = (string) $core->getHtml();
+renderContextCheck(str_contains($nonceCss, '<script nonce="fff-readiness-probe-nonce">// fff-first-paint:readiness:'), 'Early readiness helper lost the application CSP nonce.');
+request()->attributes->remove('fff.csp_nonce');
+$reset();
+echo 'PASS: one sealed readiness owner follows core CSS and carries the application-provided nonce.'.PHP_EOL;
 
 foreach ([$inactive, $active, null] as $panel) {
     Filament::setCurrentPanel($panel);

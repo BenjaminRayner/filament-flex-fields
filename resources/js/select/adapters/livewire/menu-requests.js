@@ -41,6 +41,13 @@ export function createSelectMenuRequestsMixin() {
                 if (!current()) return
             }
 
+            // Input can precede the optional remote module's query watcher.
+            // Recover that intent on opening, without restarting a pending search.
+            if (this.hasDynamicSearchResults && !this.hasPaginatedSearchResults
+                && this.comboboxQuery.trim() !== '' && !this.searchPending) {
+                this.scheduleAsyncSearch(this.comboboxQuery)
+            }
+
             if (
                 this.hasPaginatedSearchResults
                 && this.comboboxQuery.trim().length >= this.minSearchLength

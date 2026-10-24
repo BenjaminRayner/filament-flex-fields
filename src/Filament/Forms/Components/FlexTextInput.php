@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 use Bjanczak\FilamentFlexFields\Concerns\HasControlSize;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldFocusOutline;
 use Bjanczak\FilamentFlexFields\Concerns\HasFieldRounding;
+use Bjanczak\FilamentFlexFields\Concerns\RendersStockFieldView;
 use Bjanczak\FilamentFlexFields\Enums\ControlSize;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\TextInput\ConfiguresTextInputAdvanced;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\TextInput\ConfiguresTextInputAppearance;
@@ -44,6 +45,7 @@ class FlexTextInput extends TextInput
     use HasControlSize;
     use HasFieldFocusOutline;
     use HasFieldRounding;
+    use RendersStockFieldView;
 
     protected string $view = 'filament-flex-fields::forms.components.flex-text-input-field';
 

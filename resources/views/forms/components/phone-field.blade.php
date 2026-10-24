@@ -20,6 +20,10 @@
     $initialDialPrefix = PhoneCountries::dialCode($initialCountryCode);
     $livewireKey = $getLivewireKey();
     $countrySelect = $field->getCountrySelect();
+    $countrySelectConfig = app(\Bjanczak\FilamentFlexFields\Support\Rendering\CatalogPayloadTransport::class)->configuration($countrySelect, $countrySelect->getHeadlessAlpineConfig());
+    $phoneCatalog = app(\Bjanczak\FilamentFlexFields\Support\Rendering\CatalogPayloadTransport::class)->phone(
+        $field->getCountriesMetadata(), get_class($field) === \Bjanczak\FilamentFlexFields\Filament\Forms\Components\PhoneField::class,
+    );
 @endphp
 
 
@@ -35,6 +39,7 @@
         'livewireKey' => $getLivewireKey(),
     ])
     <div
+        @if ($phoneCatalog['id']) data-fff-control-configuration-id="{{ $phoneCatalog['id'] }}" @endif
         wire:ignore
         wire:key="{{ $livewireKey }}.{{ substr(md5(serialize([$isDisabled, $isReadOnly, $getSize()])), 0, 64) }}"
         x-fff-load
@@ -42,7 +47,7 @@
         x-data="phoneFieldFormComponent({
             phoneState: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
             statePath: @js($statePath),
-            countries: @js($field->getCountriesMetadata()),
+            ...@js($phoneCatalog['options']),
             selectedCountrySeed: @js($selectedCountry),
             defaultCountry: @js($defaultCountry),
             initialInputValue: @js($initialInputValue),
@@ -53,7 +58,7 @@
             searchPlaceholder: @js(__('filament-flex-fields::default.phone.search_countries')),
             countryLabel: @js(__('filament-flex-fields::default.phone.country')),
             locale: @js($field->getLocale()),
-        })"
+        }, $el)"
         x-on:fff-phone-country.stop="selectCountry($event.detail.country)"
         @class([
             'fff-phone-field',
@@ -79,12 +84,13 @@
         >
             <div class="fff-phone-field__row fff-flex-text-input__row">
                 <div class="fff-phone-field__country"
+                    @if ($countrySelectConfig['presentationConfigurationId'] ?? null) data-fff-control-configuration-id="{{ $countrySelectConfig['presentationConfigurationId'] }}" @endif
                     x-fff-load
                     x-fff-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('select-field', \Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-                    x-data="fffHeadlessSelectField({ ...{{ \Illuminate\Support\Js::from($countrySelect->getHeadlessAlpineConfig()) }},
+                    x-data="fffHeadlessSelectField({ ...{{ \Illuminate\Support\Js::from($countrySelectConfig) }},
                         state: phoneState.country,
                         onChange: values => $dispatch('fff-phone-country', { country: values[0] }),
-                    })"
+                    }, $el)"
                     x-init="$watch('phoneState.country', value => { if (value !== state) { state = value } })"
                     x-on:click.outside="if (! isEventInsideHeadlessMenu($event)) comboboxCloseMenu({ immediate: true, reason: 'outside' })"
                 >
@@ -118,7 +124,7 @@
                         {{ \Filament\Support\generate_icon_html('hugeicons-arrow-down-01', attributes: new \Illuminate\View\ComponentAttributeBag(['class' => 'fff-phone-field__country-chevron'])) }}
                     </button>
 
-                    <x-filament-flex-fields::select-menu
+                    <x-filament-flex-fields::select-menu :owner-field="$field"
                         :field="$countrySelect"
                         :panel-classes="['fff-phone-field__country-menu']"
                     />

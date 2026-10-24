@@ -73,7 +73,8 @@ final class LivewirePlanProjection
     private static function project(string $html, bool $rooted = true): string
     {
         // Unrelated responses are byte-for-byte unchanged and do not instantiate the catalog.
-        if (! str_contains($html, 'data-fff-plan-id=')) {
+        if (! str_contains($html, 'data-fff-plan-id=') && ! str_contains($html, 'data-fff-portal-template-id=')
+            && ! str_contains($html, 'data-fff-control-configuration-id=')) {
             return $html;
         }
 

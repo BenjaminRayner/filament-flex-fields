@@ -75,7 +75,7 @@ final class AssetRegistration
             return FlexFieldsJs::make($id, $path)->loadedOnRequest();
         }, array_keys(self::SCRIPT_FILES), array_values(self::SCRIPT_FILES));
         $manifest = new AlpineBuildManifest($this->root().'/components/alpine-manifest.json');
-        foreach ([FlexFieldAssets::SEGMENT_OVERFLOW_SSR_SCRIPT_ID => 'segment', FlexFieldAssets::TIMEZONE_BROWSER_SSR_BOOT_SCRIPT_ID => 'timezone'] as $id => $name) {
+        foreach ([FlexFieldAssets::SEGMENT_OVERFLOW_SSR_SCRIPT_ID => 'segment', FlexFieldAssets::TIMEZONE_BROWSER_SSR_BOOT_SCRIPT_ID => 'timezone', 'flex-fields-scoped-style-readiness' => 'readiness'] as $id => $name) {
             $file = $manifest->firstPaintFile($name);
             $path = $this->root().'/components/'.$file;
             $this->assertFile($path);

@@ -1,5 +1,5 @@
 import { createResourceScope } from '../runtime/lifecycle/resource-scope.js'
-import { createOwnedSubscriptions } from '../runtime/lifecycle/owned-subscriptions.js'
+import { createOwnedSubscriptions } from '../runtime/lifecycle/callback-effects.js'
 import { createLifecycleEvents } from '../runtime/lifecycle/lifecycle-events.js'
 import { isMountedFactoryReady } from '../core/alpine-readiness.js'
 import { isAssetElementActive, waitForAssetActivation } from '../runtime/lifecycle/asset-activation.js'

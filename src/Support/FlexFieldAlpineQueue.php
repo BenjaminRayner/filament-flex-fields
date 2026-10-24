@@ -4,9 +4,25 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support;
 
+use Bjanczak\FilamentFlexFields\Support\Assets\ComponentAssetPlan;
+
 class FlexFieldAlpineQueue
 {
     use FlexFieldAssetQueue;
+
+    public function queuePlan(ComponentAssetPlan $plan): void
+    {
+        if (static::class !== self::class) {
+            foreach ($plan->components as $component) {
+                $this->queueChunksFor($component);
+            }
+
+            return;
+        }
+        foreach ($plan->chunks as $chunk) {
+            $this->queue($chunk);
+        }
+    }
 
     /**
      * Queue shared Alpine chunks for a component, returning only chunks

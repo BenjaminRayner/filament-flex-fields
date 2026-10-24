@@ -44,29 +44,19 @@
                 </span>
             </span>
         </template>
-    @elseif (! ($field?->showsSelectionIndicator() ?? true))
+    @elseif (! (($sharedMenuMarkup ?? false) ? $showSelectionIndicator : ($field?->showsSelectionIndicator() ?? true)))
         <span class="fff-select-headless-option-label" x-html="optionDropdownLabel(row.option)"></span>
     @else
         <template x-if="! isOptionSelectedInDropdown(headlessOptionValue(row.option))">
             <span>
-                <template x-if="isHtmlAllowed">
-                    <span class="fff-select-headless-option-label" x-html="optionDropdownLabel(row.option)"></span>
-                </template>
-                <template x-if="! isHtmlAllowed">
-                    <span class="fff-select-headless-option-label" x-text="optionDropdownLabel(row.option)"></span>
-                </template>
+                @include('filament-flex-fields::forms.components.partials.select-field.option-label')
             </span>
         </template>
 
         <template x-if="isOptionSelectedInDropdown(headlessOptionValue(row.option))">
             <span class="fff-select-option-selected-row">
                 <span class="fff-select-option-selected-row__label">
-                    <template x-if="isHtmlAllowed">
-                        <span class="fff-select-headless-option-label" x-html="optionDropdownLabel(row.option)"></span>
-                    </template>
-                    <template x-if="! isHtmlAllowed">
-                        <span class="fff-select-headless-option-label" x-text="optionDropdownLabel(row.option)"></span>
-                    </template>
+                    @include('filament-flex-fields::forms.components.partials.select-field.option-label')
                 </span>
 
                 @if ($isGridLayout)

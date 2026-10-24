@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Support\Bootstrap\Bindings;
 use Bjanczak\FilamentFlexFields\Support\CountryRegistryQueue;
 use Bjanczak\FilamentFlexFields\Support\CurrencyRegistryQueue;
 use Bjanczak\FilamentFlexFields\Support\HtmlSanitizer;
+use Bjanczak\FilamentFlexFields\Support\Icons\AdmittedIconIndexes;
 use Bjanczak\FilamentFlexFields\Support\Icons\IconCatalogResolver;
 use Bjanczak\FilamentFlexFields\Support\Icons\IconSvgCache;
 use Bjanczak\FilamentFlexFields\Support\Runtime\OptionalSharedCache;
@@ -28,6 +29,7 @@ final class FieldServices
         $app->scoped(PickerCatalogState::class);
         $app->scoped(ScopedRenderCache::class);
         $app->scoped(OptionalSharedCache::class);
+        $app->scoped(AdmittedIconIndexes::class);
         $app->singleton(IconCatalogResolver::class);
         $app->singleton(IconSvgCache::class);
     }

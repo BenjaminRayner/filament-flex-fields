@@ -37,7 +37,10 @@ final readonly class TextInputRenderState
 
     public static function from(FlexTextInput $field): self
     {
-        $editable = ! $field->isDisabled() && ! $field->isReadOnly();
+        $disabled = $field->isDisabled();
+        $readOnly = $field->isReadOnly();
+        $editable = ! $disabled && ! $readOnly;
+        $id = $field->getId();
         $state = $field->getState();
         $value = is_scalar($state) ? (string) $state : '';
         $options = $field->getTextInputEditingOptions();
@@ -59,7 +62,7 @@ final readonly class TextInputRenderState
             'characterLimit' => $field->getCharacterLimit(), 'initialCount' => $count,
             'showCharacterCounter' => $field->shouldShowCharacterCounter(),
             'clearable' => $editable && $field->isClearable(), 'loading' => $field->shouldShowLoadingIndicator(),
-            'showPasswordStrength' => $password && $field->shouldShowPasswordStrength() && ! $field->isDisabled(),
+            'showPasswordStrength' => $password && $field->shouldShowPasswordStrength() && ! $disabled,
             'passwordStrengthLabels' => $password ? $field->getPasswordStrengthLabels() : [],
             'speechDictation' => $editable && $field->shouldEnableSpeechDictation(),
             'speechDictationLabel' => $field->getSpeechDictationLabel(),
@@ -95,9 +98,10 @@ final readonly class TextInputRenderState
         if ($options['suggestionsEnabled']) {
             $capabilities[] = 'suggestions';
         }
+        $extraInputAttributes = $field->getExtraInputAttributeBag();
         $options['nativeSuggestionAttributes'] = [];
         foreach (['role', 'aria-autocomplete', 'aria-controls', 'aria-expanded', 'aria-activedescendant'] as $name) {
-            $options['nativeSuggestionAttributes'][$name] = $field->getExtraInputAttributeBag()->get($name);
+            $options['nativeSuggestionAttributes'][$name] = $extraInputAttributes->get($name);
         }
         foreach ($suffixActions as $action) {
             if ($action instanceof CopyAction) {
@@ -107,12 +111,12 @@ final readonly class TextInputRenderState
         }
         $concealed = $field->isConcealed();
         $mask = $field->getMask();
-        $attributes = $field->getExtraInputAttributeBag()->merge($field->getExtraAlpineAttributes(), escape: false)->merge([
-            'id' => $field->getId(), 'value' => $value,
+        $attributes = $extraInputAttributes->merge($field->getExtraAlpineAttributes(), escape: false)->merge([
+            'id' => $id, 'value' => $value,
             'autocapitalize' => $field->getAutocapitalize(), 'autocomplete' => $field->getAutocomplete(),
-            'autofocus' => $field->isAutofocused(), 'disabled' => $field->isDisabled(), 'readonly' => $field->isReadOnly(),
+            'autofocus' => $field->isAutofocused(), 'disabled' => $disabled, 'readonly' => $readOnly,
             'inputmode' => $field->getInputMode(), 'enterkeyhint' => $options['enterKeyHint'], 'dir' => $options['textDirection'],
-            'list' => $field->getDatalistOptions() ? $field->getId().'-list' : null,
+            'list' => $field->getDatalistOptions() ? $id.'-list' : null,
             'min' => $concealed ? null : $field->getMinValue(), 'max' => $concealed ? null : $field->getMaxValue(),
             'minlength' => $concealed ? null : $field->getMinLength(), 'maxlength' => $concealed ? null : $field->getMaxLength(),
             'required' => ! $concealed && $field->isRequired(),
@@ -122,13 +126,13 @@ final readonly class TextInputRenderState
             'x-bind:type' => $field->isPasswordRevealable() && ! filled($mask) && $field->getType() === 'password'
                 ? "isPasswordRevealed ? 'text' : 'password'" : null,
             'x-mask'.($mask instanceof RawJs ? ':dynamic' : '') => filled($mask) ? $mask : null,
-            'role' => $options['suggestionsEnabled'] ? 'combobox' : $field->getExtraInputAttributeBag()->get('role'),
-            'aria-autocomplete' => $options['suggestionsEnabled'] ? 'list' : $field->getExtraInputAttributeBag()->get('aria-autocomplete'),
-            'aria-controls' => $options['suggestionsEnabled'] ? $field->getId().'-fff-suggestions' : $field->getExtraInputAttributeBag()->get('aria-controls'),
-            'aria-expanded' => $options['suggestionsEnabled'] ? 'false' : $field->getExtraInputAttributeBag()->get('aria-expanded'),
+            'role' => $options['suggestionsEnabled'] ? 'combobox' : $extraInputAttributes->get('role'),
+            'aria-autocomplete' => $options['suggestionsEnabled'] ? 'list' : $extraInputAttributes->get('aria-autocomplete'),
+            'aria-controls' => $options['suggestionsEnabled'] ? $id.'-fff-suggestions' : $extraInputAttributes->get('aria-controls'),
+            'aria-expanded' => $options['suggestionsEnabled'] ? 'false' : $extraInputAttributes->get('aria-expanded'),
             'x-bind:aria-expanded' => $options['suggestionsEnabled'] ? "suggestionsOpen ? 'true' : 'false'" : null,
             'x-bind:aria-activedescendant' => $options['suggestionsEnabled'] ? 'suggestionActiveDescendant || null' : null,
-            'aria-describedby' => trim((string) $field->getExtraInputAttributeBag()->get('aria-describedby', '').' '.$field->getId().'-fff-feedback'),
+            'aria-describedby' => trim((string) $extraInputAttributes->get('aria-describedby', '').' '.$id.'-fff-feedback'),
         ], escape: false);
         $label = TextInputCounter::label($count, $limit, $options['counterDisplay'], $options['counterTemplate'], $options['counterLocale']);
 

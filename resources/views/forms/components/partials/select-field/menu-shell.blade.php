@@ -2,9 +2,14 @@
             <div
                 x-ref="headlessMenu"
                 @if ($panelStyle ?? null) style="{{ $panelStyle }}" @endif
-                id="{{ $headlessMenuDomId }}"
-                @if ($dynamicId ?? false) x-bind:id="menuDomId" @endif
-                data-fff-select-menu-owner="{{ $headlessComponentKey }}"
+                @if ($sharedMenuMarkup ?? false)
+                    x-bind:id="menuDomId"
+                    x-bind:data-fff-select-menu-owner="componentKey"
+                @else
+                    id="{{ $headlessMenuDomId }}"
+                    @if ($dynamicId ?? false) x-bind:id="menuDomId" @endif
+                    data-fff-select-menu-owner="{{ $headlessComponentKey }}"
+                @endif
                 x-show.important="comboboxOpen"
                 x-bind:style="{ ...(menuHeight > 0 ? { '--fff-select-menu-height': menuHeight + 'px' } : {}), ...(menuMaxHeight > 0 ? { '--fff-select-menu-max-height': menuMaxHeight + 'px' } : {}) }"
                 x-bind:aria-hidden="comboboxOpen ? 'false' : 'true'"
@@ -28,11 +33,11 @@
                     'fff-select-dropdown-panel--user-select' => $isUserSelectField,
                     'fff-select-dropdown-panel--country' => $field instanceof \Bjanczak\FilamentFlexFields\Filament\Forms\Components\CountryField,
                     'fff-select-dropdown-panel--country-'.($field?->getSize() ?? 'md') => $field instanceof \Bjanczak\FilamentFlexFields\Filament\Forms\Components\CountryField,
-                    'fff-select-dropdown-panel--no-selection-indicator' => ! ($field?->showsSelectionIndicator() ?? true),
-                    'fff-select-dropdown-panel--description-trailing' => $field?->getOptionDescriptionPosition() === 'trailing',
+                    'fff-select-dropdown-panel--no-selection-indicator' => ! (($sharedMenuMarkup ?? false) ? $showSelectionIndicator : ($field?->showsSelectionIndicator() ?? true)),
+                    'fff-select-dropdown-panel--description-trailing' => (($sharedMenuMarkup ?? false) ? $optionDescriptionPosition : $field?->getOptionDescriptionPosition()) === 'trailing',
                     'fi-select-input-ctn-option-labels-not-wrapped' => ! $canOptionLabelsWrap,
                 ])
-                x-bind:aria-label="{{ json_encode($fieldLabel ?? $statePath) }}"
+                x-bind:aria-label="{{ ($sharedMenuMarkup ?? false) ? 'menuLabel' : json_encode($fieldLabel ?? $statePath) }}"
             >
                 @if ($isSearchable)
                     <div
@@ -46,9 +51,9 @@
                         <input
                             type="search"
                             class="fi-input fi-select-input-search-input"
-                            id="{{ $headlessSearchId }}"
+                            @if ($sharedMenuMarkup ?? false) x-bind:id="searchDomId" @else id="{{ $headlessSearchId }}" @endif
                             autocomplete="off"
-                            aria-controls="{{ $headlessListboxId }}"
+                            @if ($sharedMenuMarkup ?? false) x-bind:aria-controls="listboxDomId" @else aria-controls="{{ $headlessListboxId }}" @endif
                             aria-autocomplete="list"
                             {{-- auto: Hebrew/Arabic → RTL caret; Latin queries keep LTR caret (forced dir=rtl put the caret on the wrong side for "teraz"). --}}
                             dir="auto"
@@ -81,14 +86,18 @@
                         'fi-select-input-options-ctn',
                         'fi-dropdown-list' => $isGridLayout,
                     ])
-                    id="{{ $headlessListboxId }}"
-                    @if ($dynamicId ?? false) x-bind:id="menuDomId + '-listbox'" @endif
+                    @if ($sharedMenuMarkup ?? false)
+                        x-bind:id="listboxDomId"
+                    @else
+                        id="{{ $headlessListboxId }}"
+                        @if ($dynamicId ?? false) x-bind:id="menuDomId + '-listbox'" @endif
+                    @endif
                     role="listbox"
                     x-bind:aria-multiselectable="multiple ? 'true' : null"
                     x-ref="headlessOptionsList"
                     x-bind:data-fff-virtualized="comboboxOpen && shouldVirtualizeDropdown() ? 'true' : null"
                     x-on:scroll.passive="onHeadlessOptionsScroll($event)"
-                    x-bind:aria-label="{{ json_encode($fieldLabel ?? $statePath) }}"
+                    x-bind:aria-label="{{ ($sharedMenuMarkup ?? false) ? 'menuLabel' : json_encode($fieldLabel ?? $statePath) }}"
                 >
                 @if ($field instanceof \Bjanczak\FilamentFlexFields\Filament\Forms\Components\CountryMapField)
                     <div class="fff-country-map__leading-options" data-fff-select-leading-content>

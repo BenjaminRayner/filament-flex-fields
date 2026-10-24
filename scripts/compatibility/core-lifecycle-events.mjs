@@ -2,6 +2,12 @@ import assert from 'node:assert/strict'
 import { createLifecycleEvents } from '../../resources/js/runtime/lifecycle/lifecycle-events.js'
 import { createResourceScope } from '../../resources/js/runtime/lifecycle/resource-scope.js'
 import { createOwnedSubscriptions } from '../../resources/js/runtime/lifecycle/owned-subscriptions.js'
+import * as callbackEffects from '../../resources/js/runtime/lifecycle/callback-effects.js'
+import { observeEffectResult, reportEffectFailure } from '../../resources/js/runtime/lifecycle/effect-errors.js'
+
+assert.equal(createOwnedSubscriptions, callbackEffects.createOwnedSubscriptions, 'Subscription facade changed implementation identity')
+assert.equal(observeEffectResult, callbackEffects.observeEffectResult, 'Effect facade changed async error observation')
+assert.equal(reportEffectFailure, callbackEffects.reportEffectFailure, 'Effect facade changed reporting isolation')
 
 const proofs = [], unhandled = [], reports = []
 const rejected = reason => Promise.reject(Error(reason))

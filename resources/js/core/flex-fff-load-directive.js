@@ -14,6 +14,7 @@ import { getRuntimeState } from '../runtime/runtime-state.js'
 import { resolveModuleFactoryIdentity } from '../runtime/alpine/factory-identity.js'
 import { declaredComponentIdentity } from '../runtime/assets/component-scope.js'
 import { resolveLegacyComponentIdentity } from '../runtime/filament/legacy-component-identity.js'
+import { captureNativeEdits } from '../runtime/alpine/native-edit-handoff.js'
 
 export { withFactoryReadiness }
 const activationLeases = getRuntimeState().activationLeases ??= createGenerationLeases({ snapshot: initializationPlanIdentity })
@@ -170,6 +171,7 @@ async function activateAlpineInit(el, Alpine, { cancelled = () => false, signal 
 
         // Replacing the SSR placeholder is activation, not owner disposal.
         // Retained user intent must survive this internal Alpine handover.
+        const restoreNativeEdits = captureNativeEdits(el)
         el._fffReinitializing = true
         try { Alpine.destroyTree(el) } finally { delete el._fffReinitializing }
         el._x_ignore = false
@@ -177,7 +179,7 @@ async function activateAlpineInit(el, Alpine, { cancelled = () => false, signal 
 
         if (shouldInitTree(el, ignoreAttr)) {
             Alpine.initTree(el)
-
+            restoreNativeEdits?.()
         }
     })()
 }

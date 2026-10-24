@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { createServer } from 'node:http'
 import path from 'node:path'
+import fs from 'node:fs'
 import { build } from 'esbuild'
 import { launchCoreBrowser } from './browser-profile.mjs'
 
@@ -97,7 +98,8 @@ const requests = []
 const server = createServer((request, response) => {
     requests.push(request.url)
     const send = (kind, body) => { response.writeHead(200, { 'Content-Type': kind, 'Cache-Control': 'no-store' }); response.end(body) }
-    if (request.url === '/') return send('text/html', '<!doctype html><html><head><meta charset="utf-8"></head><body>' + fixture.html + '<script type="module" src="/probe.js"></script></body></html>')
+    if (request.url === '/') return send('text/html', '<!doctype html><html><head><meta charset="utf-8"></head><body>' + fixture.html + '<script src="/native-livewire.js"></script><script type="module" src="/probe.js"></script></body></html>')
+    if (request.url === '/native-livewire.js') return send('text/javascript', fs.readFileSync(path.join(root, 'vendor/livewire/livewire/dist/livewire.min.js')))
     if (request.url === '/probe.js') return send('text/javascript', output.outputFiles[0].contents)
     if (request.url === '/fixture') return send('application/json', JSON.stringify(fixture))
     if (request.url === '/z-first.css') return send('text/css', '.ordered-proof { color: rgb(128, 0, 0) }')
@@ -114,8 +116,26 @@ try {
     await page.goto(`http://127.0.0.1:${server.address().port}/`, { waitUntil: 'domcontentloaded' })
     await page.waitForFunction(() => window.probeFailure || window.probeFinished, null, { timeout: 10000 })
     const proofs = await page.evaluate(() => window.probeResult)
+    await page.waitForFunction(() => window.Alpine?.morph)
+    await page.evaluate(html => {
+        const template = document.createElement('template'); template.innerHTML = html
+        window.morphRoot = template.content.firstElementChild
+        window.Alpine.mutateDom(() => document.body.append(window.morphRoot))
+        window.Alpine.initTree(window.morphRoot)
+        window.nativeEdit = window.morphRoot.querySelector('#native-edit')
+    }, fixture.morph[0])
+    await page.locator('#native-edit').fill('User value survives metadata changes')
+    for (const html of fixture.morph.slice(1)) {
+        await page.evaluate(html => window.Alpine.morph(window.morphRoot, html, {
+            key: el => el.getAttribute('wire:key') ?? el.id,
+            lookahead: false,
+        }), html)
+        assert.equal(await page.evaluate(() => document.querySelector('#native-edit') === window.nativeEdit), true)
+        assert.equal(await page.locator('#native-edit').inputValue(), 'User value survives metadata changes')
+    }
+    proofs.push('installed native Alpine morph preserves an unkeyed application subtree and typed state across first, additional and last-removed FLEX metadata')
     const profile = await page.evaluate(() => window.planReadProfile)
-    assert.deepEqual(errors, []); assert.equal(proofs.length, 7)
+    assert.deepEqual(errors, []); assert.equal(proofs.length, 8)
     for (const resource of ['/z-first.css', '/a-last.css', '/helper.js']) assert.equal(requests.filter(url => url === resource).length, 1)
     console.log(JSON.stringify({ browser: await browser.version(), minifiedSourceBuild: true, phpProofs: fixture.proofs, owners: fixture.owners, descriptors: fixture.descriptors,
         dictionaryBytes: fixture.dictionaryBytes, inlineBytes: fixture.inlineBytes, publicDictionaryBytes: fixture.publicDictionaryBytes, publicInlineBytes: fixture.publicInlineBytes,

@@ -1,3 +1,4 @@
+import { resolveControlMetadata } from '../runtime/alpine/control-configurations.js'
 import { createResourceScope } from '../runtime/lifecycle/resource-scope.js'
 import { createRequestCoordinator } from '../select/async/request-coordinator.js'
 import { loadLibPhoneNumber, formatNationalDisplay, syncPhoneState } from '../select/adapters/phone/phone-number-service.js'
@@ -5,8 +6,11 @@ import { loadLibPhoneNumber, formatNationalDisplay, syncPhoneState } from '../se
 export { formatNationalDisplay, formatPhoneInput, syncPhoneState } from '../select/adapters/phone/phone-number-service.js'
 
 /** Phone owns formatting only. Its nested country control is the standard Select factory. */
-export default function phoneFieldFormComponent(config = {}) {
-    const records = new Map((config.countries ?? []).map(country => [country.code, country]))
+export default function phoneFieldFormComponent(config = {}, root = null) {
+    const countries = config.countriesConfigurationId
+        ? resolveControlMetadata(config.countriesConfigurationId, 'phone-catalog', root).countries : config.countries ?? []
+    if (!Array.isArray(countries)) throw Error('Invalid Phone catalog metadata.')
+    const records = new Map(countries.map(country => [country.code, country]))
     const scope = createResourceScope()
     const requests = createRequestCoordinator()
     let initialized = false

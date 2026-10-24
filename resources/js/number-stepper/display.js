@@ -1,4 +1,4 @@
-import { formatDecimal, normalizeLocale } from '../core/number-format.js'
+import { createDecimalFormatter, normalizeLocale } from '../core/number-format.js'
 import { numericValue } from './value.js'
 
 const widest = texts => texts.reduce((result, text) => Array.from(String(text)).length > Array.from(String(result)).length ? text : result, '')
@@ -6,6 +6,18 @@ const widest = texts => texts.reduce((result, text) => Array.from(String(text)).
 export function createStepperDisplayMixin() {
     let pluralRules = null
     let format = null
+    let mainFormatter, bucketFormatter, formatterLocale, formatterPlaces
+    const decimal = (owner, value, bucket = false) => {
+        // Reactive getters run several times per edit. Keep only this owner's
+        // current typography policy; never cache numeric values or other owners.
+        if (!mainFormatter || owner.locale !== formatterLocale || owner.decimalPlaces !== formatterPlaces) {
+            formatterLocale = owner.locale
+            formatterPlaces = owner.decimalPlaces
+            mainFormatter = createDecimalFormatter({ locale: formatterLocale, decimalPlaces: formatterPlaces })
+            bucketFormatter = createDecimalFormatter({ locale: formatterLocale, decimalPlaces: formatterPlaces ?? 0 })
+        }
+        return (bucket ? bucketFormatter : mainFormatter)(value)
+    }
     return {
         get numericState() { return numericValue(this.state, this.integer) },
         get hasValue() { return this.numericState !== null },
@@ -17,7 +29,7 @@ export function createStepperDisplayMixin() {
         },
         formatMain(value) {
             const number = numericValue(value, this.integer)
-            return number === null ? this.nullLabel : (this.prefix ?? '') + formatDecimal(number, this)
+            return number === null ? this.nullLabel : (this.prefix ?? '') + decimal(this, number)
         },
         formatBucketedDisplay(value) {
             const number = numericValue(value) ?? 88
@@ -25,7 +37,7 @@ export function createStepperDisplayMixin() {
             const integer = '8'.repeat(digits)
             const fraction = this.decimalPlaces !== null && this.decimalPlaces > 0 ? '.' + '8'.repeat(this.decimalPlaces) : ''
             return (this.prefix ?? '') + (this.locale
-                ? formatDecimal(Number(integer + fraction), { locale: this.locale, decimalPlaces: this.decimalPlaces ?? 0 })
+                ? decimal(this, Number(integer + fraction), true)
                 : integer + fraction)
         },
         get valueSizerText() {

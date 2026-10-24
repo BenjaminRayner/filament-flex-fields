@@ -1,6 +1,6 @@
 ---
 title: "SegmentControl"
-description: IOS-style single-select segmented control with sliding indicators, icons, and animated label expansion.
+description: Single-select segmented control with sliding indicators, icons, and animated label expansion.
 icon: "square-split-horizontal"
 "canonical": "https://flex-fields.bjanczak.com/docs/segmentcontrol"
 "og:type": "article"
@@ -48,7 +48,7 @@ icon: "square-split-horizontal"
       "@id": "https://flex-fields.bjanczak.com/docs/segmentcontrol#webpage",
       "url": "https://flex-fields.bjanczak.com/docs/segmentcontrol",
       "name": "SegmentControl",
-      "description": "IOS-style single-select segmented control with sliding indicators, icons, and animated label expansion.",
+      "description": "Single-select segmented control with sliding indicators, icons, and animated label expansion.",
       "inLanguage": "en",
       "isPartOf": {
         "@id": "https://flex-fields.bjanczak.com/#website"
@@ -62,7 +62,7 @@ icon: "square-split-horizontal"
       "@id": "https://flex-fields.bjanczak.com/docs/segmentcontrol#article",
       "url": "https://flex-fields.bjanczak.com/docs/segmentcontrol",
       "headline": "SegmentControl",
-      "description": "IOS-style single-select segmented control with sliding indicators, icons, and animated label expansion.",
+      "description": "Single-select segmented control with sliding indicators, icons, and animated label expansion.",
       "inLanguage": "en",
       "mainEntityOfPage": {
         "@id": "https://flex-fields.bjanczak.com/docs/segmentcontrol#webpage"
@@ -78,7 +78,7 @@ icon: "square-split-horizontal"
       "@type": "VideoObject",
       "@id": "https://flex-fields.bjanczak.com/art/previews/segment-control-motion.mp4#video",
       "name": "SegmentControl — FLEX Fields demonstration",
-      "description": "A recorded demonstration of SegmentControl in the FLEX Fields playground for Filament. IOS-style single-select segmented control with sliding indicators, icons, and animated label expansion.",
+      "description": "A recorded demonstration of SegmentControl in the FLEX Fields playground for Filament. Single-select segmented control with sliding indicators, icons, and animated label expansion.",
       "thumbnailUrl": [
         "https://flex-fields.bjanczak.com/art/previews/segment-control.webp"
       ],

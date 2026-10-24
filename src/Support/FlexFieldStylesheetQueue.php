@@ -26,8 +26,32 @@ class FlexFieldStylesheetQueue
     /** @param list<string> $capabilities */
     public static function requireCritical(string $component, array $capabilities = []): void
     {
-        foreach (ComponentAssetPlan::for($component, $capabilities)->stylesheets as $stylesheet) {
-            app(self::class)->critical[$stylesheet] = true;
+        self::requireCriticalPlan(ComponentAssetPlan::for($component, $capabilities));
+    }
+
+    public static function requireCriticalPlan(ComponentAssetPlan $plan): void
+    {
+        $queue = app(self::class);
+        foreach ($plan->stylesheets as $stylesheet) {
+            $queue->critical[$stylesheet] = true;
+        }
+    }
+
+    /** Reuse validated requirements; recording roots still supports deferred/table flushes. */
+    public function queuePlan(ComponentAssetPlan $plan): void
+    {
+        if (static::class !== self::class) {
+            foreach ($plan->components as $component) {
+                $this->queueFor($component);
+            }
+
+            return;
+        }
+        foreach ($plan->components as $component) {
+            $this->roots[FlexFieldAssets::resolveStylesheetComponent($component)] = true;
+        }
+        foreach ($plan->queuedStylesheets as $stylesheet) {
+            $this->queue($stylesheet);
         }
     }
 

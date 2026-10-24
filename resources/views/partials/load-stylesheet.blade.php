@@ -9,16 +9,14 @@
     // A rendered, server-visible schema instance reserves its final CSS geometry
     // before first paint. Hidden scopes and Livewire/modal updates remain lazy.
     if (\Bjanczak\FilamentFlexFields\Support\Assets\InitialSchemaVisibility::allows($assetSchemaComponent ?? $field ?? null)) {
-        FlexFieldStylesheetQueue::requireCritical($component, $capabilities ?? []);
+        FlexFieldStylesheetQueue::requireCriticalPlan($assetPlan);
         // Head links block first paint; only declared external CSS still needs
         // browser readiness. Factory/modal readiness remains independent.
         $initialCssReady = count($externalStylesheets ?? []) === 0;
     }
 
-    foreach ($assetPlan->components as $assetComponent) {
-        FlexFieldStylesheetQueue::enqueueFor($assetComponent);
-        FlexFieldAlpineQueue::enqueueChunksFor($assetComponent);
-    }
+    app(FlexFieldStylesheetQueue::class)->queuePlan($assetPlan);
+    app(FlexFieldAlpineQueue::class)->queuePlan($assetPlan);
 
     $stylesheets = $assetPlan->stylesheets;
     $chunks = $assetPlan->chunks;
@@ -40,7 +38,7 @@
         'externalStylesheets' => $externalStylesheets ?? [],
         'consumerComponent' => $component,
         'livewireKey' => $resolvedLivewireKey,
-        'factoryOwners' => \Bjanczak\FilamentFlexFields\Support\Assets\Rendering\RenderedFactoryOwners::forComponents($assetPlan->components),
+        'preparedAssetPlan' => app(\Bjanczak\FilamentFlexFields\Support\Assets\Rendering\ResolvedAssetPlan::class)->resolve($assetPlan),
     ])
 
     @php

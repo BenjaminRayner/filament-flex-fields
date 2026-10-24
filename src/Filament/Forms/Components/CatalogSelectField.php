@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components;
 
+use Bjanczak\FilamentFlexFields\Support\Rendering\CatalogPayloadTransport;
 use Closure;
 use Filament\Forms\Components\Concerns\CanBeReadOnly;
 use Illuminate\Support\HtmlString;
@@ -129,6 +130,10 @@ abstract class CatalogSelectField extends SelectField
     {
         $key = $this->getSelectOptionsRegistryKey();
         $registry = request()->attributes->get('fff.select.catalogs', []);
+        if ($this->transformOptionsForJsUsing === $this->catalogTransformer
+            && in_array($this::class, [CountryField::class, TimezoneField::class, Phone\PhoneCountrySelect::class, Currency\CurrencySelect::class], true)) {
+            return app(CatalogPayloadTransport::class)->select($key, $registry[$key]);
+        }
         $json = json_encode($registry[$key], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR);
 
         return new HtmlString('<template data-fff-select-catalog="'.$key.'">'.$json.'</template>');

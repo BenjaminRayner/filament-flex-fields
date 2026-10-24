@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Assets;
 
 use Bjanczak\FilamentFlexFields\Support\Assets\Delivery\AssetDeliveryContext;
+use Bjanczak\FilamentFlexFields\Support\Assets\Rendering\FirstPaintScripts;
 use Bjanczak\FilamentFlexFields\Support\Assets\Rendering\RuntimeEmission;
 use Bjanczak\FilamentFlexFields\Support\Assets\Rendering\RuntimeRenderContext;
 use Illuminate\Contracts\Support\Htmlable;
@@ -25,6 +26,13 @@ final class FlexFieldsCoreCss extends FlexFieldsCss
             $serialized .= ' '.$name.'="'.e($value).'"';
         }
 
-        return new HtmlString(str_replace('<link', '<link'.$serialized, $html));
+        $html = str_replace('<link', '<link'.$serialized, $html);
+        $script = app(FirstPaintScripts::class)->inline('readiness');
+        if ($script !== '') {
+            $nonce = app(AssetDeliveryContext::class)->nonce();
+            $html .= '<script'.($nonce !== null ? ' nonce="'.e($nonce).'"' : '').'>'.$script.'</script>';
+        }
+
+        return new HtmlString($html);
     }
 }

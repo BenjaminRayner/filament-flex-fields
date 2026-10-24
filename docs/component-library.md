@@ -126,7 +126,7 @@ hideFooterPagination: true
       </a>
       <a className="fff-library-card" href="/docs/segmentcontrol" data-component="SegmentControl" data-components="SegmentControl">
         <span className="fff-library-preview"><img src="/art/catalog/segment-control.webp" alt="Segment Control in the FLEX Fields playground" width="560" height="360" loading="lazy" decoding="async" /></span>
-        <span className="fff-library-copy"><strong>Segment Control</strong><span>IOS-style single-select segmented control with sliding indicators, icons, and animated label expansion.</span></span>
+        <span className="fff-library-copy"><strong>Segment Control</strong><span>Single-select segmented control with sliding indicators, icons, and animated label expansion.</span></span>
         <span className="fff-library-open" aria-hidden="true">↗</span>
       </a>
       <a className="fff-library-card" href="/docs/switchfield" data-component="SwitchField" data-components="SwitchField">

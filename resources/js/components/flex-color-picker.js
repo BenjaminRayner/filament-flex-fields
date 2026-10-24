@@ -5,6 +5,7 @@ import { createColorPopover } from '../color-picker/popover.js'
 import { createColorChannels } from '../color-picker/channels.js'
 import { colorRuntime } from '../color-picker/lifetime.js'
 import { resolveColorPalette } from '../color-picker/palette.js'
+import { createColorPanelLifecycle } from '../color-picker/panel-lifecycle.js'
 
 export default function flexColorPickerFormComponent(configuration) {
     return mergeAlpineComponentData({
@@ -27,7 +28,9 @@ export default function flexColorPickerFormComponent(configuration) {
             this.inputFormat = this.format
             this.syncExternalColor(this.state)
             this.syncInputs()
-            this.gridPalette = resolveColorPalette(configuration)
+            this.lazyPanel = !this.inline && Boolean(this.$el.querySelector(':scope > template[data-fff-color-lazy-panel]'))
+            this.panelMounted = !this.lazyPanel
+            if (this.panelMounted) this.gridPalette = resolveColorPalette(configuration)
             runtime.unbind = wireExclusiveFlexDropdown(this, {
                 openKey: 'panelOpen',
                 closeMethod: 'closePanel',
@@ -47,11 +50,11 @@ export default function flexColorPickerFormComponent(configuration) {
         },
 
         destroy() {
-            this.closePanel()
             const runtime = colorRuntime(this)
             runtime.disposed = true
+            this.closePanel()
             runtime.unbind?.()
             runtime.outside?.()
         },
-    }, createColorState(), createColorPopover(), createColorChannels())
+    }, createColorState(), createColorPopover(), createColorChannels(), createColorPanelLifecycle(configuration))
 }

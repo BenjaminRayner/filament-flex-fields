@@ -301,7 +301,7 @@ return [
         ],
         'segment-control' => [
             'label' => 'Segmentcontrole',
-            'description' => 'IOS-stijl gesegmenteerde bediening met enkele selectie, met schuifindicatoren, pictogrammen en geanimeerde labeluitbreiding.',
+            'description' => 'Gesegmenteerde bediening met enkele selectie, met schuifindicatoren, pictogrammen en geanimeerde labeluitbreiding.',
         ],
         'segment-tabs' => [
             'label' => 'Segmenttabbladen',

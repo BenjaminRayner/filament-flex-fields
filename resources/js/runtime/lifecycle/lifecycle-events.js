@@ -1,4 +1,4 @@
-import { createOwnedSubscriptions } from './owned-subscriptions.js'
+import { createOwnedSubscriptions } from './callback-effects.js'
 import { createResourceScope } from './resource-scope.js'
 import { observeEffectResult, reportEffectFailure } from './effect-errors.js'
 

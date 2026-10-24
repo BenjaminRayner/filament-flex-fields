@@ -75,7 +75,7 @@ final class AssetBuildValidator
                 }
             }
 
-            foreach (['segment', 'timezone'] as $name) {
+            foreach (['segment', 'timezone', 'readiness'] as $name) {
                 $file = 'components/'.$alpine->firstPaintFile($name);
                 if (! isset($assets[$file]) || ! str_ends_with($file, '-'.$assets[$file].'.js')) {
                     $error('first-paint-owner', $file, new \RuntimeException('First-paint filename must match its sealed content hash.'));

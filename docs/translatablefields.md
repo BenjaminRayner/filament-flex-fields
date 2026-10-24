@@ -119,7 +119,7 @@ icon: "languages"
 
 ### Summary
 
-Locale-aware **schema layout** built on **SegmentTabs** (iOS-style segmented tabs, same visual language as [SegmentControl](/docs/segmentcontrol)). Clones one or more field templates into per-locale tabs with automatic state paths, JSON hydration, and optional Spatie `laravel-translatable` support.
+Locale-aware **schema layout** built on **SegmentTabs** (segmented tabs, same visual language as [SegmentControl](/docs/segmentcontrol)). Clones one or more field templates into per-locale tabs with automatic state paths, JSON hydration, and optional Spatie `laravel-translatable` support.
 
 Designed as a first-party, extensible alternative to third-party translatable tab packages — with explicit extension points (`localeFieldUsing`, `storageAttributeUsing`, tab/field modifiers) and no external plugin dependency.
 

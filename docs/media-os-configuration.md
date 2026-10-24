@@ -216,6 +216,47 @@ Spatie conversions use `config/media-library.php` and native Spatie workers inst
 
 ## Scheduled cleanup
 
+In v4, the package registers these tasks with Laravel's scheduler by default, independently of whether a media field is rendered:
+
+| Command | Default frequency | Configuration switch under `media_capture` |
+|---|---|---|
+| `flex-fields:prune-media-staging` | Hourly | `staging.schedule_enabled` |
+| `flex-fields:prune-media-conversions` | Daily | `images.queue.prune_schedule_enabled` |
+| `flex-fields:prune-capture-media` | Daily; configurable through `retention.schedule` | `retention.schedule_enabled` |
+
+To disable automatic registration of the staging and conversion-journal tasks, merge these entries into the existing `media_capture` array in `config/filament-flex-fields.php`:
+
+```php
+'media_capture' => [
+    'staging' => [
+        'schedule_enabled' => false,
+    ],
+    'images' => [
+        'queue' => [
+            'prune_schedule_enabled' => false,
+        ],
+    ],
+],
+```
+
+Keep your other `media_capture`, `staging`, `images` and `queue` settings. These switches disable only the package's automatic schedule registration. They do not disable media features or remove the commands; you can still run them manually or register your own schedule.
+
+Capture-media retention has its own independent switch:
+
+```dotenv
+FLEX_FIELDS_RETENTION_SCHEDULE=false
+```
+
+This maps to `filament-flex-fields.media_capture.retention.schedule_enabled`; it does **not** disable either staging or conversion-journal cleanup. In v3.1.19, only the capture-retention task exists; the other two tasks are v4 additions.
+
+If your application caches configuration, rebuild it after changing these settings:
+
+```bash
+php artisan config:cache
+```
+
+If you use the relevant media workflows, arrange the required cleanup yourself when disabling the package schedules. For manual execution:
+
 ```bash
 php artisan flex-fields:prune-media-staging --dry-run
 php artisan flex-fields:prune-media-staging

@@ -301,7 +301,7 @@ return [
         ],
         'segment-control' => [
             'label' => 'Segmentsteuerung',
-            'description' => 'Segmentierte Einzelauswahlsteuerung im IOS-Stil mit Schiebeanzeigen, Symbolen und animierter Beschriftungserweiterung.',
+            'description' => 'Segmentierte Einzelauswahlsteuerung mit Schiebeanzeigen, Symbolen und animierter Beschriftungserweiterung.',
         ],
         'segment-tabs' => [
             'label' => 'Segmentregisterkarten',

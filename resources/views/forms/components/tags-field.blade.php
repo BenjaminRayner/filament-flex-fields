@@ -6,7 +6,7 @@
     $reorderable = ! $disabled && $isReorderable();
     $initialTags = $field->getInitialTagsForSsr();
     $selectConfiguration = $field->getTagSelectConfiguration();
-    $structuralConfiguration = array_diff_key($selectConfiguration, array_flip(['initialState', 'state']));
+    $structuralConfiguration = array_diff_key($selectConfiguration, array_flip(['initialState', 'initialOptionLabels', 'state']));
     $count = count($initialTags).($getMaxTags() === null ? '' : '/'.$getMaxTags());
 @endphp
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
@@ -18,7 +18,7 @@
                 tagPrefix: @js($getTagPrefix() ?? ''), tagSuffix: @js($getTagSuffix() ?? ''),
                 tagAddedMessage: @js(__('filament-forms::components.tags_input.tag_added')),
                 tagRemovedMessage: @js(__('filament-forms::components.tags_input.tag_removed')) })"
-            x-on:click.outside="if (!isEventInsideHeadlessMenu($event)) comboboxCloseMenu({ immediate: true, reason: 'outside' })"
+            x-on:click.outside="if (comboboxOpen && !isEventInsideHeadlessMenu($event)) comboboxCloseMenu({ immediate: true, reason: 'outside' })"
             x-on:fff-parent-overlay-close.window="if ($event.target.contains(_pickerHostElement || $el)) comboboxCloseMenu({ immediate: true, reason: 'parent-close' })"
             {{ $getExtraAlpineAttributeBag() }}
             @class([...$getWrapperClasses(), 'is-disabled' => $disabled, 'has-focus-outline' => $shouldShowFocusOutline()])>
@@ -39,7 +39,9 @@
                     @include('filament-flex-fields::forms.components.partials.tags.affix', ['position' => 'suffix'])
                 </div>
             </div>
-            <x-filament-flex-fields::select-menu :control-id="$getId()" :label="$getLabel()" :searchable="true" :inline-search="true" />
+            <template x-if="headlessMenuMounted">
+                <x-filament-flex-fields::select-menu :control-id="$getId()" :label="$getLabel()" :searchable="true" :inline-search="true" />
+            </template>
             <div class="fff-tags-field__chip-mount" x-show="comboboxSelectedValues.length > 0" @if (! count($initialTags)) style="display: none" @endif>
                 <div class="fff-tags-field__tags fff-tags-field__tags-ssr" aria-hidden="true">
                     @foreach ($initialTags as $tag)

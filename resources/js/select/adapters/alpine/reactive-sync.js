@@ -85,6 +85,22 @@ export function createSelectReactiveSyncMixin() {
                 }).catch(() => { /* The capability boundary dispatches the failure once. */ })
             }, { isCurrent: current })
         },
+        onMenuSurfaceAnchored() {
+            if (!this._focusFirstMountedMenu) return
+            this._focusFirstMountedMenu = false
+            const generation = this._selectOpenEffectsGeneration
+            const current = () => !this._selectDisposed && !this.disabled && this.comboboxOpen
+                && !this.__fffSheetClosing && generation === this._selectOpenEffectsGeneration
+            this.$nextTick(() => {
+                if (!current()) return
+                // First-mounted markup was hidden during the normal open effect.
+                // Focus only after real anchoring/enter, never after a guessed delay.
+                const cancel = runAfterSheetEnter(this.resolveMenuElement(), () => {
+                    if (current() && this.searchable) this.focusHeadlessSearchInput()
+                }, { isCurrent: current })
+                this.ensurePickerResourceScope().defer(cancel)
+            })
+        },
         stopSelectOpenEffects() {
             this._selectOpenEffectsGeneration++
             this.unbindDropdownScrollFadeObserver()

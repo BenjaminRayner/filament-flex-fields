@@ -12,6 +12,7 @@
     $runtime = $field->getCurrencyRuntimeConfiguration();
     $placeholder = $getPlaceholder() ?? __('filament-flex-fields::default.currency.placeholder');
     $currencySelect = $selectable ? CurrencySelect::forCurrency($field) : null;
+    $currencySelectConfig = $currencySelect ? app(\Bjanczak\FilamentFlexFields\Support\Rendering\CatalogPayloadTransport::class)->configuration($currencySelect, $currencySelect->getHeadlessAlpineConfig()) : [];
 @endphp
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field"
     :attributes="\Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())->class($getWrapperClasses())">
@@ -30,9 +31,10 @@
             <div class="fff-currency-field__row fff-flex-text-input__row">
                 @if ($currencySelect)
                     <div class="fff-currency-field__currency"
+                        @if ($currencySelectConfig['presentationConfigurationId'] ?? null) data-fff-control-configuration-id="{{ $currencySelectConfig['presentationConfigurationId'] }}" @endif
                         x-fff-load x-fff-load-src="{{ FilamentAsset::getAlpineComponentSrc('select-field', FilamentFlexFieldsPlugin::PACKAGE_NAME) }}"
-                        x-data="fffHeadlessSelectField({ ...@js($currencySelect->getHeadlessAlpineConfig()),
-                            state: currencyState.currency, onChange: values => $dispatch('fff-currency-change', values[0]) })"
+                        x-data="fffHeadlessSelectField({ ...@js($currencySelectConfig),
+                            state: currencyState.currency, onChange: values => $dispatch('fff-currency-change', values[0]) }, $el)"
                         x-init="$watch('currencyState.currency', value => { state = value })"
                         x-on:click.outside="if (!$refs.headlessMenu?.contains($event.target)) comboboxCloseMenu()">
                         {!! $currencySelect->getSelectCatalogMarkup() !!}
@@ -43,7 +45,7 @@
                             <span class="fff-currency-field__currency-code" x-text="currencyState.currency">{{ $initial['currencyCode'] }}</span>
                             <x-filament::icon icon="hugeicons-arrow-down-01" class="fff-currency-field__currency-chevron" />
                         </button>
-                        <x-filament-flex-fields::select-menu :field="$currencySelect" />
+                        <x-filament-flex-fields::select-menu :owner-field="$field" :field="$currencySelect" />
                     </div>
                 @endif
                 @include('filament-flex-fields::forms.components.currency.amount-editor')
