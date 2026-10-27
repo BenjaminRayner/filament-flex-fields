@@ -49,7 +49,6 @@ export function createHeadlessComboboxEmptyUiMixin() {
                 this.allowCreateOption
                 && query.length > 0
                 && this.searchable
-                && ! this.hasDynamicSearchResults
             ) {
                 return null
             }
