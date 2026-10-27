@@ -88,7 +88,7 @@ final class ReleaseDirectoryPublisher
         $found = 0;
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST);
         foreach ($iterator as $file) {
-            $relative = substr($file->getPathname(), strlen($directory) + 1);
+            $relative = str_replace(DIRECTORY_SEPARATOR, '/', substr($file->getPathname(), strlen($directory) + 1));
             if ($file->isLink() || ! array_key_exists($relative, $expected) || $file->isDir() !== $expected[$relative]
                 || (! $file->isDir() && ! $file->isFile())) {
                 throw new RuntimeException('Unexpected or unsafe published release entry.');

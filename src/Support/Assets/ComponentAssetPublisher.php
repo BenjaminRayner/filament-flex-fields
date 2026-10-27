@@ -127,7 +127,7 @@ final class ComponentAssetPublisher
         foreach ($this->registry->all() as $definition) {
             foreach ($definition->publications as $resource) {
                 $source = realpath($resource->sourcePath());
-                if ($source !== false && ($source === $dist || str_starts_with($source, $dist.'/'))) {
+                if ($source !== false && ($source === $dist || str_starts_with($source, $dist.DIRECTORY_SEPARATOR))) {
                     return true;
                 }
             }
@@ -170,13 +170,13 @@ final class ComponentAssetPublisher
                         continue;
                     }
                     $resolvedFile = realpath($file->getPathname());
-                    if ($resolvedFile === false || ! str_starts_with($resolvedFile, $source.'/')) {
+                    if ($resolvedFile === false || ! str_starts_with($resolvedFile, $source.DIRECTORY_SEPARATOR)) {
                         throw new RuntimeException('Resource file escaped its declared source directory.');
                     }
                     if ($manifest->versionFor($resolvedFile) !== null) {
                         continue;
                     }
-                    $relative = substr($file->getPathname(), strlen($source) + 1);
+                    $relative = str_replace(DIRECTORY_SEPARATOR, '/', substr($file->getPathname(), strlen($source) + 1));
                     $files[] = [$file->getPathname(), $root.'/'.$resource->publicDirectory.'/'.$relative, null, null];
                 }
             }
@@ -228,7 +228,7 @@ final class ComponentAssetPublisher
             $parent = dirname($parent);
         }
         $resolved = realpath($parent);
-        if ($resolved === false || ! str_starts_with($resolved.'/', $root.'/')) {
+        if ($resolved === false || ! str_starts_with($resolved.DIRECTORY_SEPARATOR, $root.DIRECTORY_SEPARATOR)) {
             throw new RuntimeException('Asset destination contains an unsafe symlink.');
         }
     }
