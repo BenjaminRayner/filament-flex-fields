@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-24T10:58:24.500Z",
+  "generatedAt": "2026-10-27T22:03:34.523Z",
   "css": {
     "address-autocomplete.css": {
       "bytes": 1501,
@@ -1268,9 +1268,9 @@
       "kb": 3.94,
       "gzipKb": 1.81
     },
-    "flex-fields-select-trigger-4RKFPUYQ.js": {
-      "bytes": 76617,
-      "kb": 74.82,
+    "flex-fields-select-trigger-PTQTJANN.js": {
+      "bytes": 76586,
+      "kb": 74.79,
       "gzipKb": 19.28
     },
     "flex-fields-shared-2GRLTSXG.js": {

@@ -138,8 +138,10 @@ it('registers timezone field playground variants', function () {
 });
 
 it('exposes focus outline api', function () {
-    expect(TimezoneField::make('timezone')->shouldShowFocusOutline())->toBeFalse()
-        ->and(TimezoneField::make('timezone')->focusOutline()->shouldShowFocusOutline())->toBeTrue();
+    expect(TimezoneField::make('timezone')->shouldShowFocusOutline())->toBeTrue()
+        ->and(TimezoneField::make('timezone')->focusOutline(false)->shouldShowFocusOutline())->toBeFalse()
+        ->and(TimezoneField::make('timezone')->focusOutline()->shouldShowFocusOutline())->toBeTrue()
+        ->and(TimezoneField::make('timezone')->focusOutline(fn (): bool => false)->shouldShowFocusOutline())->toBeFalse();
 });
 
 it('rejects unsupported timezone field variants', function () {

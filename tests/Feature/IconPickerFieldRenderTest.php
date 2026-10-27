@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\IconPickerField;
+use Bjanczak\FilamentFlexFields\Tests\Support\AlpineJsHtml;
 use Bjanczak\FilamentFlexFields\Tests\Support\TestableIconPickerForm;
 use Livewire\Livewire;
 
@@ -28,8 +29,9 @@ it('renders icon picker field shell and alpine configuration', function (): void
         ->toContain('fff-select-field')
         ->toContain('headlessSearchInput')
         ->toContain('fi-select-input-search-ctn')
-        ->toContain('fff-select-dropdown-panel--below')
-        ->toContain('x-teleport="body"');
+        ->toContain('fff-select-dropdown-panel--below');
+
+    expect(AlpineJsHtml::portalMarkup($html))->toContain('x-teleport="body"');
 });
 
 it('renders selected icon svg in trigger html when form has a value', function (): void {

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Resources\FlexFieldGroupResource\Pages;
 
 use Bjanczak\FilamentFlexFields\Filament\Resources\FlexFieldGroupResource;
-use Bjanczak\FilamentFlexFields\Filament\Resources\FlexFieldGroupResource\Concerns\PreparesFlexFieldGroupFormData;
 use Bjanczak\FilamentFlexFields\Filament\Resources\FlexFieldGroupResource\Concerns\ManagesFlexFieldGroupSchemaActions;
+use Bjanczak\FilamentFlexFields\Filament\Resources\FlexFieldGroupResource\Concerns\PreparesFlexFieldGroupFormData;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateFlexFieldGroup extends CreateRecord

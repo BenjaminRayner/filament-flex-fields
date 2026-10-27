@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
 use Bjanczak\FilamentFlexFields\Support\Playground\SelectPlayground;
-use Bjanczak\FilamentFlexFields\Tests\Support\TestableTranslatableForm;
 use Bjanczak\FilamentFlexFields\Tests\Support\SchemaComponents;
+use Bjanczak\FilamentFlexFields\Tests\Support\TestableTranslatableForm;
 use Livewire\Livewire;
 
 it('does not resolve closure based select options during initial render', function (): void {

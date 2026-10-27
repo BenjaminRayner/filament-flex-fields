@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Select;
 
+use Filament\Forms\Components\Select;
+
 /**
  * Formal contract for async relationship / search adapters used by headless SelectField.
  *
- * Host apps implement search via Livewire {@see \Filament\Forms\Components\Select::getSearchResultsFromRelationship()}
- * or custom {@see \Filament\Forms\Components\Select::getSearchResults()}. The JS side mirrors this with
- * {@see \Bjanczak\FilamentFlexFields\Support\Select\RelationshipSearchAdapter::jsContract()} (createRelationshipSearchAdapter).
+ * Host apps implement search via Livewire {@see Select::getSearchResultsFromRelationship()}
+ * or custom {@see Select::getSearchResults()}. The JS side mirrors this with
+ * {@see RelationshipSearchAdapter::jsContract()} (createRelationshipSearchAdapter).
  */
 final class RelationshipSearchAdapter
 {

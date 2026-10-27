@@ -46,11 +46,17 @@ it('renders headless combobox shell for static select fields by default', functi
         ->toContain('fffHeadlessSelectField')
         ->toContain('fff-select-field__shell--headless')
         ->toContain('id="form.status"')
-        ->toContain('id="form.status-listbox"')
-        ->toContain('id="form.technologies-search"')
+        ->toContain('data-fff-select-configuration')
+        ->toContain('x-if="headlessMenuMounted"')
         ->not->toContain('fffSelectFieldCoordinator')
         ->not->toContain('data-fff-select-root')
         ->not->toContain('selectFormComponent({');
+
+    expect(AlpineJsHtml::configurationFor($html, 'data.status')['listboxDomId'])->toBe('form.status-listbox')
+        ->and(AlpineJsHtml::configurationFor($html, 'data.technologies')['searchDomId'])->toBe('form.technologies-search')
+        ->and(AlpineJsHtml::configurationFor($html, 'data.status')['menuDomId'])
+        ->not->toBe(AlpineJsHtml::configurationFor($html, 'data.technologies')['menuDomId'])
+        ->and(AlpineJsHtml::portalMarkup($html))->toContain('x-bind:id="listboxDomId"', 'x-bind:id="searchDomId"');
 
     expect(AlpineJsHtml::containsString($html, 'statePath', 'data.status'))->toBeTrue();
     expect(AlpineJsHtml::containsString($html, 'statePath', 'data.technologies'))->toBeTrue();

@@ -11,7 +11,7 @@ return [
     'notice_title' => 'De juiste licentie voor uw project.',
     'notice' => 'Persoonlijk gebruik en daarvoor in aanmerking komende interne tools zijn gratis. Voor commerciële SaaS is een Standard-licentie nodig; klantinstallaties, herbruikbare kits en OEM vereisen overeengekomen specifieke rechten.',
     'check_scope' => 'Vind uw licentie',
-    'intro' => 'Kies hoe u FLEX Fields wilt gebruiken. Wij helpen u de reikwijdte te identificeren die wordt beschreven in LICENSE v2.0.',
+    'intro' => 'Beoordeel de functionaliteit die FLEX Fields gebruikt, niet elke functie binnen dezelfde Laravel-applicatie. Gedeelde code of een afzonderlijk Filament-paneel bepaalt niet of dat gebruik gratis of commercieel is.',
     'selection_hint' => 'Selecteer elk beoogd gebruik en bevestig de voorwaarden ervan. Wij beoordelen elk gebruik afzonderlijk, dus ook uw producten en de producten van een klant. Het aantal producten volgt onafhankelijke productidentiteiten, niet gebruikers, domeinen of servers.',
     'assess' => 'Controleer mijn gebruik',
     'assessing' => 'Controleren…',

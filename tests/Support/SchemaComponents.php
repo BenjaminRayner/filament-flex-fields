@@ -11,7 +11,7 @@ final class SchemaComponents
 {
     /** Inspect every declared branch, including a natively deferred child schema.
      *
-     * @param array<mixed>|Schema $schema
+     * @param  array<mixed>|Schema  $schema
      * @return list<Component>
      */
     public static function all(array|Schema $schema): array

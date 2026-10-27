@@ -9,7 +9,6 @@ use Bjanczak\FilamentFlexFields\Enums\FieldType;
 final class FlexFieldMatrixStorage
 {
     /**
-     * @param  mixed  $stored
      * @return list<array{value: string, label: string, icon?: string}>
      */
     public static function configToRepeater(mixed $stored, string $valueKey = 'value'): array

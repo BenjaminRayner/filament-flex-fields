@@ -7,9 +7,19 @@ rss: true
 
 {/* Generated from CHANGELOG.md by scripts/generate-changelog-docs.mjs. Do not edit this page directly. */}
 
-<Badge color="purple" shape="pill">Latest recorded version · 4.0.11</Badge>
+<Badge color="purple" shape="pill">Latest recorded version · 4.0.12</Badge>
 
 Filter the timeline by change type. Subscribe with RSS on the publicly hosted documentation.
+
+<Update label="v4.0.12" description="2026-10-27" tags={["Fixed"]} rss={{"title":"FLEX Fields 4.0.12","description":"Changes, improvements and fixes in FLEX Fields 4.0.12.","date":"2026-10-27"}}>
+
+### Fixed
+
+- **Windows asset publication** — fixed filesystem path comparisons and nested resource paths so `php artisan filament:assets` can publish assets on Windows and recognize an unchanged release on subsequent runs. Directory containment and symlink safeguards remain in place.
+- **Select custom options** — keep the “Create” option available when a remote search returns no matches and `allowCreateOption()` is enabled. Loading, pending searches, errors and minimum-search prompts retain their existing behavior.
+- **Licensing translations** — aligned the German, French, Spanish, Italian, Dutch and Brazilian Portuguese introductions with the current explanation of personal, internal and commercial use.
+
+</Update>
 
 <Update label="v4.0.11" description="2026-10-21" tags={["Changed","Fixed"]} rss={{"title":"FLEX Fields 4.0.11","description":"Changes, improvements and fixes in FLEX Fields 4.0.11.","date":"2026-10-21"}}>
 

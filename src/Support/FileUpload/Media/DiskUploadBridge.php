@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Support\FileUpload\Media;
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\FlexFileUpload;
+use Bjanczak\FilamentFlexFields\Support\Events\MediaOperationObserved;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Events\UploadEvent;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Events\UploadEventType;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Events\UploadNotifications;
@@ -236,7 +237,7 @@ final class DiskUploadBridge
         $name = $field->isMultiple() && is_array($names) ? ($names[$path] ?? null) : (is_string($names) ? $names : null);
 
         return ['name' => $name ?? $original->file->originalName, 'size' => $primary->file->bytes,
-            'correlationId' => \Bjanczak\FilamentFlexFields\Support\Events\MediaOperationObserved::identity($original->operationId),
+            'correlationId' => MediaOperationObserved::identity($original->operationId),
             'type' => $primary->file->mimeType,
             'processingStatus' => $processing['status'] ?? null,
             'processingError' => $processing['error'] ?? null,

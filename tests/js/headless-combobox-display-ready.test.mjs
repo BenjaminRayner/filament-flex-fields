@@ -423,47 +423,50 @@ test('static client-side searchable selects show Filament empty-state messages',
     assert.equal(config.headlessSelectEmptyTitle(), 'No authors available.')
 })
 
-test('remote searches with no matches keep inline creation visible', () => {
-    const config = headlessComboboxAlpine({
-        state: null,
-        searchable: true,
-        allowCreateOption: true,
-        hasDynamicSearchResults: true,
-        hasDynamicOptions: false,
-        minSearchLength: 2,
-        options: [],
-    })
+test('empty remote search keeps actual inline create rows accessible only when creation is enabled', () => {
+    for (const allowCreateOption of [true, false]) {
+        const config = headlessComboboxAlpine({
+            state: null,
+            searchable: true,
+            smartSuggestEnabled: allowCreateOption,
+            allowCreateOption,
+            hasDynamicSearchResults: true,
+            hasDynamicOptions: false,
+            minSearchLength: 2,
+            options: [],
+        })
+        config.createSelectEngine([])
+        config.comboboxQuery = 'New order'
+        config.comboboxOpen = true
+        config._engine.setQuery(config.comboboxQuery)
 
-    config.countVisibleDropdownOptions = () => 0
-    config.comboboxQuery = 'New order'
-    config.comboboxOpen = true
-
-    assert.equal(config.headlessSelectDropdownState(), null)
-    assert.equal(config.shouldShowHeadlessDropdownOptions(), true)
-    assert.equal(config.shouldShowHeadlessSelectEmptyState(), false)
-
-    config.allowCreateOption = false
-    assert.equal(config.headlessSelectDropdownState(), 'search')
-    assert.equal(config.shouldShowHeadlessDropdownOptions(), false)
+        assert.equal(config.countVisibleDropdownOptions(), 0)
+        assert.equal(config.buildHeadlessDropdownRowsForDisplay().some(row => row.type === 'create'), allowCreateOption)
+        assert.equal(config.headlessSelectDropdownState(), allowCreateOption ? null : 'search')
+        assert.equal(config.shouldShowHeadlessDropdownOptions(), allowCreateOption)
+        assert.equal(config.shouldShowHeadlessSelectEmptyState(), !allowCreateOption)
+        config._engine.destroy()
+    }
 })
 
-test('remote inline creation preserves prompts, loading and errors', () => {
+test('remote inline creation retains minimum query, pending, loading and error precedence', () => {
     const config = headlessComboboxAlpine({
         state: null,
         searchable: true,
+        smartSuggestEnabled: true,
         allowCreateOption: true,
         hasDynamicSearchResults: true,
-        hasDynamicOptions: false,
         minSearchLength: 2,
         options: [],
     })
-
-    config.countVisibleDropdownOptions = () => 0
+    config.createSelectEngine([])
     config.comboboxOpen = true
     config.comboboxQuery = 'N'
+    config._engine.setQuery('N')
     assert.equal(config.headlessSelectDropdownState(), 'prompt')
 
     config.comboboxQuery = 'New order'
+    config._engine.setQuery('New order')
     config.searchPending = true
     assert.equal(config.headlessSelectDropdownState(), 'searching')
     assert.equal(config.shouldShowHeadlessDropdownOptions(), false)
@@ -471,10 +474,17 @@ test('remote inline creation preserves prompts, loading and errors', () => {
     config.searchPending = false
     config.optionsLoading = true
     assert.equal(config.headlessSelectDropdownState(), 'loading')
+    assert.equal(config.shouldShowHeadlessDropdownOptions(), false)
 
     config.optionsLoading = false
     config.searchError = true
     assert.equal(config.headlessSelectDropdownState(), 'error')
+    config.searchError = false
+    config.optionsError = true
+    assert.equal(config.headlessSelectDropdownState(), 'error')
+    config.optionsError = false
+    assert.equal(config.headlessSelectDropdownState(), null)
+    config._engine.destroy()
 })
 
 test('multi-select shows exhausted empty state when selected options leave the dropdown', () => {

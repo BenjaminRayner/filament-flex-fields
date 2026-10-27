@@ -8,6 +8,7 @@ use Bjanczak\FilamentFlexFields\Support\Enterprise\SchemaRegistry;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldSchemaRegistry;
 use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldGroupRegistrySync;
 use Illuminate\Auth\GenericUser;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Gate;
 
 beforeEach(function (): void {
@@ -83,7 +84,7 @@ it('enforces composite slug uniqueness per tenant at database level', function (
     expect(fn () => FlexFieldGroup::factory()->create([
         'slug' => 'shared-slug',
         'tenant_id' => '',
-    ]))->toThrow(Illuminate\Database\QueryException::class);
+    ]))->toThrow(QueryException::class);
 
     FlexFieldGroup::factory()->create([
         'slug' => 'shared-slug',

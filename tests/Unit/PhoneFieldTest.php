@@ -231,8 +231,10 @@ it('includes wrapper classes for size and variant', function () {
 });
 
 it('exposes focus outline api', function () {
-    expect(PhoneField::make('phone')->shouldShowFocusOutline())->toBeFalse()
-        ->and(PhoneField::make('phone')->focusOutline()->shouldShowFocusOutline())->toBeTrue();
+    expect(PhoneField::make('phone')->shouldShowFocusOutline())->toBeTrue()
+        ->and(PhoneField::make('phone')->focusOutline(false)->shouldShowFocusOutline())->toBeFalse()
+        ->and(PhoneField::make('phone')->focusOutline()->shouldShowFocusOutline())->toBeTrue()
+        ->and(PhoneField::make('phone')->focusOutline(fn (): bool => false)->shouldShowFocusOutline())->toBeFalse();
 });
 
 it('rejects unsupported phone field variants', function () {

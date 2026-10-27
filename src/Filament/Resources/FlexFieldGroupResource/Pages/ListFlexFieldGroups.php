@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Resources\FlexFieldGroupResource\Pages;
 
 use Bjanczak\FilamentFlexFields\Filament\Resources\FlexFieldGroupResource;
-use Bjanczak\FilamentFlexFields\Models\FlexFieldGroup;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsConfig;
 use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldSchemaResolver;
 use Filament\Actions\CreateAction;

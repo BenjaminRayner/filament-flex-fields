@@ -5,6 +5,14 @@ All notable changes to `filament-flex-fields` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.12] - 2026-10-27
+
+### Fixed
+
+- **Windows asset publication** — fixed filesystem path comparisons and nested resource paths so `php artisan filament:assets` can publish assets on Windows and recognize an unchanged release on subsequent runs. Directory containment and symlink safeguards remain in place.
+- **Select custom options** — keep the “Create” option available when a remote search returns no matches and `allowCreateOption()` is enabled. Loading, pending searches, errors and minimum-search prompts retain their existing behavior.
+- **Licensing translations** — aligned the German, French, Spanish, Italian, Dutch and Brazilian Portuguese introductions with the current explanation of personal, internal and commercial use.
+
 ## [4.0.11] - 2026-10-21
 
 ### Changed

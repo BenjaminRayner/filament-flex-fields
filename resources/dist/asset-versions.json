@@ -1,6 +1,6 @@
 {
   "format": 2,
-  "release": "5e68c934c01c9cec52c2820f379e87abfa3040ab7bedf19092cc2bfb5a124bd9",
+  "release": "bd6771a2584b1e1e5710a5594398624aef24367143522f109cae22c3bc820610",
   "assets": {
     "assets/barcode-scanner-field/barcode-scan-success.mp3": "fef38e83de67a096494b3b0ae7fc0e5a5a84df59cfa1e3ea65fd5d06595e9f8a",
     "assets/country-flags/ac.svg": "3acc0d1b3156debe149d1ea086c7eda3dfd5ecd7fd14b7a3e385ae63cd71ab64",
@@ -434,7 +434,7 @@
     "components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js": "d5cf97e75ba3fa031cf555bace29cf974dac3a44020858a46169dc7ac7a706af",
     "components/flex-fields-select-menu-NYMR53KH.js": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js": "1a1ecbfd0e1d673eb6cda928ab0f0c279a40278a525e9ca8e178a7834ebdadb8",
-    "components/flex-fields-select-trigger-4RKFPUYQ.js": "86adef5ca5235de6c4c97502308df8873fec465a89b1a5664ac8d531cb3b1921",
+    "components/flex-fields-select-trigger-PTQTJANN.js": "ca3ce255806052517f96be51a49dcad2180f68af770f71157952419b603938a6",
     "components/flex-fields-shared-2GRLTSXG.js": "037c9b4ffb619f0598be669c3a6c38bd3f008d3f262afc2fa32aa0aef1200078",
     "components/flex-fields-shared-56DY2BDH.js": "f5bc13372d90c04fcc0772e2faa4eb6bb5c87b1714258e41c3e96920d7b73cc0",
     "components/flex-fields-shared-5RIWVSGE.js": "fe73d9aa1bf00299134cbe2aa4b65edf25236b1ae45020ad738e9f75d74afe8d",
@@ -462,13 +462,13 @@
     "components/flex-time-picker.js": "754ac1a33cfebf60823e2a0346747ca1a4c2c7a0924d62ecedfc92cc6dbbd36b",
     "components/flex-time-segments.js": "9654a5a141720a3706e5120f13a2fe5ed10ef8e7a2692baa63c3cfd6eecf42b8",
     "components/flex-verification-code.js": "8d385ce156d7c45c6f29008497eefd49d5081a8857a3a0223bcd3c486f633a8d",
-    "components/font-select.js": "5336247e398cae72dc1432337a0478fff91ed0739b92c79ec446c2f75618be86",
+    "components/font-select.js": "13c4e4c5437b1b12fa5e2abfaa9038beb00ca11eefb88275104041dd18869f3a",
     "components/hold-confirm-action.js": "b40540cefac26906606b65d24a1d46fc2c0c43f39040a607c559ff59481227e9",
-    "components/icon-picker-field.js": "8ecfeaec262a9fa77e03311df2b79d77acd39e96d689003f3c08befe7c4c05ae",
+    "components/icon-picker-field.js": "45918701ca20b83ca668631a62d2dadf94ad49b78342a3d62b0edeaaed3e9a8a",
     "components/image-choice-cards.js": "a516166f9322aff6d5fa7cc0abd3eb11196d32955306c15281dff7fd5921193c",
     "components/item-card-interaction.js": "557614e21f553a9ff6a33b7c0fc629a8a81e43fc833226da281597f00e533bfc",
     "components/link-preview-field.js": "7bca976b69273303a9c94556545c43cec5d983f3443aba38865e060fa77a0fbb",
-    "components/location-select.js": "23e1769dbdb55a96b7763982152bfb5b4cfe987039b896a00c4f97f266730232",
+    "components/location-select.js": "976ef84f9d64b12577b6efbca25ba5a4369892682b6fd0c35baac1cac6fea0af",
     "components/map-picker.js": "6fdea3ce17aa69ff806eeff32d3e9809fced94e545952ca34def82cbf6fa4d08",
     "components/matrix-choice-field.js": "c5c2b942f332430183e75b7997371a8b50caf55af8e657057155c1b42b08c585",
     "components/media-os.js": "7efc88f883b70361c1e576e05161a9dfbcd716eb16291f655b7f3cd22656334d",
@@ -481,12 +481,12 @@
     "components/schedule-field.js": "a2cf98cfc5a18e455597aafe395d3bc95b153846cd96d1905bc5f80032d0b2e6",
     "components/segment-control.js": "585552de91ec5775af7a8eef596600e9020c129e99416c33662a078d3f5c1de0",
     "components/segment-tabs.js": "4b4fbad07917ac47ebda846f9c6e0d7fde0f53544aa36f275673ee267ea809cf",
-    "components/select-field.js": "176c15fc5bab47729251fc390f577f934d549193500c4fc10f874a256c20110d",
+    "components/select-field.js": "58f5febdbe7ee250f32a7acd9a5e8c96b754c9994e96f0dbeb79ecc76ae8c561",
     "components/signature-field.js": "a09850465c2550b62af4da94a2f6242e45c08384524d2374535d5763f563a26c",
     "components/slug-field.js": "6f90a1b73d677c8e5e90927e3c0c8154a339b6953f31f5479c6ee1f309ec655a",
     "components/social-links-field.js": "8364c23a385fff92ef64d78a03f4c40efc39f1961a7a29454664dff404dac858",
     "components/switch.js": "e3849eeda3833498eb32d399a05bdc61b116eb995f7efa2090120ff611c87403",
-    "components/tags-field.js": "51abc274b022993aacf237eca44a46e211eec36339252edabd86112e7b9f6b14",
+    "components/tags-field.js": "00a0c76f5f3275cb18c35dfd2e22b65e9e629ca7e5bcca3975b63c7030eb27cc",
     "components/todo-list-field.js": "3bbc529f9845bf0ace53f17dbdeaac3c6b0a8f58a17fc883aa01fc088b343db1",
     "components/track-slider.js": "418b20b3ece96fd90d689d0a6d4f50d07fd032c61cb552d7c849de1ef85c48ec",
     "components/traffic-split.js": "4c278291ad62d9205cf76a077a3ab4c863bfed746fcec5b8c590ad1a48e20617",
@@ -1018,7 +1018,7 @@
     "components/flex-fields-select-configuration-rendered-portal-5QFCYY3C.js": 1909,
     "components/flex-fields-select-menu-NYMR53KH.js": 0,
     "components/flex-fields-select-options-catalog-presentation-SP2OO3SY.js": 4032,
-    "components/flex-fields-select-trigger-4RKFPUYQ.js": 76617,
+    "components/flex-fields-select-trigger-PTQTJANN.js": 76586,
     "components/flex-fields-shared-2GRLTSXG.js": 730,
     "components/flex-fields-shared-56DY2BDH.js": 4849,
     "components/flex-fields-shared-5RIWVSGE.js": 743,
@@ -1170,7 +1170,7 @@
     "support/flex-rich-editor-youtube-extension.js": 8218
   },
   "metadata": {
-    "resources/dist/components/alpine-manifest.json": "5e2c58f5c42f0c6987a1fa8171544d739cf8deb0865e8425397784e098f1c577",
+    "resources/dist/components/alpine-manifest.json": "ff80e75d64cd5197f876af0920d1d5b8c4d0b42a57d520dde68b5fc78bbba2d0",
     "src/Support/Assets/BuiltInComponentIndex.php": "bcfed335b9eba28a4d3e082dd44a39a9353a3704a8113ef9e47dbcf205a82aa1"
   }
 }

@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 final class FlexFieldOptionStorage
 {
     /**
-     * @param  mixed  $stored
      * @return list<array<string, mixed>>
      */
     public static function configToRepeater(mixed $stored, FieldType $type): array

@@ -135,8 +135,10 @@ it('registers country field playground variants', function () {
 });
 
 it('exposes focus outline api', function () {
-    expect(CountryField::make('country')->shouldShowFocusOutline())->toBeFalse()
-        ->and(CountryField::make('country')->focusOutline()->shouldShowFocusOutline())->toBeTrue();
+    expect(CountryField::make('country')->shouldShowFocusOutline())->toBeTrue()
+        ->and(CountryField::make('country')->focusOutline(false)->shouldShowFocusOutline())->toBeFalse()
+        ->and(CountryField::make('country')->focusOutline()->shouldShowFocusOutline())->toBeTrue()
+        ->and(CountryField::make('country')->focusOutline(fn (): bool => false)->shouldShowFocusOutline())->toBeFalse();
 });
 
 it('rejects unsupported country field variants', function () {
