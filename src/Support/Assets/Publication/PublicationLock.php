@@ -22,7 +22,7 @@ final class PublicationLock
             throw new InvalidArgumentException('Publication lock wait must be between 10 and 300000 milliseconds.');
         }
         $root = ArtifactPath::root($publicRoot);
-        $metadata = $root.'/filament-flex-fields-assets';
+        $metadata = $root.DIRECTORY_SEPARATOR.'filament-flex-fields-assets';
         if (is_link($metadata)) {
             throw new RuntimeException('Unsafe publication metadata directory.');
         }

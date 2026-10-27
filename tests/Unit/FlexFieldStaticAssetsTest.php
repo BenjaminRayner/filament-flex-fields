@@ -4,7 +4,27 @@ declare(strict_types=1);
 
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\BarcodeScannerField;
 use Bjanczak\FilamentFlexFields\Support\Assets\AssetVersionManifest;
+use Bjanczak\FilamentFlexFields\Support\Assets\ComponentAssetCatalog;
+use Bjanczak\FilamentFlexFields\Support\Assets\ComponentAssetPublisher;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Storage;
+
+it('publishes and verifies nested assets using native filesystem paths', function (): void {
+    $disk = Storage::fake('asset-publication');
+    $publisher = new ComponentAssetPublisher(ComponentAssetCatalog::registry(), new Filesystem);
+    $release = app(AssetVersionManifest::class)->release();
+
+    $published = $publisher->publish($disk->path(''));
+
+    expect($published['copied'])->toBeGreaterThan(0);
+    $disk->assertExists('filament-flex-fields-assets/core/'.$release.'/assets/barcode-scanner-field/barcode-scan-success.mp3');
+
+    expect($publisher->publish($disk->path('')))->toBe([
+        'copied' => 0,
+        'unchanged' => $published['copied'] + $published['unchanged'],
+    ]);
+});
 
 it('builds versioned urls for published static assets', function () {
     $url = FlexFieldAssets::assetUrl('nps-field/emojis/0.webp');
