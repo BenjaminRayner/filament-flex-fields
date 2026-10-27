@@ -423,6 +423,60 @@ test('static client-side searchable selects show Filament empty-state messages',
     assert.equal(config.headlessSelectEmptyTitle(), 'No authors available.')
 })
 
+test('remote searches with no matches keep inline creation visible', () => {
+    const config = headlessComboboxAlpine({
+        state: null,
+        searchable: true,
+        allowCreateOption: true,
+        hasDynamicSearchResults: true,
+        hasDynamicOptions: false,
+        minSearchLength: 2,
+        options: [],
+    })
+
+    config.countVisibleDropdownOptions = () => 0
+    config.comboboxQuery = 'New order'
+    config.comboboxOpen = true
+
+    assert.equal(config.headlessSelectDropdownState(), null)
+    assert.equal(config.shouldShowHeadlessDropdownOptions(), true)
+    assert.equal(config.shouldShowHeadlessSelectEmptyState(), false)
+
+    config.allowCreateOption = false
+    assert.equal(config.headlessSelectDropdownState(), 'search')
+    assert.equal(config.shouldShowHeadlessDropdownOptions(), false)
+})
+
+test('remote inline creation preserves prompts, loading and errors', () => {
+    const config = headlessComboboxAlpine({
+        state: null,
+        searchable: true,
+        allowCreateOption: true,
+        hasDynamicSearchResults: true,
+        hasDynamicOptions: false,
+        minSearchLength: 2,
+        options: [],
+    })
+
+    config.countVisibleDropdownOptions = () => 0
+    config.comboboxOpen = true
+    config.comboboxQuery = 'N'
+    assert.equal(config.headlessSelectDropdownState(), 'prompt')
+
+    config.comboboxQuery = 'New order'
+    config.searchPending = true
+    assert.equal(config.headlessSelectDropdownState(), 'searching')
+    assert.equal(config.shouldShowHeadlessDropdownOptions(), false)
+
+    config.searchPending = false
+    config.optionsLoading = true
+    assert.equal(config.headlessSelectDropdownState(), 'loading')
+
+    config.optionsLoading = false
+    config.searchError = true
+    assert.equal(config.headlessSelectDropdownState(), 'error')
+})
+
 test('multi-select shows exhausted empty state when selected options leave the dropdown', () => {
     const options = [
         { value: 'a', label: 'Alpha' },
