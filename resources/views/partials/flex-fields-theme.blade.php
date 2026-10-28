@@ -8,8 +8,9 @@
 @endphp
 
 @if ($cssVariables !== [])
+    {{-- Configured tokens must outrank the later-loaded :root and .dark defaults. --}}
     <style id="fff-theme-overrides" @if (($deliveryNonce = app(\Bjanczak\FilamentFlexFields\Support\Assets\Delivery\AssetDeliveryContext::class)->nonce()) !== null) nonce="{{ $deliveryNonce }}" @endif>
-        :root {
+        html:root {
 @foreach ($cssVariables as $name => $value)
             {{ $name }}: {!! $value !!};
 @endforeach
