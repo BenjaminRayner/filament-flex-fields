@@ -5,6 +5,16 @@ All notable changes to `filament-flex-fields` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.13] - 2026-10-28
+
+### Fixed
+
+- **Custom themes** — preserve colors, borders, shadows and other theme tokens configured through `ui.theme` or the plugin's `theme()` method when base styles load later, in both light and dark mode. Individual fields retain their own overrides.
+
+### Security
+
+- **Livewire** — exclude versions 4.3.0–4.4.7 affected by an authorization bypass and update the locked dependency to the patched 4.4.8 release.
+
 ## [4.0.12] - 2026-10-27
 
 ### Fixed

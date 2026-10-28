@@ -77,6 +77,9 @@
         "spatie/laravel-sluggable": "^4.0",
         "spatie/laravel-tags": "^4.11"
     },
+    "conflict": {
+        "livewire/livewire": ">=4.3.0 <4.4.8"
+    },
     "autoload": {
         "psr-4": {
             "Bjanczak\\FilamentFlexFields\\": "src/",

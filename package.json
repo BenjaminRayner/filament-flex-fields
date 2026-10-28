@@ -10,6 +10,7 @@
         "test:js": "node --import ./tests/js/register-svg-loader.mjs --test tests/js/**/*.test.mjs",
         "test:consumer-graph": "node --import ./tests/js/register-svg-loader.mjs --test tests/js/flex-field-consumer-graph.test.mjs tests/js/flex-field-consumer-graph.property.test.mjs tests/js/flex-field-production-emit.test.mjs tests/js/flex-field-asset-injector.test.mjs tests/js/flex-field-asset-injector-logic-audit.test.mjs tests/js/flex-field-asset-chaos.test.mjs tests/js/flex-field-prefetch-engine.test.mjs tests/js/flex-field-resync-raf.test.mjs tests/js/flex-alpine-load-gate.test.mjs tests/js/flex-fff-load-directive.test.mjs tests/js/flex-fff-load-production-dom.test.mjs tests/js/flex-field-asset-inspector.test.mjs",
         "test:e2e": "playwright test",
+        "test:e2e:theme": "playwright test --config=scripts/playwright-theme.config.mjs",
         "test:e2e:coordinator": "playwright test tests/e2e/field-smoke.spec.mjs",
         "test:e2e:smoke": "playwright test tests/e2e/field-smoke.spec.mjs",
         "test:e2e:ci": "npm run test:e2e:coordinator",

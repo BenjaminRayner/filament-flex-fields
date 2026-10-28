@@ -96,8 +96,14 @@ it('rejects another owners record and rolls back a Resource save after a control
     $foreign = new Post(['title' => 'Other owner']);
     $foreign->user_id = 2;
     $foreign->save();
-    expect(fn () => Livewire::test(EditPost::class, ['record' => $foreign->getRouteKey()]))
-        ->toThrow(ModelNotFoundException::class);
+    try {
+        Livewire::test(EditPost::class, ['record' => $foreign->getRouteKey()])->assertNotFound();
+    } catch (ModelNotFoundException $exception) {
+        // Older Livewire test brokers propagate this exception instead of an HTTP response.
+        expect($exception->getModel())->toBe(Post::class);
+    }
+    expect($foreign->fresh()->title)->toBe('Other owner')
+        ->and(DB::table('galleries')->count())->toBe(0);
 
     Post::saved(function (Post $post): void {
         if ($post->title === 'Controlled failure') {

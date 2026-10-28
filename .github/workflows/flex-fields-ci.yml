@@ -144,6 +144,8 @@ jobs:
           npm ci
           npm run build
           npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Verify configured theme precedence and field-local overrides
+        run: npm run test:e2e:theme -- --project=${{ matrix.browser }}
       - name: Execute the entire browser contract matrix
         run: node scripts/core/release-acceptance.mjs --phase=browser --browser=${{ matrix.browser }}
       - name: Execute independent Composer install, composition, update and rollback

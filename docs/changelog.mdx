@@ -7,9 +7,21 @@ rss: true
 
 {/* Generated from CHANGELOG.md by scripts/generate-changelog-docs.mjs. Do not edit this page directly. */}
 
-<Badge color="purple" shape="pill">Latest recorded version · 4.0.12</Badge>
+<Badge color="purple" shape="pill">Latest recorded version · 4.0.13</Badge>
 
 Filter the timeline by change type. Subscribe with RSS on the publicly hosted documentation.
+
+<Update label="v4.0.13" description="2026-10-28" tags={["Fixed","Security"]} rss={{"title":"FLEX Fields 4.0.13","description":"Changes, improvements and fixes in FLEX Fields 4.0.13.","date":"2026-10-28"}}>
+
+### Fixed
+
+- **Custom themes** — preserve colors, borders, shadows and other theme tokens configured through `ui.theme` or the plugin's `theme()` method when base styles load later, in both light and dark mode. Individual fields retain their own overrides.
+
+### Security
+
+- **Livewire** — exclude versions 4.3.0–4.4.7 affected by an authorization bypass and update the locked dependency to the patched 4.4.8 release.
+
+</Update>
 
 <Update label="v4.0.12" description="2026-10-27" tags={["Fixed"]} rss={{"title":"FLEX Fields 4.0.12","description":"Changes, improvements and fixes in FLEX Fields 4.0.12.","date":"2026-10-27"}}>
 
