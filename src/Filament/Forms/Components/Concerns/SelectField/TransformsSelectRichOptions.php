@@ -235,7 +235,10 @@ trait TransformsSelectRichOptions
         }
 
         if ($compact) {
-            return $this->renderRichOptionLabel($option, layout: 'trigger');
+            return $this->renderRichOptionLabel(
+                $option,
+                layout: $this->getOptionLayout() === 'list' && $this->shouldUseRichListTriggerDisplay() ? 'list' : 'trigger',
+            );
         }
 
         if ($this->getOptionLayout() === 'grid') {
