@@ -43,7 +43,7 @@
 
 <p align="center">
   <a href="https://demo.bjanczak.com/">
-    <img src="art/FLEX-FIELDS-v4.webp" width="100%" alt="FLEX Fields v4 components and capabilities for Laravel and Filament">
+    <img src="art/FLEX-FIELDS-v4.webp" class="filament-hidden" width="100%" alt="FLEX Fields v4 components and capabilities for Laravel and Filament">
   </a>
 </p>
 
