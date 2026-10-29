@@ -5,6 +5,21 @@ All notable changes to `filament-flex-fields` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.14] - 2026-10-29
+
+### Fixed
+
+- **Rich Select values** — retain option descriptions after selection and asynchronous searches when `richListTriggerDisplay()` is enabled. Trailing descriptions keep their alignment and muted styling in both initial and interactive values, including RTL layouts.
+- **Mobile text suggestions** — keep suggestions open while dragging the sheet handle, without losing input focus or blocking the drag gesture. Selecting an option, dismissing the sheet and leaving the field retain their existing behavior.
+
+### Changed
+
+- Updated Motion, virtual scrolling, Tiptap, Playwright, PHPStan, Octane, Spatie Media Library and Sluggable, together with pinned GitHub artifact actions.
+
+### Security
+
+- Updated Symfony Mime to 7.4.22 to address CVE-2026-45070. Dependency security audits remain enabled.
+
 ## [4.0.13] - 2026-10-28
 
 ### Fixed

@@ -18,9 +18,9 @@
     },
     {
       "id": "components",
-      "inputs": 1316,
+      "inputs": 1322,
       "outputs": 185,
-      "outputBytes": 2111772
+      "outputBytes": 2128596
     },
     {
       "id": "flex-rich-editor-block-image-extension",

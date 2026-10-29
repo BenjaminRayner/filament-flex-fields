@@ -7,9 +7,26 @@ rss: true
 
 {/* Generated from CHANGELOG.md by scripts/generate-changelog-docs.mjs. Do not edit this page directly. */}
 
-<Badge color="purple" shape="pill">Latest recorded version · 4.0.13</Badge>
+<Badge color="purple" shape="pill">Latest recorded version · 4.0.14</Badge>
 
 Filter the timeline by change type. Subscribe with RSS on the publicly hosted documentation.
+
+<Update label="v4.0.14" description="2026-10-29" tags={["Fixed","Changed","Security"]} rss={{"title":"FLEX Fields 4.0.14","description":"Changes, improvements and fixes in FLEX Fields 4.0.14.","date":"2026-10-29"}}>
+
+### Fixed
+
+- **Rich Select values** — retain option descriptions after selection and asynchronous searches when `richListTriggerDisplay()` is enabled. Trailing descriptions keep their alignment and muted styling in both initial and interactive values, including RTL layouts.
+- **Mobile text suggestions** — keep suggestions open while dragging the sheet handle, without losing input focus or blocking the drag gesture. Selecting an option, dismissing the sheet and leaving the field retain their existing behavior.
+
+### Changed
+
+- Updated Motion, virtual scrolling, Tiptap, Playwright, PHPStan, Octane, Spatie Media Library and Sluggable, together with pinned GitHub artifact actions.
+
+### Security
+
+- Updated Symfony Mime to 7.4.22 to address CVE-2026-45070. Dependency security audits remain enabled.
+
+</Update>
 
 <Update label="v4.0.13" description="2026-10-28" tags={["Fixed","Security"]} rss={{"title":"FLEX Fields 4.0.13","description":"Changes, improvements and fixes in FLEX Fields 4.0.13.","date":"2026-10-28"}}>
 

@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict'
 
 /** Real native Action responses, installed Alpine and independent lazy menus. */
-export async function verifyNativeSelectPortals(page, origin) {
+export async function verifyNativeSelectPortals(page, origin, waitForRequests) {
     // Finish the preceding SPA's native background requests before this probe
     // deliberately replaces its document; keep all request-failure assertions.
-    await page.waitForLoadState('networkidle')
+    assert.equal(typeof waitForRequests, 'function')
+    await waitForRequests()
     let release, requested = false
     const held = new Promise(resolve => { release = resolve })
     const holdModule = async route => { requested = true; await held; await route.continue() }
@@ -31,6 +32,7 @@ export async function verifyNativeSelectPortals(page, origin) {
         release()
         await page.unroute('**/components/select-field.js', holdModule)
     }
+    await waitForRequests()
     await page.goto(origin + '/cost?case=portal')
     await page.getByRole('button', {name: 'Open first FLEX field', exact: true}).click()
     await page.getByRole('button', {name: 'Parent select 1', exact: true}).waitFor({state: 'visible'})

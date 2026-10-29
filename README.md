@@ -1,4 +1,4 @@
-<p align="center">
+<p align="center" class="filament-hidden">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="art/readme/logo-dark.svg">
     <img src="art/readme/logo-light.svg" alt="FLEX FIELDS" width="319" height="36">
@@ -41,7 +41,7 @@
   <sub>FLEX Fields v4 is available on Packagist for Filament 5.</sub>
 </p>
 
-<p align="center">
+<p align="center" class="filament-hidden">
   <a href="https://demo.bjanczak.com/">
     <img src="art/FLEX-FIELDS-v4.webp" class="filament-hidden" width="100%" alt="FLEX Fields v4 components and capabilities for Laravel and Filament">
   </a>

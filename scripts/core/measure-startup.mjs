@@ -8,6 +8,7 @@ import { launchCoreBrowser, browserEngine } from '../compatibility/browser-profi
 import { digest, sourceSnapshot } from './acceptance-contract.mjs'
 import { safeReleaseFile, verifyReleaseSeal } from './release-metadata.mjs'
 import { startupCases, startupFields, startupBudgets, startupResourcePolicy, assertStartupResourceBudget, summarizeStartup } from './startup-cost.mjs'
+import { trackNativeRequests } from './native-request-drain.mjs'
 import { verifyNativeStartupCycles } from './native-startup-cycles.mjs'
 import { verifyNativeSelectPortals } from './native-select-portals.mjs'
 
@@ -257,6 +258,7 @@ try {
     } finally { for (const context of primed.values()) await context.close() }
     if (verifyDynamic) {
         const context = await browser.newContext(contextOptions), page = await context.newPage(), errors = []
+        const nativeRequestsTracker = trackNativeRequests(page)
         let releaseRuntime, runtimeRequested = false, browserNativeRequests = 0
         const held = new Promise(resolve => { releaseRuntime = resolve })
         page.on('pageerror', error => errors.push(error.message))
@@ -302,7 +304,7 @@ try {
             await page.waitForFunction(() => window.FffAssetInjector.getConsumerGraph().getActiveConsumerIds().length === 1)
             nestedModal = { passed: true, childAndParentOwners: nestedOwners, remainingParentOwners: 1, parentValuePreserved: true }
             if (cycles) nativeLifecycle = await verifyNativeStartupCycles(page, cycles)
-            selectPortals = await verifyNativeSelectPortals(page, origin)
+            selectPortals = await verifyNativeSelectPortals(page, origin, () => nativeRequestsTracker.drain())
             assert.deepEqual(errors, [])
         } catch (error) {
             dynamicMount = { passed: false, nativeRequests, errors,
@@ -313,7 +315,7 @@ try {
                         navigations: window.__nativeCycleProof.navigations, timers: window.__nativeCycleProof.timers.size } : null,
                 })).catch(() => null) }
             throw error
-        } finally { releaseRuntime(); await context.close() }
+        } finally { releaseRuntime(); nativeRequestsTracker.dispose(); await context.close() }
     }
     if (verifyDynamic) {
         const context = await browser.newContext(contextOptions), page = await context.newPage(), errors = []
