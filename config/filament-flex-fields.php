@@ -12,6 +12,13 @@ return [
 
     'navigation' => ['sort' => 91],
 
+    // Catalog pages can be disabled without disabling any form components.
+    'playground' => [
+        'enabled' => env('FLEX_FIELDS_PLAYGROUND', true),
+        // Optional Laravel gate ability, evaluated with the current panel user.
+        'gate' => null,
+    ],
+
     // Deployment publishes assets explicitly; local auto-publication is opt-in.
     'assets' => [
         'publish_on_boot' => env('FLEX_FIELDS_PUBLISH_ON_BOOT', false),

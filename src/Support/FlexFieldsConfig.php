@@ -46,7 +46,7 @@ class FlexFieldsConfig
 
     public static function isPlaygroundEnabled(): bool
     {
-        return true; // FLEX discovery is always available behind panel authentication.
+        return (bool) config('filament-flex-fields.playground.enabled', true);
     }
 
     public static function isSchemaResourceEnabled(): bool

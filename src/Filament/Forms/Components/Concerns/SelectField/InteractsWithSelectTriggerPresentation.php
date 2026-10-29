@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Forms\Components\Concerns\SelectF
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\SelectField;
 use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionLabelIndex;
 use Bjanczak\FilamentFlexFields\Support\Select\Data\OptionValue;
+use Closure;
 use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Livewire\Attributes\Renderless;
 
@@ -58,7 +59,7 @@ trait InteractsWithSelectTriggerPresentation
         }
 
         if ($this->getOptionLabelUsing && filled($this->getState())) {
-            return (string) (parent::getOptionLabel() ?? $state);
+            return (string) ($this->getOptionLabel() ?? $state);
         }
 
         if ($this->hasDynamicOptions() && ! $this->isPreloaded()) {
@@ -138,7 +139,7 @@ trait InteractsWithSelectTriggerPresentation
         // Filament's explicit resolver is authoritative, including null used
         // to reject an unavailable selection during server validation.
         if ($this->getOptionLabelUsing) {
-            return parent::getOptionLabel($withDefault);
+            return $this->withSelectedRelationshipOptionRendering(fn (): ?string => parent::getOptionLabel($withDefault));
         }
 
         $state = OptionValue::normalize($this->getState());
@@ -175,7 +176,7 @@ trait InteractsWithSelectTriggerPresentation
             // We unconditionally pass $options to support Filament beta signatures.
             // In older versions, PHP silently ignores the extra userland argument.
             /** @phpstan-ignore-next-line */
-            return parent::getOptionLabels($withDefaults, $options);
+            return $this->withSelectedRelationshipOptionRendering(fn (): array => parent::getOptionLabels($withDefaults, $options));
         }
 
         $labels = [];
@@ -210,5 +211,17 @@ trait InteractsWithSelectTriggerPresentation
     protected function findOptionLabel(array $options, mixed $state): array|string|null
     {
         return (new OptionLabelIndex($options, fn (array $label): bool => $this->isOptionGroupArray($label)))->find($state);
+    }
+
+    protected function withSelectedRelationshipOptionRendering(Closure $callback): mixed
+    {
+        $previous = $this->renderingSelectedRelationshipOption;
+        $this->renderingSelectedRelationshipOption = true;
+
+        try {
+            return $callback();
+        } finally {
+            $this->renderingSelectedRelationshipOption = $previous;
+        }
     }
 }

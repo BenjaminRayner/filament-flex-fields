@@ -8,6 +8,7 @@ use Bjanczak\FilamentFlexFields\Support\Assets\Rendering\RuntimeRenderContext;
 use Bjanczak\FilamentFlexFields\Support\Assets\Rendering\RuntimeRenderPhase;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsConfig;
+use Bjanczak\FilamentFlexFields\Support\Playground\PlaygroundAccess;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 
@@ -75,7 +76,7 @@ final class RenderHookRegistration
         }
         $html = '';
         foreach ($parts as $part) {
-            if ($part['catalog'] && ! FlexFieldAssets::isPlaygroundRequest()) {
+            if ($part['catalog'] && (! PlaygroundAccess::isEnabled() || ! FlexFieldAssets::isPlaygroundRequest())) {
                 continue;
             }
             $html .= view('filament-flex-fields::partials.'.$part['view'])->render();

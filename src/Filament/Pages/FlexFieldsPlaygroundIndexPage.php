@@ -12,10 +12,10 @@ use Bjanczak\FilamentFlexFields\Support\Catalog\Promotions\SponsorPreview;
 use Bjanczak\FilamentFlexFields\Support\Catalog\Promotions\SponsorProfile;
 use Bjanczak\FilamentFlexFields\Support\Components\ComponentKind;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundRegistry;
+use Bjanczak\FilamentFlexFields\Support\Playground\PlaygroundAccess;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Url;
 
@@ -46,7 +46,7 @@ class FlexFieldsPlaygroundIndexPage extends Page
 
     public static function canAccess(): bool
     {
-        return FlexFieldsPlaygroundRegistry::isEnabled() && Auth::check();
+        return FlexFieldsPlaygroundRegistry::isEnabled() && PlaygroundAccess::canAccess();
     }
 
     public function getTitle(): string|Htmlable

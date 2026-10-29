@@ -7,6 +7,7 @@ namespace Bjanczak\FilamentFlexFields\Filament\Pages;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ChoiceCards;
 use Bjanczak\FilamentFlexFields\Filament\Forms\Components\ChoiceCheckboxCards;
 use Bjanczak\FilamentFlexFields\Support\Licensing\LicenseUseAssessment;
+use Bjanczak\FilamentFlexFields\Support\Playground\PlaygroundAccess;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
@@ -15,7 +16,6 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Locked;
 use LogicException;
 
@@ -44,7 +44,7 @@ final class FlexLicenseGuidePage extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return Auth::check();
+        return PlaygroundAccess::canAccess();
     }
 
     public function mount(): void

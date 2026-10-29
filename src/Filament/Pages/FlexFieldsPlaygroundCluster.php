@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Bjanczak\FilamentFlexFields\Filament\Pages;
 
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundRegistry;
+use Bjanczak\FilamentFlexFields\Support\Playground\PlaygroundAccess;
 use Bjanczak\FilamentFlexFields\Support\Translations;
 use Filament\Clusters\Cluster;
 use Filament\Pages\Enums\SubNavigationPosition;
-use Illuminate\Support\Facades\Auth;
 
 class FlexFieldsPlaygroundCluster extends Cluster
 {
@@ -34,7 +34,7 @@ class FlexFieldsPlaygroundCluster extends Cluster
     public static function canAccess(): bool
     {
         return FlexFieldsPlaygroundRegistry::isEnabled()
-            && Auth::check();
+            && PlaygroundAccess::canAccess();
     }
 
     public static function getNavigationGroup(): string|\UnitEnum|null

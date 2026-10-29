@@ -14,6 +14,7 @@ use Bjanczak\FilamentFlexFields\Support\Playground\Contracts\PlaygroundWithCompo
 use Bjanczak\FilamentFlexFields\Support\Playground\Contracts\PlaygroundWithPersistence;
 use Bjanczak\FilamentFlexFields\Support\Playground\Contracts\PlaygroundWithValidationExamples;
 use Bjanczak\FilamentFlexFields\Support\Playground\FlexFieldsPlaygroundStore;
+use Bjanczak\FilamentFlexFields\Support\Playground\PlaygroundAccess;
 use Bjanczak\FilamentFlexFields\Support\Translations;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -27,7 +28,6 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Locked;
 
 /**
@@ -54,7 +54,7 @@ class FlexFieldsPlaygroundComponentPage extends Page implements HasForms
     public static function canAccess(): bool
     {
         return FlexFieldsPlaygroundRegistry::isEnabled()
-            && Auth::check()
+            && PlaygroundAccess::canAccess()
             && filled(static::resolveDefinition());
     }
 

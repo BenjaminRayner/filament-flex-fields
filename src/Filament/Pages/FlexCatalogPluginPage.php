@@ -8,6 +8,7 @@ use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs;
 use Bjanczak\FilamentFlexFields\Filament\Schemas\Components\SegmentTabs\SegmentTab;
 use Bjanczak\FilamentFlexFields\Support\Catalog\FlexCatalog;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundRegistry;
+use Bjanczak\FilamentFlexFields\Support\Playground\PlaygroundAccess;
 use Bjanczak\FilamentFlexFields\Support\Translations;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -16,7 +17,6 @@ use Filament\Schemas\Components\View as SchemaView;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Locked;
 
 /** @phpstan-import-type CatalogEntry from FlexCatalog */
@@ -41,7 +41,7 @@ final class FlexCatalogPluginPage extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return FlexFieldsPlaygroundRegistry::isEnabled() && Auth::check();
+        return FlexFieldsPlaygroundRegistry::isEnabled() && PlaygroundAccess::canAccess();
     }
 
     public function mount(string $entry): void

@@ -174,7 +174,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-date-picker.js",
       "type": "module",
-      "sha256": "212530575e6f634607e650ebc6013cc23e8b9dccf8868174edd9d6417a0e7ad6",
+      "sha256": "36e8bc72c41b1e982743c4c18d9a4434b14d106fb19deade4655e5899b684fc4",
       "bytes": 12225
     },
     "distribution:components/flex-date-time-field.js": {
@@ -270,8 +270,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-fields-combobox-engine-TQVQCDB7.js",
       "type": "module",
-      "sha256": null,
-      "bytes": null
+      "sha256": "ad40135a29aef694c039c525c92e446c154d39b930fc47923387067fd10f9c40",
+      "bytes": 9851
     },
     "distribution:components/flex-fields-components-segments-runtime-P5DS3WRU.js": {
       "origin": "distribution",
@@ -614,8 +614,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-fields-runtime-motion-spring-transition-QNVDFONV.js",
       "type": "module",
-      "sha256": null,
-      "bytes": null
+      "sha256": "a89c36b6d60e9ba9a266b7319ee3695ba9421ccf0fc80ebe74049ba94632676f",
+      "bytes": 480
     },
     "distribution:components/flex-fields-runtime-runtime-state-VZGYYX34.js": {
       "origin": "distribution",
@@ -694,16 +694,16 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-fields-select-trigger-RWY55DHN.js",
       "type": "module",
-      "sha256": null,
-      "bytes": null
+      "sha256": "13d01cd38650b4861a18ecaf3224186eaf1c248ca8771d3f1ecff8b68df63a49",
+      "bytes": 76586
     },
     "distribution:components/flex-fields-shared-7RXJKMOI.js": {
       "origin": "distribution",
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-fields-shared-7RXJKMOI.js",
       "type": "module",
-      "sha256": null,
-      "bytes": null
+      "sha256": "b1db1943c85fcbd53e84de4c44ba6968451108313d61875ab167c7acbb041e32",
+      "bytes": 32196
     },
     "distribution:components/flex-fields-shared-LBK4CWZD.js": {
       "origin": "distribution",
@@ -718,8 +718,8 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-fields-shared-YAVEUEMJ.js",
       "type": "module",
-      "sha256": null,
-      "bytes": null
+      "sha256": "a5b28c6cd1257b97b227cf96d5573e2a484eb62ddec6a7cf81dc7ec5b2898d7a",
+      "bytes": 60175
     },
     "distribution:components/flex-fields-teleported-menu-position-IZGK2RFU.js": {
       "origin": "distribution",
@@ -782,7 +782,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-slider.js",
       "type": "module",
-      "sha256": "7ec24999ecd545b0264e11989ce2a8b5c5d064cd4c29d731326e219c10e85b46",
+      "sha256": "03e7fca8cab6396871780b90562b005dd7aeee170019e3ba7a7128f910e5d713",
       "bytes": 10142
     },
     "distribution:components/flex-text-input.js": {
@@ -790,7 +790,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/flex-text-input.js",
       "type": "module",
-      "sha256": "1cd8ba3a97a7ef9f2c63d59eec43b8757b96ad32ef22a7672c791db9df416093",
+      "sha256": "9f90faab59f7a55f62e37117d78ad0f6c64851acc498ab3814167191aaa08843",
       "bytes": 12660
     },
     "distribution:components/flex-textarea.js": {
@@ -830,7 +830,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/font-select.js",
       "type": "module",
-      "sha256": "13c4e4c5437b1b12fa5e2abfaa9038beb00ca11eefb88275104041dd18869f3a",
+      "sha256": "c13470d04c59589f31b3a5f12dd14ee2dae9c4b6fe2901dc3c26a319dfb326d8",
       "bytes": 14360
     },
     "distribution:components/hold-confirm-action.js": {
@@ -838,7 +838,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/hold-confirm-action.js",
       "type": "module",
-      "sha256": "b40540cefac26906606b65d24a1d46fc2c0c43f39040a607c559ff59481227e9",
+      "sha256": "d87a00a56c9c8bb472016c5b05734c3c21ffaa9a4b54624519e6701c96c20c26",
       "bytes": 11585
     },
     "distribution:components/icon-picker-field.js": {
@@ -846,7 +846,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/icon-picker-field.js",
       "type": "module",
-      "sha256": "45918701ca20b83ca668631a62d2dadf94ad49b78342a3d62b0edeaaed3e9a8a",
+      "sha256": "fe77fbff97417ad91a614d7bfb910677f6aad85f4a5275bec97ef2f1ed282551",
       "bytes": 6409
     },
     "distribution:components/image-choice-cards.js": {
@@ -878,7 +878,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/location-select.js",
       "type": "module",
-      "sha256": "976ef84f9d64b12577b6efbca25ba5a4369892682b6fd0c35baac1cac6fea0af",
+      "sha256": "8bbe2f525a6c1c372f38470f45559fae34748494b963140836da4d5b06bc4144",
       "bytes": 5043
     },
     "distribution:components/map-picker.js": {
@@ -982,7 +982,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/select-field.js",
       "type": "module",
-      "sha256": "58f5febdbe7ee250f32a7acd9a5e8c96b754c9994e96f0dbeb79ecc76ae8c561",
+      "sha256": "d908702f687d40ef5386b2d0ad6222c9aafeb86c2fa4246e92e86f3307a1dbc7",
       "bytes": 3317
     },
     "distribution:components/signature-field.js": {
@@ -1014,7 +1014,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/switch.js",
       "type": "module",
-      "sha256": "e3849eeda3833498eb32d399a05bdc61b116eb995f7efa2090120ff611c87403",
+      "sha256": "5d4bd8d4de55e8edb417d8466645f840d62fe3a5bf57e85da6dab2b77c4545d2",
       "bytes": 4265
     },
     "distribution:components/tags-field.js": {
@@ -1022,7 +1022,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/tags-field.js",
       "type": "module",
-      "sha256": "00a0c76f5f3275cb18c35dfd2e22b65e9e629ca7e5bcca3975b63c7030eb27cc",
+      "sha256": "191f9ee2a3c05153651427cf6d4057313183ce02fd8d334e9f859ec692e659d7",
       "bytes": 6643
     },
     "distribution:components/todo-list-field.js": {
@@ -1030,7 +1030,7 @@
       "package": "janczakb/filament-flex-fields",
       "path": "components/todo-list-field.js",
       "type": "module",
-      "sha256": "3bbc529f9845bf0ace53f17dbdeaac3c6b0a8f58a17fc883aa01fc088b343db1",
+      "sha256": "ee8f0546d6165cbb9c565beab10dc9f9e7e2c5ef5db172c8bbd2a55b29df9135",
       "bytes": 60481
     },
     "distribution:components/track-slider.js": {

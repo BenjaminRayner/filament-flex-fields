@@ -62,6 +62,63 @@ label suppresses that label.
 
 After changing published configuration, rebuild the application configuration cache if your deployment uses it. See [configuration troubleshooting](/docs/troubleshooting#a-setting-change-has-no-effect).
 
+## Control the component catalog
+
+The catalog remains enabled by default. Disable its pages, routes and catalog-only
+styles across the application without disabling any FLEX fields:
+
+```dotenv .env
+FLEX_FIELDS_PLAYGROUND=false
+```
+
+Alternatively set `'playground' => ['enabled' => false]` in the published configuration.
+For a single panel, keep the global setting enabled and configure its plugin:
+
+```php Panel provider
+FilamentFlexFieldsPlugin::make()
+    ->playground(false);
+```
+
+The global switch takes precedence. An enabled panel cannot restore a catalog
+that the application has disabled. Theme settings, standalone components and
+separately enabled custom field management remain available. When using cached
+Filament components or application configuration, rebuild those caches after
+changing registration settings during deployment.
+
+### Restrict access to the catalog
+
+Catalog pages require a user authenticated with the **current panel's guard**.
+To restrict them further, define a Laravel gate and reference its ability in the
+published configuration:
+
+```php AuthServiceProvider::boot()
+use Illuminate\Support\Facades\Gate;
+
+Gate::define('view-flex-catalog', fn ($user): bool => $user->can('manage-developer-tools'));
+```
+
+```php config/filament-flex-fields.php
+'playground' => [
+    'enabled' => env('FLEX_FIELDS_PLAYGROUND', true),
+    'gate' => 'view-flex-catalog',
+],
+```
+
+Use an ability your application actually defines. You may also add a panel-specific
+rule in its provider:
+
+```php Panel provider
+FilamentFlexFieldsPlugin::make()
+    ->playgroundAuthorizeUsing(fn ($user, \Filament\Panel $panel): bool =>
+        $user->can('manage-developer-tools')
+    );
+```
+
+When both are configured, both rules must allow access. The same checks protect
+the catalog index, individual examples, plugin detail and license guide, including
+direct URLs. They do not grant access to other application pages or bypass your
+application's existing authorization.
+
 ## Configure panel density and theme
 
 Add these options to your existing panel provider:

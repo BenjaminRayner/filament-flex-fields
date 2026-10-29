@@ -5,6 +5,19 @@ All notable changes to `filament-flex-fields` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.15] - 2026-10-29
+
+### Added
+
+- **Rich relationship options** — `getRichOptionFromRecordUsing()` renders model attributes as rich Select rows and selected labels, including compact/full layouts, trailing descriptions, multi-select chips and custom relationship keys. Native Filament relationship queries, validation and persistence remain authoritative.
+- **Catalog access controls** — disable the catalog globally with `FLEX_FIELDS_PLAYGROUND=false` or per panel with `playground(false)`. Optional Laravel gate and `playgroundAuthorizeUsing()` restrictions use the current panel user and protect every catalog page.
+
+### Fixed
+
+- **Optional catalog** — disabled catalogs no longer register their example, detail or license-guide routes. Component fields and separately enabled schema management remain available.
+- **Upload activation** — the model-save listener is registered only when an upload field participates, once per event dispatcher. Applications and worker processes that never use uploads avoid the wildcard listener; participating fields remain request-scoped and commit-aware.
+- **Rich search consistency** — cache structured relationship results before selected-label rendering, preserving descriptions and compact trigger labels on repeated searches without retaining record projections across operations.
+
 ## [4.0.14] - 2026-10-29
 
 ### Fixed

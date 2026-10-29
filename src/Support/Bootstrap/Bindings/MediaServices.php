@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bjanczak\FilamentFlexFields\Support\Bootstrap\Bindings;
 
+use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Lifecycle\UploadModelSavedRegistration;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Lifecycle\UploadRecordLifecycle;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Staging\UploadLeaseRepository;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Storage\UploadManifestRepository;
@@ -36,6 +37,7 @@ final class MediaServices
         $app->scoped(UploadManifestRepository::class);
         $app->scoped(UploadLeaseRepository::class);
         $app->scoped(UploadRecordLifecycle::class);
+        $app->singleton(UploadModelSavedRegistration::class);
         if (! $app->bound(ImageEncoder::class)) {
             $app->scoped(ImageEncoder::class, GdImageEncoder::class);
         }

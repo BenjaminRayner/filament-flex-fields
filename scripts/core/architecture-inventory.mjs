@@ -134,6 +134,7 @@ const processPolicies = {
     CategoryRegistry: 'immutable official taxonomy; localized strings resolved at use',
     FlexCatalog: 'bounded boot-only plugin collection; one locale/revision presentation snapshot',
     HtmlSanitizer: 'fixed sanitization rules; no input or tenant results retained',
+    UploadModelSavedRegistration: 'weak event-dispatcher identities only; one stateless current-container callback on upload demand; no fields, models, request containers or scoped lifecycle retained',
     IconCatalogResolver: 'stateless reader; optional cache failure state resolved in current scope',
     IconSvgCache: 'stateless reader; no SVG values or current request retained on the service',
     FlexFieldEntityDiscovery: 'stateless discovery; panel and locale consulted on each operation',

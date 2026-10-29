@@ -2156,7 +2156,7 @@ Panel navigation: **Settings & Tools → Flex Fields Playground** — cluster wi
 
 - Root URL: `/admin/flex-fields` (redirects to first component)
 - **Slug field page:** `/admin/flex-fields/slug-field`
-- FLEX routes are always registered behind panel authentication. The only catalog navigation setting is `filament-flex-fields.navigation.sort`.
+- The catalog is enabled by default behind panel authentication. Set `FLEX_FIELDS_PLAYGROUND=false` to omit its routes, or use `playground(false)` for a panel. See [catalog access configuration](/docs/configuration#control-the-component-catalog).
 
 > **Spatie is optional for every recipe below.** Playground demos do not require Spatie. Translatable titles use PHP generation; ordinary Latin titles use the client slugifier. To align preview and save with `laravel-sluggable`, see [Optional Spatie upgrade (playground recipes)](#optional-spatie-upgrade-playground-recipes) at the end of this section.
 

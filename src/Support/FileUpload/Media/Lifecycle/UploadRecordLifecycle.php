@@ -13,6 +13,7 @@ use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Staging\UploadStaging;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Storage\UploadManifestRepository;
 use Bjanczak\FilamentFlexFields\Support\Media\Data\MediaFailure;
 use Bjanczak\FilamentFlexFields\Support\Media\Spatie\SpatieUploadBridge;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Component;
 use Throwable;
@@ -32,6 +33,7 @@ final class UploadRecordLifecycle
     public function track(FlexFileUpload|FlexSpatieMediaLibraryFileUpload $field): void
     {
         $this->fields[$field] = true;
+        app(UploadModelSavedRegistration::class)->ensureRegistered(app(Dispatcher::class));
     }
 
     public function acceptFor(Component $owner, Model $record): void

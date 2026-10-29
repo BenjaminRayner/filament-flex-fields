@@ -36,7 +36,7 @@ trait RequestsSelectOptions
             mb_strlen(trim($search)), 'options',
         ));
 
-        return $this->selectSearchResultCache()->put($cacheKey, parent::getSearchResults($search));
+        return $this->selectSearchResultCache()->put($cacheKey, $this->withRichRelationshipProjection(fn (): array => parent::getSearchResults($search)));
     }
 
     public function getSearchResultsFromRelationship(?string $search): array
@@ -55,8 +55,8 @@ trait RequestsSelectOptions
             mb_strlen(trim($search)), 'relationship',
         ));
 
-        $results = FilamentApi::hasMethod(Select::class, 'getSearchResultsFromRelationship')
-            ? parent::getSearchResultsFromRelationship($search) : parent::getSearchResults($search);
+        $results = $this->withRichRelationshipProjection(fn (): array => FilamentApi::hasMethod(Select::class, 'getSearchResultsFromRelationship')
+            ? parent::getSearchResultsFromRelationship($search) : parent::getSearchResults($search));
 
         return $this->selectSearchResultCache()->put($cacheKey, $results);
     }

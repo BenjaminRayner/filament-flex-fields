@@ -18,10 +18,12 @@ use Bjanczak\FilamentFlexFields\Filament\Pages\FlexCatalogPluginPage;
 use Bjanczak\FilamentFlexFields\Filament\Pages\FlexFieldsPlaygroundCluster;
 use Bjanczak\FilamentFlexFields\Filament\Pages\FlexFieldsPlaygroundIndexPage;
 use Bjanczak\FilamentFlexFields\Filament\Pages\FlexLicenseGuidePage;
+use Bjanczak\FilamentFlexFields\Support\FlexFieldsConfig;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldsPlaygroundRegistry;
 use Bjanczak\FilamentFlexFields\Support\Schema\FlexFieldGroupResourceRegistrar;
 use Bjanczak\FilamentFlexFields\Support\Theme\FlexFieldsTheme;
 use Bjanczak\FilamentFlexFields\Support\Theme\ThemeTokenMap;
+use Closure;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 
@@ -30,6 +32,10 @@ class FilamentFlexFieldsPlugin implements Plugin
     public const PACKAGE_NAME = 'janczakb/filament-flex-fields';
 
     public const PACKAGE_URL = 'https://github.com/janczakb/filament-flex-fields';
+
+    protected bool $playgroundEnabled = true;
+
+    protected ?Closure $playgroundAuthorization = null;
 
     protected ?string $navigationGroup = null;
 
@@ -70,18 +76,21 @@ class FilamentFlexFieldsPlugin implements Plugin
             return;
         }
 
-        $panel->pages([
-            FlexFieldsPlaygroundCluster::class,
-            FlexFieldsPlaygroundIndexPage::class,
-            FlexCatalogPluginPage::class,
-            FlexLicenseGuidePage::class,
-            ...FlexFieldsPlaygroundRegistry::pageConfigurations(),
-            ...(app()->environment(['local', 'testing']) ? [
-                AssetFormsPage::class,
-                AssetTablesPage::class,
-                AssetModalsPage::class,
-            ] : []),
-        ]);
+        if ($this->isPlaygroundEnabled()) {
+            $panel->pages([
+                FlexFieldsPlaygroundCluster::class,
+                FlexFieldsPlaygroundIndexPage::class,
+                FlexCatalogPluginPage::class,
+                FlexLicenseGuidePage::class,
+                ...FlexFieldsPlaygroundRegistry::pageConfigurations(),
+                ...(app()->environment(['local', 'testing']) ? [
+                    AssetFormsPage::class,
+                    AssetTablesPage::class,
+                    AssetModalsPage::class,
+                ] : []),
+            ]);
+
+        }
 
         FlexFieldGroupResourceRegistrar::register($panel);
     }
@@ -102,6 +111,30 @@ class FilamentFlexFieldsPlugin implements Plugin
             $flexFieldsTheme->mergeTheme($this->theme);
         }
 
+    }
+
+    public function playground(bool $enabled = true): static
+    {
+        $this->playgroundEnabled = $enabled;
+
+        return $this;
+    }
+
+    public function isPlaygroundEnabled(): bool
+    {
+        return FlexFieldsConfig::isPlaygroundEnabled() && $this->playgroundEnabled;
+    }
+
+    public function playgroundAuthorizeUsing(?Closure $callback): static
+    {
+        $this->playgroundAuthorization = $callback;
+
+        return $this;
+    }
+
+    public function getPlaygroundAuthorization(): ?Closure
+    {
+        return $this->playgroundAuthorization;
     }
 
     public function density(Density|string $density): static

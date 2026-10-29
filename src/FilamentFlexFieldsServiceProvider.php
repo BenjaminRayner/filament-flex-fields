@@ -24,17 +24,19 @@ use Bjanczak\FilamentFlexFields\Support\Bootstrap\ConsoleIntegration;
 use Bjanczak\FilamentFlexFields\Support\Bootstrap\IconRegistration;
 use Bjanczak\FilamentFlexFields\Support\Bootstrap\RenderHookRegistration;
 use Bjanczak\FilamentFlexFields\Support\Bootstrap\ServiceBindings;
-use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Lifecycle\UploadModelSaved;
+use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Lifecycle\UploadModelSavedRegistration;
 use Bjanczak\FilamentFlexFields\Support\FileUpload\Media\Lifecycle\UploadRecordSaved;
 use Bjanczak\FilamentFlexFields\Support\FlexFieldAssets;
 use Bjanczak\FilamentFlexFields\Support\RichEditorFlexIcons;
 use Bjanczak\FilamentFlexFields\Support\Translatable\RegistersTranslatableFieldMacros;
 use Filament\Resources\Events\RecordSaved;
+use Filament\Resources\Pages\Page as ResourcePage;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -109,8 +111,13 @@ class FilamentFlexFieldsServiceProvider extends ServiceProvider
         RenderHookRegistration::register();
 
         RegistersTranslatableFieldMacros::boot();
-        $this->app->make(Dispatcher::class)->listen(RecordSaved::class, UploadRecordSaved::class);
-        $this->app->make(Dispatcher::class)->listen('eloquent.saved: *', UploadModelSaved::class);
+        // Warm only dispatcher identity bookkeeping, not the upload graph or saved listener.
+        // Octane sandboxes share this registration owner even when first use is in a request.
+        $this->app->make(UploadModelSavedRegistration::class);
+        $this->app->make(Dispatcher::class)->listen(RecordSaved::class,
+            static function (Model|RecordSaved $record, array $data = [], ?ResourcePage $page = null): void {
+                app(UploadRecordSaved::class)->handle($record, $data, $page);
+            });
 
     }
 

@@ -8,6 +8,7 @@ use Bjanczak\FilamentFlexFields\Enums\PlaygroundCategory;
 use Bjanczak\FilamentFlexFields\Filament\Pages\FlexFieldsPlaygroundComponentPage;
 use Bjanczak\FilamentFlexFields\Support\Assets\ComponentAssetCatalog;
 use Bjanczak\FilamentFlexFields\Support\Catalog\CatalogValue;
+use Bjanczak\FilamentFlexFields\Support\Playground\PlaygroundAccess;
 use Bjanczak\FilamentFlexFields\Support\Playground\PlaygroundRegistryState;
 use Bjanczak\FilamentFlexFields\Support\Runtime\RequestState;
 use Filament\Pages\PageConfiguration;
@@ -99,12 +100,13 @@ class FlexFieldsPlaygroundRegistry
 
     public static function isEnabled(): bool
     {
-        return FlexFieldsConfig::isPlaygroundEnabled();
+        return PlaygroundAccess::isEnabled();
     }
 
     /** @return list<PageConfiguration> */
     public static function pageConfigurations(): array
     {
-        return ! static::isEnabled() ? [] : array_map(static fn (string $slug): PageConfiguration => PageConfiguration::make(FlexFieldsPlaygroundComponentPage::class, $slug)->slug($slug), array_keys(static::ordered()));
+        // Registration can run before a panel becomes current; the plugin owns its panel switch.
+        return ! FlexFieldsConfig::isPlaygroundEnabled() ? [] : array_map(static fn (string $slug): PageConfiguration => PageConfiguration::make(FlexFieldsPlaygroundComponentPage::class, $slug)->slug($slug), array_keys(static::ordered()));
     }
 }
