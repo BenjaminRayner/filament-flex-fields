@@ -3676,14 +3676,16 @@ mark.fff-select-entity-mention__highlight {
 }
 
 /* Rich row secondary metadata can occupy the end column without a new renderer. */
-.fi-dropdown-panel.fff-select-dropdown-panel .fff-select-option--description-trailing .fff-select-option__content {
+.fi-dropdown-panel.fff-select-dropdown-panel .fff-select-option--description-trailing .fff-select-option__content,
+:is(.fff-select-field, .fff-select-trigger-ssr) .fi-select-input-value-label .fff-select-option--description-trailing .fff-select-option__content {
     flex: 1;
     min-width: 0;
 }
-.fi-dropdown-panel.fff-select-dropdown-panel .fff-select-option__trailing-description {
+.fi-dropdown-panel.fff-select-dropdown-panel .fff-select-option__trailing-description,
+:is(.fff-select-field, .fff-select-trigger-ssr) .fi-select-input-value-label .fff-select-option__trailing-description {
     flex: none;
     margin-inline-start: auto;
-    color: var(--fff-select-rich-desc-color, var(--fff-select-menu-muted));
+    color: var(--fff-select-rich-desc-color, var(--fff-select-menu-muted, var(--fff-select-group-label)));
     font-size: var(--fff-select-rich-desc-size, 0.8125rem);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;

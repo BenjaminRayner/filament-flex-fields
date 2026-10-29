@@ -1364,6 +1364,30 @@ it('uses full list layout in trigger when richListTriggerDisplay is enabled', fu
         ->and($trigger)->toContain('fff-select-option__description');
 });
 
+it('preserves native rich descriptions in selected labels when full trigger display is enabled', function (string $position) {
+    $options = ['pro' => ['label' => 'Pro', 'description' => 'Advanced plan']];
+    $field = SelectField::make('plan')
+        ->richOptions()
+        ->richListTriggerDisplay()
+        ->optionDescriptionPosition($position)
+        ->options($options)
+        ->getSearchResultsUsing(fn (string $search): array => $options)
+        ->default('pro');
+
+    $initialLabel = $field->getInitialTriggerLabel();
+    $option = $field->getOptionsForJs()[0];
+    $searchOption = $field->getSearchResultsForJs('Pro')[0];
+    $descriptionClass = $position === 'trailing'
+        ? 'fff-select-option__trailing-description'
+        : 'fff-select-option__description';
+
+    foreach ([$initialLabel, $option['triggerLabel'] ?? $option['label'], $searchOption['triggerLabel'] ?? $searchOption['label']] as $label) {
+        expect($label)->toContain('Advanced plan')
+            ->and($label)->toContain($descriptionClass)
+            ->and($label)->toContain('fff-select-option--list');
+    }
+})->with(['below', 'trailing']);
+
 it('merges optionViewData into custom option views', function () {
     $field = SelectField::make('user')
         ->options(['fred' => ['label' => 'Fred', 'description' => 'fred@example.com']])

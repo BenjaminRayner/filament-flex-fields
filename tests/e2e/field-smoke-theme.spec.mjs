@@ -6,6 +6,45 @@ const stylesheets = {
     source: readFileSync(new URL('../../resources/css/base.css', import.meta.url), 'utf8'),
     built: readFileSync(new URL('../../resources/dist/css/core.css', import.meta.url), 'utf8'),
 }
+
+const selectCss = readFileSync(new URL('../../resources/dist/css/select-field.css', import.meta.url), 'utf8')
+
+for (const wrapper of ['fff-select-field', 'fff-select-trigger-ssr']) {
+    for (const mode of ['light', 'dark']) {
+        for (const direction of ['ltr', 'rtl']) {
+            test(`trailing selected description is styled in ${wrapper} ${mode} ${direction}`, async ({ page }) => {
+                await page.setContent(`
+                    <html class="${mode === 'dark' ? 'dark' : ''}" dir="${direction}">
+                        <body>
+                            <div class="${wrapper}" style="--fff-select-rich-desc-color:rgb(90 100 110);--fff-select-rich-desc-size:13px">
+                                <div class="fi-select-input-value-label" style="width:300px">
+                                    <span class="fff-select-option fff-select-option--list fff-select-option--description-trailing">
+                                        <span class="fff-select-option__content"><span class="fff-select-option__label">Pro</span></span>
+                                        <span class="fff-select-option__trailing-description" dir="auto">Advanced plan</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </body>
+                    </html>
+                `)
+                await page.addStyleTag({ content: selectCss })
+
+                const description = page.locator('.fff-select-option__trailing-description')
+                await expect(description).toHaveCSS('color', 'rgb(90, 100, 110)')
+                await expect(description).toHaveCSS('font-size', '13px')
+                await expect(description).toHaveCSS('white-space', 'nowrap')
+                const labelBox = await page.locator('.fff-select-option__label').boundingBox()
+                const descriptionBox = await description.boundingBox()
+                expect(Math.abs(labelBox.y - descriptionBox.y)).toBeLessThan(8)
+                if (direction === 'ltr') {
+                    expect(descriptionBox.x).toBeGreaterThan(labelBox.x + labelBox.width)
+                } else {
+                    expect(descriptionBox.x + descriptionBox.width).toBeLessThan(labelBox.x)
+                }
+            })
+        }
+    }
+}
 // PHP tests cover token rendering; retain the real Blade selector for cascade coverage.
 const themeCss = themeView.match(/\s+([^\n]+) \{\s*@foreach[\s\S]*?@endforeach\s*\}/)[0]
     .replace(/@foreach[\s\S]*?@endforeach/, `
