@@ -58,3 +58,44 @@ test('an async reply after disposal cannot restore suggestions or reopen the men
         assert.equal(f.surfaces.length,1)
     } finally {f.instance.dispose();globalThis.document=previous}
 })
+
+test('pressing a suggestions sheet handle prevents blur without stopping drag propagation', async () => {
+    const previous = globalThis.document; const f = fixture()
+    try {
+        f.instance.schedule(); await tick()
+        for (const selector of ['[data-fff-overlay-handle]', '.fff-overlay-sheet__handle']) {
+            const pointerDown = new Event('pointerdown', { cancelable: true, bubbles: true })
+            Object.defineProperty(pointerDown, 'target', { value: {
+                closest: selectors => selectors.split(', ').includes(selector) ? {} : null,
+            } })
+            let reachedDragHandler = false
+            f.panel.addEventListener('pointerdown', () => { reachedDragHandler = true }, { once: true })
+            f.panel.dispatchEvent(pointerDown)
+            assert.equal(pointerDown.defaultPrevented, true)
+            assert.equal(pointerDown.cancelBubble, false)
+            assert.equal(reachedDragHandler, true)
+            assert.equal(f.owner.suggestionsOpen, true)
+        }
+    } finally { f.instance.dispose(); globalThis.document = previous }
+})
+
+test('suggestions retain normal pointer and blur behavior and release handle listeners on disposal', async () => {
+    const previous = globalThis.document; const f = fixture()
+    const pointerDown = matchesHandle => {
+        const event = new Event('pointerdown', { cancelable: true })
+        Object.defineProperty(event, 'target', { value: { closest: () => matchesHandle ? {} : null } })
+        return event
+    }
+    try {
+        f.instance.schedule(); await tick()
+        const contentPress = pointerDown(false)
+        f.panel.dispatchEvent(contentPress)
+        assert.equal(contentPress.defaultPrevented, false)
+        f.input.dispatchEvent(new Event('blur'))
+        assert.equal(f.owner.suggestionsOpen, false)
+        f.instance.dispose()
+        const handlePress = pointerDown(true)
+        f.panel.dispatchEvent(handlePress)
+        assert.equal(handlePress.defaultPrevented, false)
+    } finally { f.instance.dispose(); globalThis.document = previous }
+})

@@ -122,6 +122,11 @@ export function createInputSuggestions(owner, { createSurface = createImperative
             }
         }
     })
+    scope.listen(panel, 'pointerdown', event => {
+        if (event.target.closest('[data-fff-overlay-handle], .fff-overlay-sheet__handle')) {
+            event.preventDefault()
+        }
+    })
     scope.listen(input, 'blur', () => { clearTimeout(timer); close() })
     scope.defer(() => {
         generation++; clearTimeout(timer); surface?.dispose(); panel.remove(); cache.clear()
