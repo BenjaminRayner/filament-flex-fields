@@ -259,6 +259,26 @@ SelectField::make('user_id')
 
 `optionView()` automatically enables `allowHtml()` and sanitizes output through the package HTML sanitizer.
 
+#### Rich relationship options
+
+Use `getRichOptionFromRecordUsing()` to return a rich option array for an Eloquent relationship. FLEX renders the dropdown, search results and saved selection without application calls to `transformRichOptionsForJs()`:
+
+```php
+SelectField::make('customer_id')
+    ->relationship('customer', 'name')
+    ->searchable(['code', 'name'])
+    ->getRichOptionFromRecordUsing(fn (Customer $record): array => [
+        'label' => $record->code,
+        'description' => $record->name,
+    ])
+    ->richListTriggerDisplay()
+    ->optionDescriptionPosition('trailing');
+```
+
+The callback accepts the same rich shape as `options()`, including icons, images, badges and `chip_label`. It can be configured before or after `relationship()`. Default selected labels remain compact; `richListTriggerDisplay()` preserves the full list row. Text remains escaped unless you explicitly enable `allowHtml()`.
+
+This is an alternative to the string-returning `getOptionLabelFromRecordUsing()` callback. Relationship query constraints, validation and persistence remain owned by Filament and the application. Existing `getOptionLabelUsing()` callbacks still return strings.
+
 #### Multi-select checklist (keep options visible)
 
 Use `keepSelectedOptionsInDropdown()` when selected options should stay in the list with checkmarks (dropdown stays open while toggling):

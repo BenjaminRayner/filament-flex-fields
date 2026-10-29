@@ -70,6 +70,8 @@ class SelectField extends Select
     /** Cloned schema fields own their caches and cannot inherit an in-progress render. */
     public function __clone(): void
     {
+        $this->richRelationshipOptions = [];
+        $this->renderingSelectedRelationshipOption = false;
         $this->selectSearchCache = null;
         $this->richOptionJsTransformer = null;
         $this->transformingRichOptionHtml = null;
